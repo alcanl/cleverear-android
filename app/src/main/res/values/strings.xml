@@ -122,7 +122,7 @@
     <string name="on_eartechnic_companyID" translatable="false">d609</string>
     <string name="left_advertising_data" translatable="false">d60900</string>
     <string name="right_advertising_data" translatable="false">d60901</string>
-    <string name="battery_percentage" translatable="false">%1$d %%</string>
+    <string name="battery_level_json" translatable="false">BatteryLevel</string>
     <string name="pref_auto_conn_key" translatable="false">enable_auto_connect</string>
     <string name="pref_binural_key" translatable="false">enable_binural</string>
     <string name="title_pref_enable_auto_conn_title" translatable="false">Enable Auto Connection</string>

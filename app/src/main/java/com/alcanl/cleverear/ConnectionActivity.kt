@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,10 +22,12 @@ import com.alcanl.cleverear.databinding.ActivityConnectionBinding
 import com.alcanl.cleverear.entity.DiscoveredDevice
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
+import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_SELECTION
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.HEARING_AID
 import com.alcanl.cleverear.helpers.LEFT
-import com.alcanl.cleverear.helpers.MANUFACTURER_CODE
+import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
+import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.helpers.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
@@ -47,13 +50,14 @@ class ConnectionActivity : AppCompatActivity() {
     @Inject
     lateinit var mEventHandler: EventHandler
     @Volatile
-    private var isDeviceFound = false
+    private var mIsDeviceFound = false
     private var mDeviceCount = 0
     private var mIsConnected = false
     private var mBluetoothPermission = false
-    private val bleDeviceList = ArrayList<DiscoveredDevice>()
+    private var mIsDoubleDeviceConnection = false
+    private val mBleDeviceList = ArrayList<DiscoveredDevice>()
     private lateinit var mEarSide : EarSide
-    private lateinit var asyncResult : AsyncResult
+    private lateinit var mAsyncResult : AsyncResult
     private lateinit var mSelectedHearingAid : HearingAid
 
     private var mBluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
@@ -85,22 +89,27 @@ class ConnectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
         getEarSideSelection()
-    }
-
-    override fun onStart()
-    {
-        super.onStart()
         buttonDetectDevice()
+    }
+    override fun onResume()
+    {
+        super.onResume()
+        mBleDeviceList.clear()
+        mBinding.adapter!!.clear()
+        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
     }
     private fun initialize()
     {
         initBinding()
+        mIsDoubleDeviceConnection = intent.getBooleanExtra(DOUBLE_DEVICE_SELECTION, false)
     }
     private fun initBinding()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_connection)
         mBinding.viewModel = ConnectionActivityListenersViewModel(this)
         mBinding.adapter = ArrayAdapter(this, R.layout.listview_item_layout, ArrayList<String>(emptyList()))
+            .apply { if (mIsDoubleDeviceConnection) mBinding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE}
+
     }
     private fun getEarSideSelection()
     {
@@ -113,7 +122,7 @@ class ConnectionActivity : AppCompatActivity() {
     {
         var value = true
 
-        for (deviceWrapper in bleDeviceList)
+        for (deviceWrapper in mBleDeviceList)
             if (deviceWrapper.address == device.address) {
                 value = false
                 break
@@ -123,12 +132,15 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun isHearingAid(manufacturerCode: String) : Boolean
     {
-        return manufacturerCode == MANUFACTURER_CODE
+        val manufacturerCodeSub = manufacturerCode.substring(0, 6)
+
+        return if (mEarSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
+                else manufacturerCodeSub == MANUFACTURER_CODE_RIGHT
     }
     private fun scanDeviceWithBluetooth()
     {
         try {
-                asyncResult = mProductManager.beginScanForWirelessDevices(
+                mAsyncResult = mProductManager.beginScanForWirelessDevices(
                 WirelessProgrammerType.kPlatformDefault, "",
                 if (mEarSide == EarSide.Left) CommunicationPort.kLeft else CommunicationPort.kRight,
                 "",
@@ -158,24 +170,14 @@ class ConnectionActivity : AppCompatActivity() {
                 mBluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_ADMIN)
             }
     }
-    fun buttonDetectDevice()
+    private fun selectDoubleItem(pos: Int)
     {
-        isDeviceFound = false
-        scanBluetooth()
-
-        if(!mIsConnected)
-            mBinding.progressBar.visibility = View.VISIBLE
-
-        scanDevices()
-        mBinding.frameLayoutStopScan.visibility = View.VISIBLE
-        mBinding.imageButtonDetect.isEnabled = false
+        //
     }
-    fun deviceDTOItemClicked(pos: Int)
+    private fun selectSingleItem(pos: Int)
     {
-
-
         val device = mBinding.adapter!!.getItem(pos)
-        val selectedDevice = bleDeviceList.find { it.name == device.toString() }
+        val selectedDevice = mBleDeviceList.find { it.name == device.toString() }
 
         if (selectedDevice != null) {
             mSelectedHearingAid = HearingAid(
@@ -185,14 +187,15 @@ class ConnectionActivity : AppCompatActivity() {
 
             val bundle = Bundle()
             bundle.putSerializable(HEARING_AID, mSelectedHearingAid)
-            isDeviceFound = true
+            mIsDeviceFound = true
+
+            stopScanButtonClicked()
 
             Intent(this, ControlActivity::class.java).apply {
                 putExtras(bundle)
                 setResult(RESULT_OK, this)
                 startActivity(this)
             }
-            stopScanButtonClicked()
         }
         else
             AlertDialog.Builder(this).setMessage(R.string.alert_dialog_connection_problem_message)
@@ -200,7 +203,27 @@ class ConnectionActivity : AppCompatActivity() {
                 .setCancelable(false)
                 .setPositiveButton(R.string.alert_dialog_connection_problem_ok_button) {_,_ -> }
                 .create().show()
+    }
+    fun buttonDetectDevice()
+    {
+        mIsDeviceFound = false
+        scanBluetooth()
 
+        if(!mIsConnected)
+            mBinding.progressBar.visibility = View.VISIBLE
+
+        scanDevices()
+        mBinding.frameLayoutStopScan.visibility = View.VISIBLE
+        mBinding.imageButtonDetect.isEnabled = false
+    }
+    fun hearingAidItemClicked(pos: Int)
+    {
+        if (mIsDoubleDeviceConnection) {
+            selectDoubleItem(pos)
+            return
+        }
+
+        selectSingleItem(pos)
     }
     fun buttonBack()
     {
@@ -208,12 +231,12 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun scanDevices()
     {
-        bleDeviceList.clear()
+
         mBinding.adapter!!.notifyDataSetChanged()
 
         try {
             thread(isDaemon = false, start = true) {
-                while (!isDeviceFound) {
+                while (!mIsDeviceFound) {
                     val event = mEventHandler.event
                     if (event.type == EventType.kScanEvent) {
                         Log.e(ScanEvent::class.java.simpleName, event.data)
@@ -221,8 +244,8 @@ class ConnectionActivity : AppCompatActivity() {
                             event.data,
                             this
                         )
-                        bleDeviceList.add(device)
-                        Log.e(String::class.java.simpleName, bleDeviceList.size.toString())
+                        mBleDeviceList.add(device)
+                        Log.e(String::class.java.simpleName, mBleDeviceList.size.toString())
                         if (!isDuplicate(device) && isHearingAid(device.manufacturerData)) {
                             runOnUiThread {
                                 mBinding.adapter!!.add(device.name); mBinding.adapter!!.notifyDataSetChanged()
@@ -242,7 +265,7 @@ class ConnectionActivity : AppCompatActivity() {
     }
     fun stopScanButtonClicked()
     {
-        mProductManager.endScanForWirelessDevices(asyncResult)
+        mProductManager.endScanForWirelessDevices(mAsyncResult)
         mBinding.imageButtonDetect.isEnabled = true
         mBinding.progressBar.visibility = View.GONE
         mBinding.frameLayoutStopScan.visibility = View.INVISIBLE

@@ -15,6 +15,7 @@ import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.HEARING_AID
+import com.alcanl.cleverear.helpers.parseJsonBatteryData
 import com.alcanl.cleverear.helpers.parseJsonConnectionData
 import com.alcanl.cleverear.sdk.events.AuxChangeEvent
 import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
@@ -34,7 +35,6 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-
 @AndroidEntryPoint
 class ControlActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityControlBinding
@@ -49,41 +49,18 @@ class ControlActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-        startConnectionListener()
-        Handler(Looper.myLooper()!!).postDelayed({ mBinding.frameLayoutLoading.visibility = View.GONE; initMemoryButtons()}, 6000)
+        startEventListener()
+        Handler(Looper.myLooper()!!).postDelayed({ mBinding.frameLayoutLoading.visibility = View.GONE; initMemoryButtons(); initBatteryViews()}, 6000)
     }
     override fun onStart()
     {
         super.onStart()
+        getDevicePropertiesFromSDK()
         connectToDevice()
 
     }
-    private fun initBinding()
-    {
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_control)
-        mBinding.viewModel = ControlActivityListenersViewModel(this)
-        mBinding.isDualDevice = false
-        mBinding.hearingAid = mHearingAid
-    }
-    private fun initialize()
-    {
-        initDevice()
-        initBinding()
-    }
-    private fun initDevice()
-    {
-        mHearingAid = when {
-            VERSION.SDK_INT < VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(HEARING_AID) as HearingAid
-            else -> intent.getSerializableExtra(HEARING_AID, HearingAid::class.java)!!
-        }
-    }
     private fun connectToDevice()
     {
-        mHearingAid.communicationAdaptor = mProductManager.createWirelessCommunicationInterface(mHearingAid.address)
-        mHearingAid.communicationAdaptor?.setEventHandler(mEventHandler)
-        mHearingAid.wirelessControl = mProductManager.wirelessControl
-        mProductManager.wirelessControl.setCommunicationAdaptor(mHearingAid.communicationAdaptor)
-        mHearingAid.wirelessControl?.setCommunicationAdaptor(mHearingAid.communicationAdaptor)
 
         thread(isDaemon = false, start = true) {
             try {
@@ -101,24 +78,61 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    private fun readDeviceConfiguration()
+    private fun initBatteryViews()
     {
-        try {
-            mHearingAid.batteryLevel = mHearingAid.wirelessControl!!.batteryLevel
-            mHearingAid.volume = mHearingAid.wirelessControl!!.volume
-            mHearingAid.numberOfMemories = mHearingAid.wirelessControl!!.numberOfMemories
-            mHearingAid.currentMemory = mHearingAid.wirelessControl!!.currentMemory
-            mHearingAid.micAttenuation =  mHearingAid.wirelessControl?.micAttenuation!!
-            mHearingAid.auxAttenuation = mHearingAid.wirelessControl?.auxAttenuation!!
-            mHearingAid.streamChannelList = mHearingAid.wirelessControl?.streamChannelList!!
-            mHearingAid.streamAddressRaw = mHearingAid.wirelessControl?.streamAddress!!
-            mHearingAid.streamAddress = mHearingAid.streamAddressRaw shr 16
+        if (mHearingAid.side == EarSide.Left) {
+            mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
+            mBinding.batteryViewLeftDevice.batteryLevel = mHearingAid.batteryLevel
         }
-        catch (e : ArkException) {
-            Log.e("Error", e.message.toString())
+        else {
+            mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
+            mBinding.batteryViewRightDevice.batteryLevel = mHearingAid.batteryLevel
         }
     }
-    private fun startConnectionListener()
+    private fun initBinding()
+    {
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_control)
+        mBinding.viewModel = ControlActivityListenersViewModel(this)
+        mBinding.isDualDevice = false
+        mBinding.hearingAid = mHearingAid
+    }
+    private fun initDevice()
+    {
+        mHearingAid = when {
+            VERSION.SDK_INT < VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(HEARING_AID) as HearingAid
+            else -> intent.getSerializableExtra(HEARING_AID, HearingAid::class.java)!!
+        }
+    }
+    private fun initialize()
+    {
+        initDevice()
+        initBinding()
+    }
+    private fun initMemoryButtons()
+    {
+        mHearingAid.numberOfMemories.also {
+
+            if (it > 4) {
+                initMemoryButtons(4, mBinding.tableLayout.getChildAt(0) as TableRow)
+                initMemoryButtons(it - 4, mBinding.tableLayout.getChildAt(1) as TableRow)
+            } else
+                initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
+        }
+    }
+    private fun initMemoryButtons(bound: Int, tableRow: TableRow)
+    {
+        (0..<bound).forEach { tableRow.getChildAt(it).isEnabled = true }
+    }
+    private fun getDevicePropertiesFromSDK()
+    {
+        mHearingAid.getPropertiesFromSDK(mProductManager, mEventHandler)
+    }
+
+    private fun readDeviceConfiguration()
+    {
+        mHearingAid.readDeviceConfiguration()
+    }
+    private fun startEventListener()
     {
        thread(isDaemon = false, start = true) {
             while (true) {
@@ -161,6 +175,14 @@ class ControlActivity : AppCompatActivity() {
                 {
                     Log.e("event", event.data)
                     Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
+                    val batteryState = parseJsonBatteryData(event.data, this)
+
+                    runOnUiThread {
+                        if (mHearingAid.side == EarSide.Left)
+                            mBinding.batteryViewLeftDevice.batteryLevel = batteryState
+                        else
+                            mBinding.batteryViewRightDevice.batteryLevel = batteryState
+                    }
                 }
                 if (event.type == EventType.kMemoryEvent)
                 {
@@ -195,22 +217,7 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    private fun initMemoryButtons()
-    {
-        Log.e("program", mHearingAid.numberOfMemories.toString())
-        mHearingAid.numberOfMemories.also {
 
-            if (it > 4) {
-                initMemoryButtons(4, mBinding.tableLayout.getChildAt(0) as TableRow)
-                initMemoryButtons(it - 4, mBinding.tableLayout.getChildAt(1) as TableRow)
-            } else
-                initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
-        }
-    }
-    private fun initMemoryButtons(bound: Int, tableRow: TableRow)
-    {
-        (0..<bound).forEach { tableRow.getChildAt(it).isEnabled = true }
-    }
     fun buttonOneClicked()
     {
         mHearingAid.wirelessControl?.currentMemory = ParameterSpace.kNvmMemory0
@@ -245,21 +252,41 @@ class ControlActivity : AppCompatActivity() {
     }
     fun sliderLeftEarOnValueChanged(value: Float)
     {
-        mHearingAid.wirelessControl?.volume = value.toInt()
+        if (isConnected) {
+            mHearingAid.wirelessControl?.volume = value.toInt()
 
-        if (mBinding.isDualDevice)
-            sliderRightEarOnValueChanged(value)
+            if (mBinding.isDualDevice)
+                sliderRightEarOnValueChanged(value)
+        }
 
     }
     fun sliderRightEarOnValueChanged(value: Float)
     {
-        mHearingAid.wirelessControl?.volume = value.toInt()
+        if (isConnected)
+            mHearingAid.wirelessControl?.volume = value.toInt()
     }
     fun switchOnCheckedChanged()
     {
         if (mBinding.isDualDevice) {
+            try {
+                mBinding.frameLayoutLoading.visibility = View.VISIBLE
+                mHearingAid.pairDevices()
+                Handler(Looper.myLooper()!!).postDelayed({ mBinding.frameLayoutLoading.visibility = View.GONE}, 5000)
+            }
+            catch (_ : ArkException)
+            {
+                mBinding.isDualDevice = false
+                Toast.makeText(this, "Cannot Detect The Second Device For Pairing",
+                    Toast.LENGTH_LONG).show()
+            }
             mBinding.sliderLeft.isEnabled = true
             mBinding.sliderRight.isEnabled = false
+
+            if (mBinding.batteryViewLeftDevice.visibility == View.INVISIBLE)
+                mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
+
+            if (mBinding.batteryViewRightDevice.visibility == View.INVISIBLE)
+                mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
         }
         else {
             mBinding.sliderLeft.isEnabled = mHearingAid.side == EarSide.Left

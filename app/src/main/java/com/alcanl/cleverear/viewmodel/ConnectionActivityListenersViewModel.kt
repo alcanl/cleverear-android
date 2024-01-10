@@ -16,7 +16,7 @@ class ConnectionActivityListenersViewModel(activity: ConnectionActivity) {
     }
     fun handleListViewItemSelected(pos: Int)
     {
-        mWeakReference.get()?.deviceDTOItemClicked(pos)
+        mWeakReference.get()?.hearingAidItemClicked(pos)
     }
     fun handleStopScanButton()
     {

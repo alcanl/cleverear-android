@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
+import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_SELECTION
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +21,11 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonDoubleDeviceClick()
     {
-        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+        Intent(this, ConnectionActivity::class.java).apply {
+            putExtra(DOUBLE_DEVICE_SELECTION, true)
+            setResult(RESULT_OK, this)
+            startActivity(this)
+        }
     }
     private fun initBinding()
     {
