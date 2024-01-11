@@ -3,14 +3,15 @@ package com.alcanl.cleverear.helpers
 import android.content.Context
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
-import com.alcanl.cleverear.entity.DiscoveredDevice
-import com.ark.Manufacturing
+import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import org.json.JSONException
 import org.json.JSONObject
 
 private const val DEVICE_NAME = 0
 private const val DEVICE_MAC = 1
 private const val DEVICE_RSSI = 2
+private const val CONNECTION_STATE = 1
+private const val BATTERY_STATE = 1
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
@@ -19,9 +20,12 @@ const val RIGHT = "right"
 const val LEFT = "left"
 const val HEARING_AID = "selected_device"
 const val DOUBLE_DEVICE_SELECTION = "double_device_selection"
+const val DOUBLE_DEVICE_MAP = "double_device_map"
+const val SHARED_PREF_FILE_NAME = "double_device_flag"
+const val IS_DOUBLE_DEVICE = "is_double_device"
 
 @Throws(JSONException::class)
-fun parseJsonScanData(data: String, context: Context): DiscoveredDevice
+fun parseJsonScanData(data: String, context: Context): DiscoveredDeviceInfo
 {
     val jsonObject = JSONObject(data)
     val scanEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
@@ -30,7 +34,7 @@ fun parseJsonScanData(data: String, context: Context): DiscoveredDevice
     val deviceRSSI = scanEvent.getJSONObject(DEVICE_RSSI)
     val manufacturingData = scanEvent.getJSONObject(MANUFACTURING_DATA)
 
-    return DiscoveredDevice(
+    return DiscoveredDeviceInfo(
         deviceMAC.getString(getString(context, R.string.device_id_json)),
         deviceName.getString(getString(context, R.string.device_name_json)),
         deviceRSSI.getInt(getString(context, R.string.device_rssi_json)),
@@ -42,7 +46,7 @@ fun parseJsonConnectionData(data: String, context: Context) : Int
 {
     val jsonObject = JSONObject(data)
     val connectionEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return connectionEvent.getJSONObject(1).getInt(getString(context, R.string.device_connection_state_json))
+    return connectionEvent.getJSONObject(CONNECTION_STATE).getInt(getString(context, R.string.device_connection_state_json))
 }
 
 @Throws(JSONException::class)
@@ -50,5 +54,5 @@ fun parseJsonBatteryData(data: String, context: Context) : Int
 {
     val jsonObject = JSONObject(data)
     val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return batteryEvent.getJSONObject(1).getInt(getString(context, R.string.battery_level_json))
+    return batteryEvent.getJSONObject(BATTERY_STATE).getInt(getString(context, R.string.battery_level_json))
 }

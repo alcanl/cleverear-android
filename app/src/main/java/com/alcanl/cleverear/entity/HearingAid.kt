@@ -47,16 +47,5 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             Log.e("Read Config Error", e.message.toString())
         }
     }
-    fun pairDevices()
-    {
-        thread(isDaemon = true, start = true) {
-            communicationAdaptor?.detectDevice()
-            runBlocking {
-                delay(2000)
-                communicationAdaptor?.enterPairingMode()
-            }
-        }
-
-    }
 }
 

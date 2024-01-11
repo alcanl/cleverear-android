@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.di.module
 
 
+import com.alcanl.cleverear.helpers.connection.DeviceConnectionHandler
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.Module
@@ -19,4 +20,10 @@ object ProductManagerModule {
     @Provides
     @Singleton
     fun createEventHandler() : EventHandler = mProductManager.eventHandler
+    @Provides
+    @Singleton
+    fun createDeviceConnectionHandler() : DeviceConnectionHandler
+    {
+        return DeviceConnectionHandler(mProductManager)
+    }
 }

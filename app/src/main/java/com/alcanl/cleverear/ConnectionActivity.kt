@@ -14,55 +14,57 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityConnectionBinding
-import com.alcanl.cleverear.entity.DiscoveredDevice
+import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
+import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_MAP
 import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_SELECTION
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.HEARING_AID
+import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
 import com.alcanl.cleverear.helpers.LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
+import com.alcanl.cleverear.helpers.SHARED_PREF_FILE_NAME
+import com.alcanl.cleverear.helpers.connection.DeviceConnectionHandler
 import com.alcanl.cleverear.helpers.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
-import com.ark.CommunicationPort
 import com.ark.EventHandler
 import com.ark.EventType
 import com.ark.ProductManager
-import com.ark.WirelessProgrammerType
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.ExecutorService
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 @AndroidEntryPoint
 class ConnectionActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityConnectionBinding
     @Inject
-    lateinit var mProductManager : ProductManager
+    lateinit var productManager : ProductManager
     @Inject
-    lateinit var mEventHandler: EventHandler
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var deviceConnectionHandler: DeviceConnectionHandler
+    @Inject
+    lateinit var threadPool: ExecutorService
     @Volatile
     private var mIsDeviceFound = false
-    private var mDeviceCount = 0
     private var mIsConnected = false
     private var mBluetoothPermission = false
     private var mIsDoubleDeviceConnection = false
-    private val mBleDeviceList = ArrayList<DiscoveredDevice>()
+    private val mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
+    private val mDoubleDeviceMap = HashMap<EarSide, HearingAid>()
     private lateinit var mEarSide : EarSide
     private lateinit var mAsyncResult : AsyncResult
     private lateinit var mSelectedHearingAid : HearingAid
-
     private var mBluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
-
-
     {isGranted : Boolean -> if (isGranted)
     {
         val bluetoothManager = ContextCompat.getSystemService(this, BluetoothManager::class.java)
@@ -73,16 +75,15 @@ class ConnectionActivity : AppCompatActivity() {
             mActivityResultLauncher.launch(enableBluetoothIntent)
         }
         else
-            scanDeviceWithBluetooth()
+            scanDevicesWithBluetooth()
     }
     else
-        mBluetoothPermission = false
-    }
+        mBluetoothPermission = false }
     private val mActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
     {
         result : ActivityResult ->
         if (result.resultCode == RESULT_OK)
-            scanDeviceWithBluetooth()
+            scanDevicesWithBluetooth()
     }
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -91,12 +92,11 @@ class ConnectionActivity : AppCompatActivity() {
         getEarSideSelection()
         buttonDetectDevice()
     }
-    override fun onResume()
+    override fun onStop()
     {
-        super.onResume()
-        mBleDeviceList.clear()
-        mBinding.adapter!!.clear()
-        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+        super.onStop()
+        val sharedPrefEditor = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE).edit()
+        sharedPrefEditor.putBoolean(IS_DOUBLE_DEVICE, mIsDoubleDeviceConnection).apply()
     }
     private fun initialize()
     {
@@ -109,7 +109,6 @@ class ConnectionActivity : AppCompatActivity() {
         mBinding.viewModel = ConnectionActivityListenersViewModel(this)
         mBinding.adapter = ArrayAdapter(this, R.layout.listview_item_layout, ArrayList<String>(emptyList()))
             .apply { if (mIsDoubleDeviceConnection) mBinding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE}
-
     }
     private fun getEarSideSelection()
     {
@@ -118,7 +117,7 @@ class ConnectionActivity : AppCompatActivity() {
             else -> EarSide.Right
         }
     }
-    private fun isDuplicate(device: DiscoveredDevice): Boolean
+    private fun isDuplicate(device: DiscoveredDeviceInfo): Boolean
     {
         var value = true
 
@@ -132,27 +131,55 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun isHearingAid(manufacturerCode: String) : Boolean
     {
-        val manufacturerCodeSub = manufacturerCode.substring(0, 6)
+        var manufacturerCodeSub = ""
 
-        return if (mEarSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
-                else manufacturerCodeSub == MANUFACTURER_CODE_RIGHT
+        try {
+            manufacturerCodeSub = manufacturerCode.substring(0, 6)
+        } catch (_ : StringIndexOutOfBoundsException) {}
+
+        return if (!mIsDoubleDeviceConnection)
+                    if (mEarSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
+                    else manufacturerCodeSub == MANUFACTURER_CODE_RIGHT
+               else
+                    manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
     }
-    private fun scanDeviceWithBluetooth()
+    private fun scanSingleDeviceWithBluetooth()
     {
         try {
-                mAsyncResult = mProductManager.beginScanForWirelessDevices(
-                WirelessProgrammerType.kPlatformDefault, "",
-                if (mEarSide == EarSide.Left) CommunicationPort.kLeft else CommunicationPort.kRight,
-                "",
-                false
-                )
+            mAsyncResult = if (mEarSide == EarSide.Right) deviceConnectionHandler.scanForLeftDevice()
+            else deviceConnectionHandler.scanForRightDevice()
 
-        } catch (e: ArkException) {
-            Log.e("",e.message!!)
+        } catch (ex: ArkException) {
+            Log.e("",ex.message!!)
             Toast.makeText(this, "Failed to connecting the device", Toast.LENGTH_LONG).show()
         }
-
     }
+    private fun scanDevicesWithBluetooth()
+    {
+        scanSingleDeviceWithBluetooth()
+        /*when {
+            !mIsDoubleDeviceConnection -> scanSingleDeviceWithBluetooth()
+            else -> scanDoubleDevicesWithBluetooth()
+        }*/
+    }
+    /*private fun scanDoubleDevicesWithBluetooth()
+    {
+        thread(isDaemon = true, start = true) {
+             try {
+                 mAsyncResult = deviceConnectionHandler.scanForLeftDevice()
+                 Thread.sleep(4000)
+                 deviceConnectionHandler.endScanProcess(mAsyncResult)
+                 Thread.sleep(1000)
+                 mAsyncResult = deviceConnectionHandler.scanForRightDevice()
+                 Thread.sleep(4000)
+                 deviceConnectionHandler.endScanProcess(mAsyncResult)
+
+            } catch (ex: ArkException) {
+                 Log.e("",ex.message!!)
+                 Toast.makeText(this, "Failed to connecting the device", Toast.LENGTH_LONG).show()
+            }
+        }
+    }*/
 
     private fun scanBluetooth()
     {
@@ -172,37 +199,74 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun selectDoubleItem(pos: Int)
     {
-        //
+        val selectedDevice = searchHearingAidInList(pos)
+
+        if (selectedDevice != null) {
+            if (selectedDevice.manufacturerData.substring(0, 6) == MANUFACTURER_CODE_RIGHT)
+                putItemToDeviceMap(EarSide.Right, selectedDevice)
+            else
+                putItemToDeviceMap(EarSide.Left, selectedDevice)
+
+
+            if (mDoubleDeviceMap.size == 2) {
+                val bundle = Bundle()
+                bundle.putSerializable(DOUBLE_DEVICE_MAP, mDoubleDeviceMap)
+                finalizeConnectionConfiguration(bundle)
+            }
+        }
+        else
+            showConnectionProblemToastMessage()
+    }
+    private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
+    {
+        if (mDoubleDeviceMap.containsKey(earSide))
+            return
+
+        mDoubleDeviceMap[earSide] = HearingAid(device.address,
+            device.name, device.rssi, device.manufacturerData, earSide)
+    }
+    private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo?
+    {
+        val device = mBinding.adapter!!.getItem(pos)
+        return mBleDeviceList.find { it.name == device.toString() }
     }
     private fun selectSingleItem(pos: Int)
     {
-        val device = mBinding.adapter!!.getItem(pos)
-        val selectedDevice = mBleDeviceList.find { it.name == device.toString() }
+        val selectedDevice = searchHearingAidInList(pos)
 
         if (selectedDevice != null) {
             mSelectedHearingAid = HearingAid(
                 selectedDevice.address, selectedDevice.name, selectedDevice.rssi,
-                selectedDevice.manufacturerData, mEarSide
+                selectedDevice.manufacturerData, recognizeEarSide(selectedDevice.manufacturerData)
             )
 
             val bundle = Bundle()
             bundle.putSerializable(HEARING_AID, mSelectedHearingAid)
-            mIsDeviceFound = true
+            finalizeConnectionConfiguration(bundle)
 
-            stopScanButtonClicked()
-
-            Intent(this, ControlActivity::class.java).apply {
-                putExtras(bundle)
-                setResult(RESULT_OK, this)
-                startActivity(this)
-            }
         }
         else
-            AlertDialog.Builder(this).setMessage(R.string.alert_dialog_connection_problem_message)
-                .setTitle(R.string.alert_dialog_connection_problem_title)
-                .setCancelable(false)
-                .setPositiveButton(R.string.alert_dialog_connection_problem_ok_button) {_,_ -> }
-                .create().show()
+            showConnectionProblemToastMessage()
+    }
+    private fun recognizeEarSide(str: String) : EarSide
+    {
+        return if (str.substring(0,6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
+    }
+    private fun showConnectionProblemToastMessage()
+    {
+        Toast.makeText(this, R.string.alert_dialog_connection_problem_message, Toast.LENGTH_LONG).show()
+    }
+    private fun finalizeConnectionConfiguration(bundle: Bundle)
+    {
+        mIsDeviceFound = true
+
+        stopScanButtonClicked()
+
+        Intent(this, ControlActivity::class.java).apply {
+            putExtras(bundle)
+            setResult(RESULT_OK, this)
+            startActivity(this)
+        }
     }
     fun buttonDetectDevice()
     {
@@ -227,36 +291,31 @@ class ConnectionActivity : AppCompatActivity() {
     }
     fun buttonBack()
     {
+        productManager.endScanForWirelessDevices(mAsyncResult)
         finish()
     }
     private fun scanDevices()
     {
-
+        var deviceCount = 0
+        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+        mBinding.adapter!!.clear()
         mBinding.adapter!!.notifyDataSetChanged()
 
         try {
-            thread(isDaemon = false, start = true) {
+            threadPool.execute {
                 while (!mIsDeviceFound) {
-                    val event = mEventHandler.event
+                    val event = eventHandler.event
                     if (event.type == EventType.kScanEvent) {
                         Log.e(ScanEvent::class.java.simpleName, event.data)
-                        val device = parseJsonScanData(
-                            event.data,
-                            this
-                        )
+                        val device = parseJsonScanData(event.data, this)
                         mBleDeviceList.add(device)
                         Log.e(String::class.java.simpleName, mBleDeviceList.size.toString())
                         if (!isDuplicate(device) && isHearingAid(device.manufacturerData)) {
                             runOnUiThread {
                                 mBinding.adapter!!.add(device.name); mBinding.adapter!!.notifyDataSetChanged()
                                 mBinding.textViewDeviceState.text = String.format(
-                                    "%d %s", ++mDeviceCount,
-                                    getText(R.string.textview_count_device_found_text)
-                                )
-                            }
-                        }
-                    }
-                }
+                                    "%d %s", ++deviceCount,
+                                    getText(R.string.textview_count_device_found_text)) } } } }
             }
         } catch (_ : IndexOutOfBoundsException)
         {
@@ -265,7 +324,7 @@ class ConnectionActivity : AppCompatActivity() {
     }
     fun stopScanButtonClicked()
     {
-        mProductManager.endScanForWirelessDevices(mAsyncResult)
+        productManager.endScanForWirelessDevices(mAsyncResult)
         mBinding.imageButtonDetect.isEnabled = true
         mBinding.progressBar.visibility = View.GONE
         mBinding.frameLayoutStopScan.visibility = View.INVISIBLE
