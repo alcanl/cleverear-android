@@ -12,6 +12,8 @@ private const val DEVICE_MAC = 1
 private const val DEVICE_RSSI = 2
 private const val CONNECTION_STATE = 1
 private const val BATTERY_STATE = 1
+private const val EVENT_SENDER = 0
+private const val MEMORY_STATE = 1
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
@@ -50,9 +52,23 @@ fun parseJsonConnectionData(data: String, context: Context) : Int
 }
 
 @Throws(JSONException::class)
-fun parseJsonBatteryData(data: String, context: Context) : Int
+fun parseJsonBatteryStateData(data: String, context: Context) : Int
 {
     val jsonObject = JSONObject(data)
     val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
     return batteryEvent.getJSONObject(BATTERY_STATE).getInt(getString(context, R.string.battery_level_json))
+}
+@Throws(JSONException::class)
+fun parseJsonSenderMacData(data: String, context: Context) : String
+{
+    val jsonObject = JSONObject(data)
+    val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+    return batteryEvent.getJSONObject(EVENT_SENDER).getString(getString(context, R.string.device_id_json))
+}
+@Throws(JSONException::class)
+fun parseJsonMemoryActiveData(data: String, context: Context) : Int
+{
+    val jsonObject = JSONObject(data)
+    val memoryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+    return memoryEvent.getJSONObject(MEMORY_STATE).getInt(getString(context, R.string.current_memory))
 }

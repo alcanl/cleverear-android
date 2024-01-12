@@ -11,6 +11,7 @@
         <variable name="hearingAid" type="HearingAid" />
         <variable name="viewModel" type="ControlActivityListenersViewModel" />
         <variable name="isDualDevice" type="boolean" />
+        <variable name="isDoubleDeviceConnection" type="boolean" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -68,6 +69,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="151dp"
                 android:layout_marginBottom="20dp"
+                android:clickable="@{isDoubleDeviceConnection}"
                 android:checked="@={isDualDevice}"
                 android:fontFamily="sans-serif-medium"
                 android:onCheckedChanged="@{()-> viewModel.handleSwitchCheckedChange()}"
@@ -111,7 +113,7 @@
                 android:layout_marginStart="-30dp"
                 android:layout_marginTop="130dp"
                 android:layout_marginBottom="123dp"
-                android:enabled="@{hearingAid.component5() == EarSide.Left}"
+                android:enabled="@{isDoubleDeviceConnection ? true : hearingAid.component5() == EarSide.Left}"
                 android:rotation="270"
                 android:value="20.0"
                 android:valueFrom="0.0"
@@ -133,7 +135,7 @@
                 android:layout_marginTop="130dp"
                 android:layout_marginEnd="-30dp"
                 android:layout_marginBottom="123dp"
-                android:enabled="@{hearingAid.component5() == EarSide.Right}"
+                android:enabled="@{isDoubleDeviceConnection ? true : hearingAid.component5() == EarSide.Right}"
                 android:rotation="270"
                 android:value="20.0"
                 android:valueFrom="0.0"

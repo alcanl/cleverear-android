@@ -1,21 +1,15 @@
 package com.alcanl.cleverear.sdk.events;
 
+import androidx.annotation.NonNull;
 
 public class CurrentMemoryCharacteristicChangedEvent extends DeviceSpecificEvent {
-
     public final byte currentMemory;
 
-    /**
-     * CurrentMemoryCharacteristicsChangedEvent is called to initialize a volume change event
-     *
-     * @param address       the address of the HA reporting its volume level.
-     * @param currentMemory current memory value
-     **/
     public CurrentMemoryCharacteristicChangedEvent(String address, byte currentMemory) {
         super(address);
         this.currentMemory = currentMemory;
     }
-
+    @NonNull
     @Override
     public String toString() {
         return super.toString() + ", CurrentMemoryValueChanged{" +

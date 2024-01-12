@@ -18,7 +18,7 @@
     <string name="textview_program_text">Programs</string>
     <string name="textview_left_device_text">Left Device</string>
     <string name="textview_right_device_text">Right Device</string>
-    <string name="switch_dual_device_text">Dual Device</string>
+    <string name="switch_dual_device_text">Dual Configuration</string>
     <string name="button_text_one">1</string>
     <string name="button_text_two">2</string>
     <string name="button_text_three">3</string>
@@ -36,7 +36,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alert_dialog_ear_side_select_title">Ear Side</string>
-    <string name="alert_dialog_ear_side_select_message">Please Select The Ear Side Of The Device</string>
     <string name="alert_dialog_left_ear_side_text">Left Ear</string>
     <string name="alert_dialog_right_ear_side_text">Right Ear</string>
     <string name="toast_bluetooth_not_found_text">Your Device Does Not Support Bluetooth Connection</string>
@@ -106,8 +105,7 @@
     <string name="left_ha_manu_data" translatable="false">ha_l_manu_data</string>
     <string name="right_ha_manu_data" translatable="false">ha_r_manu_data</string>
     <string name="title_popup_cancel">Cancel</string>
-    <string name="Left_ha_currentMemory" translatable="false">ha_l_currentMemory</string>
-    <string name="Right_ha_currentMemory" translatable="false">ha_r_currentMemory</string>
+    <string name="current_memory" translatable="false">CurrentMemory</string>
     <string name="title_connect">Connect</string>
     <string name="title_activity_scan">Scanning....</string>
     <string name="title_activity_coble2">Advanced</string>
@@ -148,5 +146,6 @@
     <string name="alert_dialog_connection_problem_message" translatable="true">Some unknown problems occurred while connecting the device, please retry to connection!</string>
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
+    <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>
 
 </resources>
