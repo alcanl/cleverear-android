@@ -11,11 +11,9 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.widget.TableRow
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_MAP
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.HEARING_AID
 import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
@@ -23,30 +21,16 @@ import com.alcanl.cleverear.helpers.SHARED_PREF_FILE_NAME
 import com.alcanl.cleverear.helpers.thread.ConnectedDeviceEventHandler
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
-import com.ark.EventHandler
 import com.ark.ParameterSpace
-import com.ark.ProductManager
 import com.google.android.material.slider.Slider
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.ExecutorService
-import javax.inject.Inject
 
-@AndroidEntryPoint
-class ControlActivity : AppCompatActivity() {
+class ControlActivity : BaseActivity() {
     lateinit var mBinding: ActivityControlBinding
-    @Inject
-    lateinit var productManager: ProductManager
-    @Inject
-    lateinit var eventHandler: EventHandler
-    @Inject
-    lateinit var threadPool: ExecutorService
     @Volatile
     var mIsConnected = false
     var mIsDoubleDeviceConnection = false
-    lateinit var mHearingAid: HearingAid
-    lateinit var mDoubleDeviceMap : HashMap<*,*>
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -100,7 +84,7 @@ class ControlActivity : AppCompatActivity() {
     }
     private fun connectForDoubleDevices()
     {
-        mDoubleDeviceMap.forEach { connectToDevice(it.value as HearingAid) }
+        mDoubleDeviceMap.forEach { connectToDevice(it.value) }
     }
     private fun initBatteryViews()
     {
@@ -139,8 +123,6 @@ class ControlActivity : AppCompatActivity() {
                 VERSION.SDK_INT < VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(HEARING_AID) as HearingAid
                 else -> intent.getSerializableExtra(HEARING_AID, HearingAid::class.java)!!
             }
-        else
-            getDoubleDeviceInfo()
     }
     private fun initialize()
     {
@@ -174,16 +156,7 @@ class ControlActivity : AppCompatActivity() {
         if (!mIsDoubleDeviceConnection)
             mHearingAid.getPropertiesFromSDK(productManager, eventHandler)
         else
-            mDoubleDeviceMap.forEach { (it.value as HearingAid).getPropertiesFromSDK(productManager, eventHandler) }
-    }
-    private fun getDoubleDeviceInfo()
-    {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap = when {
-                VERSION.SDK_INT < VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(
-                    DOUBLE_DEVICE_MAP) as HashMap<*, *>
-                else -> intent.getSerializableExtra(DOUBLE_DEVICE_MAP, HashMap::class.java)!!
-            }
+            mDoubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler) }
     }
     private fun initMemoryButtons()
     {
@@ -235,56 +208,56 @@ class ControlActivity : AppCompatActivity() {
     fun buttonOneClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory0) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory0) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory0)
     }
     fun buttonTwoClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory1) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory1) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory1)
     }
     fun buttonThreeClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory2) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory2) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory2)
     }
     fun buttonFourClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory3) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory3) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory3)
     }
     fun buttonFiveClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory4) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory4) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory4)
     }
     fun buttonSixClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory5) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory5) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory5)
     }
     fun buttonSevenClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory6) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory6) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory6)
     }
     fun buttonEightClicked()
     {
         if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value as HearingAid, ParameterSpace.kNvmMemory7) }
+            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory7) }
         else
             memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory7)
     }

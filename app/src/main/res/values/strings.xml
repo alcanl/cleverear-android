@@ -11,7 +11,7 @@
     <string name="textview_detect_device_text">Detect Device</string>
     <string name="textview_device_detection_not_found_text">Device Not Found</string>
     <string name="textview_device_detection_device_connected_text">Connected With Device</string>
-    <string name="textview_device_detection_connection_in_process_text">Connecting To Device…</string>
+    <string name="textview_device_detection_connection_in_process_text">Connecting To Device</string>
     <string name="textview_count_device_found_text">Device Found</string>
     <string name="button_stop_scan_text">\t\t\tStop Scanning</string>
     <string name="textview_volume_text">Volume</string>

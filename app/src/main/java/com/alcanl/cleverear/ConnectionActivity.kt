@@ -14,17 +14,14 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityConnectionBinding
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
-import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_MAP
 import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_SELECTION
 import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.HEARING_AID
 import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
 import com.alcanl.cleverear.helpers.LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
@@ -36,20 +33,14 @@ import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
-import com.ark.EventHandler
 import com.ark.EventType
-import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
 @AndroidEntryPoint
-class ConnectionActivity : AppCompatActivity() {
+class ConnectionActivity : BaseActivity() {
     private lateinit var mBinding: ActivityConnectionBinding
-    @Inject
-    lateinit var productManager : ProductManager
-    @Inject
-    lateinit var eventHandler: EventHandler
     @Inject
     lateinit var deviceConnectionHandler: DeviceConnectionHandler
     @Volatile
@@ -60,8 +51,6 @@ class ConnectionActivity : AppCompatActivity() {
     private var mIsConnected = false
     private var mBluetoothPermission = false
     private var mIsDoubleDeviceConnection = false
-    private val mDoubleDeviceMap = HashMap<EarSide, HearingAid>()
-    private lateinit var mEarSide : EarSide
     private lateinit var mAsyncResult : AsyncResult
     private lateinit var mSelectedHearingAid : HearingAid
     private var mBluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
@@ -106,17 +95,10 @@ class ConnectionActivity : AppCompatActivity() {
         stopScanButtonClicked()
 
     }
-    private fun finalizeConnectionConfiguration(bundle: Bundle)
+    private fun finalizeConnectionConfiguration()
     {
         stopScanButtonClicked()
         mIsDeviceFound = true
-
-        Intent(this, ControlActivity::class.java).apply {
-            putExtras(bundle)
-            setResult(RESULT_OK, this)
-            startActivity(this)
-        }
-
         finish()
     }
     private fun initialize()
@@ -238,9 +220,7 @@ class ConnectionActivity : AppCompatActivity() {
 
 
             if (mDoubleDeviceMap.size == 2) {
-                val bundle = Bundle()
-                bundle.putSerializable(DOUBLE_DEVICE_MAP, mDoubleDeviceMap)
-                finalizeConnectionConfiguration(bundle)
+                finalizeConnectionConfiguration()
             }
         }
         else
@@ -256,9 +236,8 @@ class ConnectionActivity : AppCompatActivity() {
                 selectedDevice.manufacturerData, recognizeEarSide(selectedDevice.manufacturerData)
             )
 
-            val bundle = Bundle()
-            bundle.putSerializable(HEARING_AID, mSelectedHearingAid)
-            finalizeConnectionConfiguration(bundle)
+            mHearingAid = mSelectedHearingAid
+            finalizeConnectionConfiguration()
 
         }
         else
