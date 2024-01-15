@@ -1,12 +1,14 @@
 package com.alcanl.cleverear
 
+import android.content.Intent
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
 import android.widget.TableRow
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,22 +20,13 @@ import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.HEARING_AID
 import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
 import com.alcanl.cleverear.helpers.SHARED_PREF_FILE_NAME
-import com.alcanl.cleverear.helpers.parseJsonBatteryStateData
-import com.alcanl.cleverear.helpers.parseJsonSenderMacData
-import com.alcanl.cleverear.helpers.parseJsonConnectionData
-import com.alcanl.cleverear.helpers.parseJsonMemoryActiveData
-import com.alcanl.cleverear.sdk.events.AuxChangeEvent
-import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
-import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
-import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent
-import com.alcanl.cleverear.sdk.events.MicChangeEvent
-import com.alcanl.cleverear.sdk.events.VolumeChangeEvent
+import com.alcanl.cleverear.helpers.thread.ConnectedDeviceEventHandler
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
-import com.ark.EventType
 import com.ark.ParameterSpace
 import com.ark.ProductManager
+import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -42,7 +35,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ControlActivity : AppCompatActivity() {
-    private lateinit var mBinding: ActivityControlBinding
+    lateinit var mBinding: ActivityControlBinding
     @Inject
     lateinit var productManager: ProductManager
     @Inject
@@ -50,17 +43,23 @@ class ControlActivity : AppCompatActivity() {
     @Inject
     lateinit var threadPool: ExecutorService
     @Volatile
-    private var mIsConnected = false
-    private var mIsDoubleDeviceConnection = false
-    private lateinit var mHearingAid: HearingAid
-    private lateinit var mDoubleDeviceMap : HashMap<*,*>
+    var mIsConnected = false
+    var mIsDoubleDeviceConnection = false
+    lateinit var mHearingAid: HearingAid
+    lateinit var mDoubleDeviceMap : HashMap<*,*>
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
-        startEventListener()
+        ConnectedDeviceEventHandler(this, eventHandler, threadPool).startEventListener()
         Handler(Looper.myLooper()!!).postDelayed({ mBinding.frameLayoutLoading.visibility = View.GONE
-            initMemoryButtons(); initBatteryViews(); initSliders()}, 7000)
+            initMemoryButtons(); initSliders(); initBatteryViews()}, 7000)
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
     }
     override fun onStart()
     {
@@ -72,8 +71,7 @@ class ControlActivity : AppCompatActivity() {
         else
             connectForDoubleDevices()
     }
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         super.onDestroy()
         threadPool.shutdown()
     }
@@ -149,6 +147,27 @@ class ControlActivity : AppCompatActivity() {
         loadSharedPref()
         initDevice()
         initBinding()
+        initializeNavigationView()
+    }
+    private fun initializeNavigationView()
+    {
+        mBinding.bottomNavigationView.setOnItemSelectedListener {
+
+            when (it.itemId) {
+                R.id.navbar_control -> true
+                R.id.navbar_connection -> { if (mIsConnected) {
+                    startActivity(Intent(this, ConnectionActivity::class.java))
+                    overridePendingTransition(R.anim.slide_out, R.anim.slide_in); true
+                } else false
+                }
+                else -> {
+                    if (mIsConnected) {
+                        startActivity(Intent(this, AdvancedActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
+                    } else false
+                }
+            }
+        }
     }
     private fun getDevicePropertiesFromSDK()
     {
@@ -213,110 +232,6 @@ class ControlActivity : AppCompatActivity() {
     {
         hearingAid.readDeviceConfiguration()
     }
-    private fun startEventListener()
-    {
-        threadPool.execute {
-            while (true) {
-                val event = eventHandler.event
-                val eventSender = parseJsonSenderMacData(event.data, this)
-                if (event.type == EventType.kConnectionEvent) {
-                    Log.e("event", event.data)
-                    Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
-                    val connectionState = parseJsonConnectionData(event.data, this)
-                    if (connectionState == 1) {
-                        runOnUiThread {
-                            Toast.makeText(
-                                this,
-                                "Connection Lost, Please Reconnect To Device",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        mIsConnected = false
-                    }
-                    else if (connectionState == 3) {
-                        runOnUiThread {
-                            Toast.makeText(
-                                this,
-                                "Connection Established With The Device",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        mIsConnected = true
-                    }
-                }
-                if (event.type == EventType.kVolumeEvent) {
-                    Log.e("event", event.data)
-                    Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
-
-                }
-                if (event.type == EventType.kExitEvent) {
-                    Log.e("event", event.data)
-                    Log.e("exit", event.data)
-                }
-                if (event.type == EventType.kBatteryEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
-                    val batteryState = parseJsonBatteryStateData(event.data, this)
-
-                    runOnUiThread {
-                        if (!mIsDoubleDeviceConnection)
-                            if (mHearingAid.side == EarSide.Left)
-                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                            else
-                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
-                        else
-                            if (eventSender == (mDoubleDeviceMap[EarSide.Left] as HearingAid).address)
-                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                            else
-                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
-                    }
-                }
-                if (event.type == EventType.kMemoryEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
-                    val memoryState = parseJsonMemoryActiveData(event.data, this)
-
-                    threadPool.execute {
-                        if (!mIsDoubleDeviceConnection)
-                            mHearingAid.currentMemory = ParameterSpace.value(memoryState)
-                        else
-                            if (eventSender == (mDoubleDeviceMap[EarSide.Left] as HearingAid).address)
-                                (mDoubleDeviceMap[EarSide.Left] as HearingAid).currentMemory = ParameterSpace.value(memoryState)
-                            else
-                                (mDoubleDeviceMap[EarSide.Right] as HearingAid).currentMemory = ParameterSpace.value(memoryState)
-                    }
-                }
-                if (event.type == EventType.kActiveEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e("active", event.data)
-                }
-                if (event.type == EventType.kUnknownEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e("unknown", event.data)
-                }
-                if (event.type == EventType.kECMemoryEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e("ecMemory", event.data)
-                }
-                if (event.type == EventType.kAuxAttenuationEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e(AuxChangeEvent::class.java.simpleName, event.data)
-                }
-                if (event.type == EventType.kMicAttenuationEvent)
-                {
-                    Log.e("event", event.data)
-                    Log.e(MicChangeEvent::class.java.simpleName, event.data)
-                }
-            }
-        }
-    }
-
     fun buttonOneClicked()
     {
         if (mIsDoubleDeviceConnection)
@@ -380,8 +295,6 @@ class ControlActivity : AppCompatActivity() {
                 if (!mIsDoubleDeviceConnection) {
                     mHearingAid.wirelessControl?.volume = value.toInt()
 
-                    if (mBinding.isDualDevice)
-                        sliderRightEarOnValueChanged(value)
                 } else
                     (mDoubleDeviceMap[EarSide.Left] as HearingAid).wirelessControl?.volume =
                         value.toInt()
@@ -396,8 +309,6 @@ class ControlActivity : AppCompatActivity() {
                 if (!mIsDoubleDeviceConnection) {
                     mHearingAid.wirelessControl?.volume = value.toInt()
 
-                    if (mBinding.isDualDevice)
-                        sliderRightEarOnValueChanged(value)
                 } else
                     (mDoubleDeviceMap[EarSide.Right] as HearingAid).wirelessControl?.volume =
                         value.toInt()
@@ -412,14 +323,15 @@ class ControlActivity : AppCompatActivity() {
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_left_to_right_left_slider
-                    )
+                    ).also { it.setAnimationListener(setSlidersFirstAnimationEnd(mBinding.sliderLeft)) }
                 )
                 mBinding.sliderRight.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_right_to_left_right_slider
-                    )
+                    ).also { it.setAnimationListener(setSlidersFirstAnimationEnd(mBinding.sliderRight)) }
                 )
+
             }
             mBinding.isDualDevice = true
             }
@@ -429,16 +341,87 @@ class ControlActivity : AppCompatActivity() {
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_right_to_left_left_slider
-                    )
+                    ).also { it.setAnimationListener(setSlidersSecondAnimationEnd(mBinding.sliderLeft)) }
                 )
                 mBinding.sliderRight.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_left_to_right_right_slider
-                    )
+                    ).also { it.setAnimationListener(setSlidersSecondAnimationEnd(mBinding.sliderRight)) }
                 )
+
             }
             mBinding.isDualDevice = false
+        }
+    }
+    fun sliderDualOnValueChanged(value: Float)
+    {
+        threadPool.execute { sliderLeftEarOnValueChanged(value) }
+        threadPool.execute { sliderRightEarOnValueChanged(value) }
+    }
+    private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                slider.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animation?)
+            {
+
+                slider.visibility = View.INVISIBLE
+                mBinding.textViewLeftSeekBar.visibility = View.INVISIBLE
+                mBinding.textViewRightSeekBar.visibility = View.INVISIBLE
+
+                if (mBinding.sliderCommon.visibility != View.VISIBLE) {
+                    mBinding.sliderCommon.startAnimation(
+                        android.view.animation.AnimationUtils.loadAnimation(
+                            this@ControlActivity, R.anim.alpha_blink_anim
+                        ).also {it.setAnimationListener(object : AnimationListener {
+                            override fun onAnimationStart(animation: Animation?) {
+                                mBinding.sliderCommon.visibility = View.VISIBLE
+                                mBinding.sliderCommon.isEnabled = true
+                            }
+
+                            override fun onAnimationEnd(animation: Animation?) {
+
+                            }
+
+                            override fun onAnimationRepeat(animation: Animation?) {
+
+                            }
+                        })
+
+                        })
+                }
+            }
+            override fun onAnimationRepeat(animation: Animation?)
+            {
+
+            }
+        }
+    }
+    private fun setSlidersSecondAnimationEnd(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                mBinding.sliderCommon.visibility = View.GONE
+                mBinding.sliderCommon.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animation?)
+            {
+                slider.visibility = View.VISIBLE
+                slider.isEnabled = true
+                mBinding.textViewRightSeekBar.visibility = View.VISIBLE
+                mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
         }
     }
 }

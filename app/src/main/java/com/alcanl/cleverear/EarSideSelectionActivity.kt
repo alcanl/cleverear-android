@@ -3,6 +3,7 @@ package com.alcanl.cleverear
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityEarSideSelectionBinding
 import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
@@ -16,6 +17,15 @@ class EarSideSelectionActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        mBinding.frameLayoutLeftEar.startAnimation(android.view.animation.AnimationUtils.loadAnimation
+            (this, R.anim.translate_ear_button_up_to_down))
+        mBinding.frameLayoutRightEar.startAnimation(android.view.animation.AnimationUtils.loadAnimation
+            (this, R.anim.translate_ear_button_down_to_up))
     }
     private fun initialize()
     {

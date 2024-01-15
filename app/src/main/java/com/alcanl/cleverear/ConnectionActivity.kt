@@ -92,6 +92,12 @@ class ConnectionActivity : AppCompatActivity() {
         getEarSideSelection()
         buttonDetectDevice()
     }
+
+    override fun onResume()
+    {
+        super.onResume()
+        mBinding.bottomNavigationView.selectedItemId = R.id.navbar_connection
+    }
     override fun onPause()
     {
         super.onPause()
@@ -103,17 +109,21 @@ class ConnectionActivity : AppCompatActivity() {
     private fun finalizeConnectionConfiguration(bundle: Bundle)
     {
         stopScanButtonClicked()
+        mIsDeviceFound = true
 
         Intent(this, ControlActivity::class.java).apply {
             putExtras(bundle)
             setResult(RESULT_OK, this)
             startActivity(this)
         }
+
+        finish()
     }
     private fun initialize()
     {
         initBinding()
         mIsDoubleDeviceConnection = intent.getBooleanExtra(DOUBLE_DEVICE_SELECTION, false)
+        initializeNavigationView()
     }
     private fun initBinding()
     {
@@ -302,5 +312,25 @@ class ConnectionActivity : AppCompatActivity() {
         mBinding.imageButtonDetect.isEnabled = true
         mBinding.progressBar.visibility = View.GONE
         mBinding.frameLayoutStopScan.visibility = View.INVISIBLE
+    }
+    private fun initializeNavigationView()
+    {
+        mBinding.bottomNavigationView.setOnItemSelectedListener {
+
+            when (it.itemId) {
+                R.id.navbar_connection -> true
+                R.id.navbar_control -> { if (mIsDeviceFound) {
+                    startActivity(Intent(this, ControlActivity::class.java))
+                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
+                    } else false
+                }
+                else -> {
+                    if (mIsDeviceFound) {
+                        startActivity(Intent(this, AdvancedActivity::class.java))
+                        overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
+                    } else false
+                }
+            }
+        }
     }
 }

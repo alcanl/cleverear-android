@@ -17,6 +17,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initBinding()
     }
+
+    override fun onResume()
+    {
+        super.onResume()
+        mBinding.buttonSingleDevice.startAnimation(android.view.animation.AnimationUtils.loadAnimation
+            (this, R.anim.translate_button_left_to_right))
+        mBinding.buttonDoubleDevice.startAnimation(android.view.animation.AnimationUtils.loadAnimation
+            (this, R.anim.translate_button_right_to_left))
+    }
     fun buttonSingleDeviceClick()
     {
         Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }

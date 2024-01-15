@@ -28,6 +28,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
         wirelessControl = productManager.wirelessControl
         productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
         wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
+
     }
 
     fun readDeviceConfiguration()

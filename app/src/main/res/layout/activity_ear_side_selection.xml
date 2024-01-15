@@ -37,9 +37,11 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2">
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            android:baselineAligned="false">
 
             <FrameLayout
+                android:id="@+id/frameLayoutLeftEar"
                 android:layout_width="match_parent"
                 android:layout_height="323dp"
                 android:layout_weight="5">
@@ -48,15 +50,18 @@
                     android:layout_width="119dp"
                     android:layout_height="151dp"
                     android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
                     android:background="#00FFFFFF"
                     android:onClick="@{()-> viewModel.handleLeftEarButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/lefteargray_2" />
+                    app:srcCompat="@drawable/lefteargray_2"
+                    android:contentDescription="@string/textview_left_device_text" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
                     android:layout_marginTop="110dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/alert_dialog_left_ear_side_text"
@@ -66,6 +71,7 @@
             </FrameLayout>
 
             <FrameLayout
+                android:id="@+id/frameLayoutRightEar"
                 android:layout_width="match_parent"
                 android:layout_height="323dp"
                 android:layout_weight="5">
@@ -74,16 +80,19 @@
                     android:layout_width="119dp"
                     android:layout_height="151dp"
                     android:layout_gravity="center"
+                    android:layout_marginEnd="10dp"
                     android:background="#00FFFFFF"
                     android:onClick="@{() -> viewModel.handleRightEarButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/right_ear_icon" />
+                    app:srcCompat="@drawable/right_ear_icon"
+                    android:contentDescription="@string/textview_right_device_text" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="110dp"
+                    android:layout_marginEnd="10dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/alert_dialog_right_ear_side_text"
                     android:textColor="@color/ap_black"

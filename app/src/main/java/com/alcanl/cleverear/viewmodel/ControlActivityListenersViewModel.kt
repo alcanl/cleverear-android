@@ -50,4 +50,8 @@ class ControlActivityListenersViewModel(activity: ControlActivity) {
     {
         mWeakReference.get()?.switchOnCheckedChanged()
     }
+    fun handleDualSliderValueChange(value: Float)
+    {
+        mWeakReference.get()?.sliderDualOnValueChanged(value)
+    }
 }

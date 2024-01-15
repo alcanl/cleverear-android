@@ -7,6 +7,7 @@ import com.ark.ProductManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
