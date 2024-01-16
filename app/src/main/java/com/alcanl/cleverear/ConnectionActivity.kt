@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION
-import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
@@ -14,9 +13,11 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityConnectionBinding
+import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
@@ -33,26 +34,30 @@ import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
+import com.ark.EventHandler
 import com.ark.EventType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
 @AndroidEntryPoint
-class ConnectionActivity : BaseActivity() {
+class ConnectionActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityConnectionBinding
     @Inject
     lateinit var deviceConnectionHandler: DeviceConnectionHandler
+    @Inject
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var configuration : ConfigurationModule
     @Volatile
-    private var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
+    var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
     @Volatile
     private var mDeviceCount = 0
     private var mIsDeviceFound = false
-    private var mIsConnected = false
     private var mBluetoothPermission = false
-    private var mIsDoubleDeviceConnection = false
     private lateinit var mAsyncResult : AsyncResult
     private lateinit var mSelectedHearingAid : HearingAid
+
     private var mBluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission())
     {isGranted : Boolean -> if (isGranted)
     {
@@ -74,9 +79,10 @@ class ConnectionActivity : BaseActivity() {
         if (result.resultCode == RESULT_OK)
             this.scanDevicesWithBluetooth()
     }
-    override fun onCreate(savedInstanceState: Bundle?)
+
+    override fun onStart()
     {
-        super.onCreate(savedInstanceState)
+        super.onStart()
         initialize()
         getEarSideSelection()
         buttonDetectDevice()
@@ -91,7 +97,7 @@ class ConnectionActivity : BaseActivity() {
     {
         super.onPause()
         val sharedPrefEditor = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE).edit()
-        sharedPrefEditor.putBoolean(IS_DOUBLE_DEVICE, mIsDoubleDeviceConnection).apply()
+        sharedPrefEditor.putBoolean(IS_DOUBLE_DEVICE, configuration.isDoubleDeviceConnection).apply()
         stopScanButtonClicked()
 
     }
@@ -99,12 +105,12 @@ class ConnectionActivity : BaseActivity() {
     {
         stopScanButtonClicked()
         mIsDeviceFound = true
-        finish()
+        startActivity(Intent(this, LoadingActivity::class.java))
     }
     private fun initialize()
     {
         initBinding()
-        mIsDoubleDeviceConnection = intent.getBooleanExtra(DOUBLE_DEVICE_SELECTION, false)
+        configuration.isDoubleDeviceConnection = intent.getBooleanExtra(DOUBLE_DEVICE_SELECTION, false)
         initializeNavigationView()
     }
     private fun initBinding()
@@ -112,11 +118,11 @@ class ConnectionActivity : BaseActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_connection)
         mBinding.viewModel = ConnectionActivityListenersViewModel(this)
         mBinding.adapter = ArrayAdapter(this, R.layout.listview_item_layout, ArrayList<String>(emptyList()))
-            .apply { if (mIsDoubleDeviceConnection) mBinding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE}
+            .apply { if (configuration.isDoubleDeviceConnection) mBinding.listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE}
     }
     private fun getEarSideSelection()
     {
-        mEarSide = when {
+        configuration.earSide = when {
             intent.getStringExtra(BUNDLE_EAR_SIDE_KEY) == LEFT -> EarSide.Left
             else -> EarSide.Right
         }
@@ -141,18 +147,18 @@ class ConnectionActivity : BaseActivity() {
             manufacturerCodeSub = manufacturerCode.substring(0, 6)
         } catch (_ : StringIndexOutOfBoundsException) {}
 
-        return if (!mIsDoubleDeviceConnection)
-                    if (mEarSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
+        return if (!configuration.isDoubleDeviceConnection)
+                    if (configuration.earSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
                     else manufacturerCodeSub == MANUFACTURER_CODE_RIGHT
                else
                     manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
     }
     private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
     {
-        if (mDoubleDeviceMap.containsKey(earSide))
+        if (configuration.doubleDeviceMap.containsKey(earSide))
             return
 
-        mDoubleDeviceMap[earSide] = HearingAid(device.address,
+        configuration.doubleDeviceMap[earSide] = HearingAid(device.address,
             device.name, device.rssi, device.manufacturerData, earSide)
     }
     private fun recognizeEarSide(str: String) : EarSide
@@ -178,7 +184,7 @@ class ConnectionActivity : BaseActivity() {
     private fun scanDevicesWithBluetooth()
     {
         try {
-            mAsyncResult = if (mEarSide == EarSide.Right) deviceConnectionHandler.scanForLeftDevice()
+            mAsyncResult = if (configuration.earSide == EarSide.Right) deviceConnectionHandler.scanForLeftDevice()
             else deviceConnectionHandler.scanForRightDevice()
 
         } catch (ex: ArkException) {
@@ -219,7 +225,7 @@ class ConnectionActivity : BaseActivity() {
                 putItemToDeviceMap(EarSide.Left, selectedDevice)
 
 
-            if (mDoubleDeviceMap.size == 2) {
+            if (configuration.doubleDeviceMap.size == 2) {
                 finalizeConnectionConfiguration()
             }
         }
@@ -236,7 +242,7 @@ class ConnectionActivity : BaseActivity() {
                 selectedDevice.manufacturerData, recognizeEarSide(selectedDevice.manufacturerData)
             )
 
-            mHearingAid = mSelectedHearingAid
+            configuration.hearingAid = mSelectedHearingAid
             finalizeConnectionConfiguration()
 
         }
@@ -252,7 +258,7 @@ class ConnectionActivity : BaseActivity() {
         mIsDeviceFound = false
         scanBluetooth()
 
-        if(!mIsConnected)
+        if(!configuration.isConnected)
             mBinding.progressBar.visibility = View.VISIBLE
 
         scanDevices()
@@ -262,7 +268,7 @@ class ConnectionActivity : BaseActivity() {
     }
     fun hearingAidItemClicked(pos: Int)
     {
-        if (mIsDoubleDeviceConnection) {
+        if (configuration.isDoubleDeviceConnection) {
             selectDoubleItem(pos)
             return
         }
@@ -298,13 +304,13 @@ class ConnectionActivity : BaseActivity() {
 
             when (it.itemId) {
                 R.id.navbar_connection -> true
-                R.id.navbar_control -> { if (mIsDeviceFound) {
+                R.id.navbar_control -> { if (configuration.isConnected) {
                     startActivity(Intent(this, ControlActivity::class.java))
                     overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
                     } else false
                 }
                 else -> {
-                    if (mIsDeviceFound) {
+                    if (configuration.isConnected) {
                         startActivity(Intent(this, AdvancedActivity::class.java))
                         overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
                     } else false

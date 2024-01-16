@@ -1,43 +1,45 @@
 package com.alcanl.cleverear
 
 import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.widget.TableRow
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
+import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.HEARING_AID
 import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
 import com.alcanl.cleverear.helpers.SHARED_PREF_FILE_NAME
-import com.alcanl.cleverear.helpers.thread.ConnectedDeviceEventHandler
+import com.alcanl.cleverear.helpers.listeners.ControlActivityEventListener
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
+import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-
-class ControlActivity : BaseActivity() {
+import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.ExecutorService
+import javax.inject.Inject
+@AndroidEntryPoint
+class ControlActivity : AppCompatActivity() {
+    @Inject
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var threadPool: ExecutorService
+    @Inject
+    lateinit var configuration : ConfigurationModule
     lateinit var mBinding: ActivityControlBinding
-    @Volatile
-    var mIsConnected = false
-    var mIsDoubleDeviceConnection = false
+    lateinit var listener : ControlActivityEventListener
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
-        ConnectedDeviceEventHandler(this, eventHandler, threadPool).startEventListener()
-        Handler(Looper.myLooper()!!).postDelayed({ mBinding.frameLayoutLoading.visibility = View.GONE
-            initMemoryButtons(); initSliders(); initBatteryViews()}, 7000)
+
+        if (configuration.isConnected)
+            listener.startEventListener()
     }
 
     override fun onResume()
@@ -45,62 +47,27 @@ class ControlActivity : BaseActivity() {
         super.onResume()
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
     }
-    override fun onStart()
-    {
-        super.onStart()
-        getDevicePropertiesFromSDK()
 
-        if (!mIsDoubleDeviceConnection)
-            connectForSingleDevice()
-        else
-            connectForDoubleDevices()
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        threadPool.shutdown()
-    }
-    private fun connectToDevice(hearingAid: HearingAid)
+    override fun onStop()
     {
-        threadPool.execute {
-            try {
-                hearingAid.communicationAdaptor?.connect()
-                runBlocking {
-                    delay(5000)
-                    readDeviceConfiguration(hearingAid)
-                }
-
-            }
-            catch (ex: ArkException)
-            {
-                runOnUiThread {
-                    Toast.makeText(this, "Problem occurred while connecting to device", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
-    private fun connectForSingleDevice()
-    {
-        connectToDevice(mHearingAid)
-    }
-    private fun connectForDoubleDevices()
-    {
-        mDoubleDeviceMap.forEach { connectToDevice(it.value) }
+        super.onStop()
+        listener.stopListener()
     }
     private fun initBatteryViews()
     {
-        if (mIsDoubleDeviceConnection) {
-            mBinding.batteryViewLeftDevice.batteryLevel = (mDoubleDeviceMap[EarSide.Left] as HearingAid).batteryLevel
-            mBinding.batteryViewRightDevice.batteryLevel = (mDoubleDeviceMap[EarSide.Right] as HearingAid).batteryLevel
+        if (configuration.isDoubleDeviceConnection) {
+            mBinding.batteryViewLeftDevice.batteryLevel = configuration.doubleDeviceMap[EarSide.Left]?.batteryLevel!!
+            mBinding.batteryViewRightDevice.batteryLevel = configuration.doubleDeviceMap[EarSide.Right]?.batteryLevel!!
             mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
             mBinding.batteryViewRightDevice.visibility = View.VISIBLE
 
         }
         else {
-            if (mHearingAid.side == EarSide.Left) {
-                mBinding.batteryViewLeftDevice.batteryLevel = mHearingAid.batteryLevel
+            if (configuration.hearingAid.side == EarSide.Left) {
+                mBinding.batteryViewLeftDevice.batteryLevel = configuration.hearingAid.batteryLevel
                 mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
             } else {
-                mBinding.batteryViewRightDevice.batteryLevel = mHearingAid.batteryLevel
+                mBinding.batteryViewRightDevice.batteryLevel = configuration.hearingAid.batteryLevel
                 mBinding.batteryViewRightDevice.visibility = View.VISIBLE
             }
         }
@@ -111,25 +78,20 @@ class ControlActivity : BaseActivity() {
         mBinding.viewModel = ControlActivityListenersViewModel(this)
         mBinding.isDualDevice = false
 
-        if (!mIsDoubleDeviceConnection)
-            mBinding.hearingAid = mHearingAid
+        if (!configuration.isDoubleDeviceConnection)
+            mBinding.hearingAid = configuration.hearingAid
 
-        mBinding.isDoubleDeviceConnection = mIsDoubleDeviceConnection
-    }
-    private fun initDevice()
-    {
-        if (!mIsDoubleDeviceConnection)
-            mHearingAid = when {
-                VERSION.SDK_INT < VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(HEARING_AID) as HearingAid
-                else -> intent.getSerializableExtra(HEARING_AID, HearingAid::class.java)!!
-            }
+        mBinding.isDoubleDeviceConnection = configuration.isDoubleDeviceConnection
     }
     private fun initialize()
     {
         loadSharedPref()
-        initDevice()
         initBinding()
         initializeNavigationView()
+        initMemoryButtons()
+        initSliders()
+        initBatteryViews()
+        listener = ControlActivityEventListener(this, eventHandler, threadPool, configuration)
     }
     private fun initializeNavigationView()
     {
@@ -137,13 +99,13 @@ class ControlActivity : BaseActivity() {
 
             when (it.itemId) {
                 R.id.navbar_control -> true
-                R.id.navbar_connection -> { if (mIsConnected) {
+                R.id.navbar_connection -> { if (configuration.isConnected) {
                     startActivity(Intent(this, ConnectionActivity::class.java))
                     overridePendingTransition(R.anim.slide_out, R.anim.slide_in); true
                 } else false
                 }
                 else -> {
-                    if (mIsConnected) {
+                    if (configuration.isConnected) {
                         startActivity(Intent(this, AdvancedActivity::class.java))
                         overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
                     } else false
@@ -151,16 +113,10 @@ class ControlActivity : BaseActivity() {
             }
         }
     }
-    private fun getDevicePropertiesFromSDK()
-    {
-        if (!mIsDoubleDeviceConnection)
-            mHearingAid.getPropertiesFromSDK(productManager, eventHandler)
-        else
-            mDoubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler) }
-    }
     private fun initMemoryButtons()
     {
-        initMemoryButtons(if (!mIsDoubleDeviceConnection) mHearingAid else mDoubleDeviceMap[EarSide.Left] as HearingAid)
+        initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
+            else configuration.doubleDeviceMap[EarSide.Left]!!)
     }
     private fun initMemoryButtons(hearingAid: HearingAid)
     {
@@ -179,98 +135,92 @@ class ControlActivity : BaseActivity() {
     }
     private fun initSliders()
     {
-        if (mIsConnected)
-            if (!mIsDoubleDeviceConnection)
-                if (mHearingAid.side == EarSide.Left)
-                    mBinding.sliderLeft.value = mHearingAid.volume.toFloat()
+        if (configuration.isConnected)
+            if (!configuration.isDoubleDeviceConnection)
+                if (configuration.hearingAid.side == EarSide.Left)
+                    mBinding.sliderLeft.value = configuration.hearingAid.volume.toFloat()
                 else
-                    mBinding.sliderRight.value = mHearingAid.volume.toFloat()
+                    mBinding.sliderRight.value = configuration.hearingAid.volume.toFloat()
             else {
-                mBinding.sliderLeft.value =
-                    (mDoubleDeviceMap[EarSide.Left] as HearingAid).volume.toFloat()
-                mBinding.sliderRight.value =
-                    (mDoubleDeviceMap[EarSide.Right] as HearingAid).volume.toFloat()
+                mBinding.sliderLeft.value = configuration.doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                mBinding.sliderRight.value = configuration.doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+
             }
     }
     private fun loadSharedPref()
     {
-        mIsDoubleDeviceConnection = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE)
+        configuration.isDoubleDeviceConnection = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE)
             .getBoolean(IS_DOUBLE_DEVICE, false)
     }
     private fun memoryButtonsClickedCallback(hearingAid: HearingAid, parameterSpace: ParameterSpace)
     {
         hearingAid.wirelessControl?.currentMemory = parameterSpace
     }
-    private fun readDeviceConfiguration(hearingAid: HearingAid)
-    {
-        hearingAid.readDeviceConfiguration()
-    }
     fun buttonOneClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory0) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory0) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory0)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory0)
     }
     fun buttonTwoClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory1) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory1) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory1)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory1)
     }
     fun buttonThreeClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory2) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory2) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory2)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory2)
     }
     fun buttonFourClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory3) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory3) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory3)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory3)
     }
     fun buttonFiveClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory4) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory4) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory4)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory4)
     }
     fun buttonSixClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory5) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory5) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory5)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory5)
     }
     fun buttonSevenClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory6) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory6) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory6)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory6)
     }
     fun buttonEightClicked()
     {
-        if (mIsDoubleDeviceConnection)
-            mDoubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory7) }
+        if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory7) }
         else
-            memoryButtonsClickedCallback(mHearingAid, ParameterSpace.kNvmMemory7)
+            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory7)
     }
     fun sliderLeftEarOnValueChanged(value: Float)
     {
         try {
-            if (mIsConnected) {
-                if (!mIsDoubleDeviceConnection) {
-                    mHearingAid.wirelessControl?.volume = value.toInt()
+            if (configuration.isConnected) {
+                if (!configuration.isDoubleDeviceConnection) {
+                    configuration.hearingAid.wirelessControl?.volume = value.toInt()
 
                 } else
-                    (mDoubleDeviceMap[EarSide.Left] as HearingAid).wirelessControl?.volume =
-                        value.toInt()
+                    configuration.doubleDeviceMap[EarSide.Left]?.wirelessControl?.volume = value.toInt()
             }
         }
         catch (_: ArkException) {}
@@ -278,13 +228,12 @@ class ControlActivity : BaseActivity() {
     fun sliderRightEarOnValueChanged(value: Float)
     {
         try {
-            if (mIsConnected) {
-                if (!mIsDoubleDeviceConnection) {
-                    mHearingAid.wirelessControl?.volume = value.toInt()
+            if (configuration.isConnected) {
+                if (!configuration.isDoubleDeviceConnection) {
+                    configuration.hearingAid.wirelessControl?.volume = value.toInt()
 
                 } else
-                    (mDoubleDeviceMap[EarSide.Right] as HearingAid).wirelessControl?.volume =
-                        value.toInt()
+                    configuration.doubleDeviceMap[EarSide.Right]?.wirelessControl?.volume = value.toInt()
             }
         } catch (_: ArkException) {}
     }

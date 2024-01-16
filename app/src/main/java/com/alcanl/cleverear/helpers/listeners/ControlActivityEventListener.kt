@@ -1,9 +1,9 @@
-package com.alcanl.cleverear.helpers.thread
+package com.alcanl.cleverear.helpers.listeners
 
 import android.util.Log
 import android.widget.Toast
 import com.alcanl.cleverear.ControlActivity
-import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.parseJsonBatteryStateData
 import com.alcanl.cleverear.helpers.parseJsonConnectionData
@@ -22,15 +22,18 @@ import com.ark.ParameterSpace
 import org.json.JSONException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import kotlin.math.log
+import kotlin.concurrent.thread
 
-class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventHandler: EventHandler,
-                                  private val mThreadPool : ExecutorService) {
+class ControlActivityEventListener(activity: ControlActivity, private val mEventHandler: EventHandler,
+                                   private val mThreadPool : ExecutorService,
+                                   private val mConfiguration : ConfigurationModule) {
 
     private val mWeakReference = WeakReference(activity)
+    @Volatile
+    private var isOnBoard = true
     fun startEventListener() {
-        mThreadPool.execute {
-            while (true) {
+        thread(isDaemon = true, start = true) {
+            while (isOnBoard) {
                 try {
                     val event = mEventHandler.event
                     val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -75,8 +78,7 @@ class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventH
         try {
             Log.e("event", event.data)
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
-            val connectionState =
-                parseJsonConnectionData(event.data, mWeakReference.get()!!)
+            val connectionState = parseJsonConnectionData(event.data, mWeakReference.get()!!)
             if (connectionState == 1) {
                 mWeakReference.get()?.runOnUiThread {
                     Toast.makeText(
@@ -85,7 +87,7 @@ class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventH
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                mWeakReference.get()?.mIsConnected = false
+                mConfiguration.isConnected = false
             } else if (connectionState == 3) {
                 mWeakReference.get()?.runOnUiThread {
                     Toast.makeText(
@@ -94,7 +96,7 @@ class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventH
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                mWeakReference.get()?.mIsConnected = true
+                mConfiguration.isConnected = true
             }
         } catch (ex: JSONException)
         {
@@ -109,20 +111,18 @@ class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventH
             val batteryState = parseJsonBatteryStateData(event.data, mWeakReference.get()!!)
 
             mWeakReference.get()?.runOnUiThread {
-                if (!mWeakReference.get()?.mIsDoubleDeviceConnection!!)
-                    if (mWeakReference.get()?.mHearingAid?.side == EarSide.Left)
+                if (!mConfiguration.isDoubleDeviceConnection)
+                    if (mConfiguration.hearingAid.side == EarSide.Left)
                         mWeakReference.get()?.mBinding?.batteryViewLeftDevice?.batteryLevel =
                             batteryState
                     else
                         mWeakReference.get()?.mBinding?.batteryViewRightDevice?.batteryLevel =
                             batteryState
                 else
-                    if (eventSender == (mWeakReference.get()?.mDoubleDeviceMap?.get(EarSide.Left) as HearingAid).address)
-                        mWeakReference.get()?.mBinding?.batteryViewLeftDevice?.batteryLevel =
-                            batteryState
+                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address)
+                        mWeakReference.get()?.mBinding?.batteryViewLeftDevice?.batteryLevel = batteryState
                     else
-                        mWeakReference.get()?.mBinding?.batteryViewRightDevice?.batteryLevel =
-                            batteryState
+                        mWeakReference.get()?.mBinding?.batteryViewRightDevice?.batteryLevel = batteryState
             }
         } catch (ex: JSONException)
         {
@@ -139,20 +139,21 @@ class ConnectedDeviceEventHandler(activity: ControlActivity, private val mEventH
             val memoryState = parseJsonMemoryActiveData(event.data, mWeakReference.get()!!)
 
             mThreadPool.execute {
-                if (!mWeakReference.get()?.mIsDoubleDeviceConnection!!)
-                    mWeakReference.get()?.mHearingAid?.currentMemory =
-                        ParameterSpace.value(memoryState)
+                if (!mConfiguration.isDoubleDeviceConnection)
+                    mConfiguration.hearingAid.currentMemory = ParameterSpace.value(memoryState)
                 else
-                    if (eventSender == (mWeakReference.get()?.mDoubleDeviceMap?.get(EarSide.Left) as HearingAid).address)
-                        (mWeakReference.get()?.mDoubleDeviceMap!![EarSide.Left] as HearingAid).currentMemory =
-                            ParameterSpace.value(memoryState)
+                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address!!)
+                        mConfiguration.doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
                     else
-                        (mWeakReference.get()?.mDoubleDeviceMap!![EarSide.Right] as HearingAid).currentMemory =
-                            ParameterSpace.value(memoryState)
+                        mConfiguration.doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
             }
         } catch (ex: JSONException)
         {
             Log.e("parseError", ex.message!!)
         }
+    }
+    fun stopListener()
+    {
+        isOnBoard = false
     }
 }

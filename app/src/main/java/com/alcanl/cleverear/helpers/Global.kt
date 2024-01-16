@@ -14,6 +14,7 @@ private const val CONNECTION_STATE = 1
 private const val BATTERY_STATE = 1
 private const val EVENT_SENDER = 0
 private const val MEMORY_STATE = 1
+private const val VOLUME_STATE = 1
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
@@ -72,3 +73,11 @@ fun parseJsonMemoryActiveData(data: String, context: Context) : Int
     val memoryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
     return memoryEvent.getJSONObject(MEMORY_STATE).getInt(getString(context, R.string.current_memory))
 }
+@Throws(JSONException::class)
+fun parseJsonVolumeData(data: String, context: Context) : Int
+{
+    val jsonObject = JSONObject(data)
+    val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+    return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level))
+}
+

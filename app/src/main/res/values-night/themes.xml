@@ -9,4 +9,9 @@
         <item name="android:windowEnterAnimation">@anim/alpha_blink_anim</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
+
+    <style name="ThemeOverlay.CleverEar.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
+        <item name="fullscreenTextColor">@color/light_blue_A400</item>
+    </style>
 </resources>

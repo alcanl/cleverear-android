@@ -106,6 +106,7 @@
     <string name="right_ha_manu_data" translatable="false">ha_r_manu_data</string>
     <string name="title_popup_cancel">Cancel</string>
     <string name="current_memory" translatable="false">CurrentMemory</string>
+    <string name="volume_level" translatable="false">VolumeLevel</string>
     <string name="title_connect">Connect</string>
     <string name="title_activity_scan">Scanning....</string>
     <string name="title_activity_coble2">Advanced</string>
@@ -147,5 +148,7 @@
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
     <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 </resources>
