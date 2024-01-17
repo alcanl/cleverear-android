@@ -1,6 +1,8 @@
 package com.alcanl.cleverear
 
+import android.app.ActivityOptions
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
@@ -12,8 +14,6 @@ import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.IS_DOUBLE_DEVICE
-import com.alcanl.cleverear.helpers.SHARED_PREF_FILE_NAME
 import com.alcanl.cleverear.helpers.listeners.ControlActivityEventListener
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
@@ -46,11 +46,11 @@ class ControlActivity : AppCompatActivity() {
     {
         super.onResume()
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
+        initSliders()
     }
-
-    override fun onStop()
+    override fun onDestroy()
     {
-        super.onStop()
+        super.onDestroy()
         listener.stopListener()
     }
     private fun initBatteryViews()
@@ -76,42 +76,14 @@ class ControlActivity : AppCompatActivity() {
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_control)
         mBinding.viewModel = ControlActivityListenersViewModel(this)
-        mBinding.isDualDevice = false
-
-        if (!configuration.isDoubleDeviceConnection)
-            mBinding.hearingAid = configuration.hearingAid
-
-        mBinding.isDoubleDeviceConnection = configuration.isDoubleDeviceConnection
     }
     private fun initialize()
     {
-        loadSharedPref()
         initBinding()
         initializeNavigationView()
         initMemoryButtons()
-        initSliders()
         initBatteryViews()
         listener = ControlActivityEventListener(this, eventHandler, threadPool, configuration)
-    }
-    private fun initializeNavigationView()
-    {
-        mBinding.bottomNavigationView.setOnItemSelectedListener {
-
-            when (it.itemId) {
-                R.id.navbar_control -> true
-                R.id.navbar_connection -> { if (configuration.isConnected) {
-                    startActivity(Intent(this, ConnectionActivity::class.java))
-                    overridePendingTransition(R.anim.slide_out, R.anim.slide_in); true
-                } else false
-                }
-                else -> {
-                    if (configuration.isConnected) {
-                        startActivity(Intent(this, AdvancedActivity::class.java))
-                        overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
-                    } else false
-                }
-            }
-        }
     }
     private fun initMemoryButtons()
     {
@@ -133,28 +105,126 @@ class ControlActivity : AppCompatActivity() {
     {
         (0..<bound).forEach { tableRow.getChildAt(it).isEnabled = true }
     }
+    private fun initializeNavigationView()
+    {
+        mBinding.bottomNavigationView.setOnItemSelectedListener {
+
+            when (it.itemId) {
+                R.id.navbar_control -> true
+                R.id.navbar_connection -> {
+                    initializeNavigationView(ConnectionActivity::class.java); true}
+                else ->{
+                    initializeNavigationView(AdvancedActivity::class.java); true }
+            }
+        }
+    }
+    private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>)
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startActivity(Intent(this, T::class.java))
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+        } else {
+            Intent(this, T::class.java).apply {
+                val animationBundle = ActivityOptions.makeCustomAnimation(
+                    this@ControlActivity,
+                    R.anim.slide_in,
+                    R.anim.slide_out
+                ).toBundle()
+                startActivity(this, animationBundle)
+            }
+        }
+    }
     private fun initSliders()
     {
-        if (configuration.isConnected)
+        if (configuration.isConnected) {
             if (!configuration.isDoubleDeviceConnection)
                 if (configuration.hearingAid.side == EarSide.Left)
                     mBinding.sliderLeft.value = configuration.hearingAid.volume.toFloat()
                 else
                     mBinding.sliderRight.value = configuration.hearingAid.volume.toFloat()
             else {
-                mBinding.sliderLeft.value = configuration.doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
-                mBinding.sliderRight.value = configuration.doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+                mBinding.sliderLeft.value =
+                    configuration.doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                mBinding.sliderRight.value =
+                    configuration.doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
 
             }
-    }
-    private fun loadSharedPref()
-    {
-        configuration.isDoubleDeviceConnection = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE)
-            .getBoolean(IS_DOUBLE_DEVICE, false)
+
+            if (configuration.isDualDeviceConfig) {
+                mBinding.sliderLeft.visibility = View.INVISIBLE
+                mBinding.sliderRight.visibility = View.INVISIBLE
+                mBinding.sliderCommon.visibility = View.VISIBLE
+            }
+        }
     }
     private fun memoryButtonsClickedCallback(hearingAid: HearingAid, parameterSpace: ParameterSpace)
     {
         hearingAid.wirelessControl?.currentMemory = parameterSpace
+    }
+    private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                slider.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animation?)
+            {
+
+                slider.visibility = View.INVISIBLE
+                mBinding.textViewLeftSeekBar.visibility = View.INVISIBLE
+                mBinding.textViewRightSeekBar.visibility = View.INVISIBLE
+
+                if (mBinding.sliderCommon.visibility != View.VISIBLE) {
+                    mBinding.sliderCommon.startAnimation(
+                        android.view.animation.AnimationUtils.loadAnimation(
+                            this@ControlActivity, R.anim.alpha_blink_anim
+                        ).also {it.setAnimationListener(object : AnimationListener {
+                            override fun onAnimationStart(animation: Animation?) {
+                                mBinding.sliderCommon.visibility = View.VISIBLE
+                                mBinding.sliderCommon.isEnabled = true
+                            }
+
+                            override fun onAnimationEnd(animation: Animation?) {
+
+                            }
+
+                            override fun onAnimationRepeat(animation: Animation?) {
+
+                            }
+                        })
+
+                        })
+                }
+            }
+            override fun onAnimationRepeat(animation: Animation?)
+            {
+
+            }
+        }
+    }
+    private fun setSlidersSecondAnimationEnd(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                mBinding.sliderCommon.visibility = View.GONE
+                mBinding.sliderCommon.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animation?)
+            {
+                slider.visibility = View.VISIBLE
+                slider.isEnabled = true
+                mBinding.textViewRightSeekBar.visibility = View.VISIBLE
+                mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+        }
     }
     fun buttonOneClicked()
     {
@@ -239,7 +309,7 @@ class ControlActivity : AppCompatActivity() {
     }
     fun switchOnCheckedChanged()
     {
-        if (!mBinding.isDualDevice) {
+        if (!configuration.isDualDeviceConfig) {
             runOnUiThread {
                 mBinding.sliderLeft.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
@@ -255,7 +325,7 @@ class ControlActivity : AppCompatActivity() {
                 )
 
             }
-            mBinding.isDualDevice = true
+            configuration.isDualDeviceConfig = true
             }
         else {
             runOnUiThread {
@@ -273,77 +343,12 @@ class ControlActivity : AppCompatActivity() {
                 )
 
             }
-            mBinding.isDualDevice = false
+            configuration.isDualDeviceConfig = false
         }
     }
     fun sliderDualOnValueChanged(value: Float)
     {
         threadPool.execute { sliderLeftEarOnValueChanged(value) }
         threadPool.execute { sliderRightEarOnValueChanged(value) }
-    }
-    private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener
-    {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?)
-            {
-                slider.isEnabled = false
-            }
-
-            override fun onAnimationEnd(animation: Animation?)
-            {
-
-                slider.visibility = View.INVISIBLE
-                mBinding.textViewLeftSeekBar.visibility = View.INVISIBLE
-                mBinding.textViewRightSeekBar.visibility = View.INVISIBLE
-
-                if (mBinding.sliderCommon.visibility != View.VISIBLE) {
-                    mBinding.sliderCommon.startAnimation(
-                        android.view.animation.AnimationUtils.loadAnimation(
-                            this@ControlActivity, R.anim.alpha_blink_anim
-                        ).also {it.setAnimationListener(object : AnimationListener {
-                            override fun onAnimationStart(animation: Animation?) {
-                                mBinding.sliderCommon.visibility = View.VISIBLE
-                                mBinding.sliderCommon.isEnabled = true
-                            }
-
-                            override fun onAnimationEnd(animation: Animation?) {
-
-                            }
-
-                            override fun onAnimationRepeat(animation: Animation?) {
-
-                            }
-                        })
-
-                        })
-                }
-            }
-            override fun onAnimationRepeat(animation: Animation?)
-            {
-
-            }
-        }
-    }
-    private fun setSlidersSecondAnimationEnd(slider: Slider) : AnimationListener
-    {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?)
-            {
-                mBinding.sliderCommon.visibility = View.GONE
-                mBinding.sliderCommon.isEnabled = false
-            }
-
-            override fun onAnimationEnd(animation: Animation?)
-            {
-                slider.visibility = View.VISIBLE
-                slider.isEnabled = true
-                mBinding.textViewRightSeekBar.visibility = View.VISIBLE
-                mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
-        }
     }
 }

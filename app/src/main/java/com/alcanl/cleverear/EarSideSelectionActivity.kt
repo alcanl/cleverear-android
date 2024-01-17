@@ -3,15 +3,17 @@ package com.alcanl.cleverear
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityEarSideSelectionBinding
-import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
-import com.alcanl.cleverear.helpers.LEFT
-import com.alcanl.cleverear.helpers.RIGHT
+import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.viewmodel.EarSideSelectionActivityListenersViewModel
-
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+@AndroidEntryPoint
 class EarSideSelectionActivity : AppCompatActivity() {
+    @Inject
+    lateinit var configuration: ConfigurationModule
     private lateinit var mBinding : ActivityEarSideSelectionBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -34,18 +36,12 @@ class EarSideSelectionActivity : AppCompatActivity() {
     }
     fun leftEarButtonClicked()
     {
-        Intent(this, ConnectionActivity::class.java).apply {
-            putExtra(BUNDLE_EAR_SIDE_KEY, LEFT)
-            setResult(RESULT_OK, this)
-            startActivity(this)
-        }
+        configuration.earSide = EarSide.Left
+        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
     }
     fun rightEarButtonClicked()
     {
-        Intent(this, ConnectionActivity::class.java).apply {
-            putExtra(BUNDLE_EAR_SIDE_KEY, RIGHT)
-            setResult(RESULT_OK, this)
-            startActivity(this)
-        }
+        configuration.earSide = EarSide.Right
+        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
     }
 }

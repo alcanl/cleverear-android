@@ -18,14 +18,7 @@ private const val VOLUME_STATE = 1
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
-const val BUNDLE_EAR_SIDE_KEY = "earSide"
-const val RIGHT = "right"
-const val LEFT = "left"
-const val HEARING_AID = "selected_device"
-const val DOUBLE_DEVICE_SELECTION = "double_device_selection"
-const val DOUBLE_DEVICE_MAP = "double_device_map"
-const val SHARED_PREF_FILE_NAME = "double_device_flag"
-const val IS_DOUBLE_DEVICE = "is_double_device"
+
 
 @Throws(JSONException::class)
 fun parseJsonScanData(data: String, context: Context): DiscoveredDeviceInfo
@@ -80,4 +73,5 @@ fun parseJsonVolumeData(data: String, context: Context) : Int
     val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
     return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level))
 }
+
 

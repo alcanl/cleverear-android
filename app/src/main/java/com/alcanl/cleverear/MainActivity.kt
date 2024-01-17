@@ -5,12 +5,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
-import com.alcanl.cleverear.helpers.BUNDLE_EAR_SIDE_KEY
-import com.alcanl.cleverear.helpers.DOUBLE_DEVICE_SELECTION
-import com.alcanl.cleverear.helpers.LEFT
+import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var configuration: ConfigurationModule
     private lateinit var mBinding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -32,12 +36,9 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonDoubleDeviceClick()
     {
-        Intent(this, ConnectionActivity::class.java).apply {
-            putExtra(BUNDLE_EAR_SIDE_KEY, LEFT)
-            putExtra(DOUBLE_DEVICE_SELECTION, true)
-            setResult(RESULT_OK, this)
-            startActivity(this)
-        }
+        configuration.isDoubleDeviceConnection = true
+        configuration.earSide = EarSide.Left
+        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
     }
     private fun initBinding()
     {

@@ -1,5 +1,6 @@
 package com.alcanl.cleverear
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -29,8 +30,8 @@ class LoadingActivity : AppCompatActivity() {
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var productManager: ProductManager
-    lateinit var listener: LoadingActivityEventListener
 
+    lateinit var listener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -38,15 +39,14 @@ class LoadingActivity : AppCompatActivity() {
         initialize()
         initCountDownTimer()
     }
-
-    override fun onStop()
+    override fun onDestroy()
     {
-        super.onStop()
+        super.onDestroy()
         listener.stopListener()
     }
     private fun initCountDownTimer()
     {
-        object: CountDownTimer(6000, 1000) {
+        object: CountDownTimer(6500, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 if (millisUntilFinished in 2000L..2999)
@@ -56,8 +56,13 @@ class LoadingActivity : AppCompatActivity() {
             }
             override fun onFinish()
             {
-                mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                Handler(Looper.myLooper()!!).postDelayed( {finish()}, 1000)
+                if (configuration.isConnected)
+                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
+                else
+                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
+
+                Handler(Looper.myLooper()!!).postDelayed( {finish(); startActivity(Intent
+                    (this@LoadingActivity, ControlActivity::class.java))}, 1000)
             }
         }.start()
     }

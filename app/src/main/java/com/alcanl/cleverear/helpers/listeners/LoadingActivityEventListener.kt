@@ -19,8 +19,10 @@ import com.ark.EventHandler
 import com.ark.EventType
 import com.ark.ParameterSpace
 import org.json.JSONException
+import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import kotlin.concurrent.thread
 
 class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
@@ -28,13 +30,13 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                                    private val mConfiguration : ConfigurationModule)
 {
     private val mWeakReference = WeakReference(activity)
-    @Volatile
-    private var isOnBoard = true
+
+    private lateinit var isOnBoard : Future<*>
 
     fun startEventListener() {
 
-        thread(isDaemon = true, start = true) {
-            while (isOnBoard) {
+        isOnBoard =  mThreadPool.submit {
+            while (!Thread.interrupted()) {
                 try {
                     val event = mEventHandler.event
                     val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -49,9 +51,18 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                             Log.e("ecMemory", event.data)
                         }
                     }
+                    Thread.sleep(100)
                 }catch (ex: JSONException)
                 {
                     Log.e("parseError", ex.message!!)
+                }
+                catch (ex: NullPointerException)
+                {
+                    Log.e("null", ex.message!!)
+                }
+                catch(ex : InterruptedException)
+                {
+                    Log.e("thread", ex.message!!)
                 }
             }
         }
@@ -115,7 +126,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             val memoryState = parseJsonMemoryActiveData(event.data, mWeakReference.get()!!)
 
             mThreadPool.execute {
-                if (mConfiguration.isDoubleDeviceConnection)
+                if (!mConfiguration.isDoubleDeviceConnection)
                     mConfiguration.hearingAid.currentMemory = ParameterSpace.value(memoryState)
                 else
                     if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address)
@@ -136,7 +147,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             val volumeState = parseJsonVolumeData(event.data, mWeakReference.get()!!)
 
             mThreadPool.execute {
-                if (mConfiguration.isDoubleDeviceConnection)
+                if (!mConfiguration.isDoubleDeviceConnection)
                     mConfiguration.hearingAid.volume = volumeState
                 else
                     if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address)
@@ -153,6 +164,6 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     }
     fun stopListener()
     {
-        isOnBoard = false
+        isOnBoard.cancel(true)
     }
 }

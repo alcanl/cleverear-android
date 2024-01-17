@@ -14,6 +14,7 @@ object ConfigurationModule {
     @Volatile
     var isConnected = false
     var isDoubleDeviceConnection = false
+    var isDualDeviceConfig = false
     var doubleDeviceMap = HashMap<EarSide, HearingAid>()
     lateinit var earSide : EarSide
     lateinit var hearingAid: HearingAid
