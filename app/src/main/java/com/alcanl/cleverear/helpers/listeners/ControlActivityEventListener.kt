@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.helpers.listeners
 
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import com.alcanl.cleverear.ControlActivity
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -82,6 +83,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         "Connection Lost, Please Reconnect To Device",
                         Toast.LENGTH_LONG
                     ).show()
+                    mWeakReference.get()?.finish()
                 }
                 mConfiguration.isConnected = false
             } else if (connectionState == 3) {
@@ -145,11 +147,10 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         mConfiguration.doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
                     else
                         mConfiguration.doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
+
+                actCont.setSelectedMemoryButtonView(getMemoryEventButton(memoryState), memoryState)
             }
 
-            actCont.runOnUiThread {
-                Toast.makeText(actCont, String.format("Active Memory: %d", memoryState + 1), Toast.LENGTH_SHORT).show()
-            }
 
         } catch (ex: JSONException)
         {
@@ -189,5 +190,19 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     fun stopListener()
     {
         isOnBoard.cancel(true)
+    }
+    private fun getMemoryEventButton(memoryState: Int) : Button
+    {
+        val actCont = mWeakReference.get()!!
+        return when (memoryState) {
+            0 -> actCont.mBinding.buttonOne
+            1 -> actCont.mBinding.buttonTwo
+            2 -> actCont.mBinding.buttonThree
+            3 -> actCont.mBinding.buttonFour
+            4 -> actCont.mBinding.buttonFive
+            5 -> actCont.mBinding.buttonSix
+            6 -> actCont.mBinding.buttonSeven
+            else -> actCont.mBinding.buttonEight
+        }
     }
 }

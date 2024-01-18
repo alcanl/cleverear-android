@@ -8,11 +8,11 @@ class ConnectionActivityListenersViewModel(activity: ConnectionActivity) {
 
     fun handleDetectDeviceButton()
     {
-        mWeakReference.get()?.buttonDetectDevice()
+        mWeakReference.get()?.buttonDetectDeviceClicked()
     }
     fun handleBackButton()
     {
-        mWeakReference.get()?.buttonBack()
+        mWeakReference.get()?.buttonBackClicked()
     }
     fun handleListViewItemSelected(pos: Int)
     {

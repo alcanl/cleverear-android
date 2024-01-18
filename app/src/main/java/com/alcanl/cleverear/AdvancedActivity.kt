@@ -24,6 +24,9 @@ class AdvancedActivity : AppCompatActivity(){
     override fun onResume()
     {
         super.onResume()
+        if (!configuration.isConnected)
+            finish()
+
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_advanced
     }
     private fun initialize()
@@ -42,9 +45,9 @@ class AdvancedActivity : AppCompatActivity(){
 
             when (it.itemId) {
                 R.id.navbar_control -> {
-                    initializeNavigationView(ControlActivity::class.java); true}
+                    initializeNavigationView(ControlActivity::class.java); finish(); true}
                 R.id.navbar_connection -> {
-                    initializeNavigationView(ConnectionActivity::class.java); true}
+                    initializeNavigationView(ConnectionActivity::class.java); finish(); true}
                 else -> true
             }
         }

@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
+import android.widget.Button
 import android.widget.TableRow
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -32,26 +34,34 @@ class ControlActivity : AppCompatActivity() {
     @Inject
     lateinit var configuration : ConfigurationModule
     lateinit var mBinding: ActivityControlBinding
-    lateinit var listener : ControlActivityEventListener
+    private lateinit var listener : ControlActivityEventListener
+    private var isListenerOnBoard = false
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
 
-        if (configuration.isConnected)
+        if (configuration.isConnected) {
             listener.startEventListener()
+            isListenerOnBoard = true
+        }
     }
 
     override fun onResume()
     {
         super.onResume()
+        if (!configuration.isConnected)
+            finish()
+
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         initSliders()
     }
     override fun onDestroy()
     {
         super.onDestroy()
-        listener.stopListener()
+
+        if (isListenerOnBoard)
+            listener.stopListener()
     }
     private fun initBatteryViews()
     {
@@ -101,9 +111,37 @@ class ControlActivity : AppCompatActivity() {
                 initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
         }
     }
+    private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)
+    {
+        hearingAid.numberOfMemories.also {
+
+            if (it > 4) {
+                setButtonsDefaultColor(4, mBinding.tableLayout.getChildAt(0) as TableRow, except)
+                setButtonsDefaultColor(it - 4, mBinding.tableLayout.getChildAt(1) as TableRow, except - 4)
+            } else
+                setButtonsDefaultColor(it, mBinding.tableLayout.getChildAt(0) as TableRow, except)
+        }
+    }
+    private fun setButtonsDefaultColor(bound: Int, tableRow: TableRow, except: Int)
+    {
+        (0..<bound).filter { it != except  }.forEach { tableRow.getChildAt(it).apply {
+            backgroundTintList = AppCompatResources.getColorStateList(
+            this@ControlActivity, R.color.default_button_color)
+            foregroundTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, R.color.black)
+            }
+        }
+    }
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
-        (0..<bound).forEach { tableRow.getChildAt(it).isEnabled = true }
+        runOnUiThread {
+            (0..<bound).forEach { tableRow.getChildAt(it).apply {
+                    isEnabled = true
+                    backgroundTintList = AppCompatResources.getColorStateList(
+                        this@ControlActivity, R.color.default_button_color)
+                        }
+                    }
+                }
     }
     private fun initializeNavigationView()
     {
@@ -112,9 +150,9 @@ class ControlActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navbar_control -> true
                 R.id.navbar_connection -> {
-                    initializeNavigationView(ConnectionActivity::class.java); true}
+                    initializeNavigationView(ConnectionActivity::class.java); finish(); true}
                 else ->{
-                    initializeNavigationView(AdvancedActivity::class.java); true }
+                    initializeNavigationView(AdvancedActivity::class.java); finish(); true }
             }
         }
     }
@@ -155,6 +193,20 @@ class ControlActivity : AppCompatActivity() {
                 mBinding.sliderRight.visibility = View.INVISIBLE
                 mBinding.sliderCommon.visibility = View.VISIBLE
             }
+        }
+    }
+    fun setSelectedMemoryButtonView(button: Button, num : Int)
+    {
+        runOnUiThread {
+            button.backgroundTintList = AppCompatResources.getColorStateList(
+                this,
+                com.google.android.material.R.color.design_default_color_secondary_variant
+            )
+            button.foregroundTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, R.color.white)
+
+            setButtonsDefaultColor(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
+            else configuration.doubleDeviceMap[EarSide.Left]!!, num)
         }
     }
     private fun memoryButtonsClickedCallback(hearingAid: HearingAid, parameterSpace: ParameterSpace)
@@ -232,6 +284,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory0) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory0)
+
+        setSelectedMemoryButtonView(mBinding.buttonOne, 0)
     }
     fun buttonTwoClicked()
     {
@@ -239,6 +293,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory1) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory1)
+
+        setSelectedMemoryButtonView(mBinding.buttonTwo, 1)
     }
     fun buttonThreeClicked()
     {
@@ -246,6 +302,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory2) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory2)
+
+        setSelectedMemoryButtonView(mBinding.buttonThree, 2)
     }
     fun buttonFourClicked()
     {
@@ -253,6 +311,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory3) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory3)
+
+        setSelectedMemoryButtonView(mBinding.buttonFour, 3)
     }
     fun buttonFiveClicked()
     {
@@ -260,6 +320,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory4) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory4)
+
+        setSelectedMemoryButtonView(mBinding.buttonFive, 4)
     }
     fun buttonSixClicked()
     {
@@ -267,6 +329,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory5) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory5)
+
+        setSelectedMemoryButtonView(mBinding.buttonSix, 5)
     }
     fun buttonSevenClicked()
     {
@@ -274,6 +338,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory6) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory6)
+
+        setSelectedMemoryButtonView(mBinding.buttonSeven, 6)
     }
     fun buttonEightClicked()
     {
@@ -281,6 +347,8 @@ class ControlActivity : AppCompatActivity() {
             configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory7) }
         else
             memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory7)
+
+        setSelectedMemoryButtonView(mBinding.buttonEight, 7)
     }
     fun sliderLeftEarOnValueChanged(value: Float)
     {

@@ -10,8 +10,8 @@
         <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <variable name="viewModel" type="ControlActivityListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />
-         />
     </data>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -145,7 +145,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textViewVolume"
                 app:onValueChangeListener="@{(value) -> viewModel.handleLeftEarSliderValueChange(value)}"
-                app:thumbColor="@color/design_default_color_secondary_variant"
+                app:thumbColor="@color/left_device_slider"
                 app:thumbRadius="16dp"
                 app:thumbStrokeColor="@color/design_default_color_secondary_variant"
                 app:trackColor="#A8A3A3"
@@ -167,7 +167,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textViewVolume"
                 app:onValueChangeListener="@{(value) -> viewModel.handleRightEarSliderValueChange(value)}"
-                app:thumbColor="@color/design_default_color_secondary_variant"
+                app:thumbColor="@color/right_device_slider"
+                app:tickColorActive="@color/right_device_slider"
+                app:trackColorActive="@color/right_device_slider"
+                app:trackColorInactive="@color/right_device_slider"
                 app:thumbRadius="16dp"
                 app:thumbStrokeColor="@color/design_default_color_secondary_variant"
                 app:trackColor="#A8A3A3"
@@ -254,12 +257,12 @@
                 android:padding="10dp">
 
                 <Button
+                    android:id="@+id/buttonOne"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonOneClick()}"
                     android:text="@string/button_text_one"
@@ -268,12 +271,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonTwo"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonTwoClick()}"
                     android:text="@string/button_text_two"
@@ -282,12 +285,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonThree"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonThreeClick()}"
                     android:text="@string/button_text_three"
@@ -296,12 +299,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonFour"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonFourClick()}"
                     android:text="@string/button_text_four"
@@ -316,12 +319,12 @@
                 android:padding="10dp">
 
                 <Button
+                    android:id="@+id/buttonFive"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonFiveClick()}"
                     android:text="@string/button_text_five"
@@ -330,12 +333,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonSix"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonSixClick()}"
                     android:text="@string/button_text_six"
@@ -344,12 +347,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonSeven"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonSevenClick()}"
                     android:text="@string/button_text_seven"
@@ -358,12 +361,12 @@
                     app:cornerRadius="50dp" />
 
                 <Button
+                    android:id="@+id/buttonEight"
                     style="?android:attr/buttonBarButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#A8A3A3"
                     android:enabled="false"
                     android:onClick="@{()-> viewModel.handleButtonEightClick()}"
                     android:text="@string/button_text_eight"

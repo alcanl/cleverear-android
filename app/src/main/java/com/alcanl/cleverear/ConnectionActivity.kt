@@ -2,6 +2,7 @@ package com.alcanl.cleverear
 
 import android.Manifest
 import android.app.ActivityOptions
+import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Intent
@@ -54,6 +55,7 @@ class ConnectionActivity : AppCompatActivity() {
     var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
     @Volatile
     private var mDeviceCount = 0
+    private var isScanContinue = false
     private var mBluetoothPermission = false
     private lateinit var mAsyncResult: AsyncResult
     private lateinit var mSelectedHearingAid: HearingAid
@@ -85,7 +87,13 @@ class ConnectionActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-        buttonDetectDevice()
+        buttonDetectDeviceClicked()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isScanContinue)
+            stopScanButtonClicked()
     }
     override fun onResume()
     {
@@ -97,15 +105,21 @@ class ConnectionActivity : AppCompatActivity() {
         else
             mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
     }
-
-    override fun onPause()
+    private fun alertDialogYesButtonCallback()
     {
-        super.onPause()
-        stopScanButtonClicked()
+        if (configuration.isDoubleDeviceConnection) {
+            configuration.doubleDeviceMap.forEach {it.value.endConnectionSession()}
+        }
+        else
+            configuration.hearingAid.endConnectionSession()
+
+        configuration.isConnected = false
+        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
     }
 
     private fun finalizeConnectionConfiguration() {
 
+        finish()
         startActivity(Intent(this, LoadingActivity::class.java))
     }
     private fun initialize() {
@@ -128,7 +142,7 @@ class ConnectionActivity : AppCompatActivity() {
         return if (configuration.isConnected) {
             if (VERSION.SDK_INT < VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startActivity(Intent(this, T::class.java))
-                overridePendingTransition(R.anim.slide_in, R.anim.slide_out); true
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out); finish() ;true
             } else {
                 Intent(this, T::class.java).apply {
                     val animationBundle = ActivityOptions.makeCustomAnimation(
@@ -137,7 +151,7 @@ class ConnectionActivity : AppCompatActivity() {
                         R.anim.slide_out
                     ).toBundle()
                     startActivity(this, animationBundle)
-                }; true
+                }; finish(); true
             }
         } else false
     }
@@ -215,8 +229,8 @@ class ConnectionActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
         }
     }
-    private fun scanThreadCallBack() {
-        try {
+    private fun scanThreadCallBack()
+    {
             while (!configuration.isConnected) {
                 val event = eventHandler.event
                 if (event.type == EventType.kScanEvent) {
@@ -236,12 +250,7 @@ class ConnectionActivity : AppCompatActivity() {
                         }
                     }
                 }
-                Thread.sleep(100)
             }
-        } catch (ex: InterruptedException)
-        {
-            Log.e("scanThread", ex.message!!)
-        }
     }
     private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo? {
         val device = mBinding.adapter!!.getItem(pos)
@@ -264,7 +273,6 @@ class ConnectionActivity : AppCompatActivity() {
         } else
             showConnectionProblemToastMessage()
     }
-
     private fun selectSingleItem(pos: Int) {
         val selectedDevice = searchHearingAidInList(pos)
 
@@ -286,18 +294,38 @@ class ConnectionActivity : AppCompatActivity() {
         Toast.makeText(this, R.string.alert_dialog_connection_problem_message, Toast.LENGTH_LONG)
             .show()
     }
-    fun buttonDetectDevice()
+    fun buttonBackClicked()
     {
-        scanBluetooth()
+        if (isScanContinue)
+            stopScanButtonClicked()
+
+        if (configuration.isConnected)
+            AlertDialog.Builder(this).setMessage(R.string.dialog_already_connected_message)
+                .setTitle(R.string.dialog_warning)
+                .setPositiveButton(R.string.dialog_yes) {_, _ -> alertDialogYesButtonCallback(); finish()}
+                .setCancelable(false)
+                .setNegativeButton(R.string.dialog_no) {_, _ -> }
+                .create().show()
+        else
+            finish()
+    }
+    fun buttonDetectDeviceClicked() {
 
         if (!configuration.isConnected) {
+            scanBluetooth()
             mBinding.progressBar.visibility = View.VISIBLE
+            mBinding.frameLayoutStopScan.visibility = View.VISIBLE
+            mBinding.imageButtonDetect.isEnabled = false
             scanDevices()
-        }
-
-        mBinding.frameLayoutStopScan.visibility = View.VISIBLE
-        mBinding.imageButtonDetect.isEnabled = false
+            isScanContinue = true
+        } else
+            AlertDialog.Builder(this).setMessage(R.string.dialog_already_connected_message)
+                .setPositiveButton(R.string.dialog_yes) { _, _ -> alertDialogYesButtonCallback()}
+                .setNegativeButton(R.string.dialog_no) {_,_ ->  }
+                .setCancelable(true)
+                .setTitle(R.string.dialog_warning).create().show()
     }
+
 
     fun hearingAidItemClicked(pos: Int)
     {
@@ -308,13 +336,8 @@ class ConnectionActivity : AppCompatActivity() {
 
         selectSingleItem(pos)
     }
-
-    fun buttonBack()
+    private fun scanDevices()
     {
-        stopScanButtonClicked()
-        finish()
-    }
-    private fun scanDevices() {
         mDeviceCount = 0
         mBleDeviceList.clear()
         mBinding.textViewDeviceState.text =
@@ -327,7 +350,8 @@ class ConnectionActivity : AppCompatActivity() {
 
     fun stopScanButtonClicked()
     {
-
+        isScanContinue = false
+        scanOnBoard.cancel(false)
         deviceConnectionHandler.endScanProcess(mAsyncResult)
         mBinding.imageButtonDetect.isEnabled = true
         mBinding.progressBar.visibility = View.GONE
