@@ -13,6 +13,11 @@
     <string name="textview_device_detection_device_connected_text">Connected To Device</string>
     <string name="textview_device_detection_connection_in_process_text">Connecting To Device</string>
     <string name="textview_device_detection_not_connected_text">Could not Connected To Device</string>
+    <string name="textview_mode_text">Mode</string>
+    <string name="textview_channel_text">Channel</string>
+    <string name="textview_R_text">R</string>
+    <string name="textview_L_text">L</string>
+    <string name="edittext_channel_hint">1–255</string>
     <string name="dialog_already_connected_message" translatable="true">You have already connected with a device. Do you want to end this connection?</string>
     <string name="textview_count_device_found_text">Device Found</string>
     <string name="button_stop_scan_text">\t\t\tStop Scanning</string>

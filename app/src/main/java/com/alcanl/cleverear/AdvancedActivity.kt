@@ -5,15 +5,21 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAdvancedBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.helpers.EarSide
+import com.ark.ArkException
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 @AndroidEntryPoint
 class AdvancedActivity : AppCompatActivity(){
     @Inject
     lateinit var configuration : ConfigurationModule
+    @Inject
+    lateinit var threadPool: ExecutorService
     private lateinit var mBinding : ActivityAdvancedBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -67,5 +73,59 @@ class AdvancedActivity : AppCompatActivity(){
                 startActivity(this, animationBundle)
             }
         }
+    }
+    private fun micSliderValueChanged(value: Float, earSide: EarSide)
+    {
+        try {
+            if (configuration.isConnected) {
+                if (!configuration.isDoubleDeviceConnection) {
+                    configuration.hearingAid.wirelessControl?.micAttenuation = value.toInt()
+
+                } else
+                    configuration.doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+            }
+        } catch (_: ArkException) {}
+    }
+    private fun auxSliderValueChanged(value: Float, earSide: EarSide)
+    {
+        try {
+            if (configuration.isConnected) {
+                if (!configuration.isDoubleDeviceConnection) {
+                    configuration.hearingAid.wirelessControl?.auxAttenuation = value.toInt()
+
+                } else
+                    configuration.doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+            }
+        } catch (_: ArkException) {}
+    }
+    fun micDualSliderValueChanged(value: Float)
+    {
+        threadPool.execute { micLeftSliderValueChanged(value) }
+        threadPool.execute { micRightSliderValueChanged(value) }
+    }
+    fun auxDualSliderValueChanged(value: Float)
+    {
+        threadPool.execute { auxLeftSliderValueChanged(value) }
+        threadPool.execute { auxRightSliderValueChanged(value) }
+    }
+    fun micLeftSliderValueChanged(value: Float)
+    {
+        micSliderValueChanged(value, EarSide.Left)
+    }
+    fun micRightSliderValueChanged(value: Float)
+    {
+        micSliderValueChanged(value, EarSide.Right)
+    }
+    fun auxLeftSliderValueChanged(value: Float)
+    {
+        auxSliderValueChanged(value, EarSide.Left)
+    }
+    fun auxRightSliderValueChanged(value: Float)
+    {
+        auxSliderValueChanged(value, EarSide.Right)
+    }
+    fun modeButtonClicked(view: View)
+    {
+
     }
 }
