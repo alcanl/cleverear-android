@@ -49,7 +49,7 @@ class LoadingActivity : AppCompatActivity() {
         object: CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
-                if (millisUntilFinished in 2000L..2999)
+                if (millisUntilFinished in 2000L..2999 || millisUntilFinished in 6000L..<6999)
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_connection_in_process_text)
 
                 mBinding.textViewConnecting.text = String.format("${mBinding.textViewConnecting.text}" + ".")
@@ -74,21 +74,23 @@ class LoadingActivity : AppCompatActivity() {
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
         listener = LoadingActivityEventListener(this, eventHandler, threadPool, configuration)
-        listener.startEventListener()
+            .apply { startEventListener() }
         getDevicePropertiesFromSDK()
 
     }
     private fun getDevicePropertiesFromSDK()
     {
-        if (!configuration.isDoubleDeviceConnection)
-            configuration.hearingAid.getPropertiesFromSDK(productManager, eventHandler)
-        else
-            configuration.doubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler) }
+        with(configuration) {
 
-        if (!configuration.isDoubleDeviceConnection)
-            connectForSingleDevice()
-        else
-            connectForDoubleDevices()
+            if (!isDoubleDeviceConnection) {
+                hearingAid.getPropertiesFromSDK(productManager, eventHandler)
+                connectForSingleDevice()
+            }
+            else {
+                configuration.doubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler) }
+                connectForDoubleDevices()
+            }
+        }
     }
     private fun connectForSingleDevice()
     {
@@ -104,7 +106,7 @@ class LoadingActivity : AppCompatActivity() {
             try {
                 hearingAid.communicationAdaptor?.connect()
                 runBlocking {
-                    delay(5000)
+                    delay(7000)
                     readDeviceConfiguration(hearingAid)
                 }
 
@@ -112,7 +114,7 @@ class LoadingActivity : AppCompatActivity() {
             catch (ex: ArkException)
             {
                 runOnUiThread {
-                    Toast.makeText(this, "Problem occurred while connecting to device", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
                 }
             }
         }

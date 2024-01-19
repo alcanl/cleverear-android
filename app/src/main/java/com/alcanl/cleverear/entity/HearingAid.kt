@@ -30,15 +30,17 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
     fun readDeviceConfiguration()
     {
         try {
-            batteryLevel = wirelessControl!!.batteryLevel
-            volume = wirelessControl!!.volume
-            numberOfMemories = wirelessControl!!.numberOfMemories
-            currentMemory = wirelessControl!!.currentMemory
-            micAttenuation = wirelessControl?.micAttenuation!!
-            auxAttenuation = wirelessControl?.auxAttenuation!!
-            streamChannelList = wirelessControl?.streamChannelList!!
-            streamAddressRaw = wirelessControl?.streamAddress!!
-            streamAddress = streamAddressRaw shr 16
+            with(wirelessControl!!) {
+                this@HearingAid.batteryLevel = batteryLevel
+                this@HearingAid.volume = volume
+                this@HearingAid.numberOfMemories = numberOfMemories
+                this@HearingAid.currentMemory = currentMemory
+                this@HearingAid.micAttenuation = micAttenuation
+                this@HearingAid.auxAttenuation = auxAttenuation
+                this@HearingAid.streamChannelList = streamChannelList
+                this@HearingAid.streamAddressRaw = streamAddress
+                this@HearingAid.streamAddress = streamAddressRaw shr 16
+            }
         }
         catch (e : ArkException) {
             Log.e("Read Config Error", e.message.toString())

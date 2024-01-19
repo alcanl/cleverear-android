@@ -100,20 +100,21 @@ class ConnectionActivity : AppCompatActivity() {
         super.onResume()
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_connection
 
-        if (configuration.isConnected)
-            mBinding.textViewDeviceState.text = getString(R.string.device_connected_text)
-        else
-            mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+        with(mBinding.textViewDeviceState) {
+            text = if (configuration.isConnected) getString(R.string.device_connected_text)
+                else getString(R.string.textview_device_detection_not_found_text)
+        }
     }
     private fun alertDialogYesButtonCallback()
     {
-        if (configuration.isDoubleDeviceConnection) {
-            configuration.doubleDeviceMap.forEach {it.value.endConnectionSession()}
-        }
-        else
-            configuration.hearingAid.endConnectionSession()
+        with(configuration) {
+            if (isDoubleDeviceConnection)
+                doubleDeviceMap.forEach {it.value.endConnectionSession()}
+            else
+                hearingAid.endConnectionSession()
 
-        configuration.isConnected = false
+            isConnected = false
+        }
         mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
     }
 
@@ -313,9 +314,11 @@ class ConnectionActivity : AppCompatActivity() {
 
         if (!configuration.isConnected) {
             scanBluetooth()
-            mBinding.progressBar.visibility = View.VISIBLE
-            mBinding.frameLayoutStopScan.visibility = View.VISIBLE
-            mBinding.imageButtonDetect.isEnabled = false
+            with(mBinding) {
+                progressBar.visibility = View.VISIBLE
+                frameLayoutStopScan.visibility = View.VISIBLE
+                imageButtonDetect.isEnabled = false
+            }
             scanDevices()
             isScanContinue = true
         } else
@@ -340,11 +343,13 @@ class ConnectionActivity : AppCompatActivity() {
     {
         mDeviceCount = 0
         mBleDeviceList.clear()
-        mBinding.textViewDeviceState.text =
-            getString(R.string.textview_device_detection_not_found_text)
-        mBinding.adapter!!.clear()
-        mBinding.adapter!!.notifyDataSetChanged()
 
+        with(mBinding) {
+            textViewDeviceState.text =
+                getString(R.string.textview_device_detection_not_found_text)
+            adapter!!.clear()
+            adapter!!.notifyDataSetChanged()
+        }
         scanOnBoard = threadPool.submit { scanThreadCallBack() }
     }
 
@@ -353,9 +358,12 @@ class ConnectionActivity : AppCompatActivity() {
         isScanContinue = false
         scanOnBoard.cancel(false)
         deviceConnectionHandler.endScanProcess(mAsyncResult)
-        mBinding.imageButtonDetect.isEnabled = true
-        mBinding.progressBar.visibility = View.GONE
-        mBinding.frameLayoutStopScan.visibility = View.INVISIBLE
+
+        with(mBinding) {
+            imageButtonDetect.isEnabled = true
+            progressBar.visibility = View.GONE
+            frameLayoutStopScan.visibility = View.INVISIBLE
+        }
     }
 
 

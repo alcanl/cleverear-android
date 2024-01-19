@@ -35,7 +35,6 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                             Log.e("event", event.data)
                         }
                     }
-                    Thread.sleep(100)
                 }catch (ex: JSONException)
                 {
                     Log.e("parseError", ex.message!!)

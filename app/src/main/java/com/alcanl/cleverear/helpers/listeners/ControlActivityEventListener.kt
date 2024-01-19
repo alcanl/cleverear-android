@@ -3,7 +3,9 @@ package com.alcanl.cleverear.helpers.listeners
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.ControlActivity
+import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.parseJsonBatteryStateData
@@ -54,7 +56,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                             Log.e("ecMemory", event.data)
                         }
                     }
-                    Thread.sleep(100)
+
                 } catch (ex: JSONException) {
                     Log.e("parseError", ex.message!!)
                 } catch (ex: NullPointerException) {
@@ -72,29 +74,32 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleConnectionEvent(event: Event)
     {
+        val actCont = mWeakReference.get()!!
+
         try {
             Log.e("event", event.data)
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
-            val connectionState = parseJsonConnectionData(event.data, mWeakReference.get()!!)
-            if (connectionState == 1) {
-                mWeakReference.get()?.runOnUiThread {
-                    Toast.makeText(
-                        mWeakReference.get()!!,
-                        "Connection Lost, Please Reconnect To Device",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    mWeakReference.get()?.finish()
+            val connectionState = parseJsonConnectionData(event.data, actCont)
+
+            with(actCont) {
+                runOnUiThread {
+                    if (connectionState == 1) {
+                        Toast.makeText(
+                            this,
+                            R.string.toast_connection_lost_text,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    }
+                    else if (connectionState == 3) {
+                        Toast.makeText(
+                            this,
+                            R.string.toast_connection_established_text,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        mConfiguration.isConnected = true
+                    }
                 }
-                mConfiguration.isConnected = false
-            } else if (connectionState == 3) {
-                mWeakReference.get()?.runOnUiThread {
-                    Toast.makeText(
-                        mWeakReference.get()!!,
-                        "Connection Established With The Device",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                mConfiguration.isConnected = true
             }
         } catch (ex: JSONException)
         {
@@ -103,24 +108,27 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleBatteryEvent(event: Event, eventSender: String)
     {
+        val actCont = mWeakReference.get()!!
         try {
             Log.e("event", event.data)
             Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
-            val batteryState = parseJsonBatteryStateData(event.data, mWeakReference.get()!!)
+            val batteryState = parseJsonBatteryStateData(event.data, actCont)
 
-            mWeakReference.get()?.runOnUiThread {
-                if (!mConfiguration.isDoubleDeviceConnection)
-                    if (mConfiguration.hearingAid.side == EarSide.Left)
-                        mWeakReference.get()?.mBinding?.batteryViewLeftDevice?.batteryLevel =
-                            batteryState
-                    else
-                        mWeakReference.get()?.mBinding?.batteryViewRightDevice?.batteryLevel =
-                            batteryState
-                else
-                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address)
-                        mWeakReference.get()?.mBinding?.batteryViewLeftDevice?.batteryLevel = batteryState
-                    else
-                        mWeakReference.get()?.mBinding?.batteryViewRightDevice?.batteryLevel = batteryState
+            with(actCont) {
+                runOnUiThread {
+                    with(mConfiguration) {
+                        if (!isDoubleDeviceConnection)
+                            if (hearingAid.side == EarSide.Left)
+                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
+                            else
+                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
+                        else
+                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
+                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
+                            else
+                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
+                    }
+                }
             }
         } catch (ex: JSONException)
         {
@@ -139,18 +147,18 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             val memoryState = parseJsonMemoryActiveData(event.data, mWeakReference.get()!!)
 
             mThreadPool.execute {
-                if (!mConfiguration.isDoubleDeviceConnection) {
-                    mConfiguration.hearingAid.currentMemory = ParameterSpace.value(memoryState)
-                }
-                else
-                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address!!)
-                        mConfiguration.doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
+                with(mConfiguration) {
+                    if (!isDoubleDeviceConnection)
+                        hearingAid.currentMemory = ParameterSpace.value(memoryState)
                     else
-                        mConfiguration.doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
+                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address!!)
+                            doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
+                        else
+                            doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
+                }
 
                 actCont.setSelectedMemoryButtonView(getMemoryEventButton(memoryState), memoryState)
             }
-
 
         } catch (ex: JSONException)
         {
@@ -167,18 +175,20 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             val volumeState = parseJsonVolumeData(event.data, actCont)
 
             mThreadPool.execute {
-                if (!mConfiguration.isDoubleDeviceConnection) {
-                    mConfiguration.hearingAid.volume = volumeState
-                }
-                else
-                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address)
-                        mConfiguration.doubleDeviceMap[EarSide.Left]?.volume = volumeState
+                with(mConfiguration) {
+                    if (!isDoubleDeviceConnection)
+                        hearingAid.volume = volumeState
                     else
-                        mConfiguration.doubleDeviceMap[EarSide.Right]?.volume = volumeState
+                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
+                            doubleDeviceMap[EarSide.Left]?.volume = volumeState
+                        else
+                            doubleDeviceMap[EarSide.Right]?.volume = volumeState
+                }
             }
 
             actCont.runOnUiThread {
-                Toast.makeText(actCont, String.format("Volume Level: %d", volumeState), Toast.LENGTH_SHORT).show()
+                Toast.makeText(actCont, String.format(getString(actCont,
+                    R.string.listener_volume_level_text) + " %d", volumeState), Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -194,6 +204,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     private fun getMemoryEventButton(memoryState: Int) : Button
     {
         val actCont = mWeakReference.get()!!
+
         return when (memoryState) {
             0 -> actCont.mBinding.buttonOne
             1 -> actCont.mBinding.buttonTwo

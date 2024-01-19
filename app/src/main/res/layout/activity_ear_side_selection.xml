@@ -52,10 +52,10 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:background="#00FFFFFF"
+                    android:contentDescription="@string/textview_left_device_text"
                     android:onClick="@{()-> viewModel.handleLeftEarButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/lefteargray_2"
-                    android:contentDescription="@string/textview_left_device_text" />
+                    app:srcCompat="@drawable/leftear_blue" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -84,7 +84,7 @@
                     android:background="#00FFFFFF"
                     android:onClick="@{() -> viewModel.handleRightEarButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/right_ear_icon"
+                    app:srcCompat="@drawable/rightear_red"
                     android:contentDescription="@string/textview_right_device_text" />
 
                 <TextView

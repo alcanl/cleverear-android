@@ -66,19 +66,31 @@ class ControlActivity : AppCompatActivity() {
     private fun initBatteryViews()
     {
         if (configuration.isDoubleDeviceConnection) {
-            mBinding.batteryViewLeftDevice.batteryLevel = configuration.doubleDeviceMap[EarSide.Left]?.batteryLevel!!
-            mBinding.batteryViewRightDevice.batteryLevel = configuration.doubleDeviceMap[EarSide.Right]?.batteryLevel!!
-            mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
-            mBinding.batteryViewRightDevice.visibility = View.VISIBLE
+            with(configuration.doubleDeviceMap) {
 
+                mBinding.batteryViewLeftDevice. apply {
+                    batteryLevel = this@with[EarSide.Left]?.batteryLevel!!
+                    mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
+                }
+                mBinding.batteryViewRightDevice.apply {
+                    batteryLevel = this@with[EarSide.Right]?.batteryLevel!!
+                    mBinding.batteryViewRightDevice.visibility = View.VISIBLE
+                }
+            }
         }
         else {
-            if (configuration.hearingAid.side == EarSide.Left) {
-                mBinding.batteryViewLeftDevice.batteryLevel = configuration.hearingAid.batteryLevel
-                mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
-            } else {
-                mBinding.batteryViewRightDevice.batteryLevel = configuration.hearingAid.batteryLevel
-                mBinding.batteryViewRightDevice.visibility = View.VISIBLE
+
+            with(configuration.hearingAid) {
+                if (side == EarSide.Left)
+                    mBinding.batteryViewLeftDevice.apply {
+                        batteryLevel = this@with.batteryLevel
+                        visibility = View.VISIBLE
+                    }
+                else
+                    mBinding.batteryViewRightDevice.apply {
+                        batteryLevel = this@with.batteryLevel
+                        visibility = View.VISIBLE
+                    }
             }
         }
     }
@@ -87,12 +99,28 @@ class ControlActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_control)
         mBinding.viewModel = ControlActivityListenersViewModel(this)
     }
+    private fun initDoubleDeviceConnectionSliders()
+    {
+        mBinding.sliderLeft.apply {
+            value = configuration.doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+            visibility = View.VISIBLE
+            mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
+        }
+        mBinding.sliderRight.apply {
+            value = configuration.doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+            visibility = View.VISIBLE
+            mBinding.textViewRightSeekBar.visibility = View.VISIBLE
+        }
+        mBinding.sliderCommon.visibility = View.INVISIBLE
+        mBinding.textViewCommon.visibility = View.INVISIBLE
+    }
     private fun initialize()
     {
         initBinding()
         initializeNavigationView()
         initMemoryButtons()
         initBatteryViews()
+        initSwitch()
         listener = ControlActivityEventListener(this, eventHandler, threadPool, configuration)
     }
     private fun initMemoryButtons()
@@ -111,27 +139,7 @@ class ControlActivity : AppCompatActivity() {
                 initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
         }
     }
-    private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)
-    {
-        hearingAid.numberOfMemories.also {
 
-            if (it > 4) {
-                setButtonsDefaultColor(4, mBinding.tableLayout.getChildAt(0) as TableRow, except)
-                setButtonsDefaultColor(it - 4, mBinding.tableLayout.getChildAt(1) as TableRow, except - 4)
-            } else
-                setButtonsDefaultColor(it, mBinding.tableLayout.getChildAt(0) as TableRow, except)
-        }
-    }
-    private fun setButtonsDefaultColor(bound: Int, tableRow: TableRow, except: Int)
-    {
-        (0..<bound).filter { it != except  }.forEach { tableRow.getChildAt(it).apply {
-            backgroundTintList = AppCompatResources.getColorStateList(
-            this@ControlActivity, R.color.default_button_color)
-            foregroundTintList = AppCompatResources.getColorStateList(
-                this@ControlActivity, R.color.black)
-            }
-        }
-    }
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
         runOnUiThread {
@@ -176,17 +184,10 @@ class ControlActivity : AppCompatActivity() {
     {
         if (configuration.isConnected) {
             if (!configuration.isDoubleDeviceConnection)
-                if (configuration.hearingAid.side == EarSide.Left)
-                    mBinding.sliderLeft.value = configuration.hearingAid.volume.toFloat()
-                else
-                    mBinding.sliderRight.value = configuration.hearingAid.volume.toFloat()
-            else {
-                mBinding.sliderLeft.value =
-                    configuration.doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
-                mBinding.sliderRight.value =
-                    configuration.doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+                initSliders(mBinding.sliderCommon, configuration.hearingAid)
 
-            }
+            else
+                initDoubleDeviceConnectionSliders()
 
             if (configuration.isDualDeviceConfig) {
                 mBinding.sliderLeft.visibility = View.INVISIBLE
@@ -195,23 +196,47 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    fun setSelectedMemoryButtonView(button: Button, num : Int)
+    private fun initSliders(slider: Slider,  hearingAid: HearingAid)
     {
-        runOnUiThread {
-            button.backgroundTintList = AppCompatResources.getColorStateList(
-                this,
-                com.google.android.material.R.color.design_default_color_secondary_variant
+        slider.apply {
+            value = hearingAid.volume.toFloat()
+            trackActiveTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, if (hearingAid.side == EarSide.Left) R.color.left_device_slider
+                else R.color.right_device_slider
             )
-            button.foregroundTintList = AppCompatResources.getColorStateList(
-                this@ControlActivity, R.color.white)
-
-            setButtonsDefaultColor(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
-            else configuration.doubleDeviceMap[EarSide.Left]!!, num)
+            thumbTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, if (hearingAid.side == EarSide.Left) R.color.left_device_slider
+                else R.color.right_device_slider
+            )
+            mBinding.textViewCommon.text = getString(if (hearingAid.side == EarSide.Left) R.string.textview_left_device_text
+            else R.string.textview_right_device_text)
         }
     }
-    private fun memoryButtonsClickedCallback(hearingAid: HearingAid, parameterSpace: ParameterSpace)
+    private fun initSwitch()
     {
-        hearingAid.wirelessControl?.currentMemory = parameterSpace
+        if (configuration.isDoubleDeviceConnection)
+            mBinding.switchDualConfiguration.visibility = View.VISIBLE
+    }
+    private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)
+    {
+        hearingAid.numberOfMemories.also {
+
+            if (it > 4) {
+                setButtonsDefaultColor(4, mBinding.tableLayout.getChildAt(0) as TableRow, except)
+                setButtonsDefaultColor(it - 4, mBinding.tableLayout.getChildAt(1) as TableRow, except - 4)
+            } else
+                setButtonsDefaultColor(it, mBinding.tableLayout.getChildAt(0) as TableRow, except)
+        }
+    }
+    private fun setButtonsDefaultColor(bound: Int, tableRow: TableRow, except: Int)
+    {
+        (0..<bound).filter { it != except  }.forEach { tableRow.getChildAt(it).apply {
+            backgroundTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, R.color.default_button_color)
+            foregroundTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, R.color.black)
+        }
+        }
     }
     private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener
     {
@@ -278,77 +303,34 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    fun buttonOneClicked()
+    fun memoryButtonClicked(buttonNumber: Int, button: Button)
     {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory0) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory0)
-
-        setSelectedMemoryButtonView(mBinding.buttonOne, 0)
+        with(configuration) {
+            if (isDoubleDeviceConnection)
+                doubleDeviceMap.forEach { it.value.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber) }
+            else
+                hearingAid.wirelessControl?.currentMemory= ParameterSpace.value(buttonNumber)
+        }
+        setSelectedMemoryButtonView(button, buttonNumber)
     }
-    fun buttonTwoClicked()
+    fun setSelectedMemoryButtonView(button: Button, num : Int)
     {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory1) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory1)
+        runOnUiThread {
+            button.backgroundTintList = AppCompatResources.getColorStateList(
+                this,
+                com.google.android.material.R.color.design_default_color_secondary_variant
+            )
+            button.foregroundTintList = AppCompatResources.getColorStateList(
+                this@ControlActivity, R.color.white)
 
-        setSelectedMemoryButtonView(mBinding.buttonTwo, 1)
+            setButtonsDefaultColor(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
+            else configuration.doubleDeviceMap[EarSide.Left]!!, num)
+        }
     }
-    fun buttonThreeClicked()
+    fun sliderDualOnValueChanged(value: Float)
     {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory2) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory2)
-
-        setSelectedMemoryButtonView(mBinding.buttonThree, 2)
-    }
-    fun buttonFourClicked()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory3) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory3)
-
-        setSelectedMemoryButtonView(mBinding.buttonFour, 3)
-    }
-    fun buttonFiveClicked()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory4) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory4)
-
-        setSelectedMemoryButtonView(mBinding.buttonFive, 4)
-    }
-    fun buttonSixClicked()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory5) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory5)
-
-        setSelectedMemoryButtonView(mBinding.buttonSix, 5)
-    }
-    fun buttonSevenClicked()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory6) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory6)
-
-        setSelectedMemoryButtonView(mBinding.buttonSeven, 6)
-    }
-    fun buttonEightClicked()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap.forEach { memoryButtonsClickedCallback(it.value, ParameterSpace.kNvmMemory7) }
-        else
-            memoryButtonsClickedCallback(configuration.hearingAid, ParameterSpace.kNvmMemory7)
-
-        setSelectedMemoryButtonView(mBinding.buttonEight, 7)
+        threadPool.execute { sliderLeftEarOnValueChanged(value) }
+        threadPool.execute { sliderRightEarOnValueChanged(value) }
     }
     fun sliderLeftEarOnValueChanged(value: Float)
     {
@@ -414,9 +396,5 @@ class ControlActivity : AppCompatActivity() {
             configuration.isDualDeviceConfig = false
         }
     }
-    fun sliderDualOnValueChanged(value: Float)
-    {
-        threadPool.execute { sliderLeftEarOnValueChanged(value) }
-        threadPool.execute { sliderRightEarOnValueChanged(value) }
-    }
+
 }
