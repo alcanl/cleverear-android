@@ -74,4 +74,3 @@ fun parseJsonVolumeData(data: String, context: Context) : Int
     return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level))
 }
 
-

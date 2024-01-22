@@ -1,10 +1,12 @@
 package com.alcanl.cleverear.helpers.listeners
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.ControlActivity
+import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
@@ -21,6 +23,7 @@ import com.ark.Event
 import com.ark.EventHandler
 import com.ark.EventType
 import com.ark.ParameterSpace
+import com.ark.ProductManager
 import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
@@ -45,16 +48,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                         EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                         EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        EventType.kExitEvent -> handleGenericEvent(event)
-                        EventType.kActiveEvent -> handleGenericEvent(event)
-                        EventType.kUnknownEvent -> handleGenericEvent(event)
-                        EventType.kECMemoryEvent -> handleGenericEvent(event)
-                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
-                        EventType.kMicAttenuationEvent -> handleGenericEvent(event)
-                        else -> {
-                            Log.e("event", event.data)
-                            Log.e("ecMemory", event.data)
-                        }
+                        else -> Log.e("event", event.data)
                     }
 
                 } catch (ex: JSONException) {
@@ -66,11 +60,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                 }
             }
         }
-    }
-    private fun handleGenericEvent(event: Event)
-    {
-        Log.e("event", event.data)
-        Log.e("exit", event.data)
     }
     private fun handleConnectionEvent(event: Event)
     {
@@ -89,7 +78,10 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                             R.string.toast_connection_lost_text,
                             Toast.LENGTH_LONG
                         ).show()
+
+                        startActivity(Intent(actCont, LoadingActivity::class.java))
                         finish()
+                        mConfiguration.isConnected = false
                     }
                     else if (connectionState == 3) {
                         Toast.makeText(

@@ -46,7 +46,7 @@
             app:srcCompat="@drawable/cleverear_logo_opacity" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout4"
+            android:id="@+id/constraintLayoutMode"
             android:layout_width="0dp"
             android:layout_height="204dp"
             android:background="@drawable/advanced_top_layout"
@@ -148,6 +148,22 @@
                 android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@+id/textViewChannel"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="70dp"
+                android:layout_height="68dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="#00FFFFFF"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/editTextChannel"
+                app:srcCompat="@drawable/check_tick"
+                android:contentDescription="@string/button_check_tick_content_desc" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -158,7 +174,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout4">
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutMode">
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderAuxCommon"
@@ -376,9 +392,10 @@
                 app:trackHeight="12dp" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch2"
+                android:id="@+id/switchDual"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="invisible"
                 android:layout_marginTop="90dp"
                 android:checked="@={config.INSTANCE.dualDeviceConfig}"
                 android:text="@string/switch_dual_device_text"

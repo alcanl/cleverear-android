@@ -35,4 +35,8 @@ class AdvancedActivityViewModel(activity: AdvancedActivity) {
     {
         mWeakReference.get()?.modeButtonClicked(view)
     }
+    fun handleSetChannelButtonClick()
+    {
+        mWeakReference.get()?.setStreamAddressButtonClicked()
+    }
 }

@@ -34,17 +34,13 @@ class ControlActivity : AppCompatActivity() {
     @Inject
     lateinit var configuration : ConfigurationModule
     lateinit var mBinding: ActivityControlBinding
-    private lateinit var listener : ControlActivityEventListener
+    private lateinit var mListener : ControlActivityEventListener
     private var isListenerOnBoard = false
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
 
-        if (configuration.isConnected) {
-            listener.startEventListener()
-            isListenerOnBoard = true
-        }
     }
 
     override fun onResume()
@@ -52,16 +48,22 @@ class ControlActivity : AppCompatActivity() {
         super.onResume()
         if (!configuration.isConnected)
             finish()
+        else  {
+            mListener.startEventListener()
+            isListenerOnBoard = true
+        }
 
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         initSliders()
     }
-    override fun onDestroy()
+    override fun onPause()
     {
-        super.onDestroy()
+        super.onPause()
 
-        if (isListenerOnBoard)
-            listener.stopListener()
+        if (isListenerOnBoard) {
+            mListener.stopListener()
+            isListenerOnBoard = false
+        }
     }
     private fun initBatteryViews()
     {
@@ -121,7 +123,7 @@ class ControlActivity : AppCompatActivity() {
         initMemoryButtons()
         initBatteryViews()
         initSwitch()
-        listener = ControlActivityEventListener(this, eventHandler, threadPool, configuration)
+        mListener = ControlActivityEventListener(this,  eventHandler, threadPool, configuration)
     }
     private fun initMemoryButtons()
     {
@@ -235,7 +237,7 @@ class ControlActivity : AppCompatActivity() {
                 this@ControlActivity, R.color.default_button_color)
             foregroundTintList = AppCompatResources.getColorStateList(
                 this@ControlActivity, R.color.black)
-        }
+            }
         }
     }
     private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener

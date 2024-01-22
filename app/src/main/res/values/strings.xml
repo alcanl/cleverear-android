@@ -17,6 +17,7 @@
     <string name="textview_channel_text">Channel</string>
     <string name="textview_R_text">R</string>
     <string name="textview_L_text">L</string>
+    <string name="button_check_tick_content_desc">Set Channel Done</string>
     <string name="edittext_channel_hint">1–255</string>
     <string name="dialog_already_connected_message" translatable="true">You have already connected with a device. Do you want to end this connection?</string>
     <string name="textview_count_device_found_text">Device Found</string>
@@ -26,9 +27,10 @@
     <string name="textview_left_device_text">Left Device</string>
     <string name="textview_right_device_text">Right Device</string>
     <string name="switch_dual_device_text" translatable="true">Dual Configuration</string>
-    <string name="toast_connection_lost_text" translatable="true">Connection Lost, Please Reconnect To Device</string>
+    <string name="toast_connection_lost_text" translatable="true">Connection Lost, Trying to Reconnect the Device</string>
     <string name="toast_connection_established_text" translatable="true">Connection Established With The Device</string>
     <string name="listener_volume_level_text" translatable="true">Volume Level:</string>
+    <string name="listener_aux_level_text" translatable="true">Aux Level:</string>
     <string name="toast_problem_occured_text" translatable="true">Problem occurred while connecting to device</string>
     <string name="empty_string"> </string>
     <string name="button_text_one">1</string>

@@ -31,7 +31,7 @@ class LoadingActivity : AppCompatActivity() {
     @Inject
     lateinit var productManager: ProductManager
 
-    private lateinit var listener: LoadingActivityEventListener
+    private lateinit var mListener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -42,7 +42,7 @@ class LoadingActivity : AppCompatActivity() {
     override fun onDestroy()
     {
         super.onDestroy()
-        listener.stopListener()
+        mListener.stopListener()
     }
     private fun initCountDownTimer()
     {
@@ -73,7 +73,7 @@ class LoadingActivity : AppCompatActivity() {
     private fun initialize()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
-        listener = LoadingActivityEventListener(this, eventHandler, threadPool, configuration)
+        mListener = LoadingActivityEventListener(this, eventHandler, threadPool, configuration)
             .apply { startEventListener() }
         getDevicePropertiesFromSDK()
 
