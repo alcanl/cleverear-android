@@ -40,7 +40,6 @@ class ControlActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-
     }
 
     override fun onResume()
@@ -56,9 +55,9 @@ class ControlActivity : AppCompatActivity() {
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         initSliders()
     }
-    override fun onPause()
+    override fun onStop()
     {
-        super.onPause()
+        super.onStop()
 
         if (isListenerOnBoard) {
             mListener.stopListener()
@@ -240,7 +239,7 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    private fun setSlidersFirstAnimationEnd(slider: Slider) : AnimationListener
+    private fun setSlidersFirstAnimation(slider: Slider) : AnimationListener
     {
         return object : AnimationListener {
             override fun onAnimationStart(animation: Animation?)
@@ -283,7 +282,7 @@ class ControlActivity : AppCompatActivity() {
             }
         }
     }
-    private fun setSlidersSecondAnimationEnd(slider: Slider) : AnimationListener
+    private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
     {
         return object : AnimationListener {
             override fun onAnimationStart(animation: Animation?)
@@ -367,13 +366,13 @@ class ControlActivity : AppCompatActivity() {
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_left_to_right_left_slider
-                    ).also { it.setAnimationListener(setSlidersFirstAnimationEnd(mBinding.sliderLeft)) }
+                    ).also { it.setAnimationListener(setSlidersFirstAnimation(mBinding.sliderLeft)) }
                 )
                 mBinding.sliderRight.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_right_to_left_right_slider
-                    ).also { it.setAnimationListener(setSlidersFirstAnimationEnd(mBinding.sliderRight)) }
+                    ).also { it.setAnimationListener(setSlidersFirstAnimation(mBinding.sliderRight)) }
                 )
 
             }
@@ -385,13 +384,13 @@ class ControlActivity : AppCompatActivity() {
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_right_to_left_left_slider
-                    ).also { it.setAnimationListener(setSlidersSecondAnimationEnd(mBinding.sliderLeft)) }
+                    ).also { it.setAnimationListener(setSlidersSecondAnimation(mBinding.sliderLeft)) }
                 )
                 mBinding.sliderRight.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         this,
                         R.anim.translate_left_to_right_right_slider
-                    ).also { it.setAnimationListener(setSlidersSecondAnimationEnd(mBinding.sliderRight)) }
+                    ).also { it.setAnimationListener(setSlidersSecondAnimation(mBinding.sliderRight)) }
                 )
 
             }

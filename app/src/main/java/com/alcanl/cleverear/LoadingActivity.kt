@@ -1,6 +1,7 @@
 package com.alcanl.cleverear
 
 import android.content.Intent
+import android.content.SharedPreferences.Editor
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -11,6 +12,12 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.helpers.DEVICE_MAC_KEY
+import com.alcanl.cleverear.helpers.DEVICE_MANU_KEY
+import com.alcanl.cleverear.helpers.DEVICE_NAME_KEY
+import com.alcanl.cleverear.helpers.DEVICE_NAME_PREF
+import com.alcanl.cleverear.helpers.DEVICE_RSSI_KEY
+import com.alcanl.cleverear.helpers.DEVICE_SIDE_KEY
 import com.alcanl.cleverear.helpers.listeners.LoadingActivityEventListener
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -42,7 +49,32 @@ class LoadingActivity : AppCompatActivity() {
     override fun onDestroy()
     {
         super.onDestroy()
+        with(configuration) {
+
+            if (isConnected) {
+                val editor = getSharedPreferences(DEVICE_NAME_PREF, MODE_PRIVATE).edit()
+                if (!isDoubleDeviceConnection)
+                    putPreferences(editor, configuration.hearingAid)
+                else
+                    doubleDeviceMap.forEach { putPreferences(editor, it.value) }
+
+            }
+        }
+
         mListener.stopListener()
+    }
+    private fun putPreferences(editor: Editor, hearingAid: HearingAid)
+    {
+        with(editor) {
+            putString(DEVICE_NAME_KEY, hearingAid.name)
+            putString(DEVICE_MAC_KEY, hearingAid.address)
+            putInt(DEVICE_RSSI_KEY, hearingAid.rssi)
+            putString(DEVICE_MANU_KEY, hearingAid.manufacturerData)
+            putString(DEVICE_SIDE_KEY, hearingAid.side.toString())
+            apply()
+        }
+
+
     }
     private fun initCountDownTimer()
     {

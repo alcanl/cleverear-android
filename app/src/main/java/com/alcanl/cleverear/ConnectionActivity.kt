@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -23,6 +24,14 @@ import com.alcanl.cleverear.databinding.ActivityConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.helpers.DEVICE_MAC_KEY
+import com.alcanl.cleverear.helpers.DEVICE_MANU_KEY
+import com.alcanl.cleverear.helpers.DEVICE_NAME_DEFAULT
+import com.alcanl.cleverear.helpers.DEVICE_NAME_EDITED
+import com.alcanl.cleverear.helpers.DEVICE_NAME_KEY
+import com.alcanl.cleverear.helpers.DEVICE_NAME_PREF
+import com.alcanl.cleverear.helpers.DEVICE_RSSI_KEY
+import com.alcanl.cleverear.helpers.DEVICE_SIDE_KEY
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
@@ -54,6 +63,7 @@ class ConnectionActivity : AppCompatActivity() {
     @Volatile
     var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
     @Volatile
+    private lateinit var mPrefs: SharedPreferences
     private var mDeviceCount = 0
     private var isScanContinue = false
     private var mBluetoothPermission = false
@@ -87,11 +97,12 @@ class ConnectionActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
+        loadPreferences()
         buttonDetectDeviceClicked()
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         if (isScanContinue)
             stopScanButtonClicked()
     }
@@ -192,6 +203,42 @@ class ConnectionActivity : AppCompatActivity() {
         else
             manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
     }
+    private fun loadPreferences()
+    {
+        mPrefs = getSharedPreferences(DEVICE_NAME_PREF, MODE_PRIVATE)
+    }
+    private fun isConnectedBefore(deviceName: String) : Boolean
+    {
+        return mPrefs.getString(DEVICE_NAME_KEY, DEVICE_NAME_DEFAULT)!!.contains(deviceName)
+    }
+    private fun handleConnectedBeforeDevice()
+    {
+        val name = mPrefs.getString(DEVICE_NAME_KEY, "")!!
+        val rssi = mPrefs.getInt(DEVICE_RSSI_KEY, 0)
+        val address = mPrefs.getString(DEVICE_MAC_KEY, "")
+        val manufacturer = mPrefs.getString(DEVICE_MANU_KEY, "")
+        val earSide = if (mPrefs.getString(DEVICE_SIDE_KEY, "") == EarSide.Left.toString())
+            EarSide.Left else EarSide.Right
+
+        with(configuration) {
+            if (!isDoubleDeviceConnection) {
+                hearingAid = HearingAid(address!!, name, rssi, manufacturer!!, earSide)
+                finalizeConnectionConfiguration()
+            }
+            else {
+                if (earSide == EarSide.Right)
+                    doubleDeviceMap[EarSide.Right] =
+                        HearingAid(address!!, name, rssi, manufacturer!!, earSide)
+                else
+                    doubleDeviceMap[EarSide.Left] =
+                        HearingAid(address!!, name, rssi, manufacturer!!, earSide)
+
+                if (doubleDeviceMap.size == 2)
+                    finalizeConnectionConfiguration()
+            }
+        }
+
+    }
     private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo) {
         if (configuration.doubleDeviceMap.containsKey(earSide))
             return
@@ -221,10 +268,11 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun scanDevicesWithBluetooth() {
         try {
-            mAsyncResult =
-                if (configuration.earSide == EarSide.Right) deviceConnectionHandler.scanForLeftDevice()
-                else deviceConnectionHandler.scanForRightDevice()
-
+            if (mBluetoothPermission) {
+                mAsyncResult =
+                    if (configuration.earSide == EarSide.Right) deviceConnectionHandler.scanForRightDevice()
+                    else deviceConnectionHandler.scanForLeftDevice()
+            }
         } catch (ex: ArkException) {
             Log.e("", ex.message!!)
             Toast.makeText(this, R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
@@ -242,7 +290,9 @@ class ConnectionActivity : AppCompatActivity() {
                         Log.e(String::class.java.simpleName, mBleDeviceList.size.toString())
                         if (!isDuplicate(device)) {
                             runOnUiThread {
-                                mBinding.adapter!!.add(device.name); mBinding.adapter!!.notifyDataSetChanged()
+                                mBinding.adapter!!.add(if (isConnectedBefore(device.name)) DEVICE_NAME_EDITED
+                                        else device.name)
+                                mBinding.adapter!!.notifyDataSetChanged()
                                 mBinding.textViewDeviceState.text = String.format(
                                     "%d %s", ++mDeviceCount,
                                     getText(R.string.textview_count_device_found_text)
@@ -313,6 +363,8 @@ class ConnectionActivity : AppCompatActivity() {
     fun buttonDetectDeviceClicked() {
 
         if (!configuration.isConnected) {
+            mBleDeviceList.clear()
+            mDeviceCount = 0
             scanBluetooth()
             with(mBinding) {
                 progressBar.visibility = View.VISIBLE
@@ -332,6 +384,11 @@ class ConnectionActivity : AppCompatActivity() {
 
     fun hearingAidItemClicked(pos: Int)
     {
+        if (mBinding.adapter!!.getItem(pos)!! == DEVICE_NAME_EDITED) {
+            handleConnectedBeforeDevice()
+            return
+        }
+
         if (configuration.isDoubleDeviceConnection) {
             selectDoubleItem(pos)
             return
@@ -341,9 +398,6 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun scanDevices()
     {
-        mDeviceCount = 0
-        mBleDeviceList.clear()
-
         with(mBinding) {
             textViewDeviceState.text =
                 getString(R.string.textview_device_detection_not_found_text)

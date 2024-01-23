@@ -2,10 +2,15 @@ package com.alcanl.cleverear
 
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -16,8 +21,10 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.listeners.AdvancedActivityEventListener
+import com.alcanl.cleverear.viewmodel.AdvancedActivityViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
+import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -52,9 +59,9 @@ class AdvancedActivity : AppCompatActivity(){
             }
     }
 
-    override fun onPause()
+    override fun onStop()
     {
-        super.onPause()
+        super.onStop()
         if (isListenerOnBoard) {
             mListener.stopListener()
             isListenerOnBoard = false
@@ -65,13 +72,176 @@ class AdvancedActivity : AppCompatActivity(){
         initBinding()
         initializeNavigationView()
         initSwitch()
+        initSliders()
         mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
 
     }
+    private fun initSliders()
+    {
+        with(configuration) {
+            if (!isDoubleDeviceConnection) {
+                with(mBinding) {
+                    sliderAuxLeft.visibility = View.INVISIBLE
+                    sliderAuxRight.visibility= View.INVISIBLE
+                    sliderMicLeft.visibility = View.INVISIBLE
+                    sliderMicRight.visibility = View.INVISIBLE
+                    initCommonSliderForSingleDevice(sliderMicCommon)
+                    initCommonSliderForSingleDevice(sliderAuxCommon)
+                }
+            }
+            else
+                with(mBinding) {
+                    if (!isDualDeviceConfig) {
+                        sliderAuxCommon.visibility = View.INVISIBLE
+                        sliderMicCommon.visibility = View.INVISIBLE
+                    }
+                    else {
+                        sliderMicLeft.visibility = View.INVISIBLE
+                        sliderAuxLeft.visibility = View.INVISIBLE
+                        sliderMicRight.visibility = View.INVISIBLE
+                        sliderAuxRight.visibility = View.INVISIBLE
+                    }
+                }
+        }
+    }
+    private fun initCommonSliderForSingleDevice(slider: Slider)
+    {
+        slider.apply {
+            visibility = View.VISIBLE
+            isEnabled = true
+            trackActiveTintList = initCommonSliderTheme()
+            thumbTintList = initCommonSliderTheme()
+        }
+    }
+    private fun initCommonSliderTheme() : ColorStateList
+    {
+        return if (configuration.hearingAid.side == EarSide.Left)
+            AppCompatResources.getColorStateList(
+                this@AdvancedActivity,
+                R.color.left_device_slider
+            )
+        else
+            AppCompatResources.getColorStateList(
+                this@AdvancedActivity,
+                R.color.right_device_slider
+            )
+    }
+    fun switchOnCheckedChanged()
+    {
+        with(configuration) {
+            runOnUiThread {
+                isDualDeviceConfig = if (!isDualDeviceConfig) {
+                    with(mBinding) {
+                        sliderFirstAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_left_to_right_left)
+                        sliderFirstAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_left_to_right_left)
+                        sliderFirstAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_right_to_left_right)
+                        sliderFirstAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_right_to_left_right)
+                    }
+                    true
+                } else {
+                    with(mBinding) {
+                        sliderSecondAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_right_to_left_left)
+                        sliderSecondAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_right_to_left_left)
+                        sliderSecondAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_left_to_right_right)
+                        sliderSecondAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_left_to_right_right)
+                    false
+                    }
+                }
+            }
+        }
+    }
+    private fun sliderFirstAnimationCallback(slider: Slider, anim: Int)
+    {
+        with(slider) {
+            startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(
+                    this@AdvancedActivity,
+                       anim
+                ).also { it.setAnimationListener(setSlidersFirstAnimation(slider)) })
+        }
+    }
+    private fun sliderSecondAnimationCallback(slider: Slider, anim: Int)
+    {
+        with(slider) {
+            startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(
+                    this@AdvancedActivity,
+                    anim
+                ).also { it.setAnimationListener(setSlidersSecondAnimation(slider)) })
+        }
+    }
+    private fun setSlidersFirstAnimation(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                slider.visibility = View.INVISIBLE
+            }
 
+            override fun onAnimationEnd(animation: Animation?) {
+
+                startCommonSlidersAnimation(mBinding.sliderAuxCommon)
+                startCommonSlidersAnimation(mBinding.sliderMicCommon)
+
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+
+        }
+    }
+    private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                with(mBinding) {
+                    sliderAuxCommon.apply {
+                        visibility = View.INVISIBLE; isEnabled = false
+                    }
+                    sliderMicCommon.apply {
+                        visibility = View.INVISIBLE; isEnabled = false
+                    }
+                }
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                slider.apply {
+                    visibility = View.VISIBLE
+                    isEnabled = true
+                }
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+        }
+    }
+    private fun startCommonSlidersAnimation(slider: Slider)
+    {
+        slider.startAnimation(
+            android.view.animation.AnimationUtils.loadAnimation(
+                this@AdvancedActivity, R.anim.alpha_blink_anim
+            ).also {it.setAnimationListener(
+
+                object: AnimationListener {
+                    override fun onAnimationStart(animation: Animation?) {
+                    }
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        slider.visibility = View.VISIBLE
+                        slider.isEnabled = true
+                    }
+
+                    override fun onAnimationRepeat(animation: Animation?) {
+                    }
+                }
+            ) })
+
+    }
     private fun initBinding()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_advanced)
+        mBinding.viewModel = AdvancedActivityViewModel(this)
     }
     private fun initializeNavigationView()
     {
@@ -111,7 +281,6 @@ class AdvancedActivity : AppCompatActivity(){
         if (configuration.isDoubleDeviceConnection)
             mBinding.switchDual.visibility = View.VISIBLE
     }
-
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
     {
         with(hearingAid) {
@@ -120,13 +289,19 @@ class AdvancedActivity : AppCompatActivity(){
             wirelessControl?.streamAddress = result
         }
     }
-
     private fun modeButtonClickedCallback(view: View, hearingAid: HearingAid)
     {
-        hearingAid.streamChannelList = when (view) {
-            mBinding.buttonModeOne -> 1
-            mBinding.buttonModeTwo -> 2
-            else -> 3
+        hearingAid.apply {
+            streamChannelList = when (view) {
+                mBinding.buttonModeOne -> 0
+                mBinding.buttonModeTwo -> 1
+                else -> 2
+            }
+            wirelessControl?.streamChannelList = when (view) {
+                mBinding.buttonModeOne -> 0
+                mBinding.buttonModeTwo -> 1
+                else -> 2
+            }
         }
     }
     private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>)
@@ -148,26 +323,41 @@ class AdvancedActivity : AppCompatActivity(){
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
     {
         try {
-            if (configuration.isConnected) {
-                if (!configuration.isDoubleDeviceConnection) {
-                    configuration.hearingAid.wirelessControl?.micAttenuation = value.toInt()
-
-                } else
-                    configuration.doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+            with(configuration) {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection) {
+                        hearingAid.wirelessControl?.micAttenuation = value.toInt()
+                        hearingAid.micAttenuation = value.toInt()
+                    }
+                    else {
+                        doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+                        doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
+                    }
+                }
             }
-        } catch (_: ArkException) {}
+        } catch (ex: ArkException) {
+            Log.e("mic", ex.message!!)
+        }
     }
     private fun auxSliderValueChanged(value: Float, earSide: EarSide)
     {
         try {
-            if (configuration.isConnected) {
-                if (!configuration.isDoubleDeviceConnection) {
-                    configuration.hearingAid.wirelessControl?.auxAttenuation = value.toInt()
+            with(configuration) {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection) {
+                        hearingAid.wirelessControl?.auxAttenuation = value.toInt()
+                        hearingAid.auxAttenuation = value.toInt()
 
-                } else
-                    configuration.doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                    } else {
+                        doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                        doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
+                    }
+                }
             }
-        } catch (_: ArkException) {}
+
+        } catch (ex: ArkException) {
+            Log.e("aux", ex.message!!)
+        }
     }
     private fun setSelectedModeButtonView(button: Button)
     {
@@ -230,15 +420,32 @@ class AdvancedActivity : AppCompatActivity(){
     {
         auxSliderValueChanged(value, EarSide.Right)
     }
-    fun setStreamAddressButtonClicked()
+    fun setStreamAddressButtonClicked(view: View)
     {
-        val channel: Int
+        runOnUiThread { (view as ImageButton).startAnimation( android.view.animation.AnimationUtils.loadAnimation(
+            this@AdvancedActivity, R.anim.alpha_blink_anim
+        ).also {it.setAnimationListener(
 
-        try {
-            channel = mBinding.editTextChannel.text.toString().toInt()
-            setStreamAddressButtonClicked(channel)
-        } catch (_: NumberFormatException) {
-            Toast.makeText(this, "Illegal Arguments for Channel", Toast.LENGTH_LONG).show()
+            object: AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {
+                    val channel: Int
+
+                    try {
+                        channel = mBinding.editTextChannel.text.toString().toInt()
+                        setStreamAddressButtonClicked(channel)
+                    } catch (_: NumberFormatException) {
+                        Toast.makeText(this@AdvancedActivity, "Illegal Arguments for Channel", Toast.LENGTH_LONG).show()
+                    }
+                }
+                override fun onAnimationEnd(animation: Animation?) {
+                    mBinding.editTextChannel.setText("")
+                    mBinding.editTextChannel.setHint(R.string.edittext_channel_hint)
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {
+                }
+            }
+        ) })
         }
     }
 }

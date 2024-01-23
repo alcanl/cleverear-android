@@ -14,7 +14,6 @@ class CleverEarApp : Application(){
         super.onCreate()
         BleUtil.BleManager_Init(this)
     }
-
     override fun onTerminate() {
         super.onTerminate()
         BleUtil.BleManager_DeInit()

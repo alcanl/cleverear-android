@@ -15,15 +15,16 @@ import com.alcanl.cleverear.helpers.parseJsonConnectionData
 import com.alcanl.cleverear.helpers.parseJsonMemoryActiveData
 import com.alcanl.cleverear.helpers.parseJsonSenderMacData
 import com.alcanl.cleverear.helpers.parseJsonVolumeData
+import com.alcanl.cleverear.sdk.events.AuxChangeEvent
 import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent
+import com.alcanl.cleverear.sdk.events.MicChangeEvent
 import com.alcanl.cleverear.sdk.events.VolumeChangeEvent
 import com.ark.Event
 import com.ark.EventHandler
 import com.ark.EventType
 import com.ark.ParameterSpace
-import com.ark.ProductManager
 import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
@@ -48,6 +49,8 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                         EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                         EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
+                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event, AuxChangeEvent::class.java)
+                        EventType.kMicAttenuationEvent -> handleGenericEvent(event, MicChangeEvent::class.java)
                         else -> Log.e("event", event.data)
                     }
 
@@ -60,6 +63,11 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                 }
             }
         }
+    }
+    private fun handleGenericEvent(event: Event, clazz: Class<*>)
+    {
+        Log.e("event", event.data)
+        Log.e("sender", clazz::class.java.simpleName)
     }
     private fun handleConnectionEvent(event: Event)
     {

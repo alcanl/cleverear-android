@@ -3,16 +3,16 @@
     <string name="splash_description_text">Splash Screen</string>
     <string name="background_image_description_text">Ear Technic Logo</string>
     <string name="main_logo_description_text">Ear Technic Logo</string>
-    <string name="button_single_device_connection_text">Connect For Single Device</string>
-    <string name="button_double_device_connection_text">Connect For Double Device</string>
+    <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
+    <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
     <string name="title_activity_double_device">DoubleDeviceActivity</string>
     <string name="title_activity_single_device">SingleDeviceActivity</string>
-    <string name="app_version_text">v 1.0.0</string>
-    <string name="textview_detect_device_text">Detect Device</string>
-    <string name="textview_device_detection_not_found_text">Device Not Found</string>
-    <string name="textview_device_detection_device_connected_text">Connected To Device</string>
-    <string name="textview_device_detection_connection_in_process_text">Connecting To Device</string>
-    <string name="textview_device_detection_not_connected_text">Could not Connected To Device</string>
+    <string name="app_version_text">v 3.0.0</string>
+    <string name="textview_detect_device_text" translatable="true">Detect Device</string>
+    <string name="textview_device_detection_not_found_text" translatable="true">Device Not Found</string>
+    <string name="textview_device_detection_device_connected_text" translatable="true">Connected To Device</string>
+    <string name="textview_device_detection_connection_in_process_text" translatable="true">Connecting To Device</string>
+    <string name="textview_device_detection_not_connected_text" translatable="true">Could not Connected To Device</string>
     <string name="textview_mode_text">Mode</string>
     <string name="textview_channel_text">Channel</string>
     <string name="textview_R_text">R</string>
@@ -20,12 +20,12 @@
     <string name="button_check_tick_content_desc">Set Channel Done</string>
     <string name="edittext_channel_hint">1–255</string>
     <string name="dialog_already_connected_message" translatable="true">You have already connected with a device. Do you want to end this connection?</string>
-    <string name="textview_count_device_found_text">Device Found</string>
-    <string name="button_stop_scan_text">\t\t\tStop Scanning</string>
-    <string name="textview_volume_text">Volume</string>
-    <string name="textview_program_text">Programs</string>
-    <string name="textview_left_device_text">Left Device</string>
-    <string name="textview_right_device_text">Right Device</string>
+    <string name="textview_count_device_found_text" translatable="true">Device Found</string>
+    <string name="button_stop_scan_text" translatable="true">\t\t\tStop Scanning</string>
+    <string name="textview_volume_text" translatable="true">Volume</string>
+    <string name="textview_program_text" translatable="true">Programs</string>
+    <string name="textview_left_device_text" translatable="true">Left Device</string>
+    <string name="textview_right_device_text" translatable="true">Right Device</string>
     <string name="switch_dual_device_text" translatable="true">Dual Configuration</string>
     <string name="toast_connection_lost_text" translatable="true">Connection Lost, Trying to Reconnect the Device</string>
     <string name="toast_connection_established_text" translatable="true">Connection Established With The Device</string>
@@ -41,131 +41,45 @@
     <string name="button_text_six">6</string>
     <string name="button_text_seven">7</string>
     <string name="button_text_eight">8</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="next">Next</string>
-    <string name="button_previous_activity">Previous Page</string>
-    <string name="navbar_connection_text">Connection</string>
-    <string name="navbar_control_text">Control</string>
-    <string name="navbar_advanced_text">Advanced</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="alert_dialog_ear_side_select_title">Ear Side</string>
-    <string name="alert_dialog_left_ear_side_text">Left Ear</string>
-    <string name="alert_dialog_right_ear_side_text">Right Ear</string>
-    <string name="toast_bluetooth_not_found_text">Your Device Does Not Support Bluetooth Connection</string>
-
-    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
-    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
-    <string name="tag_connect" translatable="false">connect</string>
-    <string name="tag_coble" translatable="false">coble</string>
-    <string name="tag_coble2" translatable="false">coble2</string>
-    <string name="tag_about" translatable="false">about</string>
+    <string name="navbar_connection_text" translatable="true">Connection</string>
+    <string name="navbar_control_text" translatable="true">Control</string>
+    <string name="navbar_advanced_text" translatable="true">Advanced</string>
+    <string name="alert_dialog_ear_side_select_title" translatable="true">Ear Side</string>
+    <string name="alert_dialog_left_ear_side_text" translatable="true">Left Ear</string>
+    <string name="alert_dialog_right_ear_side_text" translatable="true">Right Ear</string>
+    <string name="toast_bluetooth_not_found_text" translatable="true">Your Device Does Not Support Bluetooth Connection</string>
     <string name="title_name" translatable="false">Name: </string>
-    <string name="tag_name" translatable="false">name</string>
     <string name="title_Rssi" translatable="false">RSSI:</string>
-    <string name="tag_rssi" translatable="false">rssi</string>
     <string name="title_Address_" translatable="false">Address:</string>
     <string name="dialog_warning" translatable="true">Warning</string>
-    <string name="tag_address" translatable="false">address</string>
     <string name="dialog_yes" translatable="true">Yes</string>
     <string name="dialog_no" translatable="true">No</string>
-    <string name="title_popup_ok">OK</string>
-    <string name="title_channel_name">Channel</string>
-    <string name="title_mode">Mode</string>
-    <string name="title_select_device">Select Devices</string>
-    <string name="title_detect_device">Detect Device</string>
-    <string name="title_detect_devices">Detect Device (L+R)</string>
-    <!-- Content Description -->
-    <string name="zero" translatable="false">0</string>
-    <string name="title_gps_enabled">GPS is enabled !</string>
-    <string name="title_bluetooth_enabled">Bluetooth is now enabled</string>
-    <string name="title_bluetooth_disabled">Bluetooth not enabled, exiting</string>
-    <string name="title_gps_exiting">GPS needs to be enabled, for scanning to work!</string>
-    <string name="volume_limit" translatable="false">limit</string>
-    <string name="left_ha_name" translatable="false">ha_l_name</string>
-    <string name="right_ha_name" translatable="false">ha_r_name</string>
-    <string name="left_ha_address" translatable="false">ha_l_address</string>
-    <string name="right_ha_address" translatable="false">ha_r_address</string>
-    <string name="left_ha_friendly_name" translatable="false">ha_l_friendly</string>
-    <string name="right_ha_friendly_name" translatable="false">ha_r_friendly</string>
-    <string name="left_ha_volume" translatable="false">ha_l_volume</string>
-    <string name="right_ha_volume" translatable="false">ha_r_volume</string>
-    <string name="view_currentMemory" translatable="false">view_currentMemory</string>
     <string name="device_connected_text" translatable="true">Connected to Earnet</string>
-    <!-- Nav Drawer Menu Items -->
-    <string-array name="fragments_names">
-        <item>VOLUME_FRAGMENT</item>
-        <item>BATTERY_FRAGMENT</item>
-        <item>MEMORY_FRAGMENT</item>
-        <item>STREAM_FRAGMENT</item>
-        <item>AUX_FRAGMENT</item>
-        <item>MIC_FRAGMENT</item>
-        <item>Settings</item>
-    </string-array>
-    <string-array name="mode_array">
-        <item>Mode 1</item>
-        <item>Mode 2</item>
-        <item>Mode 3</item>
-    </string-array>
-    <string-array name="connection_state">
-        <item>Disconnecting</item>
-        <item>Disconnected</item>
-        <item>Connecting</item>
-        <item>Connected</item>
-        <item>ErrorState</item>
-    </string-array>
     <string name="connectionStatus_Disconnecting">Disconnecting…</string>
     <string name="connectionStatus_Disconnected">Disconnected</string>
     <string name="connectionStatus_Connecting">Connecting</string>
     <string name="connectionStatus_Connected">Connected</string>
     <string name="connectionStatus_ErrorState">ErrorState.</string>
-    <string name="left_ha_manu_data" translatable="false">ha_l_manu_data</string>
-    <string name="right_ha_manu_data" translatable="false">ha_r_manu_data</string>
-    <string name="title_popup_cancel">Cancel</string>
     <string name="current_memory" translatable="false">CurrentMemory</string>
     <string name="volume_level" translatable="false">VolumeLevel</string>
     <string name="title_connect">Connect</string>
     <string name="title_activity_scan">Scanning....</string>
-    <string name="title_activity_coble2">Advanced</string>
     <string name="device_name_json" translatable="false">DeviceName</string>
     <string name="device_connection_state_json" translatable="false">ConnectionState</string>
     <string name="device_id_json" translatable="false">DeviceID</string>
     <string name="device_rssi_json" translatable="false">RSSI</string>
-    <string name="HA_SIDE" translatable="false">HA_Side</string>
     <string name="event_json_obj" translatable="false">Event</string>
     <string name="device_manu_data_json" translatable="false">ManufacturingData</string>
     <string name="connecting_textView_value">Connecting to : </string>
-    <string name="on_eartechnic_companyID" translatable="false">d609</string>
-    <string name="left_advertising_data" translatable="false">d60900</string>
-    <string name="right_advertising_data" translatable="false">d60901</string>
     <string name="battery_level_json" translatable="false">BatteryLevel</string>
-    <string name="pref_auto_conn_key" translatable="false">enable_auto_connect</string>
-    <string name="pref_binural_key" translatable="false">enable_binural</string>
-    <string name="title_pref_enable_auto_conn_title" translatable="false">Enable Auto Connection</string>
-    <string name="title_msg_permission_granted">Permission granted !</string>
-    <string name="others" translatable="false">Others</string>
     <string name="title_txt_conn_status">Connection Status:</string>
     <string name="title_txt_dev_name" translatable="false">Device name:</string>
-    <string name="title_Biyonixapp" translatable="false">Biyonix App</string>
-    <string name="title_about">About</string>
-    <string name="title_advenced">Advenced</string>
-    <string name="title_control">Control</string>
-    <string name="title_scan">Scan</string>
     <string name="title_aux_label">Aux</string>
     <string name="title_mic_label">Mic</string>
-    <string name="title_volume_label">Volume</string>
-    <string name="title_program_label">Program</string>
-    <string name="title_alert_stream">Please enter a number between 1 and 250</string>
-    <string name="title_about_url">http://dosya.eartechnic.com/cleverear/cleverear_android_en.pdf</string>
-    <string name="alert_disconnect_device">Disconnect Device</string>
-    <string name="alert_disconnect_message">Do you want to disconnect from </string>
-    <string name="alert_remove_device">Remove Device</string>
-    <string name="alert_remove_message">Are you sure you want to remove !</string>
     <string name="alert_dialog_connection_problem_message" translatable="true">Some unknown problems occurred while connecting the device, please retry to connection!</string>
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
     <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="button_previous_activity">Previous</string>
 
 </resources>
