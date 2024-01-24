@@ -288,6 +288,7 @@
             android:id="@+id/constraintLayout5"
             android:layout_width="0dp"
             android:layout_height="240dp"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
