@@ -184,12 +184,12 @@ class ConnectionActivity : AppCompatActivity() {
     {
         return if (!configuration.isDoubleDeviceConnection)
                     if (configuration.earSide == EarSide.Left)
-                        mPrefs.getString(DEVICE_NAME_KEY_L, DEVICE_NAME_DEFAULT_L)!!.contains(deviceName)
+                        mPrefs.getString(DEVICE_NAME_KEY_L, DEVICE_NAME_DEFAULT_L)!! == deviceName
                     else
-                        mPrefs.getString(DEVICE_NAME_KEY_R, DEVICE_NAME_DEFAULT_R)!!.contains(deviceName)
+                        mPrefs.getString(DEVICE_NAME_KEY_R, DEVICE_NAME_DEFAULT_R)!! == deviceName
                 else
-                        mPrefs.getString(DEVICE_NAME_KEY_L, DEVICE_NAME_DEFAULT_L)!!.contains(deviceName)
-                                && mPrefs.getString(DEVICE_NAME_KEY_R, DEVICE_NAME_DEFAULT_R)!!.contains(deviceName)
+                        mPrefs.getString(DEVICE_NAME_KEY_L, DEVICE_NAME_DEFAULT_L)!! == deviceName
+                                || mPrefs.getString(DEVICE_NAME_KEY_R, DEVICE_NAME_DEFAULT_R)!! == deviceName
 
     }
     private fun handleConnectedBeforeDevice()
@@ -202,10 +202,8 @@ class ConnectionActivity : AppCompatActivity() {
                 finalizeConnectionConfiguration()
             }
             else {
-                if (earSide == EarSide.Right)
-                    doubleDeviceMap[EarSide.Right] = getConnectedBeforeRightDevice()
-                else
-                    doubleDeviceMap[EarSide.Left] = getConnectedBeforeLeftDevice()
+                doubleDeviceMap[EarSide.Right] = getConnectedBeforeRightDevice()
+                doubleDeviceMap[EarSide.Left] = getConnectedBeforeLeftDevice()
 
                 if (doubleDeviceMap.size == 2)
                     finalizeConnectionConfiguration()
