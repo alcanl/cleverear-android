@@ -4,6 +4,7 @@ import android.app.Application
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.HiltAndroidApp
+import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @HiltAndroidApp
