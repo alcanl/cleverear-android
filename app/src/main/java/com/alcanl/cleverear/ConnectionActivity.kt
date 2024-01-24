@@ -103,7 +103,8 @@ class ConnectionActivity : AppCompatActivity() {
         mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
     }
     private fun finalizeConnectionConfiguration() {
-
+        if (isScanContinue)
+            stopScanButtonClicked()
         finish()
         startActivity(Intent(this, LoadingActivity::class.java))
     }
