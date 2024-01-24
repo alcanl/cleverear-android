@@ -64,7 +64,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="110dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/alert_dialog_left_ear_side_text"
+                    android:text="@string/left_ear_side_text"
                     android:textColor="@color/ap_black"
                     android:textSize="20sp" />
 
@@ -94,7 +94,7 @@
                     android:layout_marginTop="110dp"
                     android:layout_marginEnd="10dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/alert_dialog_right_ear_side_text"
+                    android:text="@string/right_ear_side_text"
                     android:textColor="@color/ap_black"
                     android:textSize="20sp" />
             </FrameLayout>

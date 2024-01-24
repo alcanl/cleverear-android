@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CleverEar</string>
+    <string name="button_single_device_connection_text">Tek Cihaz İle Bağlantı</string>
+    <string name="button_double_device_connection_text">Çift Cihaz İle Bağlantı</string>
+    <string name="textview_detect_device_text">Cihaz Bul</string>
+    <string name="textview_device_detection_not_found_text">Cihaz Bulunamadı</string>
+    <string name="textview_device_detection_device_connected_text">Cihaza Bağlanıldı</string>
+    <string name="textview_device_detection_connection_in_process_text">Cihaza Bağlanılıyor</string>
+    <string name="textview_device_detection_not_connected_text">Cihaza Bağlanılamadı</string>
+    <string name="dialog_already_connected_message">Şu anda aktif bir bağlantınız bulunmaktadır. Bu bağlantıyı sonlandırmak istiyor musunuz?</string>
+    <string name="textview_count_device_found_text">Cihaz Bulundu</string>
+    <string name="button_stop_scan_text">Taramayı Durdur</string>
+    <string name="textview_volume_text">Ses</string>
+    <string name="textview_program_text">Programlar</string>
+    <string name="textview_left_device_text">Sol Kulak</string>
+    <string name="textview_right_device_text">Sağ Kulak</string>
+    <string name="switch_dual_device_text">Eş Kullanım</string>
+    <string name="toast_connection_lost_text">Bağlantı Kaybedildi, Cihaza Yeniden Bağlanılıyor</string>
+    <string name="toast_connection_established_text">Cihaz İle Bağlantı Kuruldu</string>
+    <string name="toast_problem_occured_text">Cihaza bağlanılırken bilinmeyen bir prolem meydana geldi.</string>
+    <string name="navbar_connection_text">Bağlantı</string>
+    <string name="navbar_control_text">Kontrol</string>
+    <string name="navbar_advanced_text">Gelişmiş</string>
+    <string name="left_ear_side_text">Sol Kulak</string>
+    <string name="right_ear_side_text">Sağ Kulak</string>
+    <string name="toast_bluetooth_not_found_text">Telefonunuzda Bluetooth Özelliği Desteklenmemektedir.</string>
+    <string name="dialog_yes">Evet</string>
+    <string name="dialog_no">Hayır</string>
+    <string name="device_connected_text">Earnet ile Bağlantı Sağlandı</string>
+    <string name="textview_mode_text">Mod</string>
+    <string name="textview_channel_text">Kanal</string>
+    <string name="title_aux_label">Hoparlör</string>
+    <string name="title_mic_label">Mikrofon</string>
+    <string name="alert_dialog_connection_problem_title">Uyarı</string>
+    <string name="alert_dialog_connection_problem_ok_button">Tamam</string>
+    <string name="toast_connection_problem_text">Cihaza Bağlanılamadı</string>
+    <string name="button_previous_activity">Önceki</string>
+</resources>

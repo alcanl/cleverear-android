@@ -437,11 +437,10 @@ class AdvancedActivity : AppCompatActivity(){
                         Toast.makeText(this@AdvancedActivity, "Illegal Arguments for Channel", Toast.LENGTH_LONG).show()
                     }
                 }
-                override fun onAnimationEnd(animation: Animation?) {
-                    mBinding.editTextChannel.setText("")
-                    mBinding.editTextChannel.setHint(R.string.edittext_channel_hint)
-                }
+                override fun onAnimationEnd(animation: Animation?)
+                {
 
+                }
                 override fun onAnimationRepeat(animation: Animation?) {
                 }
             }

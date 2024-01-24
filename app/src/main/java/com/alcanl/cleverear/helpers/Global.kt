@@ -20,12 +20,16 @@ const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
 const val DEVICE_NAME_PREF = "EarnetDevice"
 const val DEVICE_NAME_EDITED = "Earnet"
-const val DEVICE_NAME_KEY = "EarnetKey"
-const val DEVICE_RSSI_KEY = "EarnetRssi"
-const val DEVICE_MAC_KEY = "EarnetMac"
-const val DEVICE_MANU_KEY = "EarnetManu"
-const val DEVICE_SIDE_KEY = "EarnetSide"
-const val DEVICE_NAME_DEFAULT = "EARNET"
+const val DEVICE_NAME_KEY_L = "EarnetKey_L"
+const val DEVICE_RSSI_KEY_L = "EarnetRssi_L"
+const val DEVICE_MAC_KEY_L = "EarnetMac_L"
+const val DEVICE_MANU_KEY_L = "EarnetManu_L"
+const val DEVICE_NAME_DEFAULT_L = "EARNET_L"
+const val DEVICE_NAME_KEY_R = "EarnetKey_R"
+const val DEVICE_RSSI_KEY_R = "EarnetRssi_R"
+const val DEVICE_MAC_KEY_R = "EarnetMac_R"
+const val DEVICE_MANU_KEY_R = "EarnetManu_R"
+const val DEVICE_NAME_DEFAULT_R = "EARNET_R"
 
 
 @Throws(JSONException::class)
@@ -72,13 +76,13 @@ fun parseJsonMemoryActiveData(data: String, context: Context) : Int
 {
     val jsonObject = JSONObject(data)
     val memoryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return memoryEvent.getJSONObject(MEMORY_STATE).getInt(getString(context, R.string.current_memory))
+    return memoryEvent.getJSONObject(MEMORY_STATE).getInt(getString(context, R.string.current_memory_json))
 }
 @Throws(JSONException::class)
 fun parseJsonVolumeData(data: String, context: Context) : Int
 {
     val jsonObject = JSONObject(data)
     val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level))
+    return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level_json))
 }
 
