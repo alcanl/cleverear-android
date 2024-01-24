@@ -64,7 +64,7 @@ class LoadingActivity : AppCompatActivity() {
                         putPreferencesRightDevice(editor, configuration.hearingAid)
                 else {
                     putPreferencesLeftDevice(editor, doubleDeviceMap[EarSide.Left]!!)
-                    putPreferencesRightDevice(editor, doubleDeviceMap[EarSide.Left]!!)
+                    putPreferencesRightDevice(editor, doubleDeviceMap[EarSide.Right]!!)
                 }
 
             }
