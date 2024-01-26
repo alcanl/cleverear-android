@@ -1,7 +1,6 @@
 package com.alcanl.cleverear
 
 import android.content.Intent
-import android.content.SharedPreferences.Editor
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -12,16 +11,6 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.DEVICE_MAC_KEY_L
-import com.alcanl.cleverear.helpers.DEVICE_MAC_KEY_R
-import com.alcanl.cleverear.helpers.DEVICE_MANU_KEY_L
-import com.alcanl.cleverear.helpers.DEVICE_MANU_KEY_R
-import com.alcanl.cleverear.helpers.DEVICE_NAME_KEY_L
-import com.alcanl.cleverear.helpers.DEVICE_NAME_KEY_R
-import com.alcanl.cleverear.helpers.DEVICE_NAME_PREF
-import com.alcanl.cleverear.helpers.DEVICE_RSSI_KEY_L
-import com.alcanl.cleverear.helpers.DEVICE_RSSI_KEY_R
-import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.listeners.LoadingActivityEventListener
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -53,44 +42,7 @@ class LoadingActivity : AppCompatActivity() {
     override fun onDestroy()
     {
         super.onDestroy()
-        with(configuration) {
-
-            if (isConnected) {
-                val editor = getSharedPreferences(DEVICE_NAME_PREF, MODE_PRIVATE).edit()
-                if (!isDoubleDeviceConnection)
-                    if (earSide == EarSide.Left)
-                        putPreferencesLeftDevice(editor, configuration.hearingAid)
-                    else
-                        putPreferencesRightDevice(editor, configuration.hearingAid)
-                else {
-                    putPreferencesLeftDevice(editor, doubleDeviceMap[EarSide.Left]!!)
-                    putPreferencesRightDevice(editor, doubleDeviceMap[EarSide.Right]!!)
-                }
-
-            }
-        }
-
         mListener.stopListener()
-    }
-    private fun putPreferencesLeftDevice(editor: Editor, hearingAid: HearingAid)
-    {
-        with(editor) {
-            putString(DEVICE_NAME_KEY_L, hearingAid.name)
-            putString(DEVICE_MAC_KEY_L, hearingAid.address)
-            putInt(DEVICE_RSSI_KEY_L, hearingAid.rssi)
-            putString(DEVICE_MANU_KEY_L, hearingAid.manufacturerData)
-            apply()
-        }
-    }
-    private fun putPreferencesRightDevice(editor: Editor, hearingAid: HearingAid)
-    {
-        with(editor) {
-            putString(DEVICE_NAME_KEY_R, hearingAid.name)
-            putString(DEVICE_MAC_KEY_R, hearingAid.address)
-            putInt(DEVICE_RSSI_KEY_R, hearingAid.rssi)
-            putString(DEVICE_MANU_KEY_R, hearingAid.manufacturerData)
-            apply()
-        }
     }
     private fun initCountDownTimer()
     {

@@ -3,6 +3,7 @@ package com.alcanl.cleverear.helpers.listeners
 import android.util.Log
 import android.widget.Toast
 import com.alcanl.cleverear.LoadingActivity
+import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.parseJsonConnectionData
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
@@ -61,7 +62,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                 actLoad.runOnUiThread {
                     Toast.makeText(
                         actLoad,
-                        "Connection Lost, Please Reconnect To Device",
+                        R.string.toast_connection_lost_text,
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -70,7 +71,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                 actLoad.runOnUiThread {
                     Toast.makeText(
                         mWeakReference.get()!!,
-                        "Connection Established With The Device",
+                        R.string.toast_connection_established_text,
                         Toast.LENGTH_LONG
                     ).show()
                 }

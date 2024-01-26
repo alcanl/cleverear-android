@@ -3,7 +3,7 @@ package com.alcanl.cleverear.helpers.listeners
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.AdvancedActivity
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
@@ -14,11 +14,9 @@ import com.alcanl.cleverear.helpers.parseJsonConnectionData
 import com.alcanl.cleverear.helpers.parseJsonMemoryActiveData
 import com.alcanl.cleverear.helpers.parseJsonSenderMacData
 import com.alcanl.cleverear.helpers.parseJsonVolumeData
-import com.alcanl.cleverear.sdk.events.AuxChangeEvent
 import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent
-import com.alcanl.cleverear.sdk.events.MicChangeEvent
 import com.alcanl.cleverear.sdk.events.VolumeChangeEvent
 import com.ark.Event
 import com.ark.EventHandler
@@ -53,8 +51,8 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                         EventType.kActiveEvent -> handleGenericEvent(event)
                         EventType.kUnknownEvent -> handleGenericEvent(event)
                         EventType.kECMemoryEvent -> handleGenericEvent(event)
-                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event, AuxChangeEvent::class.java)
-                        EventType.kMicAttenuationEvent -> handleGenericEvent(event, MicChangeEvent::class.java)
+                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
+                        EventType.kMicAttenuationEvent -> handleGenericEvent(event)
                         else -> {
                             Log.e("event", event.data)
                             Log.e("ecMemory", event.data)
@@ -74,11 +72,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     private fun handleGenericEvent(event: Event)
     {
         Log.e("event", event.data)
-    }
-    private fun handleGenericEvent(event: Event, senderClass: Class<*>)
-    {
-        handleGenericEvent(event)
-        Log.e(senderClass::class.java.simpleName, event.data)
     }
     private fun handleConnectionEvent(event: Event)
     {
@@ -165,7 +158,8 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                 }
             }
             actAdv.runOnUiThread {
-                Toast.makeText(actAdv, "Active Program is $memoryState", Toast.LENGTH_SHORT).show()
+                Toast.makeText(actAdv, String.format(getString(actAdv, R.string.text_active_memory)
+                        + memoryState.toString()), Toast.LENGTH_SHORT).show()
             }
 
         } catch (ex: JSONException)
@@ -196,7 +190,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
 
             actAdv.runOnUiThread {
                 Toast.makeText(actAdv, String.format(
-                    ContextCompat.getString(
+                    getString(
                         actAdv,
                         R.string.listener_volume_level_text
                     ) + " %d", volumeState), Toast.LENGTH_SHORT).show()

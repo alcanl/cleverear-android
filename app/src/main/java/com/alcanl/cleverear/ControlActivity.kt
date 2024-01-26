@@ -159,9 +159,19 @@ class ControlActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navbar_control -> true
                 R.id.navbar_connection -> {
-                    initializeNavigationView(ConnectionActivity::class.java); finish(); true}
+                    initializeNavigationView(ConnectionActivity::class.java)
+                    if (isListenerOnBoard) {
+                        mListener.stopListener()
+                        isListenerOnBoard = false
+                    }
+                    finish(); true}
                 else ->{
-                    initializeNavigationView(AdvancedActivity::class.java); finish(); true }
+                    initializeNavigationView(AdvancedActivity::class.java)
+                    if (isListenerOnBoard) {
+                        mListener.stopListener()
+                        isListenerOnBoard = false
+                    }
+                    finish(); true }
             }
         }
     }

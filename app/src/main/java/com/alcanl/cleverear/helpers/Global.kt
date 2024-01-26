@@ -18,18 +18,6 @@ private const val VOLUME_STATE = 1
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
-const val DEVICE_NAME_PREF = "EarnetDevice"
-const val DEVICE_NAME_EDITED = "Earnet"
-const val DEVICE_NAME_KEY_L = "EarnetKey_L"
-const val DEVICE_RSSI_KEY_L = "EarnetRssi_L"
-const val DEVICE_MAC_KEY_L = "EarnetMac_L"
-const val DEVICE_MANU_KEY_L = "EarnetManu_L"
-const val DEVICE_NAME_DEFAULT_L = "EARNET_L"
-const val DEVICE_NAME_KEY_R = "EarnetKey_R"
-const val DEVICE_RSSI_KEY_R = "EarnetRssi_R"
-const val DEVICE_MAC_KEY_R = "EarnetMac_R"
-const val DEVICE_MANU_KEY_R = "EarnetManu_R"
-const val DEVICE_NAME_DEFAULT_R = "EARNET_R"
 
 
 @Throws(JSONException::class)

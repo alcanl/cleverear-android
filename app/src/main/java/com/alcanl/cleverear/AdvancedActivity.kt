@@ -249,9 +249,19 @@ class AdvancedActivity : AppCompatActivity(){
 
             when (it.itemId) {
                 R.id.navbar_control -> {
-                    initializeNavigationView(ControlActivity::class.java); finish(); true}
+                    initializeNavigationView(ControlActivity::class.java)
+                    if (isListenerOnBoard) {
+                        mListener.stopListener()
+                        isListenerOnBoard = false
+                    }
+                    finish(); true}
                 R.id.navbar_connection -> {
-                    initializeNavigationView(ConnectionActivity::class.java); finish(); true}
+                    initializeNavigationView(ConnectionActivity::class.java)
+                    if (isListenerOnBoard) {
+                        mListener.stopListener()
+                        isListenerOnBoard = false
+                    }
+                    finish(); true}
                 else -> true
             }
         }
@@ -259,7 +269,7 @@ class AdvancedActivity : AppCompatActivity(){
     private fun setStreamAddressButtonClicked(channel: Int)
     {
         if (channel !in 1..255) {
-            Toast.makeText(this, "Channel must be between 1 and 255", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
             mBinding.editTextChannel.setText("")
             return
         }
@@ -434,7 +444,7 @@ class AdvancedActivity : AppCompatActivity(){
                         channel = mBinding.editTextChannel.text.toString().toInt()
                         setStreamAddressButtonClicked(channel)
                     } catch (_: NumberFormatException) {
-                        Toast.makeText(this@AdvancedActivity, "Illegal Arguments for Channel", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@AdvancedActivity, R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
                     }
                 }
                 override fun onAnimationEnd(animation: Animation?)
