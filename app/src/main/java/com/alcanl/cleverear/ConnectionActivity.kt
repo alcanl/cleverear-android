@@ -1,5 +1,6 @@
 package com.alcanl.cleverear
 
+import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.app.AlertDialog
 import android.content.Intent
@@ -48,6 +49,8 @@ class ConnectionActivity : AppCompatActivity() {
     var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
     @Volatile
     private var mDeviceCount = 0
+    @Volatile
+    private var mIsDeviceFound = false
     private var isScanContinue = false
     private lateinit var scanOnBoard : Future<*>
     private lateinit var mAsyncResult: AsyncResult
@@ -90,6 +93,8 @@ class ConnectionActivity : AppCompatActivity() {
     private fun finalizeConnectionConfiguration() {
         if (isScanContinue)
             stopScanButtonClicked()
+
+        mIsDeviceFound = true
         finish()
         startActivity(Intent(this, LoadingActivity::class.java))
     }
@@ -187,9 +192,10 @@ class ConnectionActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
         }
     }
+    @SuppressLint("SuspiciousIndentation")
     private fun scanThreadCallBack()
     {
-        while (!configuration.isConnected) {
+        while (!mIsDeviceFound) {
             val event = eventHandler.event
             if (event.type == EventType.kScanEvent) {
                 Log.e(ScanEvent::class.java.simpleName, event.data)
@@ -272,6 +278,7 @@ class ConnectionActivity : AppCompatActivity() {
         if (!configuration.isConnected) {
             mBleDeviceList.clear()
             mDeviceCount = 0
+            mIsDeviceFound = false
             scanDevicesWithBluetooth()
             with(mBinding) {
                 progressBar.visibility = View.VISIBLE
@@ -311,7 +318,7 @@ class ConnectionActivity : AppCompatActivity() {
     fun stopScanButtonClicked()
     {
         isScanContinue = false
-        scanOnBoard.cancel(false)
+        scanOnBoard.cancel(true)
         deviceConnectionHandler.endScanProcess(mAsyncResult)
 
         with(mBinding) {
@@ -320,6 +327,4 @@ class ConnectionActivity : AppCompatActivity() {
             frameLayoutStopScan.visibility = View.INVISIBLE
         }
     }
-
-
 }

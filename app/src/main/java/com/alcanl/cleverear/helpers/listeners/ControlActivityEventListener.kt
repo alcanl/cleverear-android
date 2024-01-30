@@ -117,16 +117,23 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             with(actCont) {
                 runOnUiThread {
                     with(mConfiguration) {
-                        if (!isDoubleDeviceConnection)
+                        if (!isDoubleDeviceConnection) {
                             if (hearingAid.side == EarSide.Left)
                                 mBinding.batteryViewLeftDevice.batteryLevel = batteryState
                             else
                                 mBinding.batteryViewRightDevice.batteryLevel = batteryState
+
+                            hearingAid.batteryLevel = batteryState
+                        }
                         else
-                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
+                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address) {
                                 mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                            else
+                                doubleDeviceMap[EarSide.Left]?.batteryLevel = batteryState
+                            }
+                            else {
                                 mBinding.batteryViewRightDevice.batteryLevel = batteryState
+                                doubleDeviceMap[EarSide.Right]?.batteryLevel = batteryState
+                            }
                     }
                 }
             }

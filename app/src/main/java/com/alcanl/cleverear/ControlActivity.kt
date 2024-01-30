@@ -41,7 +41,6 @@ class ControlActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
     }
-
     override fun onResume()
     {
         super.onResume()
@@ -131,7 +130,7 @@ class ControlActivity : AppCompatActivity() {
     }
     private fun initMemoryButtons(hearingAid: HearingAid)
     {
-        hearingAid.numberOfMemories.also {
+        checkEnabledMemoryCount(hearingAid).also {
 
             if (it > 4) {
                 initMemoryButtons(4, mBinding.tableLayout.getChildAt(0) as TableRow)
@@ -140,17 +139,20 @@ class ControlActivity : AppCompatActivity() {
                 initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
         }
     }
+    private fun checkEnabledMemoryCount(hearingAid: HearingAid) : Int
+    {
+        var count = 0
+        (0..< hearingAid.numberOfMemories).forEach { if (hearingAid.wirelessControl?.memoryEnabled(
+            ParameterSpace.value(it))!!) ++count }
+
+        return count
+    }
 
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
         runOnUiThread {
-            (0..<bound).forEach { tableRow.getChildAt(it).apply {
-                    isEnabled = true
-                    backgroundTintList = AppCompatResources.getColorStateList(
-                        this@ControlActivity, R.color.default_button_color)
-                        }
+            (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
                     }
-                }
     }
     private fun initializeNavigationView()
     {
