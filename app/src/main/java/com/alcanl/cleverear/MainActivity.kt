@@ -4,10 +4,16 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -20,69 +26,114 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var configuration: ConfigurationModule
-    private lateinit var mBinding : ActivityMainBinding
-    private val bluetoothManager by lazy {
-        applicationContext.getSystemService(BluetoothManager::class.java)
+    private lateinit var mBinding: ActivityMainBinding
+    private val bluetoothActivityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK)
+            bluetoothScan()
     }
-    private val bluetoothAdapter by lazy {
-        bluetoothManager?.adapter
-    }
-    private val isBluetoothEnabled: Boolean
-        get() = bluetoothAdapter?.isEnabled == true
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
-
-        val enableBluetoothLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { /* Not needed */ }
-
-        val permissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { perms ->
-            val canEnableBluetooth = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                perms[Manifest.permission.BLUETOOTH_CONNECT] == true
-            } else true
-
-            if(canEnableBluetooth && !isBluetoothEnabled) {
-                enableBluetoothLauncher.launch(
-                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                )
-            }
-        }
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                )
-            )
-        }
+        scanBT()
     }
-
-    override fun onResume()
+    private fun bluetoothScan()
     {
+        Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
+    }
+    override fun onResume() {
         super.onResume()
-        mBinding.buttonSingleDevice.startAnimation(android.view.animation.AnimationUtils.loadAnimation
-            (this, R.anim.translate_button_left_to_right))
-        mBinding.buttonDoubleDevice.startAnimation(android.view.animation.AnimationUtils.loadAnimation
-            (this, R.anim.translate_button_right_to_left))
+        mBinding.buttonSingleDevice.startAnimation(
+            android.view.animation.AnimationUtils.loadAnimation
+                (this, R.anim.translate_button_left_to_right)
+        )
+        mBinding.buttonDoubleDevice.startAnimation(
+            android.view.animation.AnimationUtils.loadAnimation
+                (this, R.anim.translate_button_right_to_left)
+        )
     }
-    fun buttonSingleDeviceClick()
-    {
+
+    fun buttonSingleDeviceClick() {
         Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
     }
-    fun buttonDoubleDeviceClick()
-    {
+
+    fun buttonDoubleDeviceClick() {
         configuration.isDoubleDeviceConnection = true
         configuration.earSide = EarSide.Left
         Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
     }
-    private fun initBinding()
-    {
+
+    private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mBinding.viewModel = MainActivityListenersViewModel(this)
+    }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun checkPermissionForQ() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_ADMIN
+                ), 1
+            )
+        }
+    }
+    private fun checkPermissionForN() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
+            PackageManager.PERMISSION_GRANTED
+        )
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_ADMIN
+                ),
+                1
+            )
+    }
+    private fun scanBT()
+    {
+        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
+        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, R.string.toast_bluetooth_not_found_text, Toast.LENGTH_LONG).show()
+        }
+        else {
+            if (!bluetoothAdapter.isEnabled) {
+                val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                bluetoothActivityResultLauncher.launch(enableBluetoothIntent)
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                checkBluetoothConnectAndScanPermission()
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                checkPermissionForQ()
+            else
+                checkPermissionForN()
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun checkBluetoothConnectAndScanPermission()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) !=
+            PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        )
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ),
+                1
+            )
     }
 }

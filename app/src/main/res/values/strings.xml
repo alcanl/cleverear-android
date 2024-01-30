@@ -30,6 +30,7 @@
     <string name="listener_volume_level_text" translatable="true">Volume Level: </string>
     <string name="toast_problem_occured_text" translatable="true">Problem occurred while connecting to device</string>
     <string name="toast_channel_error_text" translatable="true">Unsupported Value for Channel. Must be in 1 to 255</string>
+    <string name="toast_bt_on" translatable="true">Bluetooth On</string>
     <string name="text_active_memory" translatable="true">Active program is </string>
     <string name="empty_string" translatable="false"> </string>
     <string name="button_text_one" translatable="false">1</string>

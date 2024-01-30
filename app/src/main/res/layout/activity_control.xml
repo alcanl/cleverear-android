@@ -41,26 +41,25 @@
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderCommon"
-                android:layout_width="316dp"
-                android:layout_height="73dp"
-                android:layout_marginTop="132dp"
-                android:layout_marginBottom="123dp"
+                android:layout_width="290dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="140dp"
                 android:rotation="270"
                 android:value="50.0"
                 android:valueFrom="0.0"
                 android:valueTo="100.0"
                 android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@+id/textViewRightSeekBar"
+                app:haloColor="@color/design_default_color_secondary_variant"
+                app:layout_constraintBottom_toTopOf="@+id/textViewPrograms"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textViewVolume"
-                app:layout_constraintVertical_bias="0.0"
                 app:onValueChangeListener="@{(value) -> viewModel.handleDualSliderValueChange(value)}"
                 app:thumbColor="@color/design_default_color_secondary_variant"
                 app:thumbRadius="16dp"
-                app:haloColor="@color/design_default_color_secondary_variant"
-                app:trackColorInactive="#A8A3A3"
                 app:trackColorActive="@color/design_default_color_secondary_variant"
+                app:trackColorInactive="#A8A3A3"
                 app:trackHeight="12dp" />
 
             <FrameLayout
@@ -109,12 +108,12 @@
                 android:id="@+id/textViewRightSeekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="123dp"
-                android:layout_marginEnd="77dp"
-                android:visibility="invisible"
+                android:layout_marginTop="135dp"
+                android:layout_marginEnd="55dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/textview_right_device_text"
                 android:textColor="@color/black"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sliderRight" />
 
@@ -122,18 +121,18 @@
                 android:id="@+id/textViewLeftSeekBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="80dp"
-                android:layout_marginTop="123dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="135dp"
                 android:fontFamily="sans-serif-medium"
-                android:visibility="invisible"
                 android:text="@string/textview_left_device_text"
                 android:textColor="@color/black"
+                android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sliderLeft" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderLeft"
-                android:layout_width="292dp"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="-30dp"
                 android:layout_marginTop="130dp"
@@ -144,8 +143,6 @@
                 android:valueFrom="0.0"
                 android:valueTo="100.0"
                 android:visibility="invisible"
-                app:trackColorInactive="#A8A3A3"
-                app:trackColorActive="@color/left_device_slider"
                 app:haloColor="@color/left_device_slider"
                 app:layout_constraintBottom_toTopOf="@+id/textViewRightSeekBar"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -156,11 +153,13 @@
                 app:onValueChangeListener="@{(value) -> viewModel.handleLeftEarSliderValueChange(value)}"
                 app:thumbColor="@color/left_device_slider"
                 app:thumbRadius="16dp"
+                app:trackColorActive="@color/left_device_slider"
+                app:trackColorInactive="#A8A3A3"
                 app:trackHeight="12dp" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderRight"
-                android:layout_width="292dp"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="130dp"
                 android:layout_marginEnd="-30dp"
@@ -171,8 +170,6 @@
                 android:valueFrom="0.0"
                 android:valueTo="100.0"
                 android:visibility="invisible"
-                app:trackColorInactive="#A8A3A3"
-                app:trackColorActive="@color/right_device_slider"
                 app:haloColor="@color/right_device_slider"
                 app:layout_constraintBottom_toTopOf="@+id/textViewRightSeekBar"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -182,6 +179,8 @@
                 app:onValueChangeListener="@{(value) -> viewModel.handleRightEarSliderValueChange(value)}"
                 app:thumbColor="@color/right_device_slider"
                 app:thumbRadius="16dp"
+                app:trackColorActive="@color/right_device_slider"
+                app:trackColorInactive="#A8A3A3"
                 app:trackHeight="12dp" />
 
             <TextView

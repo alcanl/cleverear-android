@@ -9,6 +9,7 @@
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
 
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
@@ -28,14 +29,12 @@
     <application
         android:name=".application.CleverEarApp"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/clever_ear_logo_foreground"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/clever_ear_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CleverEar"
-        tools:targetApi="31">
+        >
         <activity
             android:name=".LoadingActivity"
             android:exported="false" />
