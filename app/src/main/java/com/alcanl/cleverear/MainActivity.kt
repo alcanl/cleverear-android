@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -148,8 +149,7 @@ class MainActivity : AppCompatActivity() {
     {
         val locationManager : LocationManager = getSystemService(LocationManager::class.java)
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            val enableLocationIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            gpsActivityResultLauncher.launch(enableLocationIntent)
+            Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply { gpsActivityResultLauncher.launch(this) }
         }
     }
     @RequiresApi(Build.VERSION_CODES.S)

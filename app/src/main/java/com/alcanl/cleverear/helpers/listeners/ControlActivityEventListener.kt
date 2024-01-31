@@ -46,8 +46,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                         EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                         EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
-                        EventType.kMicAttenuationEvent -> handleGenericEvent(event)
                         else -> handleGenericEvent(event)
                     }
 
