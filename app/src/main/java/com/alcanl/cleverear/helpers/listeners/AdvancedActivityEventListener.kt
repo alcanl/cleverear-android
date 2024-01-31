@@ -26,7 +26,7 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
+import kotlin.concurrent.thread
 
 class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEventHandler: EventHandler,
                                     private val mThreadPool : ExecutorService,
@@ -34,10 +34,10 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
 ) {
 
     private val mWeakReference = WeakReference(activity)
-    private lateinit var isOnBoard : Future<*>
+    private lateinit var mListener: Thread
     fun startEventListener() {
-        isOnBoard = mThreadPool.submit {
-            while (!Thread.interrupted()) {
+        mListener = thread(isDaemon = true, start = true) {
+            while (!mListener.isInterrupted) {
                 try {
                     val event = mEventHandler.event
                     val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -54,7 +54,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                         EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
                         EventType.kMicAttenuationEvent -> handleGenericEvent(event)
                         else -> {
-                            Log.e("event", event.data)
                             Log.e("ecMemory", event.data)
                         }
                     }
@@ -68,6 +67,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                 }
             }
         }
+
     }
     private fun handleGenericEvent(event: Event)
     {
@@ -78,7 +78,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
         val actAdv = mWeakReference.get()!!
 
         try {
-            Log.e("event", event.data)
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actAdv)
 
@@ -95,14 +94,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                         finish()
                         mConfiguration.isConnected = false
                     }
-                    else if (connectionState == 3) {
-                        Toast.makeText(
-                            this,
-                            R.string.toast_connection_established_text,
-                            Toast.LENGTH_LONG
-                        ).show()
-                        mConfiguration.isConnected = true
-                    }
                 }
             }
         } catch (ex: JSONException)
@@ -114,7 +105,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     {
         val actAdv = mWeakReference.get()!!
         try {
-            Log.e("event", event.data)
             Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
             val batteryState = parseJsonBatteryStateData(event.data, actAdv)
 
@@ -139,7 +129,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
 
         try {
             val actAdv = mWeakReference.get()!!
-            Log.e("event", event.data)
             Log.e(
                 CurrentMemoryCharacteristicChangedEvent::class.java.simpleName,
                 event.data
@@ -159,7 +148,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             }
             actAdv.runOnUiThread {
                 Toast.makeText(actAdv, String.format(getString(actAdv, R.string.text_active_memory)
-                        + memoryState.toString()), Toast.LENGTH_SHORT).show()
+                        + (memoryState + 1).toString()), Toast.LENGTH_SHORT).show()
             }
 
         } catch (ex: JSONException)
@@ -172,7 +161,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
         val actAdv = mWeakReference.get()!!
 
         try {
-            Log.e("event", event.data)
             Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
             val volumeState = parseJsonVolumeData(event.data, actAdv)
 
@@ -204,6 +192,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     }
     fun stopListener()
     {
-        isOnBoard.cancel(true)
+        mListener.interrupt()
     }
 }

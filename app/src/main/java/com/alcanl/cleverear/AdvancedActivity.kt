@@ -54,6 +54,7 @@ class AdvancedActivity : AppCompatActivity(){
             finish()
         else
             if (!isListenerOnBoard) {
+                mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
                 mListener.startEventListener()
                 isListenerOnBoard = true
             }
@@ -73,7 +74,7 @@ class AdvancedActivity : AppCompatActivity(){
         initializeNavigationView()
         initSwitch()
         initSliders()
-        mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
+
 
     }
     private fun initSliders()

@@ -2,7 +2,7 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:fillAfter="false">
     <translate
-        android:fromXDelta="26%"
+        android:fromXDelta="29%"
         android:toXDelta="0%"
         android:duration="1500"
         />

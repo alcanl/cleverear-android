@@ -46,7 +46,7 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun initCountDownTimer()
     {
-        object: CountDownTimer(10000, 1000) {
+        object: CountDownTimer(12000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 if (millisUntilFinished in 2000L..2999 || millisUntilFinished in 6000L..<6999)
@@ -106,7 +106,7 @@ class LoadingActivity : AppCompatActivity() {
             try {
                 hearingAid.communicationAdaptor?.connect()
                 runBlocking {
-                    delay(7000)
+                    delay(10000)
                     readDeviceConfiguration(hearingAid)
                 }
 

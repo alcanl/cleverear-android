@@ -8,8 +8,9 @@ object SliderListener {
     @BindingAdapter(value = ["onValueChangeListener"])
     fun setOnValueChangeListener(slider: Slider, listener: OnValueChangeListener)
     {
-        slider.addOnChangeListener { _: Slider?, value: Float, _: Boolean ->
-            listener.onValueChanged(value)
+        slider.addOnChangeListener { _: Slider?, value: Float, fromUser: Boolean ->
+            if (fromUser)
+                listener.onValueChanged(value)
         }
     }
     interface OnValueChangeListener {

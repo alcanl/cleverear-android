@@ -14,20 +14,18 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 
 class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
                                    private val mThreadPool : ExecutorService,
                                    private val mConfiguration : ConfigurationModule)
 {
     private val mWeakReference = WeakReference(activity)
-
-    private lateinit var isOnBoard : Future<*>
-
+    private var mIsOnBoard = true
+    private var mDoubleDeviceCount = 0
     fun startEventListener() {
 
-        isOnBoard =  mThreadPool.submit {
-            while (!Thread.interrupted()) {
+        mThreadPool.execute {
+            while (mIsOnBoard) {
                 try {
                     val event = mEventHandler.event
                     when (event.type) {
@@ -55,27 +53,30 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     {
         val actLoad = mWeakReference.get()!!
         try {
-            Log.e("event", event.data)
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actLoad)
-            if (connectionState == 1) {
-                actLoad.runOnUiThread {
-                    Toast.makeText(
-                        actLoad,
-                        R.string.toast_connection_lost_text,
-                        Toast.LENGTH_LONG
-                    ).show()
+            if (connectionState == 3 || connectionState == 2) {
+                if (!mConfiguration.isDoubleDeviceConnection) {
+                    actLoad.runOnUiThread {
+                        Toast.makeText(
+                            actLoad,
+                            R.string.toast_connection_established_text,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    mConfiguration.isConnected = true
                 }
-                mConfiguration.isConnected = false
-            } else if (connectionState == 3) {
-                actLoad.runOnUiThread {
-                    Toast.makeText(
-                        mWeakReference.get()!!,
-                        R.string.toast_connection_established_text,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                mConfiguration.isConnected = true
+                else
+                    if (++mDoubleDeviceCount == 2) {
+                        actLoad.runOnUiThread {
+                            Toast.makeText(
+                                actLoad,
+                                R.string.toast_double_device_connection_established_text,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        mConfiguration.isConnected = true
+                    }
             }
         } catch (ex: JSONException)
         {
@@ -84,6 +85,6 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     }
     fun stopListener()
     {
-        isOnBoard.cancel(true)
+        mIsOnBoard = false
     }
 }

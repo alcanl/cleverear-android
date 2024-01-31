@@ -12,6 +12,7 @@ import com.alcanl.cleverear.databinding.ActivitySplashBinding
 class SplashActivity : AppCompatActivity() {
     private lateinit var mBinding : ActivitySplashBinding
 
+
     private fun initCountDownTimer()
     {
         object: CountDownTimer(4000, 1000) {
@@ -41,5 +42,4 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
     }
-
 }

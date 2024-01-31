@@ -4,7 +4,6 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.ControlActivity
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
@@ -15,11 +14,9 @@ import com.alcanl.cleverear.helpers.parseJsonConnectionData
 import com.alcanl.cleverear.helpers.parseJsonMemoryActiveData
 import com.alcanl.cleverear.helpers.parseJsonSenderMacData
 import com.alcanl.cleverear.helpers.parseJsonVolumeData
-import com.alcanl.cleverear.sdk.events.AuxChangeEvent
 import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent
-import com.alcanl.cleverear.sdk.events.MicChangeEvent
 import com.alcanl.cleverear.sdk.events.VolumeChangeEvent
 import com.ark.Event
 import com.ark.EventHandler
@@ -29,17 +26,17 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
+import kotlin.concurrent.thread
 
 class ControlActivityEventListener(activity: ControlActivity, private val mEventHandler: EventHandler,
                                    private val mThreadPool : ExecutorService,
                                    private val mConfiguration : ConfigurationModule) {
 
     private val mWeakReference = WeakReference(activity)
-    private lateinit var isOnBoard : Future<*>
+    private lateinit var mListener: Thread
     fun startEventListener() {
-        isOnBoard = mThreadPool.submit {
-            while (!Thread.interrupted()) {
+        mListener = thread(isDaemon = true, start = true) {
+            while (!mListener.isInterrupted) {
                 try {
                     val event = mEventHandler.event
                     val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -49,9 +46,9 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                         EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                         EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event, AuxChangeEvent::class.java)
-                        EventType.kMicAttenuationEvent -> handleGenericEvent(event, MicChangeEvent::class.java)
-                        else -> Log.e("event", event.data)
+                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
+                        EventType.kMicAttenuationEvent -> handleGenericEvent(event)
+                        else -> handleGenericEvent(event)
                     }
 
                 } catch (ex: JSONException) {
@@ -64,17 +61,15 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             }
         }
     }
-    private fun handleGenericEvent(event: Event, clazz: Class<*>)
+    private fun handleGenericEvent(event: Event)
     {
         Log.e("event", event.data)
-        Log.e("sender", clazz::class.java.simpleName)
     }
     private fun handleConnectionEvent(event: Event)
     {
         val actCont = mWeakReference.get()!!
 
         try {
-            Log.e("event", event.data)
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actCont)
 
@@ -91,14 +86,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         finish()
                         mConfiguration.isConnected = false
                     }
-                    else if (connectionState == 3) {
-                        Toast.makeText(
-                            this,
-                            R.string.toast_connection_established_text,
-                            Toast.LENGTH_LONG
-                        ).show()
-                        mConfiguration.isConnected = true
-                    }
                 }
             }
         } catch (ex: JSONException)
@@ -110,7 +97,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     {
         val actCont = mWeakReference.get()!!
         try {
-            Log.e("event", event.data)
             Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
             val batteryState = parseJsonBatteryStateData(event.data, actCont)
 
@@ -146,7 +132,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
 
         val actCont = mWeakReference.get()!!
         try {
-            Log.e("event", event.data)
             Log.e(
                 CurrentMemoryCharacteristicChangedEvent::class.java.simpleName,
                 event.data
@@ -177,27 +162,31 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
         val actCont = mWeakReference.get()!!
 
         try {
-            Log.e("event", event.data)
             Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
             val volumeState = parseJsonVolumeData(event.data, actCont)
 
-            mThreadPool.execute {
+            actCont.runOnUiThread {
                 with(mConfiguration) {
-                    if (!isDoubleDeviceConnection)
+                    if (!isDoubleDeviceConnection) {
                         hearingAid.volume = volumeState
+                        actCont.mBinding.sliderCommon.value = hearingAid.volume.toFloat()
+                    }
                     else
-                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
-                            doubleDeviceMap[EarSide.Left]?.volume = volumeState
+                        if (isDualDeviceConfig) {
+                            doubleDeviceMap.forEach {  it.value.volume = volumeState  }
+                            actCont.mBinding.sliderCommon.value = doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                        }
                         else
-                            doubleDeviceMap[EarSide.Right]?.volume = volumeState
+                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address) {
+                                doubleDeviceMap[EarSide.Left]?.volume = volumeState
+                                actCont.mBinding.sliderLeft.value = doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                            }
+                            else {
+                                doubleDeviceMap[EarSide.Right]?.volume = volumeState
+                                actCont.mBinding.sliderRight.value = doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+                            }
                 }
             }
-
-            actCont.runOnUiThread {
-                Toast.makeText(actCont, String.format(getString(actCont,
-                    R.string.listener_volume_level_text) + " %d", volumeState), Toast.LENGTH_SHORT).show()
-            }
-
         }
         catch (ex: JSONException)
         {
@@ -206,7 +195,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     fun stopListener()
     {
-        isOnBoard.cancel(true)
+        mListener.interrupt()
     }
     private fun getMemoryEventButton(memoryState: Int) : Button
     {

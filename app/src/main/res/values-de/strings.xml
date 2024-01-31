@@ -21,7 +21,9 @@
     <string name="toast_connection_lost_text">Verbindung verloren, Versuch, das Gerät wieder anzuschließen</string>
     <string name="listener_volume_level_text" translatable="true">Lautstärkepegel: </string>
     <string name="toast_channel_error_text" translatable="true">Nicht unterstützter Wert für Kanal. Muss zwischen 1 und 255 liegen</string>
-    <string name="toast_bt_on" translatable="true">Bluetooth ein</string>
+    <string name="toast_double_device_connection_established_text" translatable="true">Verbindung mit den Geräten hergestellt</string>
+    <string name="toast_bt_on" translatable="true">Bluetooth Ein</string>
+    <string name="toast_gps_on" translatable="true">GPS Ein</string>
     <string name="toast_connection_established_text">Verbindung mit dem Gerät hergestellt</string>
     <string name="toast_problem_occured_text">Problem beim Verbinden mit dem Gerät aufgetreten</string>
     <string name="navbar_connection_text">Verbindung</string>

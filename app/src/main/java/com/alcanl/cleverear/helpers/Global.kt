@@ -56,8 +56,8 @@ fun parseJsonBatteryStateData(data: String, context: Context) : Int
 fun parseJsonSenderMacData(data: String, context: Context) : String
 {
     val jsonObject = JSONObject(data)
-    val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return batteryEvent.getJSONObject(EVENT_SENDER).getString(getString(context, R.string.device_id_json))
+    val event = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+    return event.getJSONObject(EVENT_SENDER).getString(getString(context, R.string.device_id_json))
 }
 @Throws(JSONException::class)
 fun parseJsonMemoryActiveData(data: String, context: Context) : Int
