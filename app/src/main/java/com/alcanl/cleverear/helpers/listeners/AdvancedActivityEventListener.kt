@@ -47,15 +47,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                         EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                         EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                         EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        EventType.kExitEvent -> handleGenericEvent(event)
-                        EventType.kActiveEvent -> handleGenericEvent(event)
-                        EventType.kUnknownEvent -> handleGenericEvent(event)
-                        EventType.kECMemoryEvent -> handleGenericEvent(event)
-                        EventType.kAuxAttenuationEvent -> handleGenericEvent(event)
-                        EventType.kMicAttenuationEvent -> handleGenericEvent(event)
-                        else -> {
-                            Log.e("ecMemory", event.data)
-                        }
+                        else -> handleGenericEvent(event)
                     }
 
                 } catch (ex: JSONException) {
