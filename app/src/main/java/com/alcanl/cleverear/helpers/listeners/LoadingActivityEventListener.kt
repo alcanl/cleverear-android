@@ -5,7 +5,9 @@ import android.widget.Toast
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.parseJsonConnectionData
+import com.alcanl.cleverear.helpers.parseJsonSenderMacData
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.ark.Event
 import com.ark.EventHandler
@@ -21,15 +23,15 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
 {
     private val mWeakReference = WeakReference(activity)
     private var mIsOnBoard = true
-    private var mDoubleDeviceCount = 0
     fun startEventListener() {
 
         mThreadPool.execute {
             while (mIsOnBoard) {
                 try {
                     val event = mEventHandler.event
+                    val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
                     when (event.type) {
-                        EventType.kConnectionEvent -> handleConnectionEvent(event)
+                        EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
                         else -> {
                             Log.e("event", event.data)
                         }
@@ -49,7 +51,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             }
         }
     }
-    private fun handleConnectionEvent(event: Event)
+    private fun handleConnectionEvent(event: Event, eventSender: String)
     {
         val actLoad = mWeakReference.get()!!
         try {
@@ -64,10 +66,17 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                             Toast.LENGTH_LONG
                         ).show()
                     }
+                    mConfiguration.hearingAid.isConnected = true
                     mConfiguration.isConnected = true
                 }
-                else
-                    if (++mDoubleDeviceCount == 2) {
+                else {
+                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address) {
+                        mConfiguration.doubleDeviceMap[EarSide.Left]?.isConnected = true
+                    }
+                    else
+                        mConfiguration.doubleDeviceMap[EarSide.Right]?.isConnected = true
+
+                    if (mConfiguration.doubleDeviceMap.all { it.value.isConnected }){
                         actLoad.runOnUiThread {
                             Toast.makeText(
                                 actLoad,
@@ -77,6 +86,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                         }
                         mConfiguration.isConnected = true
                     }
+                }
             }
         } catch (ex: JSONException)
         {

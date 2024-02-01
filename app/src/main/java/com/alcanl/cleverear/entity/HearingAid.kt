@@ -16,7 +16,8 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                       var wirelessControl: WirelessControl? = null, var autoConnect : Boolean = false,
                       var currentMemory :  ParameterSpace? = null, var auxAttenuation : Int = 0,
                       var micAttenuation : Int = 8, var streamAddress : Int = 16,
-                      var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1, )
+                      var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
+                      var isConnected : Boolean = false)
 {
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
     {
@@ -50,6 +51,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
     fun endConnectionSession()
     {
         communicationAdaptor?.disconnect()
+        isConnected = false
     }
 }
 
