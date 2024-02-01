@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/clever_ear_logo_background"/>
+    <background android:drawable="@color/clever_ear_logo_background">
+        <shape android:shape="oval"/>
+    </background>
     <foreground android:drawable="@mipmap/clever_ear_logo_foreground"/>
 </adaptive-icon>

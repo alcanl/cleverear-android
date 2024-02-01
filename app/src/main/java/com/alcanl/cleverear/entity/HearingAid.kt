@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.entity
 
+import android.bluetooth.BluetoothDevice
 import android.util.Log
 import com.alcanl.cleverear.helpers.EarSide
 import com.ark.ArkException
@@ -10,7 +11,7 @@ import com.ark.ProductManager
 import com.ark.WirelessControl
 
 data class HearingAid(val address: String, val name: String, val rssi: Int, val manufacturerData: String,
-                      val side: EarSide, var isBond : Boolean = false, var numberOfMemories: Int = 8,
+                      val side: EarSide, var bondStatus : Int = BluetoothDevice.BOND_NONE, var numberOfMemories: Int = 8,
                       var volume: Int = 0, var batteryLevel : Int = 100, var communicationAdaptor: CommunicationAdaptor? = null,
                       var wirelessControl: WirelessControl? = null, var autoConnect : Boolean = false,
                       var currentMemory :  ParameterSpace? = null, var auxAttenuation : Int = 0,

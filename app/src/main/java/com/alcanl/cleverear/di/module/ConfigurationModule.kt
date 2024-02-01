@@ -15,10 +15,10 @@ object ConfigurationModule {
     var isConnected = false
     var isDoubleDeviceConnection = false
     var isDualDeviceConfig = false
+    var bondedDeviceCount = 0
     var doubleDeviceMap = HashMap<EarSide, HearingAid>()
     lateinit var earSide : EarSide
     lateinit var hearingAid: HearingAid
-
     @Singleton
     @Provides
     fun createConfiguration() : ConfigurationModule
