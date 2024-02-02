@@ -15,7 +15,6 @@ import com.ark.EventType
 import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
-import java.util.concurrent.ExecutorService
 import kotlin.concurrent.thread
 
 class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
