@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
@@ -80,15 +82,19 @@ class ConnectionActivity : AppCompatActivity() {
 
     private fun alertDialogYesButtonCallback()
     {
-        with(configuration) {
-            if (isDoubleDeviceConnection)
-                doubleDeviceMap.forEach {it.value.endConnectionSession()}
-            else
-                hearingAid.endConnectionSession()
+        Handler(Looper.myLooper()!!).postDelayed (
+            {
+                with(configuration) {
+                    if (isDoubleDeviceConnection)
+                        doubleDeviceMap.forEach {it.value.endConnectionSession()}
+                    else
+                        hearingAid.endConnectionSession()
 
-            isConnected = false
-        }
-        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+                    isConnected = false
+                }
+                mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+            }, 5000
+        )
     }
     private fun finalizeConnectionConfiguration() {
         if (isScanContinue)

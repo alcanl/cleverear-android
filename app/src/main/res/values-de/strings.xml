@@ -22,6 +22,7 @@
     <string name="listener_volume_level_text" translatable="true">Lautstärkepegel: </string>
     <string name="toast_channel_error_text" translatable="true">Nicht unterstützter Wert für Kanal. Muss zwischen 1 und 255 liegen</string>
     <string name="toast_double_device_connection_established_text" translatable="true">Verbindung mit den Geräten hergestellt</string>
+    <string name="toast_device_must_pair_text" translatable="true">Hörgerät muss mit mobilem Gerät gekoppelt werden</string>
     <string name="toast_bt_on" translatable="true">Bluetooth Ein</string>
     <string name="toast_gps_on" translatable="true">GPS Ein</string>
     <string name="toast_connection_established_text">Verbindung mit dem Gerät hergestellt</string>

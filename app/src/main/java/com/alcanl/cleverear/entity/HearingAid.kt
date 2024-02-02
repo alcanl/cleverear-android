@@ -17,7 +17,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                       var currentMemory :  ParameterSpace? = null, var auxAttenuation : Int = 0,
                       var micAttenuation : Int = 8, var streamAddress : Int = 16,
                       var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
-                      var isConnected : Boolean = false)
+                      @Volatile var isConnected : Boolean = false)
 {
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
     {

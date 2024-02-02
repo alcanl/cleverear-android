@@ -31,6 +31,7 @@
     <string name="listener_volume_level_text" translatable="true">Volume Level: </string>
     <string name="toast_problem_occured_text" translatable="true">Problem occurred while connecting to device</string>
     <string name="toast_channel_error_text" translatable="true">Unsupported Value for Channel. Must be in 1 to 255</string>
+    <string name="toast_device_must_pair_text" translatable="true">Hearing Aid Must Be Paired With Mobile Device</string>
     <string name="toast_bt_on" translatable="true">Bluetooth On</string>
     <string name="toast_gps_on" translatable="true">Location On</string>
     <string name="text_active_memory" translatable="true">Active program is </string>

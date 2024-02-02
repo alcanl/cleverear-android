@@ -16,17 +16,17 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
+import kotlin.concurrent.thread
 
 class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
-                                   private val mThreadPool : ExecutorService,
                                    private val mConfiguration : ConfigurationModule)
 {
     private val mWeakReference = WeakReference(activity)
-    private var mIsOnBoard = true
+    private lateinit var mListener : Thread
     fun startEventListener() {
 
-        mThreadPool.execute {
-            while (mIsOnBoard) {
+        mListener = thread(isDaemon = true, start = true) {
+            while (!mListener.isInterrupted) {
                 try {
                     val event = mEventHandler.event
                     val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -95,6 +95,6 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     }
     fun stopListener()
     {
-        mIsOnBoard = false
+        mListener.interrupt()
     }
 }

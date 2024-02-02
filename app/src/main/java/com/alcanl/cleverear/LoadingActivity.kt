@@ -40,7 +40,7 @@ class LoadingActivity : AppCompatActivity() {
     private lateinit var mListener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
     private lateinit var mBluetoothAdapter : BluetoothAdapter
-    private lateinit var mBondRequestReceiver: BroadcastReceiver
+    private var mBondRequestReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -55,7 +55,13 @@ class LoadingActivity : AppCompatActivity() {
                 handleDoubleDeviceConnection()
 
         }
-
+    }
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        mListener.stopListener()
+        if (mBondRequestReceiver != null)
+            unregisterReceiver(mBondRequestReceiver)
     }
     private fun handleSingleDeviceConnection()
     {
@@ -88,45 +94,44 @@ class LoadingActivity : AppCompatActivity() {
                 doubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler)
                     connectForDoubleDevices(); initBondedDeviceCountDownTimer()}
 
-            else if (doubleDeviceMap[EarSide.Left]?.bondStatus == BluetoothDevice.BOND_NONE)
-                doubleDeviceMap[EarSide.Left]?.apply { getPropertiesFromSDK(productManager, eventHandler)
-                    connectToDevice(this)
-                    mBondRequestReceiver = handleBondDeviceRequest(this)
-                    initUnBondSingleDeviceCountDownTimer() }
+            else if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE })
+                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Left]!!, true)
 
             else if (doubleDeviceMap[EarSide.Right]?.bondStatus == BluetoothDevice.BOND_NONE)
-                doubleDeviceMap[EarSide.Right]?.apply { getPropertiesFromSDK(productManager, eventHandler)
-                    connectToDevice(this)
-                    mBondRequestReceiver = handleBondDeviceRequest(this)
-                    initUnBondSingleDeviceCountDownTimer() }
+                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Right]!!, false)
 
             else
-                doubleDeviceMap[EarSide.Left]?.apply { getPropertiesFromSDK(productManager, eventHandler)
-                    connectToDevice(this)
-                    mBondRequestReceiver = handleBondDeviceRequest(this)
-                    initDoubleDeviceUnBondCountDownTimer()}
+                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Left]!!, false)
+
         }
     }
-    override fun onDestroy()
+    private fun unBoundDoubleDeviceInitialization(hearingAid: HearingAid, isDualUnBound: Boolean)
     {
-        super.onDestroy()
-        mListener.stopListener()
-        unregisterReceiver(mBondRequestReceiver)
+        hearingAid.apply {
+            getPropertiesFromSDK(productManager, eventHandler)
+            connectToDevice(this)
+            mBondRequestReceiver = handleBondDeviceRequest(this)
+            registerReceiver(mBondRequestReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
+            if (isDualUnBound)
+                initUnBondDoubleDeviceCountDownTimer()
+            else
+                initUnBondSingleDeviceCountDownTimer()
+        }
     }
-    private fun initDoubleDeviceUnBondCountDownTimer()
+    private fun initUnBondDoubleDeviceCountDownTimer()
     {
-        object: CountDownTimer(20000, 1000) {
+        object: CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (mBondRequestReceiver.resultCode == RESULT_OK &&
+                if (mBondRequestReceiver!!.resultCode == RESULT_OK &&
                     configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
-                    this.cancel()
+
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish()
-                        startActivity(Intent
-                            (this@LoadingActivity, LoadingActivity::class.java)) }, 2000)
+                    Handler(Looper.myLooper()!!).postDelayed({ startActivity(intent); finish() }
+                        , 2000)
+                    this.cancel()
                 }
 
             }
@@ -141,7 +146,7 @@ class LoadingActivity : AppCompatActivity() {
                     runOnUiThread {
                         Toast.makeText(
                             this@LoadingActivity,
-                            "The device must be paired",
+                            R.string.toast_device_must_pair_text,
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
@@ -163,20 +168,20 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun commonUnBondDeviceOnTick(millisUntilFinished: Long)
     {
-        if (millisUntilFinished in 4000L..4999 || millisUntilFinished in 9000L..<9999
-            || millisUntilFinished in 15000..15999)
+        if (millisUntilFinished in 5000L..5999 || millisUntilFinished in 10000L..<10999
+            || millisUntilFinished in 16000..16999 || millisUntilFinished in 24000..24999)
             mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_connection_in_process_text)
 
         mBinding.textViewConnecting.text = String.format("${mBinding.textViewConnecting.text}" + ".")
     }
     private fun initUnBondSingleDeviceCountDownTimer()
     {
-        object: CountDownTimer(20000, 1000) {
+        object: CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (mBondRequestReceiver.resultCode == RESULT_OK && configuration.isConnected) {
+                if (mBondRequestReceiver!!.resultCode == RESULT_OK && configuration.isConnected) {
                     handleBondedConnection()
                     this.cancel()
                 }
@@ -192,7 +197,7 @@ class LoadingActivity : AppCompatActivity() {
                     runOnUiThread {
                         Toast.makeText(
                             this@LoadingActivity,
-                            "The device must be paired",
+                            R.string.toast_device_must_pair_text,
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
@@ -231,7 +236,7 @@ class LoadingActivity : AppCompatActivity() {
     {
         mBluetoothAdapter = getSystemService(android.bluetooth.BluetoothManager::class.java).adapter
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
-        mListener = LoadingActivityEventListener(this, eventHandler, threadPool, configuration)
+        mListener = LoadingActivityEventListener(this, eventHandler, configuration)
             .apply { startEventListener() }
 
     }
@@ -281,8 +286,7 @@ class LoadingActivity : AppCompatActivity() {
                     {
                         hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
                     }
-                    else if (mBluetoothAdapter.getRemoteDevice(hearingAid.address).bondState == BluetoothDevice.BOND_BONDING)
-                        runOnUiThread {Toast.makeText(this@LoadingActivity, "bonding", Toast.LENGTH_LONG).show()}
+
                 }
             }
         }
@@ -298,9 +302,10 @@ class LoadingActivity : AppCompatActivity() {
     private fun handleBondedConnection() {
 
         mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-        Handler(Looper.myLooper()!!).postDelayed({ finish()
+        Handler(Looper.myLooper()!!).postDelayed({
             startActivity(Intent
-                (this@LoadingActivity, ControlActivity::class.java)) }, 2000)
+                (this@LoadingActivity, ControlActivity::class.java))
+                finish()}, 2000)
 
     }
 }
