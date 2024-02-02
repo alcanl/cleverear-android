@@ -143,8 +143,14 @@ class ControlActivity : AppCompatActivity() {
     private fun checkEnabledMemoryCount(hearingAid: HearingAid) : Int
     {
         var count = 0
-        (0..< hearingAid.numberOfMemories).forEach { if (hearingAid.wirelessControl?.memoryEnabled(
-            ParameterSpace.value(it))!!) ++count }
+        try {
+            (0..<hearingAid.numberOfMemories).forEach {
+                if (hearingAid.wirelessControl?.memoryEnabled(
+                        ParameterSpace.value(it)
+                    )!!
+                ) ++count
+            }
+        } catch (_: ArkException) {}
 
         return count
     }

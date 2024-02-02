@@ -294,26 +294,30 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
     {
-        with(hearingAid) {
-            streamAddressRaw = result
-            streamAddress = channel
-            wirelessControl?.streamAddress = result
-        }
+        try {
+            with(hearingAid) {
+                streamAddressRaw = result
+                streamAddress = channel
+                wirelessControl?.streamAddress = result
+            }
+        } catch (_: ArkException) {}
     }
     private fun modeButtonClickedCallback(view: View, hearingAid: HearingAid)
     {
-        hearingAid.apply {
-            streamChannelList = when (view) {
-                mBinding.buttonModeOne -> 0
-                mBinding.buttonModeTwo -> 1
-                else -> 2
+        try {
+            hearingAid.apply {
+                streamChannelList = when (view) {
+                    mBinding.buttonModeOne -> 0
+                    mBinding.buttonModeTwo -> 1
+                    else -> 2
+                }
+                wirelessControl?.streamChannelList = when (view) {
+                    mBinding.buttonModeOne -> 0
+                    mBinding.buttonModeTwo -> 1
+                    else -> 2
+                }
             }
-            wirelessControl?.streamChannelList = when (view) {
-                mBinding.buttonModeOne -> 0
-                mBinding.buttonModeTwo -> 1
-                else -> 2
-            }
-        }
+        } catch (_: ArkException) {}
     }
     private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>)
     {

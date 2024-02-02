@@ -1,15 +1,12 @@
 package com.alcanl.cleverear
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,12 +28,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var configuration: ConfigurationModule
     private lateinit var mBinding: ActivityMainBinding
     private var mBluetoothPermission = false
-    private val bluetoothActivityResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == RESULT_OK)
-            bluetoothScan()
-    }
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -120,28 +111,15 @@ class MainActivity : AppCompatActivity() {
     }
     private fun scanBluetooth()
     {
-        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
-
-        if (bluetoothAdapter == null) {
-            Toast.makeText(this, R.string.toast_bluetooth_not_found_text, Toast.LENGTH_LONG).show()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            checkPermissionForS()
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            scanGPS()
+            checkPermissionForQ()
         }
         else {
-            if (!bluetoothAdapter.isEnabled) {
-                val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                bluetoothActivityResultLauncher.launch(enableBluetoothIntent)
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                checkPermissionForS()
-            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                scanGPS()
-                checkPermissionForQ()
-            }
-            else {
-                scanGPS()
-                checkPermissionForN()
-            }
+            scanGPS()
+            checkPermissionForN()
         }
     }
 
@@ -167,10 +145,6 @@ class MainActivity : AppCompatActivity() {
                 ),
                 1
             )
-    }
-    private fun bluetoothScan()
-    {
-        Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
     }
     private fun gpsScan()
     {

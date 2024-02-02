@@ -21,11 +21,13 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
 {
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
     {
-        communicationAdaptor = productManager.createWirelessCommunicationInterface(address)
-        communicationAdaptor?.setEventHandler(eventHandler)
-        wirelessControl = productManager.wirelessControl
-        productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
-        wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
+        try {
+            communicationAdaptor = productManager.createWirelessCommunicationInterface(address)
+            communicationAdaptor?.setEventHandler(eventHandler)
+            wirelessControl = productManager.wirelessControl
+            productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
+            wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
+        } catch (_: ArkException) {}
 
     }
 
@@ -50,8 +52,10 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
     }
     fun endConnectionSession()
     {
-        communicationAdaptor?.disconnect()
-        isConnected = false
+        try {
+            communicationAdaptor?.disconnect()
+            isConnected = false
+        } catch (_: ArkException) {}
     }
 }
 
