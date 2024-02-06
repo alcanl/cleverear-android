@@ -294,30 +294,34 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
     {
-        try {
-            with(hearingAid) {
-                streamAddressRaw = result
-                streamAddress = channel
-                wirelessControl?.streamAddress = result
-            }
-        } catch (_: ArkException) {}
+        threadPool.execute {
+            try {
+                with(hearingAid) {
+                    streamAddressRaw = result
+                    streamAddress = channel
+                    wirelessControl?.streamAddress = result
+                }
+            } catch (_: ArkException) {}
+        }
     }
     private fun modeButtonClickedCallback(view: View, hearingAid: HearingAid)
     {
-        try {
-            hearingAid.apply {
-                streamChannelList = when (view) {
-                    mBinding.buttonModeOne -> 0
-                    mBinding.buttonModeTwo -> 1
-                    else -> 2
+        threadPool.execute {
+            try {
+                hearingAid.apply {
+                    streamChannelList = when (view) {
+                        mBinding.buttonModeOne -> 0
+                        mBinding.buttonModeTwo -> 1
+                        else -> 2
+                    }
+                    wirelessControl?.streamChannelList = when (view) {
+                        mBinding.buttonModeOne -> 0
+                        mBinding.buttonModeTwo -> 1
+                        else -> 2
+                    }
                 }
-                wirelessControl?.streamChannelList = when (view) {
-                    mBinding.buttonModeOne -> 0
-                    mBinding.buttonModeTwo -> 1
-                    else -> 2
-                }
-            }
-        } catch (_: ArkException) {}
+            } catch (_: ArkException) {}
+        }
     }
     private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>)
     {
@@ -337,41 +341,45 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
     {
-        try {
-            with(configuration) {
-                if (isConnected) {
-                    if (!isDoubleDeviceConnection) {
-                        hearingAid.wirelessControl?.micAttenuation = value.toInt()
-                        hearingAid.micAttenuation = value.toInt()
-                    }
-                    else {
-                        doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
-                        doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
+        threadPool.execute {
+            try {
+                with(configuration) {
+                    if (isConnected) {
+                        if (!isDoubleDeviceConnection) {
+                            hearingAid.wirelessControl?.micAttenuation = value.toInt()
+                            hearingAid.micAttenuation = value.toInt()
+                        }
+                        else {
+                            doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+                            doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
+                        }
                     }
                 }
+            } catch (ex: ArkException) {
+                Log.e("mic", ex.message!!)
             }
-        } catch (ex: ArkException) {
-            Log.e("mic", ex.message!!)
         }
     }
     private fun auxSliderValueChanged(value: Float, earSide: EarSide)
     {
-        try {
-            with(configuration) {
-                if (isConnected) {
-                    if (!isDoubleDeviceConnection) {
-                        hearingAid.wirelessControl?.auxAttenuation = value.toInt()
-                        hearingAid.auxAttenuation = value.toInt()
+        threadPool.execute {
+            try {
+                with(configuration) {
+                    if (isConnected) {
+                        if (!isDoubleDeviceConnection) {
+                            hearingAid.wirelessControl?.auxAttenuation = value.toInt()
+                            hearingAid.auxAttenuation = value.toInt()
 
-                    } else {
-                        doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
-                        doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
+                        } else {
+                            doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                            doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
+                        }
                     }
                 }
-            }
 
-        } catch (ex: ArkException) {
-            Log.e("aux", ex.message!!)
+            } catch (ex: ArkException) {
+                Log.e("aux", ex.message!!)
+            }
         }
     }
     private fun setSelectedModeButtonView(button: Button)
@@ -411,13 +419,13 @@ class AdvancedActivity : AppCompatActivity(){
     }
     fun micDualSliderValueChanged(value: Float)
     {
-        threadPool.execute { micLeftSliderValueChanged(value) }
-        threadPool.execute { micRightSliderValueChanged(value) }
+        micLeftSliderValueChanged(value)
+        micRightSliderValueChanged(value)
     }
     fun auxDualSliderValueChanged(value: Float)
     {
-        threadPool.execute { auxLeftSliderValueChanged(value) }
-        threadPool.execute { auxRightSliderValueChanged(value) }
+        auxLeftSliderValueChanged(value)
+        auxRightSliderValueChanged(value)
     }
     fun micLeftSliderValueChanged(value: Float)
     {
