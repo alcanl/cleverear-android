@@ -40,8 +40,8 @@ class SplashActivity : AppCompatActivity() {
             }
             override fun onFinish()
             {
-                finish()
                 Intent(this@SplashActivity, MainActivity::class.java).apply { startActivity(this) }
+                finish()
             }
         }.start()
     }
