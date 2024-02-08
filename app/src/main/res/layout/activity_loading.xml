@@ -64,6 +64,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="80dp"
                     android:gravity="center_horizontal"
+                    android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:text="@string/textview_device_detection_connection_in_process_text" />
             </FrameLayout>

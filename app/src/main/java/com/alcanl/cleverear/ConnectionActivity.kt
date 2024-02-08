@@ -82,6 +82,8 @@ class ConnectionActivity : AppCompatActivity() {
 
     private fun alertDialogYesButtonCallback()
     {
+        mBinding.frameLayoutStopConnection.visibility = View.VISIBLE
+
         Handler(Looper.myLooper()!!).postDelayed (
             {
                 with(configuration) {
@@ -93,7 +95,8 @@ class ConnectionActivity : AppCompatActivity() {
                     isConnected = false
                 }
                 mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
-            }, 5000
+                mBinding.frameLayoutStopConnection.visibility = View.GONE
+            }, 10000
         )
     }
     private fun finalizeConnectionConfiguration() {

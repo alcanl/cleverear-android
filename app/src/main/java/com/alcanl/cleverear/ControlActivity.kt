@@ -66,6 +66,14 @@ class ControlActivity : AppCompatActivity() {
             isListenerOnBoard = false
         }
     }
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isListenerOnBoard) {
+            mListener.stopListener()
+            isListenerOnBoard = false
+        }
+    }
     private fun initBatteryViews()
     {
         if (configuration.isDoubleDeviceConnection) {

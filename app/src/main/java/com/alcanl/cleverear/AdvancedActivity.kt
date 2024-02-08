@@ -45,7 +45,6 @@ class AdvancedActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         initialize()
     }
-
     override fun onResume()
     {
         super.onResume()
@@ -59,10 +58,17 @@ class AdvancedActivity : AppCompatActivity(){
                 isListenerOnBoard = true
             }
     }
-
     override fun onStop()
     {
         super.onStop()
+        if (isListenerOnBoard) {
+            mListener.stopListener()
+            isListenerOnBoard = false
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+
         if (isListenerOnBoard) {
             mListener.stopListener()
             isListenerOnBoard = false
@@ -74,7 +80,6 @@ class AdvancedActivity : AppCompatActivity(){
         initializeNavigationView()
         initSwitch()
         initSliders()
-
 
     }
     private fun initSliders()
@@ -184,11 +189,9 @@ class AdvancedActivity : AppCompatActivity(){
                 startCommonSlidersAnimation(mBinding.sliderMicCommon)
 
             }
-
             override fun onAnimationRepeat(animation: Animation?) {
 
             }
-
         }
     }
     private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
@@ -460,12 +463,8 @@ class AdvancedActivity : AppCompatActivity(){
                         Toast.makeText(this@AdvancedActivity, R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
                     }
                 }
-                override fun onAnimationEnd(animation: Animation?)
-                {
-
-                }
-                override fun onAnimationRepeat(animation: Animation?) {
-                }
+                override fun onAnimationEnd(animation: Animation?) {}
+                override fun onAnimationRepeat(animation: Animation?) {}
             }
         ) })
         }
