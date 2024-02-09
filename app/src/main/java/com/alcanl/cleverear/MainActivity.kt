@@ -57,8 +57,10 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonSingleDeviceClick() {
 
-        if (mBluetoothPermission)
+        if (mBluetoothPermission) {
             Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
+            configuration.isDoubleDeviceConnection = false
+        }
         else
             scanBluetooth()
     }

@@ -5,7 +5,7 @@
     <string name="main_logo_description_text" translatable="false">Ear Technic Logo</string>
     <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
-    <string name="app_version_text" translatable="false">v 3.0.0</string>
+    <string name="app_version_text" translatable="false">v 3.0.1</string>
     <string name="textview_detect_device_text" translatable="true">Detect Device</string>
     <string name="textview_device_detection_not_found_text" translatable="true">Device Not Found</string>
     <string name="textview_device_detection_device_connected_text" translatable="true">Connected To Device</string>
