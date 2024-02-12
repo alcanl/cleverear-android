@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -90,9 +91,13 @@ class LoadingActivity : AppCompatActivity() {
         with(configuration) {
             doubleDeviceMap.forEach { checkDeviceBondStatus(it.value) }
 
-            if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
-                doubleDeviceMap.forEach { it.value.getPropertiesFromSDK(productManager, eventHandler)
-                    connectForDoubleDevices(); initBondedDeviceCountDownTimer()}
+            if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED }) {
+                doubleDeviceMap.forEach {
+                    it.value.getPropertiesFromSDK(productManager, eventHandler)
+                    connectToDevice(it.value)
+                }
+                initBondedDeviceCountDownTimer()
+            }
 
             else if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE })
                 unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Left]!!, true)
@@ -244,10 +249,6 @@ class LoadingActivity : AppCompatActivity() {
     {
         connectToDevice(configuration.hearingAid)
     }
-    private fun connectForDoubleDevices()
-    {
-        configuration.doubleDeviceMap.forEach { connectToDevice(it.value) }
-    }
     private fun connectToDevice(hearingAid: HearingAid)
     {
         threadPool.execute {
@@ -261,6 +262,7 @@ class LoadingActivity : AppCompatActivity() {
             }
             catch (ex: ArkException)
             {
+                Log.e("connect", ex.message!!)
                 runOnUiThread {
                     Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
                 }

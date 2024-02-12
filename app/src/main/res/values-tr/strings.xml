@@ -15,7 +15,7 @@
     <string name="textview_program_text">Programlar</string>
     <string name="textview_left_device_text">Sol Kulak</string>
     <string name="textview_right_device_text">Sağ Kulak</string>
-    <string name="switch_dual_device_text">Eş Kullanım</string>
+    <string name="switch_dual_device_text">Binaural Kullanım</string>
     <string name="toast_connection_lost_text">Bağlantı Kaybedildi, Cihaza Yeniden Bağlanılıyor</string>
     <string name="toast_connection_established_text">Cihaz İle Bağlantı Kuruldu</string>
     <string name="toast_double_device_connection_established_text" translatable="true">Cihazlar ile Bağlantı Kuruldu</string>
