@@ -1,6 +1,9 @@
 package com.alcanl.cleverear
 
 import android.Manifest
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -18,6 +21,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.helpers.service.AutoConnectJobService
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -39,8 +43,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initBinding()
 
-        if (!mBluetoothPermission)
+
+        if (!mBluetoothPermission) {
             scanBluetooth()
+            checkBluetoothPermission()
+        }
 
     }
     override fun onResume() {
@@ -172,4 +179,17 @@ class MainActivity : AppCompatActivity() {
             ) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun startScheduler()
+    {
+        val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+
+        scheduler.schedule(
+            JobInfo.Builder(1, ComponentName(this, AutoConnectJobService::class.java))
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            .setPeriodic(60000)
+            .setRequiresCharging(false)
+            .setRequiresBatteryNotLow(false)
+            .build())
+
+    }
 }

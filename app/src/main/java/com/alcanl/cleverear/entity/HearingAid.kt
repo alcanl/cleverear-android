@@ -27,7 +27,10 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             wirelessControl = productManager.wirelessControl
             productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
             wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
-        } catch (_: ArkException) {}
+        } catch (ex: ArkException)
+        {
+            Log.e("SDKAdaptors", ex.message!!)
+        }
 
     }
 
@@ -57,5 +60,16 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             isConnected = false
         } catch (_: ArkException) {}
     }
+    fun checkDevice() : Boolean
+    {
+        var result = false
+
+        try {
+            result = communicationAdaptor?.checkDevice()!!
+        } catch (_: ArkException) { }
+
+        return result
+    }
+
 }
 

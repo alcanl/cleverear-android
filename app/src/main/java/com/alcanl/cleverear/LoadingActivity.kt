@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.SharedPreferences.Editor
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -19,6 +21,15 @@ import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.helpers.HA_LEFT_ADDRESS
+import com.alcanl.cleverear.helpers.HA_LEFT_NAME
+import com.alcanl.cleverear.helpers.HA_LEFT_RSSI
+import com.alcanl.cleverear.helpers.HA_RIGHT_ADDRESS
+import com.alcanl.cleverear.helpers.HA_RIGHT_NAME
+import com.alcanl.cleverear.helpers.HA_RIGHT_RSSI
+import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
+import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
+import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.helpers.listeners.LoadingActivityEventListener
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -49,6 +60,8 @@ class LoadingActivity : AppCompatActivity() {
         initialize()
 
         with(configuration) {
+            if (isConnectedBefore)
+                loadPrefs()
 
             if (!isDoubleDeviceConnection)
                 handleSingleDeviceConnection()
@@ -63,6 +76,33 @@ class LoadingActivity : AppCompatActivity() {
         mListener.stopListener()
         if (mBondRequestReceiver != null)
             unregisterReceiver(mBondRequestReceiver)
+
+        handleSharedPrefs()
+    }
+    private fun handleSharedPrefs()
+    {
+        with(configuration) {
+            if (isConnected) {
+
+                val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+                val editor = prefs.edit()
+
+                if (isDoubleDeviceConnection)
+                    doubleDeviceMap.forEach { handleSharedPrefs(editor, it.value) }
+
+                else
+                    handleSharedPrefs(editor, hearingAid)
+
+                editor.apply()
+            }
+        }
+    }
+    private fun handleSharedPrefs(editor: Editor, hearingAid: HearingAid)
+    {
+        editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_ADDRESS else HA_RIGHT_ADDRESS, hearingAid.address)
+        editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_NAME else HA_RIGHT_NAME, hearingAid.name)
+        editor.putInt(if (hearingAid.side == EarSide.Left) HA_LEFT_RSSI else HA_RIGHT_RSSI, hearingAid.rssi)
+        editor.putString(if (hearingAid.side == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT, hearingAid.manufacturerData)
     }
     private fun handleSingleDeviceConnection()
     {
@@ -308,6 +348,41 @@ class LoadingActivity : AppCompatActivity() {
             startActivity(Intent
                 (this@LoadingActivity, ControlActivity::class.java))
                 finish()}, 2000)
+
+    }
+    private fun loadPrefs()
+    {
+        val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                doubleDeviceMap[EarSide.Left] = getLeftDevice(prefs)
+                doubleDeviceMap[EarSide.Right] = getRightDevice(prefs)
+            }
+            else
+                hearingAid = if (earSide == EarSide.Left) getLeftDevice(prefs) else getRightDevice(prefs)
+        }
+
+    }
+    private fun getLeftDevice(prefs: SharedPreferences) : HearingAid
+    {
+        val deviceAddress = prefs.getString(HA_LEFT_ADDRESS, "")
+        val deviceName = prefs.getString(HA_LEFT_NAME, "")
+        val deviceRSSI = prefs.getInt(HA_LEFT_RSSI, 0)
+        val deviceManu = prefs.getString(MANUFACTURER_CODE_LEFT, "")
+
+        return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Left)
+
+    }
+
+    private fun getRightDevice(prefs: SharedPreferences) : HearingAid
+    {
+        val deviceAddress = prefs.getString(HA_RIGHT_ADDRESS, "")
+        val deviceName = prefs.getString(HA_RIGHT_NAME, "")
+        val deviceRSSI = prefs.getInt(HA_RIGHT_RSSI, 0)
+        val deviceManu = prefs.getString(MANUFACTURER_CODE_RIGHT, "")
+
+        return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Right)
 
     }
 }

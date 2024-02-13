@@ -56,7 +56,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
         try {
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actLoad)
-            if (connectionState == 3 || connectionState == 2) {
+            if (connectionState == 3) {
                 if (!mConfiguration.isDoubleDeviceConnection) {
                     actLoad.runOnUiThread {
                         Toast.makeText(

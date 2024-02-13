@@ -253,18 +253,18 @@ class AdvancedActivity : AppCompatActivity(){
 
             when (it.itemId) {
                 R.id.navbar_control -> {
-                    initializeNavigationView(ControlActivity::class.java)
                     if (isListenerOnBoard) {
                         mListener.stopListener()
                         isListenerOnBoard = false
                     }
+                    initializeNavigationView(ControlActivity::class.java)
                     finish(); true}
                 R.id.navbar_connection -> {
-                    initializeNavigationView(ConnectionActivity::class.java)
                     if (isListenerOnBoard) {
                         mListener.stopListener()
                         isListenerOnBoard = false
                     }
+                    initializeNavigationView(ConnectionActivity::class.java)
                     finish(); true}
                 else -> true
             }
