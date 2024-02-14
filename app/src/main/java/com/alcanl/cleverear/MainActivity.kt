@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.animation.Animation
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,8 +69,10 @@ class MainActivity : AppCompatActivity() {
             Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
             configuration.isDoubleDeviceConnection = false
         }
-        else
+        else {
+            toastNoPermission()
             scanBluetooth()
+        }
     }
 
     fun buttonDoubleDeviceClick()
@@ -79,8 +82,17 @@ class MainActivity : AppCompatActivity() {
             configuration.earSide = EarSide.Left
             Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
         }
-        else
+        else {
+            toastNoPermission()
             scanBluetooth()
+        }
+    }
+    fun buttonControlClicked()
+    {
+        mBinding.imageButtonControl.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@MainActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
+        }
     }
 
     private fun initBinding() {
@@ -191,5 +203,30 @@ class MainActivity : AppCompatActivity() {
             .setRequiresBatteryNotLow(false)
             .build())
 
+    }
+    private fun toastNoPermission()
+    {
+        Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_LONG).show()
+    }
+    private fun controlButtonAnimation() : Animation.AnimationListener
+    {
+        return object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                if (mBluetoothPermission) {
+                    configuration.isDoubleDeviceConnection = false
+                    Intent(this@MainActivity, AutoConnectActivity::class.java).apply { startActivity(this) }
+                }
+                else {
+                    toastNoPermission()
+                    scanBluetooth()
+                }
+            }
+            override fun onAnimationEnd(animation: Animation?)
+            {
+
+            }
+            override fun onAnimationRepeat(animation: Animation?) {}
+        }
     }
 }

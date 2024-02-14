@@ -17,7 +17,12 @@
     <string name="textview_program_text">Programme</string>
     <string name="textview_left_device_text">Linkes Gerät</string>
     <string name="textview_right_device_text">Rechtes Gerät</string>
+    <string name="textview_control_ha">Kontrolle Hörgerät</string>
     <string name="switch_dual_device_text">Doppelte Konfiguration</string>
+    <string name="toast_no_permission">Keine Bluetooth-Erlaubnis</string>
+    <string name="toast_no_device_selected">Nein Jedes ausgewählte Gerät</string>
+    <string name="textview_no_previous_device_info">Keine Geräteinformationen</string>
+    <string name="toast_no_previous_device_for_selection">Keine vorherigen Geräteinformationen für die Auswahl</string>
     <string name="toast_connection_lost_text">Verbindung verloren, Versuch, das Gerät wieder anzuschließen</string>
     <string name="listener_volume_level_text" translatable="true">Lautstärkepegel: </string>
     <string name="toast_channel_error_text" translatable="true">Nicht unterstützter Wert für Kanal. Muss zwischen 1 und 255 liegen</string>

@@ -9,43 +9,42 @@
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
-
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
-
     <uses-feature android:name="android.hardware.bluetooth" />
-
 
     <application
         android:name=".application.CleverEarApp"
         android:allowBackup="true"
-        android:screenOrientation="portrait"
         android:icon="@mipmap/clever_ear_logo_round"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/clever_ear_logo_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CleverEar"
-        >
+        android:theme="@style/Theme.CleverEar">
+        <activity
+            android:name=".AutoConnectActivity"
+            android:exported="false" />
+
         <service
-            android:permission="android.permission.BIND_JOB_SERVICE"
             android:name=".helpers.service.AutoConnectJobService"
             android:enabled="true"
             android:exported="false"
-             />
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <activity
             android:name=".LoadingActivity"
             android:exported="true" />
@@ -64,8 +63,7 @@
             android:theme="@style/Theme.CleverEar" />
         <activity
             android:name=".SplashActivity"
-            android:exported="true"
-            >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

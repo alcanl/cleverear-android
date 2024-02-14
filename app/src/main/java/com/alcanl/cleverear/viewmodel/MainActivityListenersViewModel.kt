@@ -14,4 +14,8 @@ class MainActivityListenersViewModel (activity: MainActivity) {
     {
         mWeakReference.get()?.buttonDoubleDeviceClick()
     }
+    fun handleControlButton()
+    {
+        mWeakReference.get()?.buttonControlClicked()
+    }
 }

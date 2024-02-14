@@ -3,7 +3,6 @@ package com.alcanl.cleverear
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.app.AlertDialog
-import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -22,11 +21,8 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.HA_LEFT_ADDRESS
-import com.alcanl.cleverear.helpers.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
-import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.helpers.connection.DeviceConnectionHandler
 import com.alcanl.cleverear.helpers.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
@@ -38,7 +34,6 @@ import com.ark.EventType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
-import java.util.stream.StreamSupport
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,13 +61,6 @@ class ConnectionActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-
-        if (isConnectedBefore()) {
-            configuration.isConnectedBefore = true
-            startActivity(Intent(this, LoadingActivity::class.java))
-            return
-        }
-
         buttonDetectDeviceClicked()
     }
 
@@ -91,7 +79,6 @@ class ConnectionActivity : AppCompatActivity() {
                 else getString(R.string.textview_device_detection_not_found_text)
         }
     }
-
     private fun alertDialogYesButtonCallback()
     {
         mBinding.frameLayoutStopConnection.visibility = View.VISIBLE
@@ -108,7 +95,7 @@ class ConnectionActivity : AppCompatActivity() {
                 }
                 mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
                 mBinding.frameLayoutStopConnection.visibility = View.GONE
-            }, 10000
+            }, 8000
         )
     }
     private fun finalizeConnectionConfiguration() {
@@ -338,37 +325,18 @@ class ConnectionActivity : AppCompatActivity() {
 
     fun stopScanButtonClicked()
     {
-        isScanContinue = false
-        scanOnBoard.cancel(true)
-        deviceConnectionHandler.endScanProcess(mAsyncResult)
+        try {
+            isScanContinue = false
+            scanOnBoard.cancel(true)
+            deviceConnectionHandler.endScanProcess(mAsyncResult)
 
-        with(mBinding) {
-            imageButtonDetect.isEnabled = true
-            progressBar.visibility = View.GONE
-            frameLayoutStopScan.visibility = View.INVISIBLE
-        }
-    }
-    @SuppressLint("MissingPermission")
-    private fun isConnectedBefore() : Boolean
-    {
-        val adapter = getSystemService(BluetoothManager::class.java).adapter
-        val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-
-        val leftDevice = prefs.getString(HA_LEFT_ADDRESS, "")
-        val rightDevice = prefs.getString(HA_RIGHT_ADDRESS, "")
-
-        with(configuration) {
-            if (!isDoubleDeviceConnection)
-                if (earSide == EarSide.Left)
-                    return StreamSupport.stream(adapter.bondedDevices.spliterator(), false).anyMatch {
-                        it.address == leftDevice }
-                else
-                    return StreamSupport.stream(adapter.bondedDevices.spliterator(), false).anyMatch {
-                        it.address == rightDevice
-                    }
-            else
-                return StreamSupport.stream(adapter.bondedDevices.spliterator(), false).anyMatch { it.address == leftDevice }
-                        && StreamSupport.stream(adapter.bondedDevices.spliterator(), false).anyMatch { it.address == rightDevice }
+            with(mBinding) {
+                imageButtonDetect.isEnabled = true
+                progressBar.visibility = View.GONE
+                frameLayoutStopScan.visibility = View.INVISIBLE
+            }
+        } catch (ex: ArkException) {
+            Log.e("err", ex.message!!)
         }
     }
 }

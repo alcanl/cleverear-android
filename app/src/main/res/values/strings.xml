@@ -18,6 +18,11 @@
     <string name="textview_device_detection_device_connected_text" translatable="true">Connected To Device</string>
     <string name="textview_device_detection_connection_in_process_text" translatable="true">Connecting To Device</string>
     <string name="textview_device_detection_not_connected_text" translatable="true">Could not Connected To Device</string>
+    <string name="textview_control_ha" translatable="true">Control Hearing Aid</string>
+    <string name="toast_no_permission" translatable="true">No Bluetooth Permission</string>
+    <string name="toast_no_device_selected" translatable="true">No Any Selected Device</string>
+    <string name="textview_no_previous_device_info" translatable="true">No Device Info</string>
+    <string name="toast_no_previous_device_for_selection" translatable="true">No Previous Device Info For Selection</string>
     <string name="textview_mode_text">Mode</string>
     <string name="textview_channel_text">Channel</string>
     <string name="textview_R_text" translatable="false">R</string>

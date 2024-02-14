@@ -295,8 +295,8 @@ class LoadingActivity : AppCompatActivity() {
             try {
                 hearingAid.communicationAdaptor?.connect()
                 runBlocking {
-                    delay(10000)
-                    readDeviceConfiguration(hearingAid)
+                    delay(8000)
+                    hearingAid.readDeviceConfiguration()
                 }
 
             }
@@ -308,10 +308,6 @@ class LoadingActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-    private fun readDeviceConfiguration(hearingAid: HearingAid)
-    {
-        hearingAid.readDeviceConfiguration()
     }
     private fun handleBondDeviceRequest(hearingAid: HearingAid) : BroadcastReceiver
     {
