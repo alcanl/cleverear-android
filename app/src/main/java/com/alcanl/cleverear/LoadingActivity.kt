@@ -31,6 +31,7 @@ import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.helpers.listeners.LoadingActivityEventListener
+import com.alcanl.cleverear.helpers.service.AutoConnectService
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
@@ -78,6 +79,9 @@ class LoadingActivity : AppCompatActivity() {
             unregisterReceiver(mBondRequestReceiver)
 
         handleSharedPrefs()
+
+        if (configuration.isConnected)
+            startService(Intent(this, AutoConnectService::class.java))
     }
     private fun handleSharedPrefs()
     {

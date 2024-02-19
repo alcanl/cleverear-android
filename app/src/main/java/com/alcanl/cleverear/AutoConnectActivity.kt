@@ -69,8 +69,12 @@ class AutoConnectActivity : AppCompatActivity() {
     private fun controlButtonClickedCommon()
     {
         configuration.isConnectedBefore = true
-        startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
-        finish()
+        if (!configuration.isConnected) {
+            startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
+            finish()
+        }
+        else
+            startActivity(Intent(this, ControlActivity::class.java))
     }
     private fun isValidDeviceData(isDual: Boolean, text: String) : Boolean
     {

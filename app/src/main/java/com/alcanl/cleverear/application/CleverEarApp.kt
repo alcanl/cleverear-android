@@ -1,37 +1,35 @@
 package com.alcanl.cleverear.application
 
 import android.app.Application
-import com.alcanl.cleverear.di.module.ConfigurationModule
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.core.content.getSystemService
 import com.ark.ArkException
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.HiltAndroidApp
-import java.util.concurrent.ExecutorService
-import javax.inject.Inject
 
 @HiltAndroidApp
-class CleverEarApp : Application(){
-    @Inject
-    lateinit var configuration: ConfigurationModule
-    @Inject
-    lateinit var threadPool: ExecutorService
+class CleverEarApp : Application() {
     override fun onCreate() {
         super.onCreate()
+
         try {
             BleUtil.BleManager_Init(this)
         } catch (_: ArkException) {}
-    }
-    override fun onTerminate() {
-        super.onTerminate()
-        BleUtil.BleManager_DeInit()
 
-        try {
-            if (configuration.isConnected)
-                if (configuration.isDoubleDeviceConnection)
-                    configuration.doubleDeviceMap.forEach { it.value.endConnectionSession() }
-                else
-                    configuration.hearingAid.endConnectionSession()
+        val channel = NotificationChannel(
+            "CleverEar Demo",
+            "Demo Notification",
+            NotificationManager.IMPORTANCE_HIGH
+        )
 
-            threadPool.shutdown()
-        } catch (_: ArkException) {}
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.createNotificationChannel(channel)
     }
 }
+
+
+

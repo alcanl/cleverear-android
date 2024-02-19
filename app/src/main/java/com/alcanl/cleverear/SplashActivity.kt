@@ -1,5 +1,6 @@
 package com.alcanl.cleverear
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
@@ -8,18 +9,26 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
-
+import com.alcanl.cleverear.di.module.ConfigurationModule
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+@AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     private lateinit var mBinding : ActivitySplashBinding
+    @Inject
+    lateinit var configuration: ConfigurationModule
     private val bluetoothActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
@@ -33,21 +42,28 @@ class SplashActivity : AppCompatActivity() {
     }
     private fun initCountDownTimer()
     {
-        object: CountDownTimer(4000, 1000) {
+        object: CountDownTimer(3000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
 
             }
             override fun onFinish()
             {
+                if (configuration.isConnected) {
+                    Intent(this@SplashActivity, ControlActivity::class.java).apply { startActivity(this); finish() }
+                    return
+                }
+
                 Intent(this@SplashActivity, MainActivity::class.java).apply { startActivity(this) }
                 finish()
             }
         }.start()
     }
 
+
     private fun initialize()
     {
+        requestNotificationPermission()
         initBinding()
         mEnableBluetoothBroadCast = handleBroadcastReceiver()
         registerReceiver(mEnableBluetoothBroadCast, IntentFilter(ACTION_STATE_CHANGED))
@@ -98,5 +114,21 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun requestNotificationPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE) != PackageManager.PERMISSION_GRANTED)
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE), 0)
+
+
     }
 }

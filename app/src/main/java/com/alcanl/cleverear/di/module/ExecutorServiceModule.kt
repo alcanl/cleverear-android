@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import javax.inject.Singleton
 
 @Module
@@ -14,5 +15,9 @@ object ExecutorServiceModule {
     @Provides
     @Singleton
     fun createExecutorService() : ExecutorService = Executors.newCachedThreadPool()
+
+    @Provides
+    @Singleton
+    fun createScheduledThreadPool() : ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
 }

@@ -66,7 +66,9 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
 
         try {
             result = communicationAdaptor?.checkDevice()!!
-        } catch (_: ArkException) { }
+        } catch (ex: ArkException) {
+            Log.e("checkDevice", ex.message!!)
+        }
 
         return result
     }
