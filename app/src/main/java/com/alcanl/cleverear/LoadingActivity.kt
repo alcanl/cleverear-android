@@ -16,6 +16,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -81,7 +82,9 @@ class LoadingActivity : AppCompatActivity() {
         handleSharedPrefs()
 
         if (configuration.isConnected)
-            startService(Intent(this, AutoConnectService::class.java))
+            Intent(this, AutoConnectService::class.java).apply {
+                ContextCompat.startForegroundService(this@LoadingActivity, this)
+            }
     }
     private fun handleSharedPrefs()
     {

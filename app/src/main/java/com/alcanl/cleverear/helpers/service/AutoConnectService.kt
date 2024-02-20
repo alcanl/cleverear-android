@@ -54,12 +54,13 @@ class AutoConnectService : Service()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         initialize()
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
     override fun onBind(intent: Intent?): IBinder?
     {
         throw UnsupportedOperationException()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         BleUtil.BleManager_DeInit()
@@ -107,6 +108,7 @@ class AutoConnectService : Service()
         startForeground(1, createNotification())
         mHandler = AutoConnectHandler(this)
         checkConnection()
+
     }
     private fun getSharedPrefsForLeftDevice() : HearingAid
     {
@@ -154,10 +156,11 @@ class AutoConnectService : Service()
                 return
             else {
                 if (isDoubleDeviceConnection) {
+
                     if (!doubleDeviceMap[EarSide.Left]?.isConnected!!)
                         doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
 
-                    else
+                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!!)
                         doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
 
                 }
@@ -173,7 +176,7 @@ class AutoConnectService : Service()
         return NotificationCompat.Builder(this, "CleverEar Demo")
             .setSmallIcon(R.drawable.cleverear_logo)
             .setContentTitle("CleverEar Bluetooth Connection")
-            .setContentText(String.format("Connected with %s", configuration.hearingAid.name))
+            .setContentText("Connected with Hearing Aid")
             .setOngoing(true)
             .setAutoCancel(false)
             .build()

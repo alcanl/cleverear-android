@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initBinding()
 
-
         if (!mBluetoothPermission) {
             scanBluetooth()
             checkBluetoothPermission()
