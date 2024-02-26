@@ -23,7 +23,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
-import com.alcanl.cleverear.helpers.connection.DeviceConnectionHandler
+import com.alcanl.cleverear.helpers.scan.DeviceScanHandler
 import com.alcanl.cleverear.helpers.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class ConnectionActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityConnectionBinding
     @Inject
-    lateinit var deviceConnectionHandler: DeviceConnectionHandler
+    lateinit var deviceConnectionHandler: DeviceScanHandler
     @Inject
     lateinit var eventHandler: EventHandler
     @Inject

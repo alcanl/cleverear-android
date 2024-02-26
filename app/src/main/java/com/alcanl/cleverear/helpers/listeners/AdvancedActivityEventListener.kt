@@ -73,9 +73,9 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actAdv)
 
-            with(actAdv) {
-                runOnUiThread {
-                    if (connectionState == 1) {
+            if (connectionState == 1) {
+                with(actAdv) {
+                    runOnUiThread {
                         Toast.makeText(
                             this,
                             R.string.toast_connection_lost_text,

@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.util.Log
 import com.alcanl.cleverear.helpers.EarSide
 import com.ark.ArkException
+import com.ark.AsyncResult
 import com.ark.CommunicationAdaptor
 import com.ark.EventHandler
 import com.ark.ParameterSpace
@@ -60,18 +61,5 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             isConnected = false
         } catch (_: ArkException) {}
     }
-    fun checkDevice() : Boolean
-    {
-        var result = false
-
-        try {
-            result = communicationAdaptor?.checkDevice()!!
-        } catch (ex: ArkException) {
-            Log.e("checkDevice", ex.message!!)
-        }
-
-        return result
-    }
-
 }
 

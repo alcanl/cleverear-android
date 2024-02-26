@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.connection
+package com.alcanl.cleverear.helpers.scan
 
 import com.alcanl.cleverear.helpers.EarSide
 import com.ark.AsyncResult
@@ -6,7 +6,7 @@ import com.ark.CommunicationPort
 import com.ark.ProductManager
 import com.ark.WirelessProgrammerType
 
-class DeviceConnectionHandler(private val productManager: ProductManager){
+class DeviceScanHandler(private val productManager: ProductManager){
     private fun scanDevice(earSide: EarSide) : AsyncResult
     {
         return productManager.beginScanForWirelessDevices(WirelessProgrammerType.kPlatformDefault, "",

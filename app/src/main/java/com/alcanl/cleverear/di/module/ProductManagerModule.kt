@@ -1,13 +1,12 @@
 package com.alcanl.cleverear.di.module
 
 
-import com.alcanl.cleverear.helpers.connection.DeviceConnectionHandler
+import com.alcanl.cleverear.helpers.scan.DeviceScanHandler
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -23,8 +22,8 @@ object ProductManagerModule {
     fun createEventHandler() : EventHandler = mProductManager.eventHandler
     @Provides
     @Singleton
-    fun createDeviceConnectionHandler() : DeviceConnectionHandler
+    fun createDeviceConnectionHandler() : DeviceScanHandler
     {
-        return DeviceConnectionHandler(mProductManager)
+        return DeviceScanHandler(mProductManager)
     }
 }

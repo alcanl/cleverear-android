@@ -277,9 +277,8 @@ class LoadingActivity : AppCompatActivity() {
                             (this@LoadingActivity, ControlActivity::class.java)) }, 2000)
                 }
                 else {
-                    mBinding.textViewConnecting.text =
-                        getString(R.string.textview_device_detection_not_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 1000)
+                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
+                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
                 }
             }
         }.start()

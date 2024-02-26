@@ -71,9 +71,9 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionState = parseJsonConnectionData(event.data, actCont)
 
-            with(actCont) {
-                runOnUiThread {
-                    if (connectionState == 1) {
+            if (connectionState == 1) {
+                with(actCont) {
+                    runOnUiThread {
                         Toast.makeText(
                             this,
                             R.string.toast_connection_lost_text,

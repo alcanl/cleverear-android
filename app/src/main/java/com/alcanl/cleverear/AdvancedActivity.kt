@@ -344,45 +344,51 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
     {
-        threadPool.execute {
-            try {
-                with(configuration) {
-                    if (isConnected) {
-                        if (!isDoubleDeviceConnection) {
-                            hearingAid.wirelessControl?.micAttenuation = value.toInt()
-                            hearingAid.micAttenuation = value.toInt()
-                        }
-                        else {
-                            doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
-                            doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
-                        }
+        threadPool.execute { micSliderValueChangedCallback(value, earSide) }
+    }
+    @Synchronized
+    private fun micSliderValueChangedCallback(value: Float, earSide: EarSide)
+    {
+        try {
+            with(configuration) {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection) {
+                        hearingAid.wirelessControl?.micAttenuation = value.toInt()
+                        hearingAid.micAttenuation = value.toInt()
+                    }
+                    else {
+                        doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+                        doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
                     }
                 }
-            } catch (ex: ArkException) {
-                Log.e("mic", ex.message!!)
             }
+        } catch (ex: ArkException) {
+            Log.e("mic", ex.message!!)
         }
     }
     private fun auxSliderValueChanged(value: Float, earSide: EarSide)
     {
-        threadPool.execute {
-            try {
-                with(configuration) {
-                    if (isConnected) {
-                        if (!isDoubleDeviceConnection) {
-                            hearingAid.wirelessControl?.auxAttenuation = value.toInt()
-                            hearingAid.auxAttenuation = value.toInt()
+        threadPool.execute { auxSliderValueChangedCallback(value, earSide) }
+    }
+    @Synchronized
+    private fun auxSliderValueChangedCallback(value: Float, earSide: EarSide)
+    {
+        try {
+            with(configuration) {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection) {
+                        hearingAid.wirelessControl?.auxAttenuation = value.toInt()
+                        hearingAid.auxAttenuation = value.toInt()
 
-                        } else {
-                            doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
-                            doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
-                        }
+                    } else {
+                        doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                        doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
                     }
                 }
-
-            } catch (ex: ArkException) {
-                Log.e("aux", ex.message!!)
             }
+
+        } catch (ex: ArkException) {
+            Log.e("aux", ex.message!!)
         }
     }
     private fun setSelectedModeButtonView(button: Button)
@@ -422,13 +428,35 @@ class AdvancedActivity : AppCompatActivity(){
     }
     fun micDualSliderValueChanged(value: Float)
     {
-        micLeftSliderValueChanged(value)
-        micRightSliderValueChanged(value)
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                micLeftSliderValueChanged(value)
+                micRightSliderValueChanged(value)
+                return
+            }
+
+            if (earSide == EarSide.Left)
+                micLeftSliderValueChanged(value)
+            else
+                micRightSliderValueChanged(value)
+
+        }
     }
     fun auxDualSliderValueChanged(value: Float)
     {
-        auxLeftSliderValueChanged(value)
-        auxRightSliderValueChanged(value)
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                auxLeftSliderValueChanged(value)
+                auxRightSliderValueChanged(value)
+                return
+            }
+
+            if (earSide == EarSide.Left)
+                auxLeftSliderValueChanged(value)
+            else
+                auxRightSliderValueChanged(value)
+
+        }
     }
     fun micLeftSliderValueChanged(value: Float)
     {
