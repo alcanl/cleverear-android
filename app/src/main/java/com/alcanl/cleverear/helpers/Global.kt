@@ -1,11 +1,13 @@
 package com.alcanl.cleverear.helpers
 
+import android.bluetooth.BluetoothDevice
 import android.content.Context
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import org.json.JSONException
 import org.json.JSONObject
+import java.lang.reflect.Method
 
 private const val DEVICE_NAME = 0
 private const val DEVICE_MAC = 1
@@ -26,7 +28,7 @@ const val HA_RIGHT_NAME = "HA_RIGHT_NAME"
 const val HA_LEFT_RSSI = "HA_LEFT_RSSI"
 const val HA_RIGHT_RSSI = "HA_RIGHT_RSSI"
 const val WHAT_BACKGROUND_CONNECTED = 0
-const val WHAT_BACKGROUND_NOT_CONNECTED = 1
+
 
 
 
@@ -82,5 +84,14 @@ fun parseJsonVolumeData(data: String, context: Context) : Int
     val jsonObject = JSONObject(data)
     val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
     return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level_json))
+}
+fun isConnected(device: BluetoothDevice): Boolean
+{
+    return try {
+        val m: Method = device.javaClass.getMethod("isConnected")
+        m.invoke(device) as Boolean
+    } catch (ex: Exception) {
+        throw IllegalStateException(ex)
+    }
 }
 

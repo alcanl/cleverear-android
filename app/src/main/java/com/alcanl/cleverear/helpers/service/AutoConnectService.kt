@@ -1,30 +1,39 @@
 package com.alcanl.cleverear.helpers.service
 
+import android.Manifest
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Message
-import android.widget.Toast
+import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.WHAT_BACKGROUND_CONNECTED
-import com.alcanl.cleverear.helpers.WHAT_BACKGROUND_NOT_CONNECTED
-import com.alcanl.cleverear.helpers.service.di.receiver.DeviceDisconnectBroadcastReceiver
+import com.alcanl.cleverear.helpers.isConnected
+import com.alcanl.cleverear.helpers.service.receiver.DeviceDisconnectBroadcastReceiver
 import com.ark.ArkException
-import com.ark.EventHandler
-import com.ark.ProductManager
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -37,17 +46,15 @@ class AutoConnectService : Service()
     @Inject
     lateinit var threadPool: ExecutorService
     @Inject
-    lateinit var productManager: ProductManager
-    @Inject
-    lateinit var eventHandler: EventHandler
-    @Inject
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var scheduledExecutor: ScheduledExecutorService
 
-    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver(configuration)
+    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
+    private lateinit var mConnectedNotification: Notification
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
+        mConnectedNotification = handleConnectedNotification(intent!!)
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         initialize()
         return START_STICKY
@@ -62,11 +69,13 @@ class AutoConnectService : Service()
         unregisterReceiver(mDisconnectReceiver)
 
         try {
-            if (configuration.isConnected)
-                if (configuration.isDoubleDeviceConnection)
-                    configuration.doubleDeviceMap.forEach { it.value.endConnectionSession() }
-                else
-                    configuration.hearingAid.endConnectionSession()
+            with(configuration) {
+                if (isConnected)
+                    if (isDoubleDeviceConnection)
+                        doubleDeviceMap.forEach { it.value.endConnectionSession() }
+                    else
+                        hearingAid.endConnectionSession()
+            }
 
             threadPool.shutdown()
         } catch (_: ArkException) {}
@@ -75,7 +84,7 @@ class AutoConnectService : Service()
     {
         startForeground(1, createNotification())
         mHandler = AutoConnectHandler(this)
-        checkConnection()
+        startScheduler()
 
     }
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
@@ -85,31 +94,38 @@ class AutoConnectService : Service()
             val service = mWeakReference.get()!!
 
             when(msg.what) {
-                WHAT_BACKGROUND_CONNECTED -> Toast.makeText(service, "Connected to device", Toast.LENGTH_LONG).show()
-                WHAT_BACKGROUND_NOT_CONNECTED -> Toast.makeText(service, "Could not connected to device", Toast.LENGTH_LONG).show()
+                WHAT_BACKGROUND_CONNECTED -> service.showNotification(service.mConnectedNotification)
             }
 
             super.handleMessage(msg)
         }
     }
 
-    private fun checkConnection()
+    private fun startScheduler()
     {
         scheduledExecutor.scheduleAtFixedRate(this::scheduledThreadCallback, 0, 1, TimeUnit.MINUTES)
     }
     private fun scheduledThreadCallback()
     {
-        with(configuration) {
-            if (isConnected)
-                return
-            else
-                if (isDoubleDeviceConnection)
-                    scheduledDoubleDeviceCallback()
-                else
-                    scheduledSingleDeviceCallback()
+        try {
+            with(configuration) {
+                if (isConnected)
+                    return
+                else {
+                    val adapter = getSystemService(BluetoothManager::class.java).adapter
+                    if (isDoubleDeviceConnection)
+                        scheduledDoubleDeviceCallback(adapter)
+                    else
+                        scheduledSingleDeviceCallback(adapter)
+                }
+            }
+            if (isConnected()) {
+                mHandler.sendEmptyMessage(WHAT_BACKGROUND_CONNECTED)
+                configuration.isConnected = true
+            }
+        } catch (ex: ExecutionException) {
+            Log.e("service", ex.message!!)
         }
-
-        mHandler.sendEmptyMessage(if (isConnected()) WHAT_BACKGROUND_CONNECTED else WHAT_BACKGROUND_NOT_CONNECTED)
     }
     private fun isConnected() : Boolean
     {
@@ -118,40 +134,83 @@ class AutoConnectService : Service()
             else
                 configuration.hearingAid.isConnected
     }
-    private fun scheduledDoubleDeviceCallback()
+    private fun scheduledDoubleDeviceCallback(adapter: BluetoothAdapter)
     {
-        if (!configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
-            configuration.doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
-            runBlocking {
-                delay(8000)
-                configuration.doubleDeviceMap[EarSide.Left]?.readDeviceConfiguration()
-            }
-        }
+        with(configuration) {
+            if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
+                doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
+                runBlocking {
+                    delay(6000)
+                    doubleDeviceMap[EarSide.Left]?.readDeviceConfiguration()
+                }
+                startScheduler(doubleDeviceMap[EarSide.Left]!!, adapter)
 
-        if (!configuration.doubleDeviceMap[EarSide.Right]?.isConnected!!) {
-            configuration.doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
-            runBlocking {
-                delay(8000)
-                configuration.doubleDeviceMap[EarSide.Right]?.readDeviceConfiguration()
+            }
+
+            if (!doubleDeviceMap[EarSide.Right]?.isConnected!!) {
+                doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
+                runBlocking {
+                    delay(6000)
+                    doubleDeviceMap[EarSide.Right]?.readDeviceConfiguration()
+                }
+
+                startScheduler(doubleDeviceMap[EarSide.Right]!!, adapter)
             }
         }
     }
-    private fun scheduledSingleDeviceCallback()
+    private fun startScheduler(hearingAid: HearingAid, adapter: BluetoothAdapter)
     {
-        configuration.hearingAid.communicationAdaptor?.connect()
-        runBlocking {
-            delay(6000)
-            configuration.hearingAid.readDeviceConfiguration()
+        hearingAid.apply {
+            isConnected = isConnected(adapter.getRemoteDevice(address))
+        }
+    }
+    private fun scheduledSingleDeviceCallback(adapter: BluetoothAdapter)
+    {
+        with(configuration) {
+            hearingAid.communicationAdaptor?.connect()
+            runBlocking {
+                delay(6000)
+                hearingAid.readDeviceConfiguration()
+            }
+            startScheduler(hearingAid, adapter)
         }
     }
     private fun createNotification() : Notification
     {
         return NotificationCompat.Builder(this, "CleverEar Demo")
             .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle("CleverEar Bluetooth Connection")
-            .setContentText("Connected with Hearing Aid")
+            .setContentTitle("CleverEar Hearing Aid")
             .setOngoing(true)
             .setAutoCancel(false)
             .build()
     }
+    private fun handleConnectedNotification(intent: Intent) : Notification
+    {
+        getSystemService(NotificationManager::class.java).createNotificationChannel(
+            NotificationChannel("Connected", "CleverEar", NotificationManager.IMPORTANCE_DEFAULT)
+        )
+
+        val pendingIntent = PendingIntent.getActivity(this, 5, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        return createConnectedNotification(pendingIntent)
+    }
+    private fun showNotification(notification: Notification)
+    {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED)
+            NotificationManagerCompat.from(this).notify(2, notification)
+    }
+    private fun createConnectedNotification(pendingIntent: PendingIntent) : Notification
+    {
+        return NotificationCompat.Builder(this, "Connected")
+            .setSmallIcon(R.drawable.cleverear_logo)
+            .setContentTitle("Hearing Aid Re-Connected")
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
+    }
+
 }

@@ -1,11 +1,9 @@
 package com.alcanl.cleverear.helpers.listeners
 
-import android.content.Intent
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import com.alcanl.cleverear.ControlActivity
-import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
@@ -36,28 +34,29 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     private lateinit var mListener: Thread
     fun startEventListener() {
         mListener = thread(isDaemon = true, start = true) {
-            while (!mListener.isInterrupted) {
                 try {
-                    val event = mEventHandler.event
-                    val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
+                    while (!mListener.isInterrupted) {
+                        try {
+                            val event = mEventHandler.event
+                            val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
 
-                    when (event.type) {
-                        EventType.kConnectionEvent -> handleConnectionEvent(event)
-                        EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
-                        EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
-                        EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        else -> handleGenericEvent(event)
+                            when (event.type) {
+                                EventType.kConnectionEvent -> handleConnectionEvent(event)
+                                EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
+                                EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
+                                EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
+                                else -> handleGenericEvent(event)
+                            }
+                        } catch (ex: JSONException) {
+                            Log.e("parseError", ex.message!!)
+                        }
                     }
-
-                } catch (ex: JSONException) {
-                    Log.e("parseError", ex.message!!)
                 } catch (ex: NullPointerException) {
-                    Log.e("null", ex.message!!)
-                } catch (ex: InterruptedException) {
-                    Log.e("thread", ex.message!!)
-                }
+                        Log.e("null", ex.message!!)
+                    } catch (ex: InterruptedException) {
+                        Log.e("thread", ex.message!!)
+                    }
             }
-        }
     }
     private fun handleGenericEvent(event: Event)
     {
@@ -80,7 +79,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                             Toast.LENGTH_LONG
                         ).show()
 
-                        startActivity(Intent(actCont, LoadingActivity::class.java))
                         finish()
                         mConfiguration.isConnected = false
                     }

@@ -10,6 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+
 object ConfigurationModule {
     @Volatile
     var isConnected = false

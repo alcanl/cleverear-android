@@ -1,11 +1,9 @@
 package com.alcanl.cleverear.helpers.listeners
 
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.AdvancedActivity
-import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
@@ -37,29 +35,29 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     private lateinit var mListener: Thread
     fun startEventListener() {
         mListener = thread(isDaemon = true, start = true) {
-            while (!mListener.isInterrupted) {
-                try {
-                    val event = mEventHandler.event
-                    val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
+            try {
+                while (!mListener.isInterrupted) {
+                    try {
+                        val event = mEventHandler.event
+                        val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
 
-                    when (event.type) {
-                        EventType.kConnectionEvent -> handleConnectionEvent(event)
-                        EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
-                        EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
-                        EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                        else -> handleGenericEvent(event)
+                        when (event.type) {
+                            EventType.kConnectionEvent -> handleConnectionEvent(event)
+                            EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
+                            EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
+                            EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
+                            else -> handleGenericEvent(event)
+                        }
+                    } catch (ex: JSONException) {
+                        Log.e("parseError", ex.message!!)
                     }
-
-                } catch (ex: JSONException) {
-                    Log.e("parseError", ex.message!!)
-                } catch (ex: NullPointerException) {
-                    Log.e("null", ex.message!!)
-                } catch (ex: InterruptedException) {
-                    Log.e("thread", ex.message!!)
                 }
+            } catch (ex: NullPointerException) {
+                Log.e("null", ex.message!!)
+            } catch (ex: InterruptedException) {
+                Log.e("thread", ex.message!!)
             }
         }
-
     }
     private fun handleGenericEvent(event: Event)
     {
@@ -81,8 +79,6 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                             R.string.toast_connection_lost_text,
                             Toast.LENGTH_LONG
                         ).show()
-
-                        startActivity(Intent(actAdv, LoadingActivity::class.java))
                         finish()
                         mConfiguration.isConnected = false
                     }

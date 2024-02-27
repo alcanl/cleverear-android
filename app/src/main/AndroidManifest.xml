@@ -70,7 +70,7 @@
             </intent-filter>
 
         </activity>
-        <receiver android:name=".helpers.service.di.receiver.DeviceDisconnectBroadcastReceiver"
+        <receiver android:name=".helpers.service.receiver.DeviceDisconnectBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
