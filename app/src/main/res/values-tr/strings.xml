@@ -22,6 +22,8 @@
     <string name="toast_no_previous_device_for_selection">Kayıtlı Cihaz Bilgisi Bulunmamaktadır</string>
     <string name="textview_control_ha">Cihazı Kontrol Et</string>
     <string name="toast_connection_lost_text">Bağlantı Kaybedildi</string>
+    <string name="dialog_unpaired_device_text" translatable="true">Cihaz Konfigürasyon İçin Telefon İle EŞlenmek Zorundadır</string>
+    <string name="notification_disconnect_text" translatable="true">İşitme Cihazı Bağlantısı Kaybedildi</string>
     <string name="toast_connection_established_text">Cihaz İle Bağlantı Kuruldu</string>
     <string name="toast_double_device_connection_established_text" translatable="true">Cihazlar ile Bağlantı Kuruldu</string>
     <string name="toast_device_must_pair_text" translatable="true">Bağlantı için Cihaz Telefon ile Eşlenmek Zorundadır</string>

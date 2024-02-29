@@ -30,60 +30,87 @@ const val HA_RIGHT_RSSI = "HA_RIGHT_RSSI"
 const val WHAT_BACKGROUND_CONNECTED = 0
 
 
-
-
 @Throws(JSONException::class)
 fun parseJsonScanData(data: String, context: Context): DiscoveredDeviceInfo
 {
-    val jsonObject = JSONObject(data)
-    val scanEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    val deviceName = scanEvent.getJSONObject(DEVICE_NAME)
-    val deviceMAC = scanEvent.getJSONObject(DEVICE_MAC)
-    val deviceRSSI = scanEvent.getJSONObject(DEVICE_RSSI)
-    val manufacturingData = scanEvent.getJSONObject(MANUFACTURING_DATA)
+    try {
+        val jsonObject = JSONObject(data)
+        val scanEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        val deviceName = scanEvent.getJSONObject(DEVICE_NAME)
+        val deviceMAC = scanEvent.getJSONObject(DEVICE_MAC)
+        val deviceRSSI = scanEvent.getJSONObject(DEVICE_RSSI)
+        val manufacturingData = scanEvent.getJSONObject(MANUFACTURING_DATA)
 
-    return DiscoveredDeviceInfo(
-        deviceMAC.getString(getString(context, R.string.device_id_json)),
-        deviceName.getString(getString(context, R.string.device_name_json)),
-        deviceRSSI.getInt(getString(context, R.string.device_rssi_json)),
-        manufacturingData.getString(getString(context, R.string.device_manu_data_json))
-    )
+        return DiscoveredDeviceInfo(
+            deviceMAC.getString(getString(context, R.string.device_id_json)),
+            deviceName.getString(getString(context, R.string.device_name_json)),
+            deviceRSSI.getInt(getString(context, R.string.device_rssi_json)),
+            manufacturingData.getString(getString(context, R.string.device_manu_data_json))
+        )
+    } catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
 }
 @Throws(JSONException::class)
 fun parseJsonConnectionData(data: String, context: Context) : Int
 {
-    val jsonObject = JSONObject(data)
-    val connectionEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return connectionEvent.getJSONObject(CONNECTION_STATE).getInt(getString(context, R.string.device_connection_state_json))
+    try {
+        val jsonObject = JSONObject(data)
+        val connectionEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        return connectionEvent.getJSONObject(CONNECTION_STATE)
+            .getInt(getString(context, R.string.device_connection_state_json))
+    }catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
 }
 
 @Throws(JSONException::class)
 fun parseJsonBatteryStateData(data: String, context: Context) : Int
 {
-    val jsonObject = JSONObject(data)
-    val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return batteryEvent.getJSONObject(BATTERY_STATE).getInt(getString(context, R.string.battery_level_json))
+    try {
+        val jsonObject = JSONObject(data)
+        val batteryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        return batteryEvent.getJSONObject(BATTERY_STATE).getInt(getString(context, R.string.battery_level_json))
+    } catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
+
 }
 @Throws(JSONException::class)
 fun parseJsonSenderMacData(data: String, context: Context) : String
 {
-    val jsonObject = JSONObject(data)
-    val event = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return event.getJSONObject(EVENT_SENDER).getString(getString(context, R.string.device_id_json))
+    try {
+        val jsonObject = JSONObject(data)
+        val event = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        return event.getJSONObject(EVENT_SENDER)
+            .getString(getString(context, R.string.device_id_json))
+    } catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
 }
 @Throws(JSONException::class)
 fun parseJsonMemoryActiveData(data: String, context: Context) : Int
 {
-    val jsonObject = JSONObject(data)
-    val memoryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return memoryEvent.getJSONObject(MEMORY_STATE).getInt(getString(context, R.string.current_memory_json))
+    try {
+        val jsonObject = JSONObject(data)
+        val memoryEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        return memoryEvent.getJSONObject(MEMORY_STATE)
+            .getInt(getString(context, R.string.current_memory_json))
+    } catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
 }
 @Throws(JSONException::class)
 fun parseJsonVolumeData(data: String, context: Context) : Int
 {
-    val jsonObject = JSONObject(data)
-    val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
-    return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level_json))
+    try {
+        val jsonObject = JSONObject(data)
+        val volumeEvent = jsonObject.getJSONArray(getString(context, R.string.event_json_obj))
+        return volumeEvent.getJSONObject(VOLUME_STATE).getInt(getString(context, R.string.volume_level_json))
+    } catch (ex: NullPointerException) {
+        throw JSONException(ex.cause)
+    }
+
 }
 fun isConnected(device: BluetoothDevice): Boolean
 {

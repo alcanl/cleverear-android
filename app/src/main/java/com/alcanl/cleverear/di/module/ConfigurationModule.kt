@@ -17,8 +17,9 @@ object ConfigurationModule {
     var isDoubleDeviceConnection = false
     var isDualDeviceConfig = false
     var isConnectedBefore = false
+    var isServiceOnBoard = false
     var doubleDeviceMap = HashMap<EarSide, HearingAid>()
-    lateinit var earSide : EarSide
+    var earSide : EarSide = EarSide.Right
     lateinit var hearingAid: HearingAid
     @Singleton
     @Provides

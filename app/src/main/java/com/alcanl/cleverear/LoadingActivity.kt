@@ -1,12 +1,12 @@
 package com.alcanl.cleverear
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.IntentFilter.SYSTEM_HIGH_PRIORITY
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.os.Bundle
@@ -31,14 +31,13 @@ import com.alcanl.cleverear.helpers.HA_RIGHT_RSSI
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.helpers.broadcast.BondDeviceBroadcastReceiver
 import com.alcanl.cleverear.helpers.listeners.LoadingActivityEventListener
 import com.alcanl.cleverear.helpers.service.AutoConnectService
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 @AndroidEntryPoint
@@ -53,8 +52,7 @@ class LoadingActivity : AppCompatActivity() {
     lateinit var productManager: ProductManager
     private lateinit var mListener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
-    private lateinit var mBluetoothAdapter : BluetoothAdapter
-    private var mBondRequestReceiver: BroadcastReceiver? = null
+    private lateinit var mBondRequestReceiver: BondDeviceBroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -76,15 +74,26 @@ class LoadingActivity : AppCompatActivity() {
     {
         super.onDestroy()
         mListener.stopListener()
-        if (mBondRequestReceiver != null)
-            unregisterReceiver(mBondRequestReceiver)
+        unregisterReceiver(mBondRequestReceiver)
 
         handleSharedPrefs()
 
-        if (configuration.isConnected)
-            Intent(this, AutoConnectService::class.java).apply {
-                ContextCompat.startForegroundService(this@LoadingActivity, this)
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                if (isConnected && doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
+                    startService()
             }
+
+            else if (isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
+                startService()
+
+        }
+    }
+    private fun startService()
+    {
+        Intent(this, AutoConnectService::class.java).apply {
+            ContextCompat.startForegroundService(this@LoadingActivity, this)
+        }
     }
     private fun handleSharedPrefs()
     {
@@ -124,13 +133,7 @@ class LoadingActivity : AppCompatActivity() {
                 return
             }
 
-            mBondRequestReceiver = handleBondDeviceRequest(hearingAid)
-            registerReceiver(
-                mBondRequestReceiver,
-                IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-            )
-
-            initUnBondSingleDeviceCountDownTimer()
+            initUnBondSingleDeviceCountDownTimer(hearingAid)
         }
     }
     private fun handleDoubleDeviceConnection()
@@ -160,14 +163,16 @@ class LoadingActivity : AppCompatActivity() {
     private fun unBoundDoubleDeviceInitialization(hearingAid: HearingAid, isDualUnBound: Boolean)
     {
         hearingAid.apply {
+            configuration.earSide = hearingAid.side
             getPropertiesFromSDK(productManager, eventHandler)
             connectToDevice(this)
-            mBondRequestReceiver = handleBondDeviceRequest(this)
-            registerReceiver(mBondRequestReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
+
             if (isDualUnBound)
                 initUnBondDoubleDeviceCountDownTimer()
             else
-                initUnBondSingleDeviceCountDownTimer()
+                initUnBondSingleDeviceCountDownTimer(hearingAid)
+
+
         }
     }
     private fun initUnBondDoubleDeviceCountDownTimer()
@@ -177,7 +182,7 @@ class LoadingActivity : AppCompatActivity() {
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (mBondRequestReceiver!!.resultCode == RESULT_OK &&
+                if (configuration.doubleDeviceMap[EarSide.Left]?.bondStatus == BluetoothDevice.BOND_BONDED &&
                     configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
 
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
@@ -226,14 +231,14 @@ class LoadingActivity : AppCompatActivity() {
 
         mBinding.textViewConnecting.text = String.format("${mBinding.textViewConnecting.text}" + ".")
     }
-    private fun initUnBondSingleDeviceCountDownTimer()
+    private fun initUnBondSingleDeviceCountDownTimer(hearingAid: HearingAid)
     {
         object: CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (mBondRequestReceiver!!.resultCode == RESULT_OK && configuration.isConnected) {
+                if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected) {
                     handleBondedConnection()
                     this.cancel()
                 }
@@ -285,7 +290,9 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun initialize()
     {
-        mBluetoothAdapter = getSystemService(android.bluetooth.BluetoothManager::class.java).adapter
+        mBondRequestReceiver = BondDeviceBroadcastReceiver()
+        registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
+            .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
         mListener = LoadingActivityEventListener(this, eventHandler, configuration)
             .apply { startEventListener() }
@@ -295,50 +302,42 @@ class LoadingActivity : AppCompatActivity() {
     {
         connectToDevice(configuration.hearingAid)
     }
+    @SuppressLint("MissingPermission")
     private fun connectToDevice(hearingAid: HearingAid)
     {
+        val adapter = getSystemService(BluetoothManager::class.java).adapter
+
         threadPool.execute {
+
             try {
                 hearingAid.communicationAdaptor?.connect()
-                runBlocking {
-                    delay(8000)
+
+                Thread.sleep(8000)
+
+                if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
+                    adapter.getRemoteDevice(hearingAid.address).createBond()
+
+                else if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
                     hearingAid.readDeviceConfiguration()
-                }
 
             }
-            catch (ex: ArkException)
-            {
+            catch (ex: ArkException) {
                 Log.e("connect", ex.message!!)
                 runOnUiThread {
                     Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
                 }
             }
-        }
-    }
-    private fun handleBondDeviceRequest(hearingAid: HearingAid) : BroadcastReceiver
-    {
-        return object : BroadcastReceiver() {
-
-            @SuppressLint("MissingPermission")
-            override fun onReceive(context: Context?, intent: Intent?)
-            {
-                val action = intent!!.action
-
-                if (action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
-
-                    if (mBluetoothAdapter.getRemoteDevice(hearingAid.address).bondState == BluetoothDevice.BOND_BONDED)
-                    {
-                        hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
-                    }
-
-                }
+            catch (ex: InterruptedException) {
+                Log.e("connectThread", ex.message!!)
             }
         }
     }
     @SuppressLint("MissingPermission")
     private fun checkDeviceBondStatus(hearingAid: HearingAid)
     {
-        for (device in mBluetoothAdapter.bondedDevices)
+        val adapter = getSystemService(BluetoothManager::class.java).adapter
+
+        for (device in adapter.bondedDevices)
             if (hearingAid.address == device.address)
                 hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
 

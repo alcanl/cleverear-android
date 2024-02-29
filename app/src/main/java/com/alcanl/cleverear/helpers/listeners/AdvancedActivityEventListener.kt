@@ -36,7 +36,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     fun startEventListener() {
         mListener = thread(isDaemon = true, start = true) {
             try {
-                while (!mListener.isInterrupted) {
+                 do {
                     try {
                         val event = mEventHandler.event
                         val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -51,7 +51,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                     } catch (ex: JSONException) {
                         Log.e("parseError", ex.message!!)
                     }
-                }
+                } while (!mListener.isInterrupted)
             } catch (ex: NullPointerException) {
                 Log.e("null", ex.message!!)
             } catch (ex: InterruptedException) {

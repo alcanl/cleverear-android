@@ -21,14 +21,22 @@ import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.helpers.listeners.SplashActivityEventListener
+import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
-    private lateinit var mBinding : ActivitySplashBinding
     @Inject
     lateinit var configuration: ConfigurationModule
+    @Inject
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var threadPool: ExecutorService
+    private lateinit var mBinding : ActivitySplashBinding
+    private lateinit var mListener: SplashActivityEventListener
     private val bluetoothActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
@@ -67,6 +75,7 @@ class SplashActivity : AppCompatActivity() {
         initBinding()
         mEnableBluetoothBroadCast = handleBroadcastReceiver()
         registerReceiver(mEnableBluetoothBroadCast, IntentFilter(ACTION_STATE_CHANGED))
+        mListener = SplashActivityEventListener(eventHandler)
     }
     private fun initBinding()
     {
@@ -78,6 +87,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
         searchBluetooth()
+        cleanEvents()
     }
 
     override fun onDestroy()
@@ -130,5 +140,15 @@ class SplashActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE), 0)
 
 
+    }
+    private fun cleanEvents()
+    {
+        threadPool.execute {
+            try {
+                mListener.startEventListener()
+                Thread.sleep(2000)
+                mListener.stopListener()
+            } catch (_: InterruptedException) {}
+        }
     }
 }

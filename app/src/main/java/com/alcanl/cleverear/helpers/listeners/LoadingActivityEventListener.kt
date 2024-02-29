@@ -1,9 +1,7 @@
 package com.alcanl.cleverear.helpers.listeners
 
 import android.util.Log
-import android.widget.Toast
 import com.alcanl.cleverear.LoadingActivity
-import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.parseJsonConnectionData
@@ -25,28 +23,27 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     fun startEventListener() {
 
         mListener = thread(isDaemon = true, start = true) {
-            while (!mListener.isInterrupted) {
-                try {
-                    val event = mEventHandler.event
-                    val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
-                    when (event.type) {
-                        EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
-                        else -> {
-                            Log.e("event", event.data)
+            try {
+                 do {
+                    try {
+                        val event = mEventHandler.event
+                        val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
+                        when (event.type) {
+                            EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
+                            else -> {
+                                Log.e("event", event.data)
+                            }
                         }
+                    } catch (ex: JSONException) {
+                        Log.e("parseError", ex.message!!)
                     }
-                }catch (ex: JSONException)
-                {
-                    Log.e("parseError", ex.message!!)
-                }
-                catch (ex: NullPointerException)
-                {
-                    Log.e("null", ex.message!!)
-                }
-                catch(ex : InterruptedException)
-                {
-                    Log.e("thread", ex.message!!)
-                }
+                } while (!mListener.isInterrupted)
+
+            } catch (ex: NullPointerException) {
+                Log.e("nullTest", ex.message!!)
+            }
+            catch(ex : InterruptedException) {
+                Log.e("thread", ex.message!!)
             }
         }
     }
@@ -58,13 +55,6 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             val connectionState = parseJsonConnectionData(event.data, actLoad)
             if (connectionState == 3) {
                 if (!mConfiguration.isDoubleDeviceConnection) {
-                    actLoad.runOnUiThread {
-                        Toast.makeText(
-                            actLoad,
-                            R.string.toast_connection_established_text,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
                     mConfiguration.hearingAid.isConnected = true
                     mConfiguration.isConnected = true
                 }
@@ -75,16 +65,9 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                     else
                         mConfiguration.doubleDeviceMap[EarSide.Right]?.isConnected = true
 
-                    if (mConfiguration.doubleDeviceMap.all { it.value.isConnected }){
-                        actLoad.runOnUiThread {
-                            Toast.makeText(
-                                actLoad,
-                                R.string.toast_double_device_connection_established_text,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                    if (mConfiguration.doubleDeviceMap.all { it.value.isConnected })
                         mConfiguration.isConnected = true
-                    }
+
                 }
             }
         } catch (ex: JSONException)

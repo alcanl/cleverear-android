@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -47,7 +48,8 @@
 
         <activity
             android:name=".LoadingActivity"
-            android:exported="true" />
+            android:exported="true"
+            />
         <activity
             android:name=".AdvancedActivity"
             android:exported="true" />
@@ -80,6 +82,13 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <receiver android:name=".helpers.broadcast.BondDeviceBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

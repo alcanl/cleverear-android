@@ -73,6 +73,7 @@ class ControlActivity : AppCompatActivity() {
             mListener.stopListener()
             isListenerOnBoard = false
         }
+
     }
     private fun initBatteryViews()
     {

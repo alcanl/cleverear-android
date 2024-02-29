@@ -51,37 +51,39 @@ class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
     {
         try {
             if (leftDevice.isNotBlank() && !isConnected(adapter.getRemoteDevice(leftDevice))) {
-                Log.d("debug", String.format("Device %s disconnected", leftDevice))
-                if (configuration.isDoubleDeviceConnection) {
-                    configuration.doubleDeviceMap[EarSide.Left]?.isConnected = false
-                    if (!configuration.doubleDeviceMap[EarSide.Right]?.isConnected!!)
-                        configuration.isConnected = false
-                }
-                else {
-                    configuration.hearingAid.isConnected = false
-                    configuration.isConnected = false
-                }
+                Log.d("debug", String.format("The Device %s disconnected", leftDevice))
 
+                with(configuration) {
+                    if (isDoubleDeviceConnection) {
+                        doubleDeviceMap[EarSide.Left]?.isConnected = false
+                        if (!doubleDeviceMap[EarSide.Right]?.isConnected!!)
+                            isConnected = false
+                    }
+                    else {
+                        hearingAid.isConnected = false
+                        isConnected = false
+                    }
+                }
                 showNotification(context, notification)
             }
 
 
             if (rightDevice.isNotBlank() && !isConnected(adapter.getRemoteDevice(rightDevice))) {
-                Log.d("debug", String.format("Device %s disconnected", rightDevice))
+                Log.d("debug", String.format("The Device %s disconnected", rightDevice))
 
-                if (configuration.isDoubleDeviceConnection) {
-                    configuration.doubleDeviceMap[EarSide.Right]?.isConnected = false
-                    if (!configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!)
-                        configuration.isConnected = false
+                with(configuration) {
+                    if (isDoubleDeviceConnection) {
+                        doubleDeviceMap[EarSide.Right]?.isConnected = false
+                        if (!doubleDeviceMap[EarSide.Left]?.isConnected!!)
+                            isConnected = false
+                    }
+                    else {
+                        hearingAid.isConnected = false
+                        isConnected = false
+                    }
                 }
-                else {
-                    configuration.hearingAid.isConnected = false
-                    configuration.isConnected = false
-                }
-
                 showNotification(context, notification)
             }
-
 
         } catch (_: IllegalStateException) {}
     }
@@ -97,7 +99,7 @@ class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
     {
         return NotificationCompat.Builder(context, "Disconnected")
             .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle("Hearing Aid Disconnected")
+            .setContentTitle(context.getString(R.string.notification_disconnect_text))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()

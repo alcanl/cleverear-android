@@ -30,8 +30,6 @@ import com.alcanl.cleverear.helpers.service.receiver.DeviceDisconnectBroadcastRe
 import com.ark.ArkException
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -49,13 +47,11 @@ class AutoConnectService : Service()
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var scheduledExecutor: ScheduledExecutorService
-
-    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
     private lateinit var mConnectedNotification: Notification
+    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         mConnectedNotification = handleConnectedNotification(intent!!)
-        registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         initialize()
         return START_STICKY
     }
@@ -82,8 +78,10 @@ class AutoConnectService : Service()
     }
     private fun initialize()
     {
+        registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         startForeground(1, createNotification())
         mHandler = AutoConnectHandler(this)
+        configuration.isServiceOnBoard = true
         startScheduler()
 
     }
@@ -136,26 +134,32 @@ class AutoConnectService : Service()
     }
     private fun scheduledDoubleDeviceCallback(adapter: BluetoothAdapter)
     {
-        with(configuration) {
-            if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
-                doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
-                runBlocking {
-                    delay(6000)
-                    doubleDeviceMap[EarSide.Left]?.readDeviceConfiguration()
-                }
-                startScheduler(doubleDeviceMap[EarSide.Left]!!, adapter)
+        try {
+            with(configuration) {
+                if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
+                    doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
 
-            }
+                    Thread.sleep(6000)
+                    startScheduler(doubleDeviceMap[EarSide.Left]!!, adapter)
 
-            if (!doubleDeviceMap[EarSide.Right]?.isConnected!!) {
-                doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
-                runBlocking {
-                    delay(6000)
-                    doubleDeviceMap[EarSide.Right]?.readDeviceConfiguration()
+                    if (doubleDeviceMap[EarSide.Left]?.isConnected!!)
+                        doubleDeviceMap[EarSide.Left]?.readDeviceConfiguration()
+
                 }
 
-                startScheduler(doubleDeviceMap[EarSide.Right]!!, adapter)
+                if (!doubleDeviceMap[EarSide.Right]?.isConnected!!) {
+                    doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
+
+                    Thread.sleep(6000)
+                    startScheduler(doubleDeviceMap[EarSide.Right]!!, adapter)
+
+                    if (doubleDeviceMap[EarSide.Right]?.isConnected!!)
+                        doubleDeviceMap[EarSide.Right]?.readDeviceConfiguration()
+
+                }
             }
+        } catch (ex: InterruptedException) {
+            Log.e("scheduler", ex.message!!)
         }
     }
     private fun startScheduler(hearingAid: HearingAid, adapter: BluetoothAdapter)
@@ -166,14 +170,20 @@ class AutoConnectService : Service()
     }
     private fun scheduledSingleDeviceCallback(adapter: BluetoothAdapter)
     {
-        with(configuration) {
-            hearingAid.communicationAdaptor?.connect()
-            runBlocking {
-                delay(6000)
-                hearingAid.readDeviceConfiguration()
+        try {
+            with(configuration) {
+                hearingAid.communicationAdaptor?.connect()
+                Thread.sleep(6000)
+                startScheduler(hearingAid, adapter)
+
+                if (hearingAid.isConnected)
+                    hearingAid.readDeviceConfiguration()
+
             }
-            startScheduler(hearingAid, adapter)
+        } catch (ex: InterruptedException) {
+            Log.e("scheduler", ex.message!!)
         }
+
     }
     private fun createNotification() : Notification
     {
