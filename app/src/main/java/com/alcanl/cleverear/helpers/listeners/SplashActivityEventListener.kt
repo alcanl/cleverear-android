@@ -5,9 +5,11 @@ import com.ark.EventHandler
 import java.lang.NullPointerException
 import kotlin.concurrent.thread
 
-class SplashActivityEventListener(private val mEventHandler: EventHandler, ) {
+class SplashActivityEventListener(private val mEventHandler: EventHandler) {
     private lateinit var mListener: Thread
-    fun startEventListener() {
+    fun startEventListener()
+    {
+
         mListener = thread(isDaemon = true, start = true) {
             try {
                 do {

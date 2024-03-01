@@ -80,11 +80,11 @@ class LoadingActivity : AppCompatActivity() {
 
         with(configuration) {
             if (isDoubleDeviceConnection) {
-                if (isConnected && doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
+                if (!isServiceOnBoard && isConnected && doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
                     startService()
             }
 
-            else if (isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
+            else if (!isServiceOnBoard && isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
                 startService()
 
         }

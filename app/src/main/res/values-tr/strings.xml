@@ -30,6 +30,8 @@
     <string name="toast_problem_occured_text">Cihaza bağlanılırken bilinmeyen bir prolem meydana geldi.</string>
     <string name="toast_channel_error_text" translatable="true">Kanal Değeri 1 ile 255 arasında olmalıdır.</string>
     <string name="toast_bt_on" translatable="true">Bluetooth Açık</string>
+    <string name="notification_reconnect_text" translatable="true">İşitme Cihazı İle Yeniden Bağlanıldı</string>
+    <string name="service_notification_start_service_text" translatable="true">CleverEar İşitme Cihazı Konfigürasyonu</string>
     <string name="toast_gps_on" translatable="true">Konum Açık</string>
     <string name="listener_volume_level_text">Ses Seviyesi: </string>
     <string name="navbar_connection_text">Bağlantı</string>

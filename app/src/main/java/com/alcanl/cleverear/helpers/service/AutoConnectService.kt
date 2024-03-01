@@ -27,7 +27,10 @@ import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.helpers.isConnected
 import com.alcanl.cleverear.helpers.service.receiver.DeviceDisconnectBroadcastReceiver
+import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.ark.ArkException
+import com.ark.EventHandler
+import com.ark.ProductManager
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
@@ -40,13 +43,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AutoConnectService : Service()
 {
-    private lateinit var mHandler: Handler
     @Inject
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var scheduledExecutor: ScheduledExecutorService
+    @Inject
+    lateinit var productManager: ProductManager
+    @Inject
+    lateinit var eventHandler: EventHandler
+    private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
     private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
@@ -71,15 +78,20 @@ class AutoConnectService : Service()
                         doubleDeviceMap.forEach { it.value.endConnectionSession() }
                     else
                         hearingAid.endConnectionSession()
+
+                isServiceOnBoard = false
             }
 
             threadPool.shutdown()
+            scheduledExecutor.shutdown()
+
+
         } catch (_: ArkException) {}
     }
     private fun initialize()
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
-        startForeground(1, createNotification())
+        startForeground(1, createServiceNotification())
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
         startScheduler()
@@ -98,7 +110,6 @@ class AutoConnectService : Service()
             super.handleMessage(msg)
         }
     }
-
     private fun startScheduler()
     {
         scheduledExecutor.scheduleAtFixedRate(this::scheduledThreadCallback, 0, 1, TimeUnit.MINUTES)
@@ -107,8 +118,10 @@ class AutoConnectService : Service()
     {
         try {
             with(configuration) {
-                if (isConnected)
+                if (isConnected) {
+                    Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
                     return
+                }
                 else {
                     val adapter = getSystemService(BluetoothManager::class.java).adapter
                     if (isDoubleDeviceConnection)
@@ -137,9 +150,12 @@ class AutoConnectService : Service()
         try {
             with(configuration) {
                 if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
-                    doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.connect()
+                    doubleDeviceMap[EarSide.Left]?.apply {
+                        getPropertiesFromSDK(productManager, eventHandler)
+                        communicationAdaptor?.connect()
+                    }
 
-                    Thread.sleep(6000)
+                    Thread.sleep(8000)
                     startScheduler(doubleDeviceMap[EarSide.Left]!!, adapter)
 
                     if (doubleDeviceMap[EarSide.Left]?.isConnected!!)
@@ -148,9 +164,12 @@ class AutoConnectService : Service()
                 }
 
                 if (!doubleDeviceMap[EarSide.Right]?.isConnected!!) {
-                    doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.connect()
+                    doubleDeviceMap[EarSide.Right]?.apply {
+                        getPropertiesFromSDK(productManager, eventHandler)
+                        communicationAdaptor?.connect()
+                    }
 
-                    Thread.sleep(6000)
+                    Thread.sleep(8000)
                     startScheduler(doubleDeviceMap[EarSide.Right]!!, adapter)
 
                     if (doubleDeviceMap[EarSide.Right]?.isConnected!!)
@@ -166,14 +185,16 @@ class AutoConnectService : Service()
     {
         hearingAid.apply {
             isConnected = isConnected(adapter.getRemoteDevice(address))
+            Log.e("Connection", isConnected.toString())
         }
     }
     private fun scheduledSingleDeviceCallback(adapter: BluetoothAdapter)
     {
         try {
             with(configuration) {
+                hearingAid.getPropertiesFromSDK(productManager, eventHandler)
                 hearingAid.communicationAdaptor?.connect()
-                Thread.sleep(6000)
+                Thread.sleep(8000)
                 startScheduler(hearingAid, adapter)
 
                 if (hearingAid.isConnected)
@@ -183,13 +204,12 @@ class AutoConnectService : Service()
         } catch (ex: InterruptedException) {
             Log.e("scheduler", ex.message!!)
         }
-
     }
-    private fun createNotification() : Notification
+    private fun createServiceNotification() : Notification
     {
-        return NotificationCompat.Builder(this, "CleverEar Demo")
+        return NotificationCompat.Builder(this, getString(R.string.service_notification_start_channel_id))
             .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle("CleverEar Hearing Aid")
+            .setContentTitle(getString(R.string.service_notification_start_service_text))
             .setOngoing(true)
             .setAutoCancel(false)
             .build()
@@ -197,8 +217,7 @@ class AutoConnectService : Service()
     private fun handleConnectedNotification(intent: Intent) : Notification
     {
         getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel("Connected", "CleverEar", NotificationManager.IMPORTANCE_DEFAULT)
-        )
+            NotificationChannel(getString(R.string.service_notification_channel_id), getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT))
 
         val pendingIntent = PendingIntent.getActivity(this, 5, intent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -206,7 +225,6 @@ class AutoConnectService : Service()
     }
     private fun showNotification(notification: Notification)
     {
-
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
@@ -215,9 +233,9 @@ class AutoConnectService : Service()
     }
     private fun createConnectedNotification(pendingIntent: PendingIntent) : Notification
     {
-        return NotificationCompat.Builder(this, "Connected")
+        return NotificationCompat.Builder(this, getString(R.string.service_notification_channel_id))
             .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle("Hearing Aid Re-Connected")
+            .setContentTitle(getString(R.string.notification_reconnect_text))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()

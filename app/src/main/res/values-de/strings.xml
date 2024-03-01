@@ -25,6 +25,8 @@
     <string name="toast_no_previous_device_for_selection">Keine vorherigen Geräteinformationen für die Auswahl</string>
     <string name="dialog_unpaired_device_text" translatable="true">Das Gerät muss mit dem Telefon für die Konfiguration verbunden sein</string>
     <string name="notification_disconnect_text" translatable="true">Die Verbindung zum Hörgerät wurde unterbrochen</string>
+    <string name="notification_reconnect_text" translatable="true">Hörgerät wieder angeschlossen</string>
+    <string name="service_notification_start_service_text" translatable="true">CleverEar-Hörgerätekonfiguration</string>
     <string name="toast_connection_lost_text">Verbindung verloren</string>
     <string name="listener_volume_level_text" translatable="true">Lautstärkepegel: </string>
     <string name="toast_channel_error_text" translatable="true">Nicht unterstützter Wert für Kanal. Muss zwischen 1 und 255 liegen</string>

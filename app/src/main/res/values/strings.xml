@@ -69,6 +69,7 @@
     <string name="dialog_yes" translatable="true">Yes</string>
     <string name="dialog_no" translatable="true">No</string>
     <string name="device_connected_text" translatable="true">Connected to Earnet</string>
+    <string name="notification_reconnect_text" translatable="true">Hearing Aid Re-Connected</string>
     <string name="current_memory_json" translatable="false">CurrentMemory</string>
     <string name="volume_level_json" translatable="false">VolumeLevel</string>
     <string name="device_name_json" translatable="false">DeviceName</string>
@@ -85,5 +86,9 @@
     <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>
     <string name="button_previous_activity">Previous</string>
     <string name="notification_disconnect_text" translatable="true">The Hearing Aid Connection Lost</string>
+    <string name="service_notification_channel_id" translatable="false">Connected</string>
+    <string name="service_notification_start_service_text" translatable="true">CleverEar Hearing Aid Configuration</string>
+    <string name="service_notification_start_channel_id" translatable="false">CleverEarService</string>
+    <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
 
 </resources>

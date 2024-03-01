@@ -4,8 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
-import androidx.core.content.getSystemService
+import com.alcanl.cleverear.R
 import com.ark.ArkException
 import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.HiltAndroidApp
@@ -20,8 +19,8 @@ class CleverEarApp : Application() {
         } catch (_: ArkException) {}
 
         val channel = NotificationChannel(
-            "CleverEar Demo",
-            "Demo Notification",
+            getString(R.string.service_notification_start_channel_id),
+            getString(R.string.service_notification_start_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         )
 

@@ -183,7 +183,7 @@ class ControlActivity : AppCompatActivity() {
                     }
                     initializeNavigationView(ConnectionActivity::class.java)
                     finish(); true}
-                else ->{
+                else -> {
                     if (isListenerOnBoard) {
                         mListener.stopListener()
                         isListenerOnBoard = false
