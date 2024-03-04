@@ -11,7 +11,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +22,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.helpers.EarSide
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
+import com.alcanl.cleverear.helpers.adapter.DeviceListAdapter
 import com.alcanl.cleverear.helpers.scan.DeviceScanHandler
 import com.alcanl.cleverear.helpers.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
@@ -54,6 +54,7 @@ class ConnectionActivity : AppCompatActivity() {
     @Volatile
     private var mIsDeviceFound = false
     private var isScanContinue = false
+    private lateinit var mAdapter: DeviceListAdapter
     private lateinit var scanOnBoard : Future<*>
     private lateinit var mAsyncResult: AsyncResult
     private lateinit var mSelectedHearingAid: HearingAid
@@ -142,12 +143,12 @@ class ConnectionActivity : AppCompatActivity() {
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_connection)
         mBinding.viewModel = ConnectionActivityListenersViewModel(this)
-        mBinding.adapter =
-            ArrayAdapter(this, R.layout.listview_item_layout, ArrayList<String>(emptyList()))
-                .apply {
-                    if (configuration.isDoubleDeviceConnection) mBinding.listView.choiceMode =
-                        ListView.CHOICE_MODE_MULTIPLE
-                }
+        mAdapter = DeviceListAdapter(this)
+            .apply {
+                if (configuration.isDoubleDeviceConnection) mBinding.listView.choiceMode =
+                    ListView.CHOICE_MODE_MULTIPLE
+            }
+        mBinding.adapter = mAdapter
     }
     private fun isDuplicate(device: DiscoveredDeviceInfo): Boolean {
         var value = true
@@ -184,12 +185,12 @@ class ConnectionActivity : AppCompatActivity() {
             device.name, device.rssi, device.manufacturerData, earSide
         )
     }
-    private fun recognizeEarSide(str: String): EarSide {
-        return if (str.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
+    private fun recognizeEarSide(manufacturerData: String): EarSide
+    {
+        return if (manufacturerData.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
     }
-
-
-    private fun scanDevicesWithBluetooth() {
+    private fun scanDevicesWithBluetooth()
+    {
         try {
             mAsyncResult =
                 if (configuration.earSide == EarSide.Right) deviceConnectionHandler.scanForRightDevice()
@@ -210,25 +211,41 @@ class ConnectionActivity : AppCompatActivity() {
                 val device = parseJsonScanData(event.data, this)
                     if (isHearingAid(device.manufacturerData)) {
                         mBleDeviceList.add(device)
-                        if (!isDuplicate(device)) {
-                            runOnUiThread {
-                                mBinding.adapter!!.add(device.name)
-                                mBinding.adapter!!.notifyDataSetChanged()
-                                mBinding.textViewDeviceState.text = String.format(
-                                   "%d %s", ++mDeviceCount,
-                                   getText(R.string.textview_count_device_found_text)
-                                )
-                            }
-                        }
+                        if (!isDuplicate(device))
+                            runOnUiThread { addHearingAidToListCallback(device) }
                    }
             }
+        }
+    }
+    private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
+    {
+        with(mBinding) {
+
+            adapter!!.add(device.name)
+
+            if (configuration.isDoubleDeviceConnection)
+                if (recognizeEarSide(device.manufacturerData) == EarSide.Right)
+                    mAdapter.isRightDevice(true)
+                else
+                    mAdapter.isRightDevice(false)
+            else
+                if (configuration.earSide == EarSide.Right)
+                    mAdapter.isRightDevice(true)
+                else
+                    mAdapter.isRightDevice(false)
+
+            adapter!!.notifyDataSetChanged()
+
+            textViewDeviceState.text = String.format(
+                "%d %s", ++mDeviceCount,
+                getText(R.string.textview_count_device_found_text)
+            )
         }
     }
     private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo? {
         val device = mBinding.adapter!!.getItem(pos)
         return mBleDeviceList.find { it.name == device.toString() }
     }
-
     private fun selectDoubleItem(pos: Int) {
         val selectedDevice = searchHearingAidInList(pos)
 

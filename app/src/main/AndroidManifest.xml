@@ -38,13 +38,11 @@
         android:roundIcon="@mipmap/clever_ear_logo_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CleverEar">
+        android:theme="@style/Theme.CleverEar"
+        tools:ignore="DiscouragedApi">
         <activity
             android:name=".AutoConnectActivity"
-            android:exported="false" />
-
-        <service
-            android:name=".helpers.service.AutoConnectService" android:foregroundServiceType="connectedDevice"/>
+            android:exported="true" />
 
         <activity
             android:name=".LoadingActivity"
@@ -64,26 +62,31 @@
             android:exported="true"
             android:theme="@style/Theme.CleverEar" />
         <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+        <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+
+        <service
+            android:name=".helpers.service.AutoConnectService"
+            android:foregroundServiceType="connectedDevice"/>
+
         <receiver android:name=".helpers.service.receiver.DeviceDisconnectBroadcastReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
             </intent-filter>
         </receiver>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
+
         <receiver android:name=".helpers.broadcast.BondDeviceBroadcastReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />
             </intent-filter>
