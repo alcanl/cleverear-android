@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.service
+package com.alcanl.cleverear.util.service
 
 import android.Manifest
 import android.app.Notification
@@ -23,10 +23,10 @@ import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.WHAT_BACKGROUND_CONNECTED
-import com.alcanl.cleverear.helpers.isConnected
-import com.alcanl.cleverear.helpers.service.receiver.DeviceDisconnectBroadcastReceiver
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
+import com.alcanl.cleverear.util.isConnected
+import com.alcanl.cleverear.util.service.receiver.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -53,9 +53,10 @@ class AutoConnectService : Service()
     lateinit var productManager: ProductManager
     @Inject
     lateinit var eventHandler: EventHandler
+    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
-    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         mConnectedNotification = handleConnectedNotification(intent!!)
@@ -85,7 +86,6 @@ class AutoConnectService : Service()
             threadPool.shutdown()
             scheduledExecutor.shutdown()
 
-
         } catch (_: ArkException) {}
     }
     private fun initialize()
@@ -95,7 +95,6 @@ class AutoConnectService : Service()
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
         startScheduler()
-
     }
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(service)
@@ -103,8 +102,8 @@ class AutoConnectService : Service()
         override fun handleMessage(msg: Message) {
             val service = mWeakReference.get()!!
 
-            when(msg.what) {
-                WHAT_BACKGROUND_CONNECTED -> service.showNotification(service.mConnectedNotification)
+            when (msg.what) {
+            WHAT_BACKGROUND_CONNECTED -> service.showNotification(service.mConnectedNotification)
             }
 
             super.handleMessage(msg)
@@ -149,6 +148,7 @@ class AutoConnectService : Service()
     {
         try {
             with(configuration) {
+
                 if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
                     doubleDeviceMap[EarSide.Left]?.apply {
                         getPropertiesFromSDK(productManager, eventHandler)

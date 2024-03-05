@@ -1,6 +1,6 @@
-package com.alcanl.cleverear.helpers.scan
+package com.alcanl.cleverear.util.scan
 
-import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.util.EarSide
 import com.ark.AsyncResult
 import com.ark.CommunicationPort
 import com.ark.ProductManager

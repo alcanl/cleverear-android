@@ -21,7 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.listeners.SplashActivityEventListener
+import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService

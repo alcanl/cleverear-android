@@ -15,8 +15,8 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.listeners.ControlActivityEventListener
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.listeners.ControlActivityEventListener
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -56,6 +56,7 @@ class ControlActivity : AppCompatActivity() {
         }
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         initSliders()
+        initTextViews()
     }
     override fun onStop()
     {
@@ -131,6 +132,7 @@ class ControlActivity : AppCompatActivity() {
         initMemoryButtons()
         initBatteryViews()
         initSwitch()
+
 
     }
     private fun initMemoryButtons()
@@ -445,6 +447,15 @@ class ControlActivity : AppCompatActivity() {
 
             }
             configuration.isDualDeviceConfig = false
+        }
+    }
+    private fun initTextViews()
+    {
+        if (configuration.isDualDeviceConfig) {
+            mBinding.apply {
+                textViewLeftSeekBar.visibility = View.INVISIBLE
+                textViewRightSeekBar.visibility = View.INVISIBLE
+            }
         }
     }
 }

@@ -18,9 +18,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.EnumMap
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -73,8 +74,11 @@ class MainActivity : AppCompatActivity() {
     fun buttonDoubleDeviceClick()
     {
         if (mBluetoothPermission) {
-            configuration.isDoubleDeviceConnection = true
-            configuration.earSide = EarSide.Left
+            configuration.apply {
+                doubleDeviceMap = EnumMap(EarSide::class.java)
+                isDoubleDeviceConnection = true
+                earSide = EarSide.Left
+            }
             Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
         }
         else {
@@ -88,6 +92,10 @@ class MainActivity : AppCompatActivity() {
             startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@MainActivity,
                 R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
         }
+    }
+    fun buttonInfoClicked()
+    {
+
     }
 
     private fun initBinding() {

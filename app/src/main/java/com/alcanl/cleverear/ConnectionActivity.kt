@@ -19,13 +19,14 @@ import com.alcanl.cleverear.databinding.ActivityConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_LEFT
-import com.alcanl.cleverear.helpers.MANUFACTURER_CODE_RIGHT
-import com.alcanl.cleverear.helpers.adapter.DeviceListAdapter
-import com.alcanl.cleverear.helpers.scan.DeviceScanHandler
-import com.alcanl.cleverear.helpers.parseJsonScanData
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
+import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
+import com.alcanl.cleverear.util.adapter.DeviceListAdapter
+import com.alcanl.cleverear.util.scan.DeviceScanHandler
+import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
+import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
@@ -38,7 +39,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ConnectionActivity : AppCompatActivity() {
-    private lateinit var mBinding: ActivityConnectionBinding
+
     @Inject
     lateinit var deviceConnectionHandler: DeviceScanHandler
     @Inject
@@ -48,8 +49,6 @@ class ConnectionActivity : AppCompatActivity() {
     @Inject
     lateinit var threadPool: ExecutorService
     @Volatile
-    var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
-    @Volatile
     private var mDeviceCount = 0
     @Volatile
     private var mIsDeviceFound = false
@@ -58,6 +57,9 @@ class ConnectionActivity : AppCompatActivity() {
     private lateinit var scanOnBoard : Future<*>
     private lateinit var mAsyncResult: AsyncResult
     private lateinit var mSelectedHearingAid: HearingAid
+    private lateinit var mBinding: ActivityConnectionBinding
+    @Volatile
+    private var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -83,6 +85,13 @@ class ConnectionActivity : AppCompatActivity() {
     private fun alertDialogYesButtonCallback()
     {
         mBinding.frameLayoutStopConnection.visibility = View.VISIBLE
+
+        if (configuration.isServiceOnBoard) {
+            Intent(this, AutoConnectService::class.java).apply {
+                stopService(this)
+            }
+            configuration.isServiceOnBoard = false
+        }
 
         Handler(Looper.myLooper()!!).postDelayed (
             {
@@ -223,16 +232,11 @@ class ConnectionActivity : AppCompatActivity() {
 
             adapter!!.add(device.name)
 
-            if (configuration.isDoubleDeviceConnection)
-                if (recognizeEarSide(device.manufacturerData) == EarSide.Right)
-                    mAdapter.isRightDevice(true)
-                else
-                    mAdapter.isRightDevice(false)
-            else
-                if (configuration.earSide == EarSide.Right)
-                    mAdapter.isRightDevice(true)
-                else
-                    mAdapter.isRightDevice(false)
+            if (configuration.isDoubleDeviceConnection && recognizeEarSide(device.manufacturerData) == EarSide.Right)
+                mAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
+
+            else if (configuration.earSide == EarSide.Right)
+                mAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
 
             adapter!!.notifyDataSetChanged()
 

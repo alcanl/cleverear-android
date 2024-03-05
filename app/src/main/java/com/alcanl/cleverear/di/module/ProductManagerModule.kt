@@ -1,7 +1,7 @@
 package com.alcanl.cleverear.di.module
 
 
-import com.alcanl.cleverear.helpers.scan.DeviceScanHandler
+import com.alcanl.cleverear.util.scan.DeviceScanHandler
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.Module

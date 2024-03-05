@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CleverEar</string>
-    <string name="button_single_device_connection_text">Verbinden für ein einzelnes Gerät</string>
-    <string name="button_double_device_connection_text">Verbinden für Doppelgerät</string>
-    <string name="textview_detect_device_text">Gerät erkennen</string>
+    <string name="button_single_device_connection_text">Ein Hörgerät koppeln</string>
+    <string name="button_double_device_connection_text">Zwei Hörgeräte koppeln</string>
+    <string name="textview_detect_device_text">Gerät suchen</string>
     <string name="textview_device_detection_not_found_text">Gerät nicht gefunden</string>
     <string name="textview_device_detection_device_connected_text">Verbunden mit Gerät</string>
     <string name="textview_device_detection_connection_in_process_text">Verbinden mit dem Gerät</string>
@@ -11,14 +11,14 @@
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
     <string name="dialog_already_connected_message">Sie haben bereits eine Verbindung mit einem Gerät hergestellt. Möchten Sie diese Verbindung beenden?</string>
-    <string name="textview_count_device_found_text">Gerät gefunden</string>
-    <string name="button_stop_scan_text">\tScannen beenden</string>
-    <string name="textview_volume_text">Band</string>
+    <string name="textview_count_device_found_text">Geräte gefunden</string>
+    <string name="button_stop_scan_text">\tGerät suchen</string>
+    <string name="textview_volume_text">Lautstärke</string>
     <string name="textview_program_text">Programme</string>
     <string name="textview_left_device_text">Linkes Gerät</string>
     <string name="textview_right_device_text">Rechtes Gerät</string>
-    <string name="textview_control_ha">Kontrolle Hörgerät</string>
-    <string name="switch_dual_device_text">Doppelte Konfiguration</string>
+    <string name="textview_control_ha">Hörgerät einstellen</string>
+    <string name="switch_dual_device_text">Binaurale Konfiguration</string>
     <string name="toast_no_permission">Keine Bluetooth-Erlaubnis</string>
     <string name="toast_no_device_selected">Nein Jedes ausgewählte Gerät</string>
     <string name="textview_no_previous_device_info">Keine Geräteinformationen</string>
@@ -38,7 +38,7 @@
     <string name="toast_problem_occured_text">Problem beim Verbinden mit dem Gerät aufgetreten</string>
     <string name="navbar_connection_text">Verbindung</string>
     <string name="navbar_control_text">Kontrolle</string>
-    <string name="navbar_advanced_text">Fortgeschrittene</string>
+    <string name="navbar_advanced_text">Erweitert</string>
     <string name="toast_bluetooth_not_found_text">Ihr Gerät unterstützt keine Bluetooth-Verbindung</string>
     <string name="dialog_yes">Ja</string>
     <string name="dialog_no">Nein</string>

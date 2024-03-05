@@ -6,7 +6,7 @@
 
     <data>
         <import type="com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel"/>
-        <import type="com.alcanl.cleverear.helpers.EarSide"/>
+        <import type="com.alcanl.cleverear.util.EarSide"/>
         <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <variable name="viewModel" type="ControlActivityListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />

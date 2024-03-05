@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityEarSideSelectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.viewmodel.EarSideSelectionActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

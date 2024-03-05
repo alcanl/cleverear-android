@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers
+package com.alcanl.cleverear.util
 
 enum class EarSide {
     Left, Right

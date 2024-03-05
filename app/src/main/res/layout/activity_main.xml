@@ -47,6 +47,7 @@
             app:layout_constraintVertical_bias="0.499" />
 
         <ImageView
+            android:id="@+id/imageView4"
             android:layout_width="328dp"
             android:layout_height="180dp"
             android:layout_marginStart="41dp"
@@ -97,6 +98,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageButtonControl"
             app:layout_constraintVertical_bias="0.0" />
+
+        <ImageButton
+            android:id="@+id/imageButtonInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="19dp"
+            android:layout_marginEnd="27dp"
+            android:backgroundTint="#00FFFFFF"
+            android:onClick="@{()-> viewModel.handleInfoButton()}"
+            app:layout_constraintBottom_toTopOf="@+id/imageView4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/info"
+            android:contentDescription="@string/button_info_context_text" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

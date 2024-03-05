@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.listeners
+package com.alcanl.cleverear.util.listeners
 
 import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider

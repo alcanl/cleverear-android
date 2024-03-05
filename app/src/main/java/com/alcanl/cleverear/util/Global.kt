@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers
+package com.alcanl.cleverear.util
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context

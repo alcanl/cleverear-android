@@ -18,4 +18,8 @@ class MainActivityListenersViewModel (activity: MainActivity) {
     {
         mWeakReference.get()?.buttonControlClicked()
     }
+    fun handleInfoButton()
+    {
+        mWeakReference.get()?.buttonInfoClicked()
+    }
 }

@@ -1,11 +1,11 @@
-package com.alcanl.cleverear.helpers.listeners
+package com.alcanl.cleverear.util.listeners
 
 import android.util.Log
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.parseJsonConnectionData
-import com.alcanl.cleverear.helpers.parseJsonSenderMacData
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.parseJsonConnectionData
+import com.alcanl.cleverear.util.parseJsonSenderMacData
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.ark.Event
 import com.ark.EventHandler

@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.service.receiver
+package com.alcanl.cleverear.util.service.receiver
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -6,25 +6,23 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.HA_LEFT_ADDRESS
-import com.alcanl.cleverear.helpers.HA_RIGHT_ADDRESS
-import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
+import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import dagger.hilt.android.AndroidEntryPoint
-import com.alcanl.cleverear.helpers.isConnected
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -36,21 +34,26 @@ class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
     {
         super.onReceive(context, intent)
         val action = intent?.action
-        val adapter = context?.getSystemService(BluetoothManager::class.java)?.adapter
+
+        val device  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            intent?.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+        else
+            intent?.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+
         val prefs = context?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)!!
         val leftDevice = prefs.getString(HA_LEFT_ADDRESS, "")!!
         val rightDevice = prefs.getString(HA_RIGHT_ADDRESS, "")!!
         val notification = handleNotification(context, intent!!)
 
-        if (action == BluetoothDevice.ACTION_ACL_DISCONNECTED && adapter?.isEnabled!!)
-            onReceive(leftDevice, rightDevice, adapter, context, notification)
+        if (action == BluetoothDevice.ACTION_ACL_DISCONNECTED)
+            onReceive(leftDevice, rightDevice, device!!, context, notification)
 
     }
     @SuppressLint("MissingPermission")
-    private fun onReceive(leftDevice: String, rightDevice: String, adapter: BluetoothAdapter, context: Context, notification: Notification)
+    private fun onReceive(leftDevice: String, rightDevice: String, device: BluetoothDevice, context: Context, notification: Notification)
     {
         try {
-            if (leftDevice.isNotBlank() && !isConnected(adapter.getRemoteDevice(leftDevice))) {
+            if (device.address == leftDevice) {
                 Log.d("debug", String.format("The Device %s disconnected", leftDevice))
 
                 with(configuration) {
@@ -68,7 +71,7 @@ class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
             }
 
 
-            if (rightDevice.isNotBlank() && !isConnected(adapter.getRemoteDevice(rightDevice))) {
+            if (device.address == rightDevice) {
                 Log.d("debug", String.format("The Device %s disconnected", rightDevice))
 
                 with(configuration) {

@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.listeners
+package com.alcanl.cleverear.util.listeners
 
 import android.util.Log
 import android.widget.Toast
@@ -6,12 +6,12 @@ import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.AdvancedActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.parseJsonBatteryStateData
-import com.alcanl.cleverear.helpers.parseJsonConnectionData
-import com.alcanl.cleverear.helpers.parseJsonMemoryActiveData
-import com.alcanl.cleverear.helpers.parseJsonSenderMacData
-import com.alcanl.cleverear.helpers.parseJsonVolumeData
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.parseJsonBatteryStateData
+import com.alcanl.cleverear.util.parseJsonConnectionData
+import com.alcanl.cleverear.util.parseJsonMemoryActiveData
+import com.alcanl.cleverear.util.parseJsonSenderMacData
+import com.alcanl.cleverear.util.parseJsonVolumeData
 import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent

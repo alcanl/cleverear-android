@@ -19,8 +19,8 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAdvancedBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.listeners.AdvancedActivityEventListener
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.listeners.AdvancedActivityEventListener
 import com.alcanl.cleverear.viewmodel.AdvancedActivityViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -80,7 +80,7 @@ class AdvancedActivity : AppCompatActivity(){
         initializeNavigationView()
         initSwitch()
         initSliders()
-
+        initTextViews()
     }
     private fun initSliders()
     {
@@ -188,6 +188,13 @@ class AdvancedActivity : AppCompatActivity(){
                 startCommonSlidersAnimation(mBinding.sliderAuxCommon)
                 startCommonSlidersAnimation(mBinding.sliderMicCommon)
 
+                with(mBinding) {
+                    textViewAuxL.visibility = View.INVISIBLE
+                    textViewAuxR.visibility= View.INVISIBLE
+                    textViewMicL.visibility = View.INVISIBLE
+                    textViewMicR.visibility = View.INVISIBLE
+                }
+
             }
             override fun onAnimationRepeat(animation: Animation?) {
 
@@ -205,6 +212,11 @@ class AdvancedActivity : AppCompatActivity(){
                     sliderMicCommon.apply {
                         visibility = View.INVISIBLE; isEnabled = false
                     }
+
+                    textViewAuxL.visibility = View.VISIBLE
+                    textViewAuxR.visibility= View.VISIBLE
+                    textViewMicL.visibility = View.VISIBLE
+                    textViewMicR.visibility = View.VISIBLE
                 }
             }
 
@@ -339,6 +351,17 @@ class AdvancedActivity : AppCompatActivity(){
                     R.anim.slide_out
                 ).toBundle()
                 startActivity(this, animationBundle)
+            }
+        }
+    }
+    private fun initTextViews()
+    {
+        if (configuration.isDualDeviceConfig) {
+            mBinding.apply {
+                textViewAuxL.visibility = View.INVISIBLE
+                textViewAuxR.visibility = View.INVISIBLE
+                textViewMicL.visibility = View.INVISIBLE
+                textViewMicR.visibility = View.INVISIBLE
             }
         }
     }

@@ -74,10 +74,10 @@
         </activity>
 
         <service
-            android:name=".helpers.service.AutoConnectService"
+            android:name=".util.service.AutoConnectService"
             android:foregroundServiceType="connectedDevice"/>
 
-        <receiver android:name=".helpers.service.receiver.DeviceDisconnectBroadcastReceiver"
+        <receiver android:name=".util.service.receiver.DeviceDisconnectBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
@@ -85,7 +85,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".helpers.broadcast.BondDeviceBroadcastReceiver"
+        <receiver android:name=".util.broadcast.BondDeviceBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />

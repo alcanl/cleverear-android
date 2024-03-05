@@ -1,11 +1,12 @@
 package com.alcanl.cleverear.di.module
 
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.util.EarSide
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.EnumMap
 import javax.inject.Singleton
 
 @Module
@@ -18,8 +19,8 @@ object ConfigurationModule {
     var isDualDeviceConfig = false
     var isConnectedBefore = false
     var isServiceOnBoard = false
-    var doubleDeviceMap = HashMap<EarSide, HearingAid>()
     var earSide : EarSide = EarSide.Right
+    lateinit var doubleDeviceMap : EnumMap<EarSide, HearingAid>
     lateinit var hearingAid: HearingAid
     @Singleton
     @Provides

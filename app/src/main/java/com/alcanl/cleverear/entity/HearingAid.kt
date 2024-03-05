@@ -2,7 +2,7 @@ package com.alcanl.cleverear.entity
 
 import android.bluetooth.BluetoothDevice
 import android.util.Log
-import com.alcanl.cleverear.helpers.EarSide
+import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
 import com.ark.EventHandler

@@ -9,10 +9,10 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAutoConnectBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.HA_LEFT_NAME
-import com.alcanl.cleverear.helpers.HA_RIGHT_NAME
-import com.alcanl.cleverear.helpers.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.HA_LEFT_NAME
+import com.alcanl.cleverear.util.HA_RIGHT_NAME
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.viewmodel.AutoConnectActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

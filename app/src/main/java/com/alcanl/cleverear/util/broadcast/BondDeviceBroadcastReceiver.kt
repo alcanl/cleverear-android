@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.helpers.broadcast
+package com.alcanl.cleverear.util.broadcast
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -8,8 +8,8 @@ import android.content.Intent
 import android.util.Log
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.helpers.EarSide
-import com.alcanl.cleverear.helpers.service.receiver.HiltBroadcastReceiver
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.service.receiver.HiltBroadcastReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.system.exitProcess
