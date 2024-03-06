@@ -220,11 +220,12 @@ class ControlActivity : AppCompatActivity() {
             else
                 initDoubleDeviceConnectionSliders()
 
-            if (configuration.isDualDeviceConfig) {
-                mBinding.sliderLeft.visibility = View.INVISIBLE
-                mBinding.sliderRight.visibility = View.INVISIBLE
-                mBinding.sliderCommon.visibility = View.VISIBLE
-            }
+            if (configuration.isDualDeviceConfig)
+                mBinding. apply {
+                    sliderLeft.visibility = View.INVISIBLE
+                    sliderRight.visibility = View.INVISIBLE
+                    sliderCommon.visibility = View.VISIBLE
+                }
         }
     }
     private fun initSliders(slider: Slider,  hearingAid: HearingAid)
@@ -429,7 +430,7 @@ class ControlActivity : AppCompatActivity() {
 
             }
             configuration.isDualDeviceConfig = true
-            }
+        }
         else {
             runOnUiThread {
                 mBinding.sliderLeft.startAnimation(

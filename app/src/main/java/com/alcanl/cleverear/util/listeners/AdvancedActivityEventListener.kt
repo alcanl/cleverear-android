@@ -77,7 +77,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                         Toast.makeText(
                             this,
                             R.string.toast_connection_lost_text,
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         ).show()
                         finish()
                         mConfiguration.isConnected = false

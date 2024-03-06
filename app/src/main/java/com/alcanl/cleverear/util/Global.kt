@@ -2,6 +2,7 @@ package com.alcanl.cleverear.util
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import androidx.compose.ui.text.intl.Locale
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
@@ -28,6 +29,11 @@ const val HA_RIGHT_NAME = "HA_RIGHT_NAME"
 const val HA_LEFT_RSSI = "HA_LEFT_RSSI"
 const val HA_RIGHT_RSSI = "HA_RIGHT_RSSI"
 const val WHAT_BACKGROUND_CONNECTED = 0
+const val TURKISH = "tr"
+const val GERMAN = "de"
+const val TURKISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_tr.pdf"""
+const val ENGLISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_en.pdf"""
+const val GERMAN_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_de.pdf"""
 
 
 @Throws(JSONException::class)
@@ -120,5 +126,10 @@ fun isConnected(device: BluetoothDevice): Boolean
     } catch (ex: Exception) {
         throw IllegalStateException(ex)
     }
+}
+
+fun getSystemLanguage() : String
+{
+    return Locale.current.language
 }
 

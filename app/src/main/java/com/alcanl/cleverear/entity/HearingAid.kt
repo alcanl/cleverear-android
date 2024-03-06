@@ -9,6 +9,7 @@ import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.ark.ProductManager
 import com.ark.WirelessControl
+import java.util.Objects
 
 data class HearingAid(val address: String, val name: String, val rssi: Int, val manufacturerData: String,
                       val side: EarSide, var bondStatus : Int = BluetoothDevice.BOND_NONE, var numberOfMemories: Int = 8,
@@ -60,5 +61,21 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             isConnected = false
         } catch (_: ArkException) {}
     }
+
+    override fun equals(other: Any?): Boolean
+    {
+        return other is HearingAid && address == other.address && name == other.name && rssi == other.rssi
+    }
+
+    override fun hashCode(): Int
+    {
+        return Objects.hashCode(address)
+    }
+
+    override fun toString(): String
+    {
+        return name
+    }
 }
+
 

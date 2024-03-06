@@ -103,8 +103,10 @@ class ConnectionActivity : AppCompatActivity() {
 
                     isConnected = false
                 }
-                mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
-                mBinding.frameLayoutStopConnection.visibility = View.GONE
+                mBinding.apply {
+                    textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+                    frameLayoutStopConnection.visibility = View.GONE
+                }
             }, 8000
         )
     }
@@ -159,11 +161,12 @@ class ConnectionActivity : AppCompatActivity() {
             }
         mBinding.adapter = mAdapter
     }
-    private fun isDuplicate(device: DiscoveredDeviceInfo): Boolean {
+    private fun isDuplicate(device: DiscoveredDeviceInfo): Boolean
+    {
         var value = true
 
         for (deviceWrapper in mBleDeviceList)
-            if (deviceWrapper.address == device.address) {
+            if (deviceWrapper == device) {
                 value = false
                 break
             }
@@ -176,8 +179,7 @@ class ConnectionActivity : AppCompatActivity() {
 
         try {
             manufacturerCodeSub = manufacturerCode.substring(0, 6)
-        } catch (_: StringIndexOutOfBoundsException) {
-        }
+        } catch (_: StringIndexOutOfBoundsException) {}
 
         return if (!configuration.isDoubleDeviceConnection)
             if (configuration.earSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
@@ -185,7 +187,8 @@ class ConnectionActivity : AppCompatActivity() {
         else
             manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
     }
-    private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo) {
+    private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
+    {
         if (configuration.doubleDeviceMap.containsKey(earSide))
             return
 
@@ -230,7 +233,7 @@ class ConnectionActivity : AppCompatActivity() {
     {
         with(mBinding) {
 
-            adapter!!.add(device.name)
+            adapter!!.add(device.toString())
 
             if (configuration.isDoubleDeviceConnection && recognizeEarSide(device.manufacturerData) == EarSide.Right)
                 mAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
@@ -246,11 +249,13 @@ class ConnectionActivity : AppCompatActivity() {
             )
         }
     }
-    private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo? {
+    private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo?
+    {
         val device = mBinding.adapter!!.getItem(pos)
-        return mBleDeviceList.find { it.name == device.toString() }
+        return mBleDeviceList.find { it.toString() == device }
     }
-    private fun selectDoubleItem(pos: Int) {
+    private fun selectDoubleItem(pos: Int)
+    {
         val selectedDevice = searchHearingAidInList(pos)
 
         if (selectedDevice != null) {
@@ -259,14 +264,14 @@ class ConnectionActivity : AppCompatActivity() {
             else
                 putItemToDeviceMap(EarSide.Left, selectedDevice)
 
-
-            if (configuration.doubleDeviceMap.size == 2) {
+            if (configuration.doubleDeviceMap.size == 2)
                 finalizeConnectionConfiguration()
-            }
-        } else
+        }
+        else
             showConnectionProblemToastMessage()
     }
-    private fun selectSingleItem(pos: Int) {
+    private fun selectSingleItem(pos: Int)
+    {
         val selectedDevice = searchHearingAidInList(pos)
 
         if (selectedDevice != null) {

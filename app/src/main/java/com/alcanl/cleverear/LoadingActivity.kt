@@ -1,6 +1,7 @@
 package com.alcanl.cleverear
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.bluetooth.BluetoothManager
@@ -172,7 +173,6 @@ class LoadingActivity : AppCompatActivity() {
             else
                 initUnBondSingleDeviceCountDownTimer(hearingAid)
 
-
         }
     }
     private fun initUnBondDoubleDeviceCountDownTimer()
@@ -206,11 +206,11 @@ class LoadingActivity : AppCompatActivity() {
                             R.string.toast_device_must_pair_text,
                             Toast.LENGTH_LONG
                         ).show()
-                        finish()
-                        threadPool.execute {
-                            configuration.doubleDeviceMap[EarSide.Left]?.endConnectionSession()
-                            configuration.doubleDeviceMap[EarSide.Left]?.isConnected = false
-                        }
+                    }
+                    finish()
+                    threadPool.execute {
+                        configuration.doubleDeviceMap[EarSide.Left]?.endConnectionSession()
+                        configuration.doubleDeviceMap[EarSide.Left]?.isConnected = false
                     }
                 }
             }
@@ -257,11 +257,11 @@ class LoadingActivity : AppCompatActivity() {
                             R.string.toast_device_must_pair_text,
                             Toast.LENGTH_LONG
                         ).show()
-                        finish()
-                        threadPool.execute {
-                            configuration.hearingAid.endConnectionSession()
-                            configuration.isConnected = false
-                        }
+                    }
+                    finish()
+                    threadPool.execute {
+                        configuration.hearingAid.endConnectionSession()
+                        configuration.isConnected = false
                     }
                 }
             }
@@ -302,34 +302,36 @@ class LoadingActivity : AppCompatActivity() {
     {
         connectToDevice(configuration.hearingAid)
     }
-    @SuppressLint("MissingPermission")
+
     private fun connectToDevice(hearingAid: HearingAid)
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
 
-        threadPool.execute {
+        threadPool.execute { connectToDeviceCallback(adapter, hearingAid) }
+    }
+    @SuppressLint("MissingPermission")
+    private fun connectToDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
+    {
+        try {
+            hearingAid.communicationAdaptor?.connect()
 
-            try {
-                hearingAid.communicationAdaptor?.connect()
+            Thread.sleep(8000)
 
-                Thread.sleep(8000)
+            if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
+                adapter.getRemoteDevice(hearingAid.address).createBond()
 
-                if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
-                    adapter.getRemoteDevice(hearingAid.address).createBond()
+            else if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
+                hearingAid.readDeviceConfiguration()
 
-                else if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
-                    hearingAid.readDeviceConfiguration()
-
+        }
+        catch (ex: ArkException) {
+            Log.e("connect", ex.message!!)
+            runOnUiThread {
+                Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
             }
-            catch (ex: ArkException) {
-                Log.e("connect", ex.message!!)
-                runOnUiThread {
-                    Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
-                }
-            }
-            catch (ex: InterruptedException) {
-                Log.e("connectThread", ex.message!!)
-            }
+        }
+        catch (ex: InterruptedException) {
+            Log.e("connectThread", ex.message!!)
         }
     }
     @SuppressLint("MissingPermission")

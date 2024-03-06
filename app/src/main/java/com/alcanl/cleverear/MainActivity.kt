@@ -7,7 +7,11 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.KeyEvent
+import android.view.View
 import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,7 +22,13 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.util.ENGLISH_MANUAL_URL
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.GERMAN
+import com.alcanl.cleverear.util.GERMAN_MANUAL_URL
+import com.alcanl.cleverear.util.TURKISH
+import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
+import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.EnumMap
@@ -30,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var configuration: ConfigurationModule
     private lateinit var mBinding: ActivityMainBinding
     private var mBluetoothPermission = false
+    private var mIsWebViewActive = false
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -45,11 +56,14 @@ class MainActivity : AppCompatActivity() {
             scanBluetooth()
             checkBluetoothPermission()
         }
-
     }
     override fun onResume() {
         super.onResume()
         checkBluetoothPermission()
+
+        if (mIsWebViewActive)
+            mBinding.frameLayoutWebView.visibility = View.GONE
+
         mBinding.buttonSingleDevice.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation
                 (this, R.anim.translate_button_left_to_right)
@@ -59,45 +73,16 @@ class MainActivity : AppCompatActivity() {
                 (this, R.anim.translate_button_right_to_left)
         )
     }
-    fun buttonSingleDeviceClick() {
-
-        if (mBluetoothPermission) {
-            Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
-            configuration.isDoubleDeviceConnection = false
-        }
-        else {
-            toastNoPermission()
-            scanBluetooth()
-        }
-    }
-
-    fun buttonDoubleDeviceClick()
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
     {
-        if (mBluetoothPermission) {
-            configuration.apply {
-                doubleDeviceMap = EnumMap(EarSide::class.java)
-                isDoubleDeviceConnection = true
-                earSide = EarSide.Left
-            }
-            Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && mBinding.webView.canGoBack()) {
+            mBinding.webView.goBack()
+            mBinding.frameLayoutWebView.visibility = View.GONE
+            return true
         }
-        else {
-            toastNoPermission()
-            scanBluetooth()
-        }
-    }
-    fun buttonControlClicked()
-    {
-        mBinding.imageButtonControl.apply {
-            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@MainActivity,
-                R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
-        }
-    }
-    fun buttonInfoClicked()
-    {
 
+        return super.onKeyDown(keyCode, event)
     }
-
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mBinding.viewModel = MainActivityListenersViewModel(this)
@@ -199,9 +184,9 @@ class MainActivity : AppCompatActivity() {
     {
         Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_LONG).show()
     }
-    private fun controlButtonAnimation() : Animation.AnimationListener
+    private fun controlButtonAnimation() : AnimationListener
     {
-        return object : Animation.AnimationListener {
+        return object : AnimationListener {
             override fun onAnimationStart(animation: Animation?)
             {
                 if (mBluetoothPermission) {
@@ -213,11 +198,71 @@ class MainActivity : AppCompatActivity() {
                     scanBluetooth()
                 }
             }
-            override fun onAnimationEnd(animation: Animation?)
-            {
+            override fun onAnimationEnd(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+        }
+    }
+    private fun infoButtonAnimation() : AnimationListener
+    {
+        return object : AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                val language = getSystemLanguage()
 
+                with(mBinding) {
+
+                    when (language.lowercase()) {
+                        TURKISH -> webView.loadUrl(TURKISH_MANUAL_URL)
+                        GERMAN -> webView.loadUrl(GERMAN_MANUAL_URL)
+                        else -> webView.loadUrl(ENGLISH_MANUAL_URL)
+                    }
+
+                    frameLayoutWebView.visibility = View.VISIBLE
+                    mIsWebViewActive = true
+                }
             }
             override fun onAnimationRepeat(animation: Animation?) {}
+        }
+    }
+    fun buttonSingleDeviceClick() {
+
+        if (mBluetoothPermission) {
+            Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
+            configuration.isDoubleDeviceConnection = false
+        }
+        else {
+            toastNoPermission()
+            scanBluetooth()
+        }
+    }
+    fun buttonDoubleDeviceClick()
+    {
+        if (mBluetoothPermission) {
+            configuration.apply {
+                doubleDeviceMap = EnumMap(EarSide::class.java)
+                isDoubleDeviceConnection = true
+                earSide = EarSide.Left
+            }
+            Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+        }
+        else {
+            toastNoPermission()
+            scanBluetooth()
+        }
+    }
+    fun buttonControlClicked()
+    {
+        mBinding.imageButtonControl.apply {
+            startAnimation(
+                AnimationUtils.loadAnimation(this@MainActivity,
+                    R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
+        }
+    }
+    fun buttonInfoClicked()
+    {
+        mBinding.imageButtonInfo.apply {
+            startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.alpha_blink_anim)
+                .also { it.setAnimationListener(infoButtonAnimation()) })
         }
     }
 }

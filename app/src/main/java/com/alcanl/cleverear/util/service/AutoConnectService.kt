@@ -123,6 +123,12 @@ class AutoConnectService : Service()
                 }
                 else {
                     val adapter = getSystemService(BluetoothManager::class.java).adapter
+
+                    if (!adapter.isEnabled) {
+                        stopSelf()
+                        return
+                    }
+
                     if (isDoubleDeviceConnection)
                         scheduledDoubleDeviceCallback(adapter)
                     else

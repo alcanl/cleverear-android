@@ -101,17 +101,34 @@
 
         <ImageButton
             android:id="@+id/imageButtonInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
             android:layout_marginTop="19dp"
             android:layout_marginEnd="27dp"
             android:backgroundTint="#00FFFFFF"
+            android:contentDescription="@string/button_info_context_text"
             android:onClick="@{()-> viewModel.handleInfoButton()}"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toTopOf="@+id/imageView4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/info"
-            android:contentDescription="@string/button_info_context_text" />
+            app:srcCompat="@drawable/info" />
+
+        <FrameLayout
+            android:id="@+id/frameLayoutWebView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -356,13 +356,32 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun initTextViews()
     {
-        if (configuration.isDualDeviceConfig) {
-            mBinding.apply {
-                textViewAuxL.visibility = View.INVISIBLE
-                textViewAuxR.visibility = View.INVISIBLE
-                textViewMicL.visibility = View.INVISIBLE
-                textViewMicR.visibility = View.INVISIBLE
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                if (isDualDeviceConfig)
+                    mBinding.apply {
+                        textViewAuxL.visibility = View.INVISIBLE
+                        textViewAuxR.visibility = View.INVISIBLE
+                        textViewMicL.visibility = View.INVISIBLE
+                        textViewMicR.visibility = View.INVISIBLE
+                    }
+                else
+                    return
             }
+
+            else
+                if (earSide == EarSide.Left)
+                mBinding.apply {
+                    textViewMicR.visibility = View.INVISIBLE
+                    textViewAuxR.visibility = View.INVISIBLE
+                }
+
+                else
+                    mBinding.apply {
+                        textViewAuxL.visibility = View.INVISIBLE
+                        textViewMicL.visibility = View.INVISIBLE
+                    }
+
         }
     }
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
