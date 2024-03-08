@@ -32,6 +32,7 @@
     <string name="toast_bt_on" translatable="true">Bluetooth Açık</string>
     <string name="notification_reconnect_text" translatable="true">İşitme Cihazı İle Yeniden Bağlanıldı</string>
     <string name="service_notification_start_service_text" translatable="true">CleverEar İşitme Cihazı Konfigürasyonu</string>
+    <string name="toast_unknown_problem_text" translatable="true">Bilinmeyen bir problem oluştu. Lütfen uygulamayı yeniden başlatın.</string>
     <string name="toast_gps_on" translatable="true">Konum Açık</string>
     <string name="listener_volume_level_text">Ses Seviyesi: </string>
     <string name="navbar_connection_text">Bağlantı</string>

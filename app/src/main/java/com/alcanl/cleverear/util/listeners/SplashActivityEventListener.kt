@@ -3,21 +3,23 @@ package com.alcanl.cleverear.util.listeners
 import android.util.Log
 import com.ark.EventHandler
 import java.lang.NullPointerException
-import kotlin.concurrent.thread
+import java.util.concurrent.ExecutorService
 
-class SplashActivityEventListener(private val mEventHandler: EventHandler) {
+class SplashActivityEventListener(private val mEventHandler: EventHandler,
+    private val mThreadPool: ExecutorService) {
     private lateinit var mListener: Thread
     fun startEventListener()
     {
 
-        mListener = thread(isDaemon = true, start = true) {
+        mThreadPool.execute {
             try {
-                do {
+                mListener = Thread.currentThread()
+                while (!mListener.isInterrupted) {
                     val event = mEventHandler.event
-                    Log.e("event", event.data)
+                    Log.e("eventSplash", event.data)
 
-                } while (!mListener.isInterrupted)
-
+                }
+                Log.d("splash", "SplashListenerStopped")
             } catch (ex: NullPointerException) {
                 Log.e("null", ex.message!!)
             } catch (ex: InterruptedException) {
@@ -25,8 +27,10 @@ class SplashActivityEventListener(private val mEventHandler: EventHandler) {
             }
         }
     }
+    @Synchronized
     fun stopListener()
     {
         mListener.interrupt()
+        mEventHandler.exit()
     }
 }

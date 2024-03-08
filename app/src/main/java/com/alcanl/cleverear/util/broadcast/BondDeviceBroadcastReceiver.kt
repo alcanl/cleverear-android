@@ -9,7 +9,7 @@ import android.util.Log
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.service.receiver.HiltBroadcastReceiver
+import com.alcanl.cleverear.util.service.broadcast.HiltBroadcastReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.system.exitProcess
@@ -20,7 +20,7 @@ class BondDeviceBroadcastReceiver: HiltBroadcastReceiver() {
     lateinit var configuration : ConfigurationModule
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?)
-        {
+    {
         val action = intent!!.action
 
         if (action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {

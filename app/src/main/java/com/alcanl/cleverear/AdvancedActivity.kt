@@ -39,40 +39,39 @@ class AdvancedActivity : AppCompatActivity(){
     lateinit var threadPool: ExecutorService
     private lateinit var mBinding : ActivityAdvancedBinding
     private lateinit var mListener: AdvancedActivityEventListener
-    private var isListenerOnBoard = false
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
+        mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
+            .apply { startEventListener() }
     }
     override fun onResume()
     {
         super.onResume()
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_advanced
-        if (!configuration.isConnected)
+        if (!configuration.isConnected) {
             finish()
-        else
-            if (!isListenerOnBoard) {
-                mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
-                mListener.startEventListener()
-                isListenerOnBoard = true
-            }
+            return
+        }
+
+        if (!mListener.isListenerOnBoard())
+            mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
+                .apply { startEventListener() }
     }
     override fun onStop()
     {
         super.onStop()
-        if (isListenerOnBoard) {
+        if (mListener.isListenerOnBoard())
             mListener.stopListener()
-            isListenerOnBoard = false
-        }
+
     }
     override fun onDestroy() {
         super.onDestroy()
 
-        if (isListenerOnBoard) {
+        if (mListener.isListenerOnBoard())
             mListener.stopListener()
-            isListenerOnBoard = false
-        }
+
     }
     private fun initialize()
     {
@@ -265,17 +264,9 @@ class AdvancedActivity : AppCompatActivity(){
 
             when (it.itemId) {
                 R.id.navbar_control -> {
-                    if (isListenerOnBoard) {
-                        mListener.stopListener()
-                        isListenerOnBoard = false
-                    }
                     initializeNavigationView(ControlActivity::class.java)
                     finish(); true}
                 R.id.navbar_connection -> {
-                    if (isListenerOnBoard) {
-                        mListener.stopListener()
-                        isListenerOnBoard = false
-                    }
                     initializeNavigationView(ConnectionActivity::class.java)
                     finish(); true}
                 else -> true

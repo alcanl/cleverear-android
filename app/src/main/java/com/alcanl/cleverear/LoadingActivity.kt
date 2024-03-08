@@ -269,10 +269,17 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun initBondedDeviceCountDownTimer()
     {
-        object: CountDownTimer(10000, 1000) {
+        object: CountDownTimer(12000, 1000) {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonBondDeviceOnTick(millisUntilFinished)
+                if (configuration.isConnected) {
+                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
+                    Handler(Looper.myLooper()!!).postDelayed({ finish()
+                        startActivity(Intent
+                            (this@LoadingActivity, ControlActivity::class.java)) }, 3000)
+                    this.cancel()
+                }
             }
             override fun onFinish() {
                 if (configuration.isConnected) {
@@ -294,7 +301,7 @@ class LoadingActivity : AppCompatActivity() {
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
-        mListener = LoadingActivityEventListener(this, eventHandler, configuration)
+        mListener = LoadingActivityEventListener(this, eventHandler, configuration, threadPool)
             .apply { startEventListener() }
 
     }
@@ -315,7 +322,7 @@ class LoadingActivity : AppCompatActivity() {
         try {
             hearingAid.communicationAdaptor?.connect()
 
-            Thread.sleep(8000)
+            Thread.sleep(7000)
 
             if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
                 adapter.getRemoteDevice(hearingAid.address).createBond()

@@ -24,7 +24,6 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import kotlin.concurrent.thread
 
 class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEventHandler: EventHandler,
                                     private val mThreadPool : ExecutorService,
@@ -32,11 +31,12 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
 ) {
 
     private val mWeakReference = WeakReference(activity)
-    private lateinit var mListener: Thread
+    private var mListener: Thread? = null
     fun startEventListener() {
-        mListener = thread(isDaemon = true, start = true) {
+        mThreadPool.execute {
             try {
-                 do {
+                mListener = Thread.currentThread()
+                while (!mListener?.isInterrupted!!) {
                     try {
                         val event = mEventHandler.event
                         val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -51,7 +51,9 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
                     } catch (ex: JSONException) {
                         Log.e("parseError", ex.message!!)
                     }
-                } while (!mListener.isInterrupted)
+                }
+
+                Log.d("advanced", "AdvancedListenerStopped")
             } catch (ex: NullPointerException) {
                 Log.e("null", ex.message!!)
             } catch (ex: InterruptedException) {
@@ -61,7 +63,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
     }
     private fun handleGenericEvent(event: Event)
     {
-        Log.e("event", event.data)
+        Log.e("eventAdvanced", event.data)
     }
     private fun handleConnectionEvent(event: Event)
     {
@@ -178,8 +180,18 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             Log.e("parseError", ex.message!!)
         }
     }
+    @Synchronized
     fun stopListener()
     {
-        mListener.interrupt()
+        mListener?.interrupt()
+        mEventHandler.exit()
+    }
+    fun isListenerOnBoard() : Boolean
+    {
+        if (mListener == null)
+            return false
+
+        return mListener?.isAlive!!
+
     }
 }

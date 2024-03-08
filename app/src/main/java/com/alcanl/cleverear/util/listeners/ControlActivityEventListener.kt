@@ -24,18 +24,18 @@ import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
-import kotlin.concurrent.thread
 
 class ControlActivityEventListener(activity: ControlActivity, private val mEventHandler: EventHandler,
                                    private val mThreadPool : ExecutorService,
                                    private val mConfiguration : ConfigurationModule) {
 
     private val mWeakReference = WeakReference(activity)
-    private lateinit var mListener: Thread
+    private var mListener: Thread? = null
     fun startEventListener() {
-        mListener = thread(isDaemon = true, start = true) {
+        mThreadPool.execute {
                 try {
-                    do {
+                    mListener = Thread.currentThread()
+                    while (!mListener?.isInterrupted!!) {
                         try {
                             val event = mEventHandler.event
                             val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -50,7 +50,8 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         } catch (ex: JSONException) {
                             Log.e("parseError", ex.message!!)
                         }
-                    } while (!mListener.isInterrupted)
+                    }
+                    Log.d("control", "ControlListenerStopped")
 
                 } catch (ex: NullPointerException) {
                         Log.e("null", ex.message!!)
@@ -61,7 +62,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleGenericEvent(event: Event)
     {
-        Log.e("event", event.data)
+        Log.e("eventControl", event.data)
     }
     private fun handleConnectionEvent(event: Event)
     {
@@ -84,6 +85,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                         mConfiguration.isConnected = false
                     }
                 }
+                Thread.currentThread().interrupt()
             }
         } catch (ex: JSONException)
         {
@@ -190,9 +192,11 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             Log.e("parseError", ex.message!!)
         }
     }
+    @Synchronized
     fun stopListener()
     {
-        mListener.interrupt()
+        mListener?.interrupt()
+        mEventHandler.exit()
     }
     private fun getMemoryEventButton(memoryState: Int) : Button
     {
@@ -208,5 +212,13 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             6 -> actCont.mBinding.buttonSeven
             else -> actCont.mBinding.buttonEight
         }
+    }
+    fun isListenerOnBoard() : Boolean
+    {
+        if (mListener == null)
+            return false
+
+        return mListener?.isAlive!!
+
     }
 }

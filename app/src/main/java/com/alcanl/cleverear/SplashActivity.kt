@@ -75,7 +75,7 @@ class SplashActivity : AppCompatActivity() {
         initBinding()
         mEnableBluetoothBroadCast = handleBroadcastReceiver()
         registerReceiver(mEnableBluetoothBroadCast, IntentFilter(ACTION_STATE_CHANGED))
-        mListener = SplashActivityEventListener(eventHandler)
+        mListener = SplashActivityEventListener(eventHandler, threadPool)
     }
     private fun initBinding()
     {
@@ -143,12 +143,15 @@ class SplashActivity : AppCompatActivity() {
     }
     private fun cleanEvents()
     {
-        threadPool.execute {
-            try {
-                mListener.startEventListener()
-                Thread.sleep(2000)
-                mListener.stopListener()
-            } catch (_: InterruptedException) {}
-        }
+        threadPool.execute { cleanEventsCallback() }
+    }
+    @Synchronized
+    private fun cleanEventsCallback()
+    {
+        try {
+            mListener.startEventListener()
+            Thread.sleep(1000)
+            mListener.stopListener()
+        } catch (_: InterruptedException) {}
     }
 }

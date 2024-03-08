@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.util.service.receiver
+package com.alcanl.cleverear.util.service.broadcast
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -55,40 +55,55 @@ class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
         try {
             if (device.address == leftDevice) {
                 Log.d("debug", String.format("The Device %s disconnected", leftDevice))
-
-                with(configuration) {
-                    if (isDoubleDeviceConnection) {
-                        doubleDeviceMap[EarSide.Left]?.isConnected = false
-                        if (!doubleDeviceMap[EarSide.Right]?.isConnected!!)
-                            isConnected = false
-                    }
-                    else {
-                        hearingAid.isConnected = false
-                        isConnected = false
-                    }
-                }
+                handleLeftDeviceDisconnect()
                 showNotification(context, notification)
             }
 
-
             if (device.address == rightDevice) {
                 Log.d("debug", String.format("The Device %s disconnected", rightDevice))
-
-                with(configuration) {
-                    if (isDoubleDeviceConnection) {
-                        doubleDeviceMap[EarSide.Right]?.isConnected = false
-                        if (!doubleDeviceMap[EarSide.Left]?.isConnected!!)
-                            isConnected = false
-                    }
-                    else {
-                        hearingAid.isConnected = false
-                        isConnected = false
-                    }
-                }
+                handleRightDeviceDisconnect()
                 showNotification(context, notification)
             }
 
         } catch (_: IllegalStateException) {}
+        catch (_: Throwable) {}
+    }
+    private fun handleLeftDeviceDisconnect()
+    {
+        with(configuration) {
+            if (isDoubleDeviceConnection)
+                doubleDeviceMap[EarSide.Left]?.apply {
+                    isConnected = false
+                    isDeviceInRange = false
+                }
+            else
+                hearingAid.apply {
+                    isConnected = false
+                    isDeviceInRange = false
+                }
+
+            isConnected = false
+            canBondDeviceReConnect = false
+        }
+    }
+    private fun handleRightDeviceDisconnect()
+    {
+        with(configuration) {
+            if (isDoubleDeviceConnection) {
+                doubleDeviceMap[EarSide.Right]?.apply {
+                    isConnected = false
+                    isDeviceInRange = false
+                }
+            }
+            else {
+                hearingAid.apply {
+                    isConnected = false
+                    isDeviceInRange = false
+                }
+            }
+            isConnected = false
+            canBondDeviceReConnect = false
+        }
     }
     private fun showNotification(context: Context, notification: Notification)
     {

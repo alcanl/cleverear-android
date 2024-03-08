@@ -22,8 +22,8 @@ android {
         applicationId = "com.eartechnic.Biyonix"
         minSdk = 27
         targetSdk = 34
-        versionCode = 301
-        versionName = "3.0.1"
+        versionCode = 310
+        versionName = "3.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

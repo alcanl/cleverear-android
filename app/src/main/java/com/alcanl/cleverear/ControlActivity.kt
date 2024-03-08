@@ -35,45 +35,45 @@ class ControlActivity : AppCompatActivity() {
     lateinit var configuration : ConfigurationModule
     lateinit var mBinding: ActivityControlBinding
     private lateinit var mListener : ControlActivityEventListener
-    private var isListenerOnBoard = false
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
+        mListener =
+            ControlActivityEventListener(this, eventHandler, threadPool, configuration).apply {
+                startEventListener()
+            }
     }
     override fun onResume()
     {
         super.onResume()
-        if (!configuration.isConnected)
+        if (!configuration.isConnected) {
             finish()
-        else  {
-            if (!isListenerOnBoard) {
-                mListener =
-                    ControlActivityEventListener(this, eventHandler, threadPool, configuration)
-                mListener.startEventListener()
-                isListenerOnBoard = true
-            }
+            return
         }
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         initSliders()
         initTextViews()
+
+        if (!mListener.isListenerOnBoard())
+            mListener =
+                ControlActivityEventListener(this, eventHandler, threadPool, configuration).apply {
+                    startEventListener()
+                }
     }
     override fun onStop()
     {
         super.onStop()
 
-        if (isListenerOnBoard) {
+        if (mListener.isListenerOnBoard())
             mListener.stopListener()
-            isListenerOnBoard = false
-        }
+
     }
     override fun onDestroy() {
         super.onDestroy()
 
-        if (isListenerOnBoard) {
+        if (mListener.isListenerOnBoard())
             mListener.stopListener()
-            isListenerOnBoard = false
-        }
 
     }
     private fun initBatteryViews()
@@ -133,7 +133,6 @@ class ControlActivity : AppCompatActivity() {
         initBatteryViews()
         initSwitch()
 
-
     }
     private fun initMemoryButtons()
     {
@@ -179,17 +178,9 @@ class ControlActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navbar_control -> true
                 R.id.navbar_connection -> {
-                    if (isListenerOnBoard) {
-                        mListener.stopListener()
-                        isListenerOnBoard = false
-                    }
                     initializeNavigationView(ConnectionActivity::class.java)
                     finish(); true}
                 else -> {
-                    if (isListenerOnBoard) {
-                        mListener.stopListener()
-                        isListenerOnBoard = false
-                    }
                     initializeNavigationView(AdvancedActivity::class.java)
                     finish(); true }
             }

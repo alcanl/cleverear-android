@@ -69,12 +69,9 @@ class AutoConnectActivity : AppCompatActivity() {
     private fun controlButtonClickedCommon()
     {
         configuration.isConnectedBefore = true
-        if (!configuration.isConnected) {
-            startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
-            finish()
-        }
-        else
-            startActivity(Intent(this, ControlActivity::class.java))
+        startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
+        finish()
+
     }
     private fun isValidDeviceData(isDual: Boolean, text: String) : Boolean
     {
@@ -124,6 +121,7 @@ class AutoConnectActivity : AppCompatActivity() {
                             toastInvalidDeviceData()
                     else if (isLeftSelected)
                         if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())){
+                            isDoubleDeviceConnection = false
                             earSide = EarSide.Left
                             controlButtonClickedCommon()
                         }
@@ -131,6 +129,7 @@ class AutoConnectActivity : AppCompatActivity() {
                             toastInvalidDeviceData()
                     else if (isRightSelected)
                         if (isValidDeviceData(false, mBinding.textViewRight.text.toString())){
+                            isDoubleDeviceConnection = false
                             earSide = EarSide.Right
                             controlButtonClickedCommon()
                         }

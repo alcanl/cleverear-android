@@ -5,6 +5,7 @@
     <string name="main_logo_description_text" translatable="false">Ear Technic Logo</string>
     <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
+    <string name="toast_unknown_problem_text" translatable="true">Some unknown problem occurred. Please restart the application.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
     <string name="app_version_text" translatable="false">v 3.1.0</string>
     <string name="button_info_context_text" translatable="false">User Manual</string>

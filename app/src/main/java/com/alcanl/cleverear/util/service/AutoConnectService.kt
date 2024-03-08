@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.util.service
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,6 +9,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
+import android.bluetooth.BluetoothDevice.ACTION_FOUND
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.IntentFilter
@@ -26,12 +28,12 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
-import com.alcanl.cleverear.util.service.receiver.DeviceDisconnectBroadcastReceiver
+import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
+import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
-import com.onsemi.androidble.BleUtil
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
@@ -54,13 +56,12 @@ class AutoConnectService : Service()
     @Inject
     lateinit var eventHandler: EventHandler
     private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
+    private val mDeviceFoundReceiver = DeviceFoundBroadcastReceiver()
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
-        mConnectedNotification = handleConnectedNotification(intent!!)
-        initialize()
+        initialize(intent)
         return START_STICKY
     }
     override fun onBind(intent: Intent?): IBinder?
@@ -69,7 +70,6 @@ class AutoConnectService : Service()
     }
     override fun onDestroy() {
         super.onDestroy()
-        BleUtil.BleManager_DeInit()
         unregisterReceiver(mDisconnectReceiver)
 
         try {
@@ -83,18 +83,15 @@ class AutoConnectService : Service()
                 isServiceOnBoard = false
             }
 
-            threadPool.shutdown()
-            scheduledExecutor.shutdown()
-
         } catch (_: ArkException) {}
     }
-    private fun initialize()
+    private fun initialize(intent: Intent?)
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         startForeground(1, createServiceNotification())
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
-        startScheduler()
+        startScheduler(intent)
     }
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(service)
@@ -105,43 +102,58 @@ class AutoConnectService : Service()
             when (msg.what) {
             WHAT_BACKGROUND_CONNECTED -> service.showNotification(service.mConnectedNotification)
             }
-
             super.handleMessage(msg)
         }
     }
-    private fun startScheduler()
+    private fun startScheduler(intent: Intent?)
     {
-        scheduledExecutor.scheduleAtFixedRate(this::scheduledThreadCallback, 0, 1, TimeUnit.MINUTES)
+        scheduledExecutor.scheduleAtFixedRate(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
     }
-    private fun scheduledThreadCallback()
+    private fun scheduledThreadCallback(intent: Intent?)
     {
         try {
             with(configuration) {
-                if (isConnected) {
-                    Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
-                    return
-                }
+                if (!isDoubleDeviceConnection)
+                    if (isConnected) {
+                        Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
+                        return
+                    }
+                    else
+                        doConnection(hearingAid)
                 else {
-                    val adapter = getSystemService(BluetoothManager::class.java).adapter
-
-                    if (!adapter.isEnabled) {
-                        stopSelf()
+                    if (doubleDeviceMap.all { it.value.isConnected }) {
+                        Log.d(ConnectionStateChangedEvent::class.java.simpleName, "DoubleDeviceConnected")
                         return
                     }
 
-                    if (isDoubleDeviceConnection)
-                        scheduledDoubleDeviceCallback(adapter)
-                    else
-                        scheduledSingleDeviceCallback(adapter)
+                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!!)
+                        doConnection(doubleDeviceMap[EarSide.Left]!!)
+
+                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!!)
+                        doConnection(doubleDeviceMap[EarSide.Right]!!)
                 }
             }
             if (isConnected()) {
+                mConnectedNotification = handleConnectedNotification(intent!!)
+                configuration.apply {
+                    isConnected = true
+                    canBondDeviceReConnect = false
+                }
                 mHandler.sendEmptyMessage(WHAT_BACKGROUND_CONNECTED)
-                configuration.isConnected = true
             }
         } catch (ex: ExecutionException) {
             Log.e("service", ex.message!!)
         }
+    }
+    private fun doConnection(hearingAid: HearingAid)
+    {
+        val adapter = getSystemService(BluetoothManager::class.java).adapter
+
+        if (!adapter.isEnabled) {
+            Log.e("Bluetooth", "Bluetooth Off")
+            return
+        }
+        scheduledThreadConnectDevice(adapter, hearingAid)
     }
     private fun isConnected() : Boolean
     {
@@ -150,43 +162,6 @@ class AutoConnectService : Service()
             else
                 configuration.hearingAid.isConnected
     }
-    private fun scheduledDoubleDeviceCallback(adapter: BluetoothAdapter)
-    {
-        try {
-            with(configuration) {
-
-                if (!doubleDeviceMap[EarSide.Left]?.isConnected!!) {
-                    doubleDeviceMap[EarSide.Left]?.apply {
-                        getPropertiesFromSDK(productManager, eventHandler)
-                        communicationAdaptor?.connect()
-                    }
-
-                    Thread.sleep(8000)
-                    startScheduler(doubleDeviceMap[EarSide.Left]!!, adapter)
-
-                    if (doubleDeviceMap[EarSide.Left]?.isConnected!!)
-                        doubleDeviceMap[EarSide.Left]?.readDeviceConfiguration()
-
-                }
-
-                if (!doubleDeviceMap[EarSide.Right]?.isConnected!!) {
-                    doubleDeviceMap[EarSide.Right]?.apply {
-                        getPropertiesFromSDK(productManager, eventHandler)
-                        communicationAdaptor?.connect()
-                    }
-
-                    Thread.sleep(8000)
-                    startScheduler(doubleDeviceMap[EarSide.Right]!!, adapter)
-
-                    if (doubleDeviceMap[EarSide.Right]?.isConnected!!)
-                        doubleDeviceMap[EarSide.Right]?.readDeviceConfiguration()
-
-                }
-            }
-        } catch (ex: InterruptedException) {
-            Log.e("scheduler", ex.message!!)
-        }
-    }
     private fun startScheduler(hearingAid: HearingAid, adapter: BluetoothAdapter)
     {
         hearingAid.apply {
@@ -194,21 +169,33 @@ class AutoConnectService : Service()
             Log.e("Connection", isConnected.toString())
         }
     }
-    private fun scheduledSingleDeviceCallback(adapter: BluetoothAdapter)
+    private fun scheduledThreadConnectDevice(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
         try {
+            startDeviceScan(adapter)
+            Thread.sleep(8000)
             with(configuration) {
-                hearingAid.getPropertiesFromSDK(productManager, eventHandler)
-                hearingAid.communicationAdaptor?.connect()
-                Thread.sleep(8000)
-                startScheduler(hearingAid, adapter)
+                if (canBondDeviceReConnect) {
+                    hearingAid.getPropertiesFromSDK(productManager, eventHandler)
+                    hearingAid.communicationAdaptor?.connect()
+                    Thread.sleep(8000)
+                    startScheduler(hearingAid, adapter)
 
-                if (hearingAid.isConnected)
-                    hearingAid.readDeviceConfiguration()
-
+                    if (hearingAid.isConnected && hearingAid.isDeviceInRange)
+                        hearingAid.apply {
+                            isDeviceInRange = false
+                            readDeviceConfiguration()
+                        }
+                    else {}
+                }
+                else
+                    Log.d("deviceNotFound", "There is not any hearing aid in range!")
             }
         } catch (ex: InterruptedException) {
             Log.e("scheduler", ex.message!!)
+        } catch (_: Throwable) {}
+        finally {
+            stopDeviceScan(adapter)
         }
     }
     private fun createServiceNotification() : Notification
@@ -245,6 +232,18 @@ class AutoConnectService : Service()
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
+    }
+    @SuppressLint("MissingPermission")
+    private fun startDeviceScan(adapter: BluetoothAdapter)
+    {
+        registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
+        adapter.startDiscovery()
+    }
+    @SuppressLint("MissingPermission")
+    private fun stopDeviceScan(adapter: BluetoothAdapter)
+    {
+        adapter.cancelDiscovery()
+        unregisterReceiver(mDeviceFoundReceiver)
     }
 
 }

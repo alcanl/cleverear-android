@@ -13,31 +13,33 @@ import com.ark.EventType
 import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
-import kotlin.concurrent.thread
+import java.util.concurrent.ExecutorService
 
 class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
-                                   private val mConfiguration : ConfigurationModule)
+                                   private val mConfiguration : ConfigurationModule, private val mThreadPool : ExecutorService)
 {
     private val mWeakReference = WeakReference(activity)
     private lateinit var mListener : Thread
     fun startEventListener() {
 
-        mListener = thread(isDaemon = true, start = true) {
+        mThreadPool.execute {
             try {
-                 do {
+                mListener = Thread.currentThread()
+                 while (!mListener.isInterrupted){
                     try {
                         val event = mEventHandler.event
                         val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
                         when (event.type) {
                             EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
                             else -> {
-                                Log.e("event", event.data)
+                                Log.e("eventLoading", event.data)
                             }
                         }
                     } catch (ex: JSONException) {
                         Log.e("parseError", ex.message!!)
                     }
-                } while (!mListener.isInterrupted)
+                }
+                Log.d("loading", "LoadingListenerStopped")
 
             } catch (ex: NullPointerException) {
                 Log.e("nullTest", ex.message!!)
@@ -75,8 +77,10 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             Log.e("parseError", ex.message!!)
         }
     }
+    @Synchronized
     fun stopListener()
     {
         mListener.interrupt()
+        mEventHandler.exit()
     }
 }

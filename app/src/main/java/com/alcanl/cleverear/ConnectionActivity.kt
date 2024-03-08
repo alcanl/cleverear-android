@@ -34,7 +34,6 @@ import com.ark.EventHandler
 import com.ark.EventType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,27 +49,27 @@ class ConnectionActivity : AppCompatActivity() {
     lateinit var threadPool: ExecutorService
     @Volatile
     private var mDeviceCount = 0
-    @Volatile
     private var mIsDeviceFound = false
     private var isScanContinue = false
     private lateinit var mAdapter: DeviceListAdapter
-    private lateinit var scanOnBoard : Future<*>
+    private lateinit var scanOnBoard : Thread
     private lateinit var mAsyncResult: AsyncResult
     private lateinit var mSelectedHearingAid: HearingAid
     private lateinit var mBinding: ActivityConnectionBinding
     @Volatile
-    private var mBleDeviceList = ArrayList<DiscoveredDeviceInfo>()
+    private var mBleDeviceList = HashSet<DiscoveredDeviceInfo>()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
         buttonDetectDeviceClicked()
     }
-
-    override fun onStop() {
-        super.onStop()
+    override fun onStop()
+    {
         if (isScanContinue)
             stopScanButtonClicked()
+
+        super.onStop()
     }
     override fun onResume()
     {
@@ -91,6 +90,7 @@ class ConnectionActivity : AppCompatActivity() {
                 stopService(this)
             }
             configuration.isServiceOnBoard = false
+
         }
 
         Handler(Looper.myLooper()!!).postDelayed (
@@ -107,10 +107,16 @@ class ConnectionActivity : AppCompatActivity() {
                     textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
                     frameLayoutStopConnection.visibility = View.GONE
                 }
-            }, 8000
+                Intent(this, MainActivity::class.java).apply {
+                    startActivity(this)
+
+                    finish()
+                }
+            }, 6000
         )
     }
-    private fun finalizeConnectionConfiguration() {
+    private fun finalizeConnectionConfiguration()
+    {
         if (isScanContinue)
             stopScanButtonClicked()
 
@@ -161,19 +167,6 @@ class ConnectionActivity : AppCompatActivity() {
             }
         mBinding.adapter = mAdapter
     }
-    private fun isDuplicate(device: DiscoveredDeviceInfo): Boolean
-    {
-        var value = true
-
-        for (deviceWrapper in mBleDeviceList)
-            if (deviceWrapper == device) {
-                value = false
-                break
-            }
-
-        return value
-    }
-
     private fun isHearingAid(manufacturerCode: String): Boolean {
         var manufacturerCodeSub = ""
 
@@ -216,18 +209,22 @@ class ConnectionActivity : AppCompatActivity() {
     @SuppressLint("SuspiciousIndentation")
     private fun scanThreadCallBack()
     {
-        while (!mIsDeviceFound) {
+        scanOnBoard = Thread.currentThread()
+        mBleDeviceList.clear()
+        runOnUiThread { mBinding.adapter!!.notifyDataSetChanged() }
+
+        while (!scanOnBoard.isInterrupted) {
             val event = eventHandler.event
             if (event.type == EventType.kScanEvent) {
                 Log.e(ScanEvent::class.java.simpleName, event.data)
                 val device = parseJsonScanData(event.data, this)
                     if (isHearingAid(device.manufacturerData)) {
                         mBleDeviceList.add(device)
-                        if (!isDuplicate(device))
-                            runOnUiThread { addHearingAidToListCallback(device) }
+                        runOnUiThread { addHearingAidToListCallback(device) }
                    }
             }
         }
+        Log.e("scan", "Scan ended")
     }
     private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
     {
@@ -307,8 +304,8 @@ class ConnectionActivity : AppCompatActivity() {
         else
             finish()
     }
-    fun buttonDetectDeviceClicked() {
-
+    fun buttonDetectDeviceClicked()
+    {
         if (!configuration.isConnected) {
             mBleDeviceList.clear()
             mDeviceCount = 0
@@ -346,14 +343,19 @@ class ConnectionActivity : AppCompatActivity() {
             adapter!!.clear()
             adapter!!.notifyDataSetChanged()
         }
-        scanOnBoard = threadPool.submit { scanThreadCallBack() }
+        threadPool.execute { scanThreadCallBack() }
     }
 
     fun stopScanButtonClicked()
     {
         try {
+            @Synchronized
+            fun stop() {
+                scanOnBoard.interrupt()
+                eventHandler.exit()
+            }
+            stop()
             isScanContinue = false
-            scanOnBoard.cancel(true)
             deviceConnectionHandler.endScanProcess(mAsyncResult)
 
             with(mBinding) {
@@ -363,6 +365,8 @@ class ConnectionActivity : AppCompatActivity() {
             }
         } catch (ex: ArkException) {
             Log.e("err", ex.message!!)
+        } catch (_: Throwable) {
+            Toast.makeText(this, R.string.toast_unknown_problem_text, Toast.LENGTH_LONG).show()
         }
     }
 }

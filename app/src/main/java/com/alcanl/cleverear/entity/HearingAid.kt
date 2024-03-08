@@ -13,12 +13,12 @@ import java.util.Objects
 
 data class HearingAid(val address: String, val name: String, val rssi: Int, val manufacturerData: String,
                       val side: EarSide, var bondStatus : Int = BluetoothDevice.BOND_NONE, var numberOfMemories: Int = 8,
-                      var volume: Int = 0, var batteryLevel : Int = 100, var communicationAdaptor: CommunicationAdaptor? = null,
+                      var volume: Int = 45, var batteryLevel : Int = 100, var communicationAdaptor: CommunicationAdaptor? = null,
                       var wirelessControl: WirelessControl? = null, var autoConnect : Boolean = false,
                       var currentMemory :  ParameterSpace? = null, var auxAttenuation : Int = 0,
                       var micAttenuation : Int = 8, var streamAddress : Int = 16,
                       var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
-                      @Volatile var isConnected : Boolean = false)
+                      @Volatile var isConnected : Boolean = false, @Volatile var isDeviceInRange: Boolean = false)
 {
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
     {

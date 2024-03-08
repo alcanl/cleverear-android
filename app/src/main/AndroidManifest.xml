@@ -75,23 +75,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <service
             android:name=".util.service.AutoConnectService"
             android:foregroundServiceType="connectedDevice"/>
 
-        <receiver android:name=".util.service.receiver.DeviceDisconnectBroadcastReceiver"
+        <receiver android:name=".util.service.broadcast.DeviceDisconnectBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".util.broadcast.BondDeviceBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".util.service.broadcast.DeviceFoundBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACTION_FOUND" />
             </intent-filter>
         </receiver>
 

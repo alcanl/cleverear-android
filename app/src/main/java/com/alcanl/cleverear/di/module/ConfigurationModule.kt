@@ -11,10 +11,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-
 object ConfigurationModule {
     @Volatile
     var isConnected = false
+    @Volatile
+    var canBondDeviceReConnect = false
     var isDoubleDeviceConnection = false
     var isDualDeviceConfig = false
     var isConnectedBefore = false

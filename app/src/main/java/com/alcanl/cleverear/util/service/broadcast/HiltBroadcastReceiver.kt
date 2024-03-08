@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.util.service.receiver
+package com.alcanl.cleverear.util.service.broadcast
 
 import android.content.BroadcastReceiver
 import android.content.Context

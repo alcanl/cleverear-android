@@ -8,6 +8,7 @@
     <string name="textview_device_detection_device_connected_text">Verbunden mit Gerät</string>
     <string name="textview_device_detection_connection_in_process_text">Verbinden mit dem Gerät</string>
     <string name="textview_device_detection_not_connected_text">Konnte nicht mit dem Gerät verbunden werden</string>
+    <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
     <string name="dialog_already_connected_message">Sie haben bereits eine Verbindung mit einem Gerät hergestellt. Möchten Sie diese Verbindung beenden?</string>
