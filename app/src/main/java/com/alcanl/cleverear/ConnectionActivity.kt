@@ -211,7 +211,9 @@ class ConnectionActivity : AppCompatActivity() {
     {
         scanOnBoard = Thread.currentThread()
         mBleDeviceList.clear()
-        runOnUiThread { mBinding.adapter!!.notifyDataSetChanged() }
+        runOnUiThread {
+            mBinding.adapter!!.clear()
+            mBinding.adapter!!.notifyDataSetChanged() }
 
         while (!scanOnBoard.isInterrupted) {
             val event = eventHandler.event
@@ -337,12 +339,7 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun scanDevices()
     {
-        with(mBinding) {
-            textViewDeviceState.text =
-                getString(R.string.textview_device_detection_not_found_text)
-            adapter!!.clear()
-            adapter!!.notifyDataSetChanged()
-        }
+        mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
         threadPool.execute { scanThreadCallBack() }
     }
 
