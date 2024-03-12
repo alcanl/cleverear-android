@@ -24,12 +24,12 @@ import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 @AndroidEntryPoint
 class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
 
     @Inject
     lateinit var configuration: ConfigurationModule
+    @Suppress("DEPRECATION")
     override fun onReceive(context: Context?, intent: Intent?)
     {
         super.onReceive(context, intent)

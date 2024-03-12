@@ -14,6 +14,7 @@ import javax.inject.Inject
 class DeviceFoundBroadcastReceiver : HiltBroadcastReceiver() {
     @Inject
     lateinit var configuration: ConfigurationModule
+    @Suppress("DEPRECATION")
     override fun onReceive(context: Context?, intent: Intent?)
     {
         super.onReceive(context, intent)
