@@ -173,7 +173,7 @@ class AutoConnectService : Service()
     {
         try {
             startDeviceScan(adapter)
-            Thread.sleep(8000)
+            Thread.sleep(10000)
             with(configuration) {
                 if (canBondDeviceReConnect) {
                     hearingAid.getPropertiesFromSDK(productManager, eventHandler)

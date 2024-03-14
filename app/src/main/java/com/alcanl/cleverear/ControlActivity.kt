@@ -52,8 +52,8 @@ class ControlActivity : AppCompatActivity() {
             return
         }
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
-        initSliders()
-        initTextViews()
+        runOnUiThread { initSliders() }
+        runOnUiThread { initTextViews() }
 
         if (!mListener.isListenerOnBoard())
             mListener =
@@ -136,8 +136,10 @@ class ControlActivity : AppCompatActivity() {
     }
     private fun initMemoryButtons()
     {
-        initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
+        runOnUiThread {
+            initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
             else configuration.doubleDeviceMap[EarSide.Left]!!)
+        }
     }
     private fun initMemoryButtons(hearingAid: HearingAid)
     {
@@ -167,9 +169,7 @@ class ControlActivity : AppCompatActivity() {
 
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
-        runOnUiThread {
-            (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
-                    }
+        (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
     }
     private fun initializeNavigationView()
     {
@@ -330,12 +330,19 @@ class ControlActivity : AppCompatActivity() {
     private fun sliderLeftEarOnValueChangedCallback(value: Float)
     {
         try {
-            if (configuration.isConnected) {
-                if (!configuration.isDoubleDeviceConnection)
-                    configuration.hearingAid.wirelessControl?.volume = value.toInt()
-                else
-                    configuration.doubleDeviceMap[EarSide.Left]?.wirelessControl?.volume =
-                        value.toInt()
+            configuration.apply {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection)
+                        hearingAid.apply {
+                            wirelessControl?.volume = value.toInt()
+                            volume = value.toInt()
+                        }
+                    else
+                        doubleDeviceMap[EarSide.Left]?.apply {
+                            wirelessControl?.volume = value.toInt()
+                            volume = value.toInt()
+                        }
+                }
             }
         } catch (_: ArkException) {}
     }
@@ -343,12 +350,19 @@ class ControlActivity : AppCompatActivity() {
     private fun sliderRightEarOnValueChangedCallback(value: Float)
     {
         try {
-            if (configuration.isConnected) {
-                if (!configuration.isDoubleDeviceConnection)
-                    configuration.hearingAid.wirelessControl?.volume = value.toInt()
-                else
-                    configuration.doubleDeviceMap[EarSide.Right]?.wirelessControl?.volume =
-                        value.toInt()
+            configuration.apply {
+                if (isConnected) {
+                    if (!isDoubleDeviceConnection)
+                        hearingAid.apply {
+                            wirelessControl?.volume = value.toInt()
+                            volume = value.toInt()
+                        }
+                    else
+                        doubleDeviceMap[EarSide.Right]?.apply {
+                            wirelessControl?.volume = value.toInt()
+                            volume = value.toInt()
+                        }
+                }
             }
         } catch (_: ArkException) {}
     }
