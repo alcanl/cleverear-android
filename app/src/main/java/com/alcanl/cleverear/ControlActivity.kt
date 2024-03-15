@@ -54,6 +54,11 @@ class ControlActivity : AppCompatActivity() {
         mBinding.bottomNavigationView.selectedItemId = R.id.navbar_control
         runOnUiThread { initSliders() }
         runOnUiThread { initTextViews() }
+        runOnUiThread { initActiveMemory(if (configuration.isDoubleDeviceConnection)
+            configuration.doubleDeviceMap[EarSide.Left]?.currentMemory?.value()!!
+        else
+            configuration.hearingAid.currentMemory?.value()!!
+        ) }
 
         if (!mListener.isListenerOnBoard())
             mListener =
@@ -345,6 +350,22 @@ class ControlActivity : AppCompatActivity() {
                 }
             }
         } catch (_: ArkException) {}
+    }
+    private fun initActiveMemory(num: Int)
+    {
+        val button = with(mBinding) {
+            when (num) {
+                0 -> buttonOne
+                1 -> buttonTwo
+                2 -> buttonThree
+                3 -> buttonFour
+                4 -> buttonFive
+                5 -> buttonSix
+                6 -> buttonSeven
+                else -> buttonEight
+            }
+        }
+        setSelectedMemoryButtonView(button, num)
     }
     @Synchronized
     private fun sliderRightEarOnValueChangedCallback(value: Float)
