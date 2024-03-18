@@ -150,7 +150,7 @@ class SplashActivity : AppCompatActivity() {
     {
         try {
             mListener.startEventListener()
-            Thread.sleep(1000)
+            Thread.sleep(1500)
             mListener.stopListener()
         } catch (_: InterruptedException) {}
     }
