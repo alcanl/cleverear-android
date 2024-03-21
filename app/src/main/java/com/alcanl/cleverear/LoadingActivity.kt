@@ -71,10 +71,27 @@ class LoadingActivity : AppCompatActivity() {
 
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (!mListener.isListenerOnBoard())
+            mListener = LoadingActivityEventListener(this, eventHandler, configuration, threadPool)
+                .apply { startEventListener() }
+    }
+    override fun onStop()
+    {
+        super.onStop()
+        if (mListener.isListenerOnBoard())
+            mListener.stopListener()
+
+    }
     override fun onDestroy()
     {
         super.onDestroy()
-        mListener.stopListener()
+        if (mListener.isListenerOnBoard())
+            mListener.stopListener()
+
         unregisterReceiver(mBondRequestReceiver)
 
         handleSharedPrefs()

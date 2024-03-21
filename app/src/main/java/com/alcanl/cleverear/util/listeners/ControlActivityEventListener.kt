@@ -213,6 +213,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             else -> actCont.mBinding.buttonEight
         }
     }
+    @Synchronized
     fun isListenerOnBoard() : Boolean
     {
         if (mListener == null)

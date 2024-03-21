@@ -19,13 +19,13 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
                                    private val mConfiguration : ConfigurationModule, private val mThreadPool : ExecutorService)
 {
     private val mWeakReference = WeakReference(activity)
-    private lateinit var mListener : Thread
+    private var mListener : Thread? = null
     fun startEventListener() {
 
         mThreadPool.execute {
             try {
                 mListener = Thread.currentThread()
-                 while (!mListener.isInterrupted){
+                 while (!mListener?.isInterrupted!!){
                     try {
                         val event = mEventHandler.event
                         val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
@@ -80,7 +80,16 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     @Synchronized
     fun stopListener()
     {
-        mListener.interrupt()
+        mListener?.interrupt()
         mEventHandler.exit()
+    }
+    @Synchronized
+    fun isListenerOnBoard() : Boolean
+    {
+        if (mListener == null)
+            return false
+
+        return mListener?.isAlive!!
+
     }
 }

@@ -186,6 +186,7 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
         mListener?.interrupt()
         mEventHandler.exit()
     }
+    @Synchronized
     fun isListenerOnBoard() : Boolean
     {
         if (mListener == null)
