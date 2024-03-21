@@ -15,6 +15,7 @@ import com.alcanl.cleverear.util.HA_RIGHT_NAME
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.viewmodel.AutoConnectActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.EnumMap
 import javax.inject.Inject
 @AndroidEntryPoint
 class AutoConnectActivity : AppCompatActivity() {
@@ -114,6 +115,7 @@ class AutoConnectActivity : AppCompatActivity() {
 
                     if (isLeftSelected && isRightSelected)
                         if (isValidDeviceData(true, "")) {
+                            doubleDeviceMap = EnumMap(EarSide::class.java)
                             isDoubleDeviceConnection = true
                             controlButtonClickedCommon()
                         }
