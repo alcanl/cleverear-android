@@ -1,7 +1,12 @@
 package com.alcanl.cleverear
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
@@ -33,29 +38,41 @@ import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.EnumMap
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var configuration: ConfigurationModule
     private lateinit var mBinding: ActivityMainBinding
-    private var mBluetoothPermission = false
+    private var mIsBluetoothPermissionsGranted = false
     private var mIsWebViewActive = false
+    private var mIsBluetoothEnabled by Delegates.notNull<Boolean>()
+    private lateinit var mEnableBluetoothBroadCast : BroadcastReceiver
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         result: ActivityResult ->
         if (result.resultCode == RESULT_OK)
-            gpsScan()
+            gpsTurnedOn()
+    }
+    private val bluetoothActivityResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK)
+            bluetoothTurnedOn()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initBinding()
+        initialize()
+        checkBluetoothPermission()
 
-        if (!mBluetoothPermission) {
+        if (!mIsBluetoothPermissionsGranted) {
             scanBluetooth()
             checkBluetoothPermission()
         }
+
+        checkBluetoothEnabled()
     }
     override fun onResume() {
         super.onResume()
@@ -73,6 +90,11 @@ class MainActivity : AppCompatActivity() {
                 (this, R.anim.translate_button_right_to_left)
         )
     }
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        unregisterReceiver(mEnableBluetoothBroadCast)
+    }
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && mBinding.webView.canGoBack()) {
@@ -82,6 +104,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         return super.onKeyDown(keyCode, event)
+    }
+    private fun bluetoothTurnedOn()
+    {
+        Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
+        mIsBluetoothEnabled = true
+    }
+    private fun initialize()
+    {
+        initBinding()
+        mEnableBluetoothBroadCast = handleBroadcastReceiver()
+        registerReceiver(mEnableBluetoothBroadCast, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
     }
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -132,7 +165,6 @@ class MainActivity : AppCompatActivity() {
             checkPermissionForN()
         }
     }
-
     private fun scanGPS()
     {
         val locationManager : LocationManager = getSystemService(LocationManager::class.java)
@@ -157,13 +189,13 @@ class MainActivity : AppCompatActivity() {
                 1
             )
     }
-    private fun gpsScan()
+    private fun gpsTurnedOn()
     {
         Toast.makeText(this, R.string.toast_gps_on, Toast.LENGTH_LONG).show()
     }
     private fun checkBluetoothPermission()
     {
-        mBluetoothPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        mIsBluetoothPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.BLUETOOTH_CONNECT
@@ -189,7 +221,7 @@ class MainActivity : AppCompatActivity() {
         return object : AnimationListener {
             override fun onAnimationStart(animation: Animation?)
             {
-                if (mBluetoothPermission) {
+                if (mIsBluetoothPermissionsGranted) {
                     configuration.isDoubleDeviceConnection = false
                     Intent(this@MainActivity, AutoConnectActivity::class.java).apply { startActivity(this) }
                 }
@@ -224,9 +256,53 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
+    private fun checkBluetoothEnabled()
+    {
+        mIsBluetoothEnabled = getSystemService(BluetoothManager::class.java).adapter.isEnabled
+    }
+    private fun searchBluetooth()
+    {
+        val bluetoothAdapter = getSystemService(BluetoothManager::class.java).adapter
+
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, R.string.toast_bluetooth_not_found_text, Toast.LENGTH_LONG).show()
+            finish()
+        }
+        else if (!bluetoothAdapter.isEnabled) {
+            checkBluetoothPermission()
+            if (mIsBluetoothPermissionsGranted) {
+                val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                bluetoothActivityResultLauncher.launch(enableBluetoothIntent)
+            }
+            else
+                Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_LONG).show()
+        }
+            else
+                mIsBluetoothEnabled = true
+    }
+    private fun handleBroadcastReceiver() : BroadcastReceiver
+    {
+        return object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val action = intent?.action
+
+                if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    if (resultCode == RESULT_OK)
+                        mIsBluetoothEnabled = true
+                    else
+                        finish()
+                }
+            }
+        }
+    }
     fun buttonSingleDeviceClick() {
 
-        if (mBluetoothPermission) {
+        if (!mIsBluetoothEnabled) {
+            searchBluetooth()
+            return
+        }
+
+        if (mIsBluetoothPermissionsGranted) {
             Intent(this, EarSideSelectionActivity::class.java).apply { startActivity(this) }
             configuration.isDoubleDeviceConnection = false
         }
@@ -237,7 +313,12 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonDoubleDeviceClick()
     {
-        if (mBluetoothPermission) {
+        if (!mIsBluetoothEnabled) {
+            searchBluetooth()
+            return
+        }
+
+        if (mIsBluetoothPermissionsGranted) {
             configuration.apply {
                 doubleDeviceMap = EnumMap(EarSide::class.java)
                 isDoubleDeviceConnection = true
@@ -252,6 +333,11 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonControlClicked()
     {
+        if (!mIsBluetoothEnabled) {
+            searchBluetooth()
+            return
+        }
+
         mBinding.imageButtonControl.apply {
             startAnimation(
                 AnimationUtils.loadAnimation(this@MainActivity,
