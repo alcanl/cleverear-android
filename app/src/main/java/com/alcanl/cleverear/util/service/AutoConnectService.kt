@@ -8,6 +8,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
 import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
 import android.bluetooth.BluetoothDevice.ACTION_FOUND
 import android.bluetooth.BluetoothManager
@@ -30,6 +31,7 @@ import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
+import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -57,6 +59,7 @@ class AutoConnectService : Service()
     lateinit var eventHandler: EventHandler
     private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
     private val mDeviceFoundReceiver = DeviceFoundBroadcastReceiver()
+    private val mBluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver()
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
@@ -71,6 +74,7 @@ class AutoConnectService : Service()
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mDisconnectReceiver)
+        unregisterReceiver(mBluetoothStateBroadcastReceiver)
 
         try {
             with(configuration) {
@@ -88,6 +92,7 @@ class AutoConnectService : Service()
     private fun initialize(intent: Intent?)
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
+        registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         startForeground(1, createServiceNotification())
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
@@ -118,7 +123,7 @@ class AutoConnectService : Service()
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
                         return
                     }
-                    else
+                    else if (isBluetoothEnabled)
                         doConnection(hearingAid)
                 else {
                     if (doubleDeviceMap.all { it.value.isConnected }) {
@@ -126,10 +131,10 @@ class AutoConnectService : Service()
                         return
                     }
 
-                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!!)
+                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled)
                         doConnection(doubleDeviceMap[EarSide.Left]!!)
 
-                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!!)
+                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled)
                         doConnection(doubleDeviceMap[EarSide.Right]!!)
                 }
             }

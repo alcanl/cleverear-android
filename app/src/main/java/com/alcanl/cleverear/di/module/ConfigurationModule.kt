@@ -20,6 +20,7 @@ object ConfigurationModule {
     var isDualDeviceConfig = false
     var isConnectedBefore = false
     var isServiceOnBoard = false
+    var isBluetoothEnabled = false
     var earSide : EarSide = EarSide.Right
     lateinit var doubleDeviceMap : EnumMap<EarSide, HearingAid>
     lateinit var hearingAid: HearingAid

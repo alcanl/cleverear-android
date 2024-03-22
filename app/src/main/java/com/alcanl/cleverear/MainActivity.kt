@@ -38,7 +38,6 @@ import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.EnumMap
 import javax.inject.Inject
-import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -47,7 +46,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMainBinding
     private var mIsBluetoothPermissionsGranted = false
     private var mIsWebViewActive = false
-    private var mIsBluetoothEnabled by Delegates.notNull<Boolean>()
     private lateinit var mEnableBluetoothBroadCast : BroadcastReceiver
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -108,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     private fun bluetoothTurnedOn()
     {
         Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
-        mIsBluetoothEnabled = true
+        configuration.isBluetoothEnabled = true
     }
     private fun initialize()
     {
@@ -258,7 +256,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun checkBluetoothEnabled()
     {
-        mIsBluetoothEnabled = getSystemService(BluetoothManager::class.java).adapter.isEnabled
+        configuration.isBluetoothEnabled = getSystemService(BluetoothManager::class.java).adapter.isEnabled
     }
     private fun searchBluetooth()
     {
@@ -278,7 +276,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_LONG).show()
         }
             else
-                mIsBluetoothEnabled = true
+                configuration.isBluetoothEnabled = true
     }
     private fun handleBroadcastReceiver() : BroadcastReceiver
     {
@@ -288,7 +286,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                     if (resultCode == RESULT_OK)
-                        mIsBluetoothEnabled = true
+                        configuration.isBluetoothEnabled = true
                     else
                         finish()
                 }
@@ -297,7 +295,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonSingleDeviceClick() {
 
-        if (!mIsBluetoothEnabled) {
+        if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
             return
         }
@@ -313,7 +311,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonDoubleDeviceClick()
     {
-        if (!mIsBluetoothEnabled) {
+        if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
             return
         }
@@ -333,7 +331,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun buttonControlClicked()
     {
-        if (!mIsBluetoothEnabled) {
+        if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
             return
         }
