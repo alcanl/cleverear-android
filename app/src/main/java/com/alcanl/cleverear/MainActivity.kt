@@ -3,8 +3,6 @@ package com.alcanl.cleverear
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -34,6 +32,7 @@ import com.alcanl.cleverear.util.GERMAN_MANUAL_URL
 import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
 import com.alcanl.cleverear.util.getSystemLanguage
+import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.EnumMap
@@ -46,7 +45,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMainBinding
     private var mIsBluetoothPermissionsGranted = false
     private var mIsWebViewActive = false
-    private lateinit var mEnableBluetoothBroadCast : BroadcastReceiver
+    @Inject
+    lateinit var enableBluetoothBroadCast : BluetoothStateBroadcastReceiver
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy()
     {
         super.onDestroy()
-        unregisterReceiver(mEnableBluetoothBroadCast)
+        unregisterReceiver(enableBluetoothBroadCast)
     }
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
     {
@@ -111,8 +111,7 @@ class MainActivity : AppCompatActivity() {
     private fun initialize()
     {
         initBinding()
-        mEnableBluetoothBroadCast = handleBroadcastReceiver()
-        registerReceiver(mEnableBluetoothBroadCast, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+        registerReceiver(enableBluetoothBroadCast, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
     }
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -277,21 +276,6 @@ class MainActivity : AppCompatActivity() {
         }
             else
                 configuration.isBluetoothEnabled = true
-    }
-    private fun handleBroadcastReceiver() : BroadcastReceiver
-    {
-        return object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                val action = intent?.action
-
-                if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                    if (resultCode == RESULT_OK)
-                        configuration.isBluetoothEnabled = true
-                    else
-                        finish()
-                }
-            }
-        }
     }
     fun buttonSingleDeviceClick() {
 
