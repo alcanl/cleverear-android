@@ -10,12 +10,10 @@ import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.service.broadcast.HiltBroadcastReceiver
-import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
-@AndroidEntryPoint
-class BondDeviceBroadcastReceiver: HiltBroadcastReceiver() {
+class BondDeviceBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
     @Inject
     lateinit var configuration : ConfigurationModule
     @SuppressLint("MissingPermission")

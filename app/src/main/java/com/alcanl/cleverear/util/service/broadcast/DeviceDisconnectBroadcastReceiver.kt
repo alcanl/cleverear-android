@@ -22,10 +22,8 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
 import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
-import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-@AndroidEntryPoint
-class DeviceDisconnectBroadcastReceiver: HiltBroadcastReceiver() {
+class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
 
     @Inject
     lateinit var configuration: ConfigurationModule

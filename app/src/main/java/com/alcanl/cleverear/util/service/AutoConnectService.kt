@@ -57,9 +57,12 @@ class AutoConnectService : Service()
     lateinit var productManager: ProductManager
     @Inject
     lateinit var eventHandler: EventHandler
-    private val mDisconnectReceiver = DeviceDisconnectBroadcastReceiver()
-    private val mDeviceFoundReceiver = DeviceFoundBroadcastReceiver()
-    private val mBluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver()
+    @Inject
+    lateinit var mDisconnectReceiver : DeviceDisconnectBroadcastReceiver
+    @Inject
+    lateinit var mDeviceFoundReceiver : DeviceFoundBroadcastReceiver
+    @Inject
+    lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int

@@ -8,6 +8,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import javax.inject.Inject
 
 class BluetoothStateBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
+    @Inject
     lateinit var configuration: ConfigurationModule
     override fun onReceive(context: Context?, intent: Intent?)
     {

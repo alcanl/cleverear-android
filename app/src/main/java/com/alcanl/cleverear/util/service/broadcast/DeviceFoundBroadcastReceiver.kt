@@ -7,11 +7,9 @@ import android.os.Build
 import android.util.Log
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
-import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class DeviceFoundBroadcastReceiver : HiltBroadcastReceiver() {
+class DeviceFoundBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
     @Inject
     lateinit var configuration: ConfigurationModule
     @Suppress("DEPRECATION")
