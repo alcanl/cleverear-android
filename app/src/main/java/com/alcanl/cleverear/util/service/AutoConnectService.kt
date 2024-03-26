@@ -37,6 +37,7 @@ import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -76,10 +77,11 @@ class AutoConnectService : Service()
     }
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mDisconnectReceiver)
-        unregisterReceiver(mBluetoothStateBroadcastReceiver)
-
         try {
+            unregisterReceiver(mDisconnectReceiver)
+            unregisterReceiver(mBluetoothStateBroadcastReceiver)
+            unregisterReceiver(mDeviceFoundReceiver)
+
             with(configuration) {
                 if (isConnected)
                     if (isDoubleDeviceConnection)
@@ -91,15 +93,17 @@ class AutoConnectService : Service()
             }
 
         } catch (_: ArkException) {}
+        catch (_: IllegalArgumentException) {}
     }
     private fun initialize(intent: Intent?)
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
+        registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
         startForeground(1, createServiceNotification())
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
-        startScheduler(intent)
+        checkDeviceConnectionState(intent)
     }
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(service)
@@ -113,7 +117,7 @@ class AutoConnectService : Service()
             super.handleMessage(msg)
         }
     }
-    private fun startScheduler(intent: Intent?)
+    private fun checkDeviceConnectionState(intent: Intent?)
     {
         scheduledExecutor.scheduleAtFixedRate(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
     }
@@ -141,6 +145,7 @@ class AutoConnectService : Service()
                         doConnection(doubleDeviceMap[EarSide.Right]!!)
                 }
             }
+            Thread.sleep(23000)
             if (isConnected()) {
                 mConnectedNotification = handleConnectedNotification(intent!!)
                 configuration.apply {
@@ -151,6 +156,8 @@ class AutoConnectService : Service()
             }
         } catch (ex: ExecutionException) {
             Log.e("service", ex.message!!)
+        } catch (ex : InterruptedException) {
+            Log.e("threadEx", ex.message!!)
         }
     }
     private fun doConnection(hearingAid: HearingAid)
@@ -170,7 +177,7 @@ class AutoConnectService : Service()
             else
                 configuration.hearingAid.isConnected
     }
-    private fun startScheduler(hearingAid: HearingAid, adapter: BluetoothAdapter)
+    private fun checkDeviceConnectionState(hearingAid: HearingAid, adapter: BluetoothAdapter)
     {
         hearingAid.apply {
             isConnected = isConnected(adapter.getRemoteDevice(address))
@@ -186,8 +193,8 @@ class AutoConnectService : Service()
                 if (canBondDeviceReConnect) {
                     hearingAid.getPropertiesFromSDK(productManager, eventHandler)
                     hearingAid.communicationAdaptor?.connect()
-                    Thread.sleep(8000)
-                    startScheduler(hearingAid, adapter)
+                    Thread.sleep(10000)
+                    checkDeviceConnectionState(hearingAid, adapter)
 
                     if (hearingAid.isConnected && hearingAid.isDeviceInRange)
                         hearingAid.apply {
@@ -244,14 +251,13 @@ class AutoConnectService : Service()
     @SuppressLint("MissingPermission")
     private fun startDeviceScan(adapter: BluetoothAdapter)
     {
-        registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
         adapter.startDiscovery()
     }
     @SuppressLint("MissingPermission")
     private fun stopDeviceScan(adapter: BluetoothAdapter)
     {
         adapter.cancelDiscovery()
-        unregisterReceiver(mDeviceFoundReceiver)
+
     }
 
 }

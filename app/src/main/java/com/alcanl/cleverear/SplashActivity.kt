@@ -48,7 +48,7 @@ class SplashActivity : AppCompatActivity() {
     {
         requestNotificationPermission()
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
-        mListener = SplashActivityEventListener(eventHandler, threadPool)
+        mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
     }
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -80,7 +80,7 @@ class SplashActivity : AppCompatActivity() {
     {
         try {
             mListener.startEventListener()
-            Thread.sleep(1500)
+            Thread.sleep(2000)
             mListener.stopListener()
         } catch (_: InterruptedException) {}
     }
