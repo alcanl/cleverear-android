@@ -329,6 +329,7 @@ class AdvancedActivity : AppCompatActivity(){
             } catch (_: ArkException) {}
         }
     }
+    @Suppress("DEPRECATION")
     private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>)
     {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

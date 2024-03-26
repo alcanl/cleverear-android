@@ -139,6 +139,7 @@ class ConnectionActivity : AppCompatActivity() {
             }
         }
     }
+    @Suppress("DEPRECATION")
     private inline fun <reified T : AppCompatActivity> initializeNavigationView(activity: Class<T>) : Boolean
     {
         return if (configuration.isConnected) {
