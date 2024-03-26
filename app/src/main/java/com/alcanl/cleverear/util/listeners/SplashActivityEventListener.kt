@@ -8,6 +8,7 @@ import com.alcanl.cleverear.util.parseJsonBatteryStateData
 import com.alcanl.cleverear.util.parseJsonSenderMacData
 import com.ark.EventHandler
 import com.ark.EventType
+import org.json.JSONException
 import java.lang.NullPointerException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
@@ -46,6 +47,8 @@ class SplashActivityEventListener(private val mEventHandler: EventHandler,
                 Log.e("null", ex.message!!)
             } catch (ex: InterruptedException) {
                 Log.e("thread", ex.message!!)
+            } catch (ex: JSONException) {
+                Log.e("json", ex.message!!)
             }
         }
     }
