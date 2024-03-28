@@ -125,13 +125,14 @@ class AutoConnectService : Service()
     {
         try {
             with(configuration) {
-                if (!isDoubleDeviceConnection)
+                if (!isDoubleDeviceConnection) {
                     if (isConnected) {
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
                         return
                     }
                     else if (isBluetoothEnabled)
                         doConnection(hearingAid)
+                }
                 else {
                     if (doubleDeviceMap.all { it.value.isConnected }) {
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "DoubleDeviceConnected")
