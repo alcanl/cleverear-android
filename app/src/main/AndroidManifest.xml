@@ -84,7 +84,7 @@
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".util.broadcast.BondDeviceBroadcastReceiver"
+        <receiver android:name=".util.service.broadcast.BondHearingAidBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />

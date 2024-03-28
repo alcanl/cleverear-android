@@ -32,7 +32,7 @@ import com.alcanl.cleverear.util.HA_RIGHT_RSSI
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
-import com.alcanl.cleverear.util.broadcast.BondDeviceBroadcastReceiver
+import com.alcanl.cleverear.util.service.broadcast.BondHearingAidBroadcastReceiver
 import com.alcanl.cleverear.util.listeners.LoadingActivityEventListener
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.ark.ArkException
@@ -51,9 +51,11 @@ class LoadingActivity : AppCompatActivity() {
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var productManager: ProductManager
+    @Inject
+    lateinit var mBondRequestReceiver: BondHearingAidBroadcastReceiver
     private lateinit var mListener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
-    private lateinit var mBondRequestReceiver: BondDeviceBroadcastReceiver
+
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -314,7 +316,6 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun initialize()
     {
-        mBondRequestReceiver = BondDeviceBroadcastReceiver()
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)

@@ -1,4 +1,4 @@
-package com.alcanl.cleverear.util.broadcast
+package com.alcanl.cleverear.util.service.broadcast
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -9,16 +9,15 @@ import android.util.Log
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.service.broadcast.HiltBroadcastReceiver
 import javax.inject.Inject
 import kotlin.system.exitProcess
-
-class BondDeviceBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
+class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
     @Inject
     lateinit var configuration : ConfigurationModule
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?)
     {
+        super.onReceive(context, intent)
         val action = intent!!.action
 
         if (action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
@@ -35,7 +34,6 @@ class BondDeviceBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver()
 
 
         }
-        super.onReceive(context, intent)
     }
     private fun handleStateBonded()
     {
