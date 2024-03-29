@@ -10,5 +10,6 @@
     <color name="default_button_color">#A8A3A3</color>
     <color name="right_device_slider">#900D09</color>
     <color name="left_device_slider">#FF01579B</color>
+    <color name="colorGrayText">#C3C4C8</color>
 </resources>
 

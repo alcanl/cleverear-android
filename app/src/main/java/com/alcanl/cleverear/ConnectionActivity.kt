@@ -2,7 +2,6 @@ package com.alcanl.cleverear
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -26,6 +25,7 @@ import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.scan.DeviceScanHandler
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
+import com.alcanl.cleverear.util.dialog.CustomAlertDialog
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
@@ -51,6 +51,7 @@ class ConnectionActivity : AppCompatActivity() {
     private var mDeviceCount = 0
     private var mIsDeviceFound = false
     private var isScanContinue = false
+    private lateinit var mAlertDialog: CustomAlertDialog
     private lateinit var mAdapter: DeviceListAdapter
     private lateinit var scanOnBoard : Thread
     private lateinit var mAsyncResult: AsyncResult
@@ -81,40 +82,6 @@ class ConnectionActivity : AppCompatActivity() {
                 else getString(R.string.textview_device_detection_not_found_text)
         }
     }
-    private fun alertDialogYesButtonCallback()
-    {
-        mBinding.frameLayoutStopConnection.visibility = View.VISIBLE
-
-        if (configuration.isServiceOnBoard) {
-            Intent(this, AutoConnectService::class.java).apply {
-                stopService(this)
-            }
-            configuration.isServiceOnBoard = false
-
-        }
-
-        Handler(Looper.myLooper()!!).postDelayed (
-            {
-                with(configuration) {
-                    if (isDoubleDeviceConnection)
-                        doubleDeviceMap.forEach {it.value.endConnectionSession()}
-                    else
-                        hearingAid.endConnectionSession()
-
-                    isConnected = false
-                }
-                mBinding.apply {
-                    textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
-                    frameLayoutStopConnection.visibility = View.GONE
-                }
-                Intent(this, MainActivity::class.java).apply {
-                    startActivity(this)
-
-                    finish()
-                }
-            }, 6000
-        )
-    }
     private fun finalizeConnectionConfiguration()
     {
         if (isScanContinue)
@@ -124,7 +91,8 @@ class ConnectionActivity : AppCompatActivity() {
         finish()
         startActivity(Intent(this, LoadingActivity::class.java))
     }
-    private fun initialize() {
+    private fun initialize()
+    {
         initBinding()
         initializeNavigationView()
     }
@@ -298,12 +266,7 @@ class ConnectionActivity : AppCompatActivity() {
             stopScanButtonClicked()
 
         if (configuration.isConnected)
-            AlertDialog.Builder(this).setMessage(R.string.dialog_already_connected_message)
-                .setTitle(R.string.alert_dialog_connection_problem_title)
-                .setPositiveButton(R.string.dialog_yes) {_, _ -> alertDialogYesButtonCallback(); finish()}
-                .setCancelable(false)
-                .setNegativeButton(R.string.dialog_no) {_, _ -> }
-                .create().show()
+            mAlertDialog = CustomAlertDialog(this).apply { show() }
         else
             finish()
     }
@@ -322,11 +285,52 @@ class ConnectionActivity : AppCompatActivity() {
             scanDevices()
             isScanContinue = true
         } else
-            AlertDialog.Builder(this).setMessage(R.string.dialog_already_connected_message)
-                .setPositiveButton(R.string.dialog_yes) { _, _ -> alertDialogYesButtonCallback()}
-                .setNegativeButton(R.string.dialog_no) {_,_ ->  startActivity(Intent(this, ControlActivity::class.java)); finish()}
-                .setCancelable(false)
-                .setTitle(R.string.alert_dialog_connection_problem_title).create().show()
+            mAlertDialog = CustomAlertDialog(this).apply { show() }
+    }
+    fun alertDialogPositiveButtonClicked()
+    {
+        mAlertDialog.dismiss()
+        mBinding.frameLayoutStopConnection.visibility = View.VISIBLE
+
+        if (configuration.isServiceOnBoard) {
+            Intent(this, AutoConnectService::class.java).apply {
+                stopService(this)
+            }
+            configuration.isServiceOnBoard = false
+
+        }
+
+        Handler(Looper.myLooper()!!).postDelayed (
+            {
+                with(configuration) {
+                    if (isDoubleDeviceConnection)
+                        doubleDeviceMap.forEach {it.value.endConnectionSession()}
+                    else
+                        hearingAid.endConnectionSession()
+
+                    isConnected = false
+                }
+                mBinding.apply {
+                    textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+                    frameLayoutStopConnection.visibility = View.GONE
+                }
+                Intent(this, MainActivity::class.java).apply {
+                    startActivity(this)
+
+                    finish()
+                }
+            }, 6000
+        )
+    }
+    fun alertDialogNegativeButtonClicked(view: View)
+    {
+        mAlertDialog.dismiss()
+
+        if (view.id == mBinding.buttonBack.id)
+            return
+
+        finish()
+        startActivity(Intent(this, ControlActivity::class.java))
     }
 
     fun hearingAidItemClicked(pos: Int)
