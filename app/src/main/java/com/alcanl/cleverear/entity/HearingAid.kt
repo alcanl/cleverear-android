@@ -24,6 +24,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
     {
         try {
             communicationAdaptor = productManager.createWirelessCommunicationInterface(address)
+            communicationAdaptor?.isVerifyNvmWrites = false
             communicationAdaptor?.setEventHandler(eventHandler)
             wirelessControl = productManager.wirelessControl
             productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
@@ -32,9 +33,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
         {
             Log.e("SDKAdaptors", ex.message!!)
         }
-
     }
-
     fun readDeviceConfiguration()
     {
         try {

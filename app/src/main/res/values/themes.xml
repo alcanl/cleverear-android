@@ -20,6 +20,11 @@
         <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
 
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/alpha_blink_anim</item>
+        <item name="android:windowExitAnimation">@anim/slide_out</item>
+    </style>
+
     <style name="DialogStyle" parent="Theme.AppCompat.Dialog">
         <item name="android:windowMinWidthMajor">100%</item>
         <item name="android:windowMinWidthMinor">85%</item>

@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.fitting.WirelessFitting
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.listeners.ControlActivityEventListener
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
@@ -33,6 +34,8 @@ class ControlActivity : AppCompatActivity() {
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var configuration : ConfigurationModule
+    @Inject
+    lateinit var wirelessFitting: WirelessFitting
     lateinit var mBinding: ActivityControlBinding
     private lateinit var mListener : ControlActivityEventListener
     override fun onCreate(savedInstanceState: Bundle?)
@@ -390,6 +393,7 @@ class ControlActivity : AppCompatActivity() {
     }
     fun memoryButtonClicked(buttonNumber: Int, button: Button)
     {
+        wirelessFitting.initControls()
         try {
             with(configuration) {
                 if (isDoubleDeviceConnection)
