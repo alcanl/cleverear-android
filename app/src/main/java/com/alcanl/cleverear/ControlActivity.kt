@@ -15,7 +15,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.fitting.WirelessFitting
+import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.listeners.ControlActivityEventListener
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
@@ -35,7 +35,7 @@ class ControlActivity : AppCompatActivity() {
     @Inject
     lateinit var configuration : ConfigurationModule
     @Inject
-    lateinit var wirelessFitting: WirelessFitting
+    lateinit var wirelessFitting: WirelessFittingInitializer
     lateinit var mBinding: ActivityControlBinding
     private lateinit var mListener : ControlActivityEventListener
     override fun onCreate(savedInstanceState: Bundle?)

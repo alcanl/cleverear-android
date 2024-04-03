@@ -6,18 +6,24 @@ import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
 import com.ark.EventHandler
+import com.ark.Library
+import com.ark.ParameterList
+import com.ark.ParameterMemory
+import com.ark.ParameterMemoryList
 import com.ark.ParameterSpace
+import com.ark.Product
 import com.ark.ProductManager
 import com.ark.WirelessControl
+import java.lang.reflect.Parameter
 import java.util.Objects
 
 data class HearingAid(val address: String, val name: String, val rssi: Int, val manufacturerData: String,
                       val side: EarSide, var bondStatus : Int = BluetoothDevice.BOND_NONE, var numberOfMemories: Int = 8,
                       var volume: Int = 45, var batteryLevel : Int = 100, var communicationAdaptor: CommunicationAdaptor? = null,
-                      var wirelessControl: WirelessControl? = null, var autoConnect : Boolean = false,
-                      var currentMemory :  ParameterSpace? = null, var auxAttenuation : Int = 45,
-                      var micAttenuation : Int = 8, var streamAddress : Int = 16,
+                      var wirelessControl: WirelessControl? = null, var currentMemory :  ParameterSpace? = null,
+                      var auxAttenuation : Int = 45, var micAttenuation : Int = 8, var streamAddress : Int = 16,
                       var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
+                      var memories: ParameterMemoryList? = null, var parameters: ParameterList? = null, val systemMemory: ParameterMemory? = null,
                       @Volatile var isConnected : Boolean = false, @Volatile var isDeviceInRange: Boolean = false)
 {
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
@@ -29,8 +35,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             wirelessControl = productManager.wirelessControl
             productManager.wirelessControl.setCommunicationAdaptor(communicationAdaptor)
             wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
-        } catch (ex: ArkException)
-        {
+        } catch (ex: ArkException) {
             Log.e("SDKAdaptors", ex.message!!)
         }
     }
