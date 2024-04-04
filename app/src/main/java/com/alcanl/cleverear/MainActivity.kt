@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         checkBluetoothPermission()
 
         if (!mIsBluetoothPermissionsGranted) {
-            scanBluetooth()
+            scanBluetoothPermissions()
             checkBluetoothPermission()
         }
 
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         mBinding.viewModel = MainActivityListenersViewModel(this)
     }
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun checkPermissionForQ() {
+    private fun checkAndRequestPermissionForQ() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
             PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
-    private fun checkPermissionForN() {
+    private fun checkAndRequestPermissionForN() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
             PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
             PackageManager.PERMISSION_GRANTED
@@ -149,17 +149,17 @@ class MainActivity : AppCompatActivity() {
                 1
             )
     }
-    private fun scanBluetooth()
+    private fun scanBluetoothPermissions()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            checkPermissionForS()
+            checkAndRequestPermissionForS()
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             scanGPS()
-            checkPermissionForQ()
+            checkAndRequestPermissionForQ()
         }
         else {
             scanGPS()
-            checkPermissionForN()
+            checkAndRequestPermissionForN()
         }
     }
     private fun scanGPS()
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun checkPermissionForS()
+    private fun checkAndRequestPermissionForS()
     {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) !=
             PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else {
                     toastNoPermission()
-                    scanBluetooth()
+                    scanBluetoothPermissions()
                 }
             }
             override fun onAnimationEnd(animation: Animation?) {}
@@ -290,7 +290,7 @@ class MainActivity : AppCompatActivity() {
         }
         else {
             toastNoPermission()
-            scanBluetooth()
+            scanBluetoothPermissions()
         }
     }
     fun buttonDoubleDeviceClick()
@@ -310,7 +310,7 @@ class MainActivity : AppCompatActivity() {
         }
         else {
             toastNoPermission()
-            scanBluetooth()
+            scanBluetoothPermissions()
         }
     }
     fun buttonControlClicked()

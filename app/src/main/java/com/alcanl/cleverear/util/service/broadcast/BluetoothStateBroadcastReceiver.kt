@@ -19,14 +19,18 @@ class BluetoothStateBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
             val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
             if (state == BluetoothAdapter.STATE_OFF) {
                 configuration.apply {
-                    isBluetoothEnabled = false
+                    try {
+                        isBluetoothEnabled = false
 
-                    if (isDoubleDeviceConnection)
-                        doubleDeviceMap.forEach { it.value.isConnected = false }
-                    else
-                        hearingAid.isConnected = false
+                        if (isDoubleDeviceConnection)
+                            doubleDeviceMap.forEach { it.value.isConnected = false }
+                        else
+                            hearingAid.isConnected = false
 
-                    isConnected = false
+                    } catch (_: UninitializedPropertyAccessException) {}
+                    finally {
+                        isConnected = false
+                    }
                 }
             }
 

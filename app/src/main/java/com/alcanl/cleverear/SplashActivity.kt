@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -46,7 +47,7 @@ class SplashActivity : AppCompatActivity() {
     }
     private fun initialize()
     {
-        requestNotificationPermission()
+        checkAndRequestNotificationPermission()
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
         mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
     }
@@ -57,17 +58,17 @@ class SplashActivity : AppCompatActivity() {
         initCountDownTimer()
         cleanEvents()
     }
-    private fun requestNotificationPermission()
+    private fun checkAndRequestNotificationPermission()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                     0
                 )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-            if (checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE) != PackageManager.PERMISSION_GRANTED)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE) != PackageManager.PERMISSION_GRANTED)
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE), 0)
 
     }
