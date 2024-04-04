@@ -2,14 +2,11 @@ package com.alcanl.cleverear.fitting
 
 import android.util.Log
 import com.ark.Product
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
-fun Product.getParameter(parameterName: String)
-{
-    val parameterValue = this.memories.getItem(currentMemory.value()).parameters.getById(parameterName)
-
-    parameterValue.isBooleanValue
-
-}
 fun Product.setParameter(parameterName: String, value: Int)
 {
     val parameter = this.memories.getItem(currentMemory.value()).parameters.getById(parameterName)

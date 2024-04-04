@@ -32,6 +32,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
                 initializeLibrary()
                 createProducts()
                 initializeDevice()
+                initControls()
             } catch (ex: IOException) {
                 Log.e("Initializer", ex.stackTraceToString())
             } catch (ex: ArkException) {
@@ -101,27 +102,19 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         }
         return file.absolutePath
     }
-    fun initControls() {
-        threadPool.execute {
-            try {
+    private fun initControls() {
 
-                val product = mLibrary.products.getItem(1).createProduct()
-                val device = configuration.hearingAid.communicationAdaptor?.detectDevice()
-                product.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
-
-                Log.e("test", product.deviceMACAddress)
-                Log.e("test", product.memories.getItem(configuration.hearingAid.currentMemory?.value()!!)
-                    .parameters.getItem(0).value.toString())
-                Log.e("test", product.systemMemory.parameters.getById("X_Volume").id)
-                Log.e("test", product.systemMemory.parameters.getById("X_Volume").value.toString())
+        try {
+            Log.e("test", mLibrary.libraryId.toString())
+            Log.e("test", configuration.productLeft.deviceMACAddress)
+            Log.e("test", configuration.productLeft.systemMemory.parameters.getById("X_Volume").id)
+            Log.e("test", configuration.productLeft.systemMemory.parameters.getById("X_Volume").value.toString())
 
 
 
-            } catch (ex: IOException) {
-                Log.e("IO", ex.stackTraceToString())
-            } catch (ex: ArkException) {
-                Log.e("ARK", ex.stackTraceToString())
-            }
+        } catch (ex: ArkException) {
+            Log.e("ARK", ex.stackTraceToString())
         }
+
     }
 }

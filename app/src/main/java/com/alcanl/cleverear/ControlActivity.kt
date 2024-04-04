@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
@@ -393,7 +394,14 @@ class ControlActivity : AppCompatActivity() {
     }
     fun memoryButtonClicked(buttonNumber: Int, button: Button)
     {
-        wirelessFitting.initControls()
+        val device = configuration.hearingAid.communicationAdaptor?.detectDevice()
+        wirelessFitting.startInitializer()
+        Log.e("detect", device?.libraryId?.toString()!!)
+        Log.e("detect", device.firmwareId!!)
+        Log.e("detect", device.firmwareVersion!!)
+        Log.e("detect", device.productId.toString())
+        Log.e("detect", device.serialId.toString())
+
         try {
             with(configuration) {
                 if (isDoubleDeviceConnection)
