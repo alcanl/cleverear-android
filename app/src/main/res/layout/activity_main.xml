@@ -28,7 +28,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonSingleDevice"
-            app:layout_constraintVertical_bias="0.149" />
+            app:layout_constraintVertical_bias="0.149"
+            tools:ignore="TextContrastCheck" />
 
         <Button
             android:id="@+id/buttonSingleDevice"
@@ -44,7 +45,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.499" />
+            app:layout_constraintVertical_bias="0.499"
+            tools:ignore="TextContrastCheck" />
 
         <ImageView
             android:id="@+id/imageView4"
@@ -59,7 +61,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.127"
-            app:srcCompat="@drawable/cleverear_logo" />
+            app:srcCompat="@drawable/cleverear_logo"
+            tools:ignore="ImageContrastCheck" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -78,13 +81,14 @@
             android:layout_height="80dp"
             android:backgroundTint="#00FFFFFF"
             android:contentDescription="@string/textview_control_ha"
-            android:scaleType="fitXY"
             android:onClick="@{()-> viewModel.handleControlButton()}"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonDoubleDevice"
-            app:srcCompat="@drawable/control" />
+            app:srcCompat="@drawable/control"
+            tools:ignore="DuplicateSpeakableTextCheck" />
 
         <TextView
             android:id="@+id/textViewControl"

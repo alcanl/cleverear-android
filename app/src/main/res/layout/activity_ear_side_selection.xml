@@ -27,7 +27,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.127"
-            app:srcCompat="@drawable/cleverear_logo" />
+            app:srcCompat="@drawable/cleverear_logo"
+            tools:ignore="ImageContrastCheck" />
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -55,7 +56,8 @@
                     android:contentDescription="@string/textview_left_device_text"
                     android:onClick="@{()-> viewModel.handleLeftEarButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/leftear_blue" />
+                    app:srcCompat="@drawable/leftear_blue"
+                    tools:ignore="DuplicateSpeakableTextCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -82,10 +84,11 @@
                     android:layout_gravity="center"
                     android:layout_marginEnd="10dp"
                     android:background="#00FFFFFF"
+                    android:contentDescription="@string/textview_right_device_text"
                     android:onClick="@{() -> viewModel.handleRightEarButton()}"
                     android:scaleType="fitCenter"
                     app:srcCompat="@drawable/rightear_red"
-                    android:contentDescription="@string/textview_right_device_text" />
+                    tools:ignore="DuplicateSpeakableTextCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"

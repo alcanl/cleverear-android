@@ -169,7 +169,7 @@ class AutoConnectService : Service()
             Log.e("Bluetooth", "Bluetooth Off")
             return
         }
-        threadPool.execute { scheduledThreadConnectDevice(adapter, hearingAid) }
+        threadPool.execute { scheduledThreadConnectDeviceCallback(adapter, hearingAid) }
     }
     private fun isConnected() : Boolean
     {
@@ -185,7 +185,7 @@ class AutoConnectService : Service()
             Log.e("Connection", isConnected.toString())
         }
     }
-    private fun scheduledThreadConnectDevice(adapter: BluetoothAdapter, hearingAid: HearingAid)
+    private fun scheduledThreadConnectDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
         try {
             startDeviceScan(adapter)

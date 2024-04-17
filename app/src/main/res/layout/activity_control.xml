@@ -113,7 +113,8 @@
                 android:textColor="@color/black"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sliderRight" />
+                app:layout_constraintTop_toBottomOf="@+id/sliderRight"
+                tools:ignore="VisualLintLocaleText" />
 
             <TextView
                 android:id="@+id/textViewLeftSeekBar"
@@ -126,7 +127,8 @@
                 android:textColor="@color/black"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sliderLeft" />
+                app:layout_constraintTop_toBottomOf="@+id/sliderLeft"
+                tools:ignore="VisualLintLocaleText" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderLeft"
@@ -150,7 +152,8 @@
                 app:thumbRadius="16dp"
                 app:trackColorActive="@color/left_device_slider"
                 app:trackColorInactive="#A8A3A3"
-                app:trackHeight="12dp" />
+                app:trackHeight="12dp"
+                tools:ignore="VisualLintBounds" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderRight"
@@ -174,7 +177,8 @@
                 app:thumbRadius="16dp"
                 app:trackColorActive="@color/right_device_slider"
                 app:trackColorInactive="#A8A3A3"
-                app:trackHeight="12dp" />
+                app:trackHeight="12dp"
+                tools:ignore="VisualLintBounds" />
 
             <TextView
                 android:id="@+id/textViewVolume"
@@ -267,7 +271,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonTwo"
@@ -282,7 +287,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonThree"
@@ -297,7 +303,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonFour"
@@ -312,7 +319,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
             </TableRow>
 
             <TableRow
@@ -333,7 +341,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonSix"
@@ -348,7 +357,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonSeven"
@@ -363,7 +373,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
 
                 <Button
                     android:id="@+id/buttonEight"
@@ -378,7 +389,8 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp" />
+                    app:cornerRadius="50dp"
+                    tools:ignore="VisualLintButtonSize" />
             </TableRow>
 
 
@@ -408,7 +420,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        tools:ignore="VisualLintBottomNav" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
