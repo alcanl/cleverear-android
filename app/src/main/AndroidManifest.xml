@@ -18,13 +18,14 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
-    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
     <uses-feature
@@ -44,13 +45,14 @@
         android:usesCleartextTraffic="true"
         tools:ignore="DiscouragedApi">
         <activity
+            android:name=".RemoteFittingActivity"
+            android:exported="false" />
+        <activity
             android:name=".AutoConnectActivity"
             android:exported="true" />
-
         <activity
             android:name=".LoadingActivity"
-            android:exported="true"
-            />
+            android:exported="true" />
         <activity
             android:name=".AdvancedActivity"
             android:exported="true" />
@@ -72,33 +74,37 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".util.service.AutoConnectService"
-            android:foregroundServiceType="connectedDevice"/>
+            android:foregroundServiceType="connectedDevice" />
 
-        <receiver android:name=".util.service.broadcast.DeviceDisconnectBroadcastReceiver"
+        <receiver
+            android:name=".util.service.broadcast.DeviceDisconnectBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".util.service.broadcast.BondHearingAidBroadcastReceiver"
+        <receiver
+            android:name=".util.service.broadcast.BondHearingAidBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".util.service.broadcast.DeviceFoundBroadcastReceiver"
+        <receiver
+            android:name=".util.service.broadcast.DeviceFoundBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_FOUND" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

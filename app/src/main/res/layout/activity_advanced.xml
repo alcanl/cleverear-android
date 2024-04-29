@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="com.alcanl.cleverear.viewmodel.AdvancedActivityViewModel"/>
+        <import type="com.alcanl.cleverear.viewmodel.AdvancedActivityListenersViewModel"/>
         <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <import type="com.alcanl.cleverear.util.EarSide"/>
-        <variable name="viewModel" type="AdvancedActivityViewModel" />
+        <variable name="viewModel" type="AdvancedActivityListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout

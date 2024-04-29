@@ -258,7 +258,7 @@ class LoadingActivity : AppCompatActivity() {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
                 if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected) {
-                    handleBondedConnection()
+                    finalizeConnectedLoadingTimer()
                     this.cancel()
                 }
             }
@@ -293,26 +293,33 @@ class LoadingActivity : AppCompatActivity() {
             {
                 commonBondDeviceOnTick(millisUntilFinished)
                 if (configuration.isConnected) {
-                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish()
-                        startActivity(Intent
-                            (this@LoadingActivity, ControlActivity::class.java)) }, 3000)
+                    finalizeConnectedLoadingTimer()
                     this.cancel()
                 }
             }
-            override fun onFinish() {
-                if (configuration.isConnected) {
-                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish()
-                        startActivity(Intent
-                            (this@LoadingActivity, ControlActivity::class.java)) }, 2000)
-                }
-                else {
-                    mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
-                }
+            override fun onFinish()
+            {
+                finalizeLoadingTimer()
             }
         }.start()
+    }
+    private fun finalizeConnectedLoadingTimer()
+    {
+        mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
+        Handler(Looper.myLooper()!!).postDelayed({ finish()
+            startActivity(if (!configuration.isRemoteFittingConnection) Intent
+                (this@LoadingActivity, ControlActivity::class.java) else Intent(
+                this@LoadingActivity, RemoteFittingActivity::class.java
+            )) }, 2000)
+    }
+    private fun finalizeLoadingTimer()
+    {
+        if (configuration.isConnected)
+            finalizeConnectedLoadingTimer()
+        else {
+            mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
+            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
+        }
     }
     private fun initialize()
     {
@@ -367,15 +374,6 @@ class LoadingActivity : AppCompatActivity() {
         for (device in adapter.bondedDevices)
             if (hearingAid.address == device.address)
                 hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
-
-    }
-    private fun handleBondedConnection() {
-
-        mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-        Handler(Looper.myLooper()!!).postDelayed({
-            startActivity(Intent
-                (this@LoadingActivity, ControlActivity::class.java))
-                finish()}, 2000)
 
     }
     private fun loadPrefs()

@@ -4,7 +4,7 @@ import android.view.View
 import com.alcanl.cleverear.AdvancedActivity
 import java.lang.ref.WeakReference
 
-class AdvancedActivityViewModel(activity: AdvancedActivity) {
+class AdvancedActivityListenersViewModel(activity: AdvancedActivity) {
     private val mWeakReference = WeakReference(activity)
 
     fun handleMicDualSliderValueChange(value: Float)

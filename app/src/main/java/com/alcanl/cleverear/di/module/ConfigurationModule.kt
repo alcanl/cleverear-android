@@ -23,6 +23,7 @@ object ConfigurationModule {
     var isConnectedBefore = false
     var isServiceOnBoard = false
     var isBluetoothEnabled = false
+    var isRemoteFittingConnection = false
     var earSide : EarSide = EarSide.Right
     lateinit var productLeft: Product
     lateinit var productRight: Product

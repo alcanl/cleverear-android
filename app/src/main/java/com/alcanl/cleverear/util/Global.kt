@@ -34,6 +34,7 @@ const val GERMAN = "de"
 const val TURKISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_tr.pdf"""
 const val ENGLISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_en.pdf"""
 const val GERMAN_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_de.pdf"""
+const val API_BASE_URL = "http://192.168.2.178:50531/api/ear-technic/"
 
 
 @Throws(JSONException::class)

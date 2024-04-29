@@ -3,14 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="com.alcanl.cleverear.viewmodel.AutoConnectActivityViewModel"/>
-        <variable name="viewModel" type="AutoConnectActivityViewModel" />
+        <import type="com.alcanl.cleverear.viewmodel.AutoConnectActivityListenersViewModel"/>
+        <variable name="viewModel" type="AutoConnectActivityListenersViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background">
+
+        <TextView
+            android:id="@+id/textViewRemoteConf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:text="@string/textview_remote_conf_ha"
+            android:textColor="@color/ap_black"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageButtonRemoteConf" />
 
         <ImageView
             android:id="@+id/imageView2"
@@ -135,6 +147,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageButtonControl" />
+
+        <ImageButton
+            android:id="@+id/imageButtonRemoteConf"
+            android:layout_width="90dp"
+            android:layout_height="80dp"
+            android:backgroundTint="#00FFFFFF"
+            android:scaleType="fitXY"
+            android:onClick="@{()->viewModel.handleRemoteFittingButtonClick()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            app:layout_constraintVertical_bias="0.79"
+            app:srcCompat="@drawable/baseline_rss_feed_24"
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

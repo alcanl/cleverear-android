@@ -13,7 +13,7 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_NAME
 import com.alcanl.cleverear.util.HA_RIGHT_NAME
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
-import com.alcanl.cleverear.viewmodel.AutoConnectActivityViewModel
+import com.alcanl.cleverear.viewmodel.AutoConnectActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.EnumMap
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class AutoConnectActivity : AppCompatActivity() {
     private fun initBinding()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_auto_connect)
-        mBinding.viewModel = AutoConnectActivityViewModel(this)
+        mBinding.viewModel = AutoConnectActivityListenersViewModel(this)
     }
     fun getLeftEarModelNumber() : String
     {
@@ -67,12 +67,23 @@ class AutoConnectActivity : AppCompatActivity() {
                 R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
         }
     }
+    fun remoteFittingButtonClicked()
+    {
+        mBinding.imageButtonRemoteConf.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(remoteFittingButtonAnimation()) })
+        }
+    }
     private fun controlButtonClickedCommon()
     {
         configuration.isConnectedBefore = true
         startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
         finish()
-
+    }
+    private fun remoteFittingButtonClickedCommon()
+    {
+        configuration.isRemoteFittingConnection = true
+        controlButtonClickedCommon()
     }
     private fun isValidDeviceData(isDual: Boolean, text: String) : Boolean
     {
@@ -134,6 +145,46 @@ class AutoConnectActivity : AppCompatActivity() {
                             isDoubleDeviceConnection = false
                             earSide = EarSide.Right
                             controlButtonClickedCommon()
+                        }
+                        else
+                            toastInvalidDeviceData()
+
+                    else
+                        Toast.makeText(this@AutoConnectActivity, R.string.toast_no_device_selected, Toast.LENGTH_LONG).show()
+                }
+            }
+            override fun onAnimationEnd(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+        }
+    }
+    private fun remoteFittingButtonAnimation() : Animation.AnimationListener
+    {
+        return object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?)
+            {
+                with(configuration) {
+
+                    if (isLeftSelected && isRightSelected)
+                        if (isValidDeviceData(true, "")) {
+                            doubleDeviceMap = EnumMap(EarSide::class.java)
+                            isDoubleDeviceConnection = true
+                            remoteFittingButtonClickedCommon()
+                        }
+                        else
+                            toastInvalidDeviceData()
+                    else if (isLeftSelected)
+                        if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())){
+                            isDoubleDeviceConnection = false
+                            earSide = EarSide.Left
+                            remoteFittingButtonClickedCommon()
+                        }
+                        else
+                            toastInvalidDeviceData()
+                    else if (isRightSelected)
+                        if (isValidDeviceData(false, mBinding.textViewRight.text.toString())){
+                            isDoubleDeviceConnection = false
+                            earSide = EarSide.Right
+                            remoteFittingButtonClickedCommon()
                         }
                         else
                             toastInvalidDeviceData()

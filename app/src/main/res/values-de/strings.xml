@@ -20,6 +20,7 @@
     <string name="textview_right_device_text">Rechtes Gerät</string>
     <string name="textview_control_ha">Hörgerät einstellen</string>
     <string name="switch_dual_device_text">Binaurale Konfiguration</string>
+    <string name="textview_remote_conf_ha" translatable="true">Remote Fitting</string>
     <string name="toast_no_permission">Keine Bluetooth-Erlaubnis</string>
     <string name="toast_no_device_selected">Nein Jedes ausgewählte Gerät</string>
     <string name="textview_no_previous_device_info">kein Hörgerät</string>

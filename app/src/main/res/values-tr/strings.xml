@@ -19,6 +19,7 @@
     <string name="toast_no_permission">Bluetooth İzinleri Bulunamadı</string>
     <string name="toast_no_device_selected">Seçili Cihaz Bulunamadı</string>
     <string name="textview_no_previous_device_info">Kayıtlı Cihaz Yok</string>
+    <string name="textview_remote_conf_ha" translatable="true">Uzak Konfigürasyon</string>
     <string name="toast_no_previous_device_for_selection">Kayıtlı Cihaz Bilgisi Bulunmamaktadır</string>
     <string name="textview_control_ha">Cihazı Kontrol Et</string>
     <string name="toast_connection_lost_text">Bağlantı Kaybedildi</string>

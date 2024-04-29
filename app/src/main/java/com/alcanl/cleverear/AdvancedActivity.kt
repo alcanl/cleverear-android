@@ -21,7 +21,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.listeners.AdvancedActivityEventListener
-import com.alcanl.cleverear.viewmodel.AdvancedActivityViewModel
+import com.alcanl.cleverear.viewmodel.AdvancedActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.google.android.material.slider.Slider
@@ -256,7 +256,7 @@ class AdvancedActivity : AppCompatActivity(){
     private fun initBinding()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_advanced)
-        mBinding.viewModel = AdvancedActivityViewModel(this)
+        mBinding.viewModel = AdvancedActivityListenersViewModel(this)
     }
     private fun initializeNavigationView()
     {

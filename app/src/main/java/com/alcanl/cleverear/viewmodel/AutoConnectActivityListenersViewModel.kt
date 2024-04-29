@@ -5,7 +5,7 @@ import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
 import java.lang.ref.WeakReference
 
-class AutoConnectActivityViewModel(activity: AutoConnectActivity) {
+class AutoConnectActivityListenersViewModel(activity: AutoConnectActivity) {
     private val mWeakReference = WeakReference(activity)
 
     fun getLeftEarModelNumber() : String
@@ -31,5 +31,9 @@ class AutoConnectActivityViewModel(activity: AutoConnectActivity) {
     fun handleControlButtonClick()
     {
         mWeakReference.get()?.controlButtonClicked()
+    }
+    fun handleRemoteFittingButtonClick()
+    {
+        mWeakReference.get()?.remoteFittingButtonClicked()
     }
 }

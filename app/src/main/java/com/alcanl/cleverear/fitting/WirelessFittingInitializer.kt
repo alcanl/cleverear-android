@@ -1,16 +1,20 @@
 package com.alcanl.cleverear.fitting
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import com.alcanl.cleverear.api.IEarTechnicLibraryService
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.Library
 import com.ark.ProductManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStreamWriter
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.inject.Inject
@@ -23,6 +27,9 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var threadPool: ExecutorService
+    @Inject
+    lateinit var earTechnicService: IEarTechnicLibraryService
+
     private lateinit var mLibrary: Library
     fun startInitializer() : Future<*>
     {
@@ -38,6 +45,26 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             } catch (ex: ArkException) {
                 Log.e("Initializer", ex.stackTraceToString())
             }
+        }
+    }
+    fun writeLibraryToFilesDir(byteArray: ByteArray)
+    {
+        threadPool.execute { writeLibraryToFilesDirCallback(byteArray) }
+    }
+    private fun writeLibraryToFilesDirCallback(byteArray: ByteArray)
+    {
+        try {
+            val fos = FileOutputStream(File(mContext.filesDir, "test5.library"))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                byteArray.inputStream().transferTo(fos)
+            else {
+                fos.use {
+                    it.write(byteArray)
+                }
+            }
+
+        } catch (ex: IOException) {
+            Log.e("writeLibraryToCache", ex.message!!)
         }
     }
     private fun initializeLibrary()
@@ -117,4 +144,5 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         }
 
     }
+    fun findLibrary(modelName: String) = earTechnicService.findLibraryByHearingAidModelName(modelName)
 }
