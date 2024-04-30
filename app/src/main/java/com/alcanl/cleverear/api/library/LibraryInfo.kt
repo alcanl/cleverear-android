@@ -1,9 +1,30 @@
 package com.alcanl.cleverear.api.library
 
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
+import java.util.Objects
 
 @Serializable
-class LibraryInfo {
-    var libraryId : String? = null
-    var libraryFile : ByteArray? = null
+data class LibraryInfo(
+    @SerializedName("libraryName") val libraryId : String? = null,
+    @SerializedName("libraryData") val libraryFile : String? = null
+) {
+    override fun equals(other: Any?): Boolean
+    {
+        return other is LibraryInfo && libraryId == other.libraryId
+                && libraryFile == other.libraryFile
+    }
+
+    override fun hashCode(): Int
+    {
+        return Objects.hash(libraryId, libraryFile)
+    }
+
+    override fun toString(): String
+    {
+        return String.format("Id: %s, Data Size: %s", libraryId, libraryFile)
+    }
+    fun convertLibraryData() = libraryFile?.encodeToByteArray()
+
 }
+

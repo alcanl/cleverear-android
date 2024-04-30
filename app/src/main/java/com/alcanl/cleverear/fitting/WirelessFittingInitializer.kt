@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.fitting
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.util.Log
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
@@ -15,6 +16,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.inject.Inject
@@ -54,15 +56,18 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     private fun writeLibraryToFilesDirCallback(byteArray: ByteArray)
     {
         try {
-            val fos = FileOutputStream(File(mContext.filesDir, "test5.library"))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                byteArray.inputStream().transferTo(fos)
-            else {
-                fos.use {
-                    it.write(byteArray)
+            val file = File(mContext.cacheDir, "test10.library")
+            Log.d("exist", file.exists().toString())
+            if (file.createNewFile()) {
+                val fos = FileOutputStream(file)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                    byteArray.inputStream().transferTo(fos)
+                else {
+                    fos.use {
+                        it.write(byteArray)
+                    }
                 }
             }
-
         } catch (ex: IOException) {
             Log.e("writeLibraryToCache", ex.message!!)
         }

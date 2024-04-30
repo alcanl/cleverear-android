@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface IEarTechnicLibraryService {
-    @GET("/model/library/info")
+    @GET("model/library/info")
     fun findLibraryByHearingAidModelName(@Query("name")modelName: String) : Call<LibraryInfo>
 
 }

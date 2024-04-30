@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 @AndroidEntryPoint
 class RemoteFittingActivity : AppCompatActivity() {
@@ -42,12 +43,15 @@ class RemoteFittingActivity : AppCompatActivity() {
         call.enqueue(object: Callback<LibraryInfo> {
             override fun onResponse(call: Call<LibraryInfo>, response: Response<LibraryInfo>)
             {
+                call.timeout().timeout(30, TimeUnit.SECONDS)
+                call.timeout().deadline(1, TimeUnit.MINUTES)
                 val libraryInfo = response.body()
 
                 if (libraryInfo != null) {
                     mLibraryInfo = libraryInfo
                     Log.d("getLibrary", libraryInfo.libraryId!!)
-                    wirelessFittingInitializer.writeLibraryToFilesDir(libraryInfo.libraryFile!!)
+                    Log.d("libData", libraryInfo.libraryFile!!)
+                    wirelessFittingInitializer.writeLibraryToFilesDir(libraryInfo.convertLibraryData()!!)
                 }
                 else
                     Log.e("getLibrary", "Library is Null")
@@ -56,6 +60,7 @@ class RemoteFittingActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<LibraryInfo>, ex: Throwable)
             {
+                Log.e("Fail", ex.stackTraceToString())
                 Toast.makeText(this@RemoteFittingActivity, "Exception: ${ex.message}", Toast.LENGTH_LONG).show()
             }
 
