@@ -1,7 +1,6 @@
 package com.alcanl.cleverear.fitting
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.util.Log
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
@@ -11,12 +10,9 @@ import com.ark.ArkException
 import com.ark.Library
 import com.ark.ProductManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.inject.Inject
