@@ -205,8 +205,10 @@ class LoadingActivity : AppCompatActivity() {
                     configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
 
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ startActivity(intent); finish() }
-                        , 2000)
+                    Handler(Looper.myLooper()!!).postDelayed({ startActivity(
+                        Intent(this@LoadingActivity, LoadingActivity::class.java))
+                        finish() }
+                        , 3000)
                     this.cancel()
                 }
 
@@ -216,7 +218,7 @@ class LoadingActivity : AppCompatActivity() {
                 if (!configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
                     mBinding.textViewConnecting.text =
                         getString(R.string.textview_device_detection_not_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
+                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
                 }
                 else {
                     runOnUiThread {
@@ -370,9 +372,8 @@ class LoadingActivity : AppCompatActivity() {
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
 
-        for (device in adapter.bondedDevices)
-            if (hearingAid.address == device.address)
-                hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
+        if (adapter.bondedDevices.any { hearingAid.address == it.address })
+            hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
 
     }
     private fun loadPrefs()
