@@ -37,7 +37,10 @@ class RemoteFittingActivity : AppCompatActivity() {
     }
     fun getLibrary()
     {
-        val modelName = "TIE_X_65_FPP_v4"
+        wirelessFittingInitializer.startInitializer()
+
+        /*
+        val modelName = "Biyonix_P+_MicP".uppercase()
         val call = wirelessFittingInitializer.findLibrary(modelName)
 
         call.enqueue(object: Callback<LibraryInfo> {
@@ -51,7 +54,7 @@ class RemoteFittingActivity : AppCompatActivity() {
                     mLibraryInfo = libraryInfo
                     Log.d("getLibrary", libraryInfo.libraryId!!)
                     Log.d("libData", libraryInfo.libraryFile!!)
-                    wirelessFittingInitializer.writeLibraryToFilesDir(libraryInfo.convertLibraryData()!!)
+                    wirelessFittingInitializer.writeLibraryToFilesDir(libraryInfo.convertLibraryData())
                 }
                 else
                     Log.e("getLibrary", "Library is Null")
@@ -65,5 +68,7 @@ class RemoteFittingActivity : AppCompatActivity() {
             }
 
         })
+
+         */
     }
 }

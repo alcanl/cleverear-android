@@ -45,11 +45,12 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             }
         }
     }
-    fun writeLibraryToFilesDir(byteArray: ByteArray)
+    fun writeLibraryToCacheDir(byteArray: ByteArray)
     {
-        threadPool.execute { writeLibraryToFilesDirCallback(byteArray) }
+        threadPool.execute { writeLibraryToCacheDirCallback(byteArray) }
     }
-    private fun writeLibraryToFilesDirCallback(byteArray: ByteArray)
+    private fun writeLibraryToCacheDirCallback(byteArray: ByteArray)
+
     {
         try {
             val file = File(mContext.cacheDir, "test10.library")
@@ -70,7 +71,8 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     }
     private fun initializeLibrary()
     {
-        mLibrary = productManager.loadLibraryFromFile(writeLibrary())
+        val file = File(mContext.cacheDir, "test10.library")
+        mLibrary = productManager.loadLibraryFromFile(file.absolutePath)
     }
     private fun createProducts()
     {
@@ -102,33 +104,19 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             }
             else
                 if (earSide == EarSide.Left)
-                    hearingAid.communicationAdaptor?.apply {
-                        detectDevice()
-                        productLeft.initializeDevice(this)
+                    hearingAid.communicationAdaptor?.let {
+                        val test = it.detectDevice()
+
+                        Log.d("deviceInfo", test.libraryId.toString())
+                        //productLeft.initializeDevice(it)
                     }
                 else
-                    hearingAid.communicationAdaptor?.apply {
-                        detectDevice()
-                        productRight.initializeDevice(this)
+                    hearingAid.communicationAdaptor?.let{
+                        it.detectDevice()
+                        productRight.initializeDevice(it)
                     }
 
         }
-    }
-    private fun writeLibrary() : String
-    {
-        val file = File(mContext.filesDir, "test.library")
-        val inputStream = mContext.resources.assets.open("test.library")
-        inputStream.use {
-            val fos = FileOutputStream(file.absoluteFile)
-            fos.use { fileOutputStream ->
-                val buf = ByteArray(1024)
-                var len: Int
-                while (inputStream.read(buf).also { len = it } > 0) {
-                    fileOutputStream.write(buf, 0, len)
-                }
-            }
-        }
-        return file.absolutePath
     }
     private fun initControls() {
 
@@ -145,5 +133,6 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         }
 
     }
-    fun findLibrary(modelName: String) = earTechnicService.findLibraryByHearingAidModelName(modelName)
+    fun findLibraryByModelName(modelName: String) = earTechnicService.findLibraryByHearingAidModelName(modelName)
+    fun findLibraryByLibraryId(libraryId: String) = earTechnicService.findLibraryByLibraryId(libraryId)
 }

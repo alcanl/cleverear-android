@@ -6,15 +6,12 @@ import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
 import com.ark.EventHandler
-import com.ark.Library
 import com.ark.ParameterList
 import com.ark.ParameterMemory
 import com.ark.ParameterMemoryList
 import com.ark.ParameterSpace
-import com.ark.Product
 import com.ark.ProductManager
 import com.ark.WirelessControl
-import java.lang.reflect.Parameter
 import java.util.Objects
 
 data class HearingAid(val address: String, val name: String, val rssi: Int, val manufacturerData: String,
@@ -65,7 +62,6 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             isConnected = false
         } catch (_: ArkException) {}
     }
-
     override fun equals(other: Any?): Boolean
     {
         return other is HearingAid && address == other.address && name == other.name && rssi == other.rssi

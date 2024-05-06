@@ -2,6 +2,7 @@ package com.alcanl.cleverear.api.library
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
+import java.util.Base64
 import java.util.Objects
 
 @Serializable
@@ -24,7 +25,7 @@ data class LibraryInfo(
     {
         return String.format("Id: %s, Data Size: %s", libraryId, libraryFile)
     }
-    fun convertLibraryData() = libraryFile?.encodeToByteArray()
+    fun convertLibraryData(): ByteArray = Base64.getDecoder().decode(libraryFile)
 
 }
 

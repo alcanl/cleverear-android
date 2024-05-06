@@ -310,7 +310,7 @@ class LoadingActivity : AppCompatActivity() {
             startActivity(if (!configuration.isRemoteFittingConnection) Intent
                 (this@LoadingActivity, ControlActivity::class.java) else Intent(
                 this@LoadingActivity, RemoteFittingActivity::class.java
-            )) }, 2000)
+            )) }, 3000)
     }
     private fun finalizeLoadingTimer()
     {
@@ -318,7 +318,7 @@ class LoadingActivity : AppCompatActivity() {
             finalizeConnectedLoadingTimer()
         else {
             mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
-            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
+            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
         }
     }
     private fun initialize()
@@ -346,7 +346,6 @@ class LoadingActivity : AppCompatActivity() {
     {
         try {
             hearingAid.communicationAdaptor?.connect()
-
             Thread.sleep(7000)
 
             if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
