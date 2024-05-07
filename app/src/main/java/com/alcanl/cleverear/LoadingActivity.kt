@@ -348,7 +348,7 @@ class LoadingActivity : AppCompatActivity() {
     {
         try {
             hearingAid.communicationAdaptor?.connect()
-            Thread.sleep(7000)
+            Thread.sleep(6000)
 
             if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
                 adapter.getRemoteDevice(hearingAid.address).createBond()

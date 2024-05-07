@@ -3,18 +3,24 @@ package com.alcanl.cleverear.fitting
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
+import com.alcanl.cleverear.api.library.LibraryInfo
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.util.EarSide
-import com.ark.ArkException
 import com.ark.Library
+import com.ark.Product
 import com.ark.ProductManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WirelessFittingInitializer @Inject constructor(@ApplicationContext context: Context) {
@@ -29,27 +35,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     lateinit var earTechnicService: IEarTechnicLibraryService
 
     private lateinit var mLibrary: Library
-    fun startInitializer() : Future<*>
-    {
-        return threadPool.submit {
-
-            try {
-                initializeLibrary()
-                createProducts()
-                initializeDevice()
-                initControls()
-            } catch (ex: IOException) {
-                Log.e("Initializer", ex.stackTraceToString())
-            } catch (ex: ArkException) {
-                Log.e("Initializer", ex.stackTraceToString())
-            }
-        }
-    }
-    fun writeLibraryToCacheDir(byteArray: ByteArray)
-    {
-        threadPool.execute { writeLibraryToCacheDirCallback(byteArray) }
-    }
-    private fun writeLibraryToCacheDirCallback(byteArray: ByteArray)
+    private fun writeLibraryToCacheDirCallback(byteArray: ByteArray) : File?
 
     {
         try {
@@ -65,74 +51,55 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
                     }
                 }
             }
+            return file
         } catch (ex: IOException) {
             Log.e("writeLibraryToCache", ex.message!!)
+            return null
         }
     }
-    private fun initializeLibrary()
+    private fun getLibraryFromService(libId: String) : File?
     {
-        val file = File(mContext.cacheDir, "test10.library")
-        mLibrary = productManager.loadLibraryFromFile(file.absolutePath)
-    }
-    private fun createProducts()
-    {
-        with(configuration) {
-            if (isDoubleDeviceConnection) {
-                productLeft = mLibrary.products.getItem(1).createProduct()
-                productRight = mLibrary.products.getItem(1).createProduct()
-            }
-            else
-                if (earSide == EarSide.Left)
-                    productLeft = mLibrary.products.getItem(1).createProduct()
-                else
-                    productRight = mLibrary.products.getItem(1).createProduct()
+        val call = earTechnicService.findLibraryByLibraryId(libId)
+        var libraryInfo: LibraryInfo?
+        var libFile : File? = null
 
-        }
-    }
-    private fun initializeDevice()
-    {
-        with(configuration) {
-            if (isDoubleDeviceConnection) {
-                doubleDeviceMap[EarSide.Left]?.communicationAdaptor?.apply {
-                    detectDevice()
-                    productLeft.initializeDevice(this)
-                }
-                doubleDeviceMap[EarSide.Right]?.communicationAdaptor?.apply {
-                    detectDevice()
-                    productRight.initializeDevice(this)
+        call.enqueue(object: Callback<LibraryInfo> {
+            override fun onResponse(call: Call<LibraryInfo>, response: Response<LibraryInfo>)
+            {
+                call.timeout().timeout(30, TimeUnit.SECONDS)
+                call.timeout().deadline(1, TimeUnit.MINUTES)
+                libraryInfo = response.body()
+
+                libraryInfo?.let {
+                    libFile = writeLibraryToCacheDir(it.convertLibraryData()).get()
                 }
             }
-            else
-                if (earSide == EarSide.Left)
-                    hearingAid.communicationAdaptor?.let {
-                        val test = it.detectDevice()
-
-                        Log.d("deviceInfo", test.libraryId.toString())
-                        //productLeft.initializeDevice(it)
-                    }
-                else
-                    hearingAid.communicationAdaptor?.let{
-                        it.detectDevice()
-                        productRight.initializeDevice(it)
-                    }
-
-        }
+            override fun onFailure(call: Call<LibraryInfo>, ex: Throwable)
+            {
+                Log.e("FailOnTransferData", ex.stackTraceToString())
+                Toast.makeText(mContext, "Exception: ${ex.message}", Toast.LENGTH_LONG).show()
+            }
+        })
+        return libFile
     }
-    private fun initControls() {
+    private fun writeLibraryToCacheDir(byteArray: ByteArray) : Future<File?>
+    {
+        return threadPool.submit(Callable { writeLibraryToCacheDirCallback(byteArray) })
+    }
+    fun createProduct(productId : Int): Product = mLibrary.products.getById(productId).createProduct()
 
+    fun findLibraryByLibraryId(libraryId: String) : File?
+    {
         try {
-            Log.e("test", mLibrary.libraryId.toString())
-            Log.e("test", configuration.productLeft.deviceMACAddress)
-            Log.e("test", configuration.productLeft.systemMemory.parameters.getById("X_Volume").id)
-            Log.e("test", configuration.productLeft.systemMemory.parameters.getById("X_Volume").value.toString())
+            val idHex = Integer.toHexString(libraryId.toInt())
+            val libFile = File(mContext.cacheDir, "$idHex.library")
 
+            return if (libFile.exists()) libFile else getLibraryFromService(libraryId)
 
-
-        } catch (ex: ArkException) {
-            Log.e("ARK", ex.stackTraceToString())
+        } catch (ex: NumberFormatException) {
+            Log.e("NumberFormat", ex.message!!)
+            return null
         }
-
     }
-    fun findLibraryByModelName(modelName: String) = earTechnicService.findLibraryByHearingAidModelName(modelName)
-    fun findLibraryByLibraryId(libraryId: String) = earTechnicService.findLibraryByLibraryId(libraryId)
+
 }

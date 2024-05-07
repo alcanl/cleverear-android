@@ -8,6 +8,6 @@ class RemoteFittingActivityListenersViewModel(activity: RemoteFittingActivity) {
 
     fun getLibrary()
     {
-        mWeakReference.get()?.getLibrary()
+
     }
 }

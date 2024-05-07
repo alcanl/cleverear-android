@@ -35,6 +35,14 @@ const val TURKISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverea
 const val ENGLISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_en.pdf"""
 const val GERMAN_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_de.pdf"""
 const val API_BASE_URL = "http://192.168.2.174:50531/api/ear-technic/"
+const val API_LIB_INFO_GET_BY_HA_URL = "library/model/info"
+const val API_LIB_INFO_GET_BY_LIB_ID_URL = "library"
+const val API_PARAM_DEFAULT_DATA_GET_BY_HA = "param/model/data"
+const val API_QUERY_NAME = "name"
+const val API_QUERY_ID = "id"
+const val API_QUERY_EMAIL = "email"
+const val API_QUERY_PASS = "password"
+const val API_ACTIVE_PARAM_DATA_GET_BY_USER = "user/param/active"
 
 
 @Throws(JSONException::class)

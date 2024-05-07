@@ -1,30 +1,36 @@
 package com.alcanl.cleverear
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.alcanl.cleverear.api.library.LibraryInfo
 import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
+import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.viewmodel.RemoteFittingActivityListenersViewModel
+import com.ark.Library
+import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 @AndroidEntryPoint
 class RemoteFittingActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityRemoteFittingBinding
-    private var mLibraryInfo: LibraryInfo? = null
+    private lateinit var mLibrary: Library
     @Inject
     lateinit var wirelessFittingInitializer: WirelessFittingInitializer
+    @Inject
+    lateinit var configuration: ConfigurationModule
+    @Inject
+    lateinit var productManager: ProductManager
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
+    }
+    override fun onStart()
+    {
+        super.onStart()
+        initializeProduct()
     }
     private fun initialize()
     {
@@ -35,40 +41,17 @@ class RemoteFittingActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
         mBinding.viewModel = RemoteFittingActivityListenersViewModel(this)
     }
-    fun getLibrary()
+    private fun initializeProduct()
     {
-        wirelessFittingInitializer.startInitializer()
+        val deviceInfo = configuration.hearingAid.communicationAdaptor?.detectDevice()
+        val libFile = wirelessFittingInitializer.findLibraryByLibraryId(deviceInfo?.libraryId?.toString()!!)
 
-        /*
-        val modelName = "Biyonix_P+_MicP".uppercase()
-        val call = wirelessFittingInitializer.findLibrary(modelName)
+        if (libFile != null) {
+            mLibrary = productManager.loadLibraryFromFile(libFile.absolutePath)
+            configuration.productLeft = wirelessFittingInitializer.createProduct(deviceInfo.productId)
+        }
+        else
+            Toast.makeText(this, "Library is null", Toast.LENGTH_LONG).show()
 
-        call.enqueue(object: Callback<LibraryInfo> {
-            override fun onResponse(call: Call<LibraryInfo>, response: Response<LibraryInfo>)
-            {
-                call.timeout().timeout(30, TimeUnit.SECONDS)
-                call.timeout().deadline(1, TimeUnit.MINUTES)
-                val libraryInfo = response.body()
-
-                if (libraryInfo != null) {
-                    mLibraryInfo = libraryInfo
-                    Log.d("getLibrary", libraryInfo.libraryId!!)
-                    Log.d("libData", libraryInfo.libraryFile!!)
-                    wirelessFittingInitializer.writeLibraryToFilesDir(libraryInfo.convertLibraryData())
-                }
-                else
-                    Log.e("getLibrary", "Library is Null")
-
-            }
-
-            override fun onFailure(call: Call<LibraryInfo>, ex: Throwable)
-            {
-                Log.e("Fail", ex.stackTraceToString())
-                Toast.makeText(this@RemoteFittingActivity, "Exception: ${ex.message}", Toast.LENGTH_LONG).show()
-            }
-
-        })
-
-         */
     }
 }
