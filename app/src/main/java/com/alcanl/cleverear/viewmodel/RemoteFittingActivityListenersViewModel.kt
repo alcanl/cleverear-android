@@ -6,8 +6,8 @@ import java.lang.ref.WeakReference
 class RemoteFittingActivityListenersViewModel(activity: RemoteFittingActivity) {
     private val mWeakReference = WeakReference(activity)
 
-    fun getLibrary()
+    fun handleRetryButton()
     {
-
+        mWeakReference.get()?.retryButtonClicked()
     }
 }

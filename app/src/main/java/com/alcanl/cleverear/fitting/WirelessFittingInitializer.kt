@@ -3,10 +3,10 @@ package com.alcanl.cleverear.fitting
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
 import com.alcanl.cleverear.api.library.LibraryInfo
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.ark.Library
 import com.ark.Product
 import com.ark.ProductManager
@@ -33,27 +33,21 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var earTechnicService: IEarTechnicLibraryService
-
-    private lateinit var mLibrary: Library
-    private fun writeLibraryToCacheDirCallback(byteArray: ByteArray) : File?
+    private fun writeLibraryToFilesDirCallback(byteArray: ByteArray, fileName: String) : File?
 
     {
         try {
-            val file = File(mContext.cacheDir, "test10.library")
-            Log.d("exist", file.exists().toString())
-            if (file.createNewFile()) {
-                val fos = FileOutputStream(file)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                    byteArray.inputStream().transferTo(fos)
-                else {
-                    fos.use {
-                        it.write(byteArray)
-                    }
-                }
-            }
+            val file = File(mContext.filesDir, fileName)
+            val fos = FileOutputStream(file)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                byteArray.inputStream().transferTo(fos)
+            else
+                fos.use { it.write(byteArray) }
+
             return file
         } catch (ex: IOException) {
-            Log.e("writeLibraryToCache", ex.message!!)
+            Log.e("writeLibraryToFilesDir", ex.message!!)
             return null
         }
     }
@@ -67,32 +61,34 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             override fun onResponse(call: Call<LibraryInfo>, response: Response<LibraryInfo>)
             {
                 call.timeout().timeout(30, TimeUnit.SECONDS)
-                call.timeout().deadline(1, TimeUnit.MINUTES)
+                call.timeout().deadline(30, TimeUnit.SECONDS)
                 libraryInfo = response.body()
 
                 libraryInfo?.let {
-                    libFile = writeLibraryToCacheDir(it.convertLibraryData()).get()
+                    val idHex = Integer.toHexString(libId.toInt())
+                    libFile = writeLibraryToFilesDir(it.convertLibraryData(), "$idHex.library").get()
                 }
             }
             override fun onFailure(call: Call<LibraryInfo>, ex: Throwable)
             {
-                Log.e("FailOnTransferData", ex.stackTraceToString())
-                Toast.makeText(mContext, "Exception: ${ex.message}", Toast.LENGTH_LONG).show()
+                throw NetworkException(ex)
             }
         })
+
+        Thread.sleep(10000)
         return libFile
     }
-    private fun writeLibraryToCacheDir(byteArray: ByteArray) : Future<File?>
+    private fun writeLibraryToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
     {
-        return threadPool.submit(Callable { writeLibraryToCacheDirCallback(byteArray) })
+        return threadPool.submit(Callable { writeLibraryToFilesDirCallback(byteArray, fileName) })
     }
-    fun createProduct(productId : Int): Product = mLibrary.products.getById(productId).createProduct()
+    fun createProduct(productId : Int, library: Library): Product = library.products.getById(productId).createProduct()
 
     fun findLibraryByLibraryId(libraryId: String) : File?
     {
         try {
             val idHex = Integer.toHexString(libraryId.toInt())
-            val libFile = File(mContext.cacheDir, "$idHex.library")
+            val libFile = File(mContext.filesDir, "$idHex.library")
 
             return if (libFile.exists()) libFile else getLibraryFromService(libraryId)
 

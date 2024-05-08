@@ -1,27 +1,46 @@
 package com.alcanl.cleverear
 
 import android.os.Bundle
-import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
+import com.alcanl.cleverear.fitting.exception.NetworkException
+import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
+import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
+import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
+import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_FAIL
+import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_SUCCESS
 import com.alcanl.cleverear.viewmodel.RemoteFittingActivityListenersViewModel
+import com.ark.ArkException
+import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.ref.WeakReference
+import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 @AndroidEntryPoint
 class RemoteFittingActivity : AppCompatActivity() {
-    private lateinit var mBinding: ActivityRemoteFittingBinding
-    private lateinit var mLibrary: Library
     @Inject
     lateinit var wirelessFittingInitializer: WirelessFittingInitializer
     @Inject
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var productManager: ProductManager
+    @Inject
+    lateinit var threadPool: ExecutorService
+
+    private var mDeviceInfo: DeviceInfo? = null
+    private lateinit var mHandler: RemoteHandler
+    private lateinit var mLibrary: Library
+    private lateinit var mBinding: ActivityRemoteFittingBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -35,23 +54,117 @@ class RemoteFittingActivity : AppCompatActivity() {
     private fun initialize()
     {
         initBinding()
+        mHandler = RemoteHandler(this)
     }
     private fun initBinding()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
         mBinding.viewModel = RemoteFittingActivityListenersViewModel(this)
     }
+    private fun initializeProductCallback()
+    {
+        try {
+            mDeviceInfo = configuration.hearingAid.communicationAdaptor?.detectDevice()
+            Log.d("libId", mDeviceInfo?.libraryId.toString())
+            val libFile =
+                wirelessFittingInitializer.findLibraryByLibraryId(mDeviceInfo?.libraryId?.toString()!!)
+
+            if (libFile != null) {
+                mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
+                Thread.sleep(2000)
+                mLibrary = productManager.loadLibraryFromFile(libFile.absolutePath)
+                with(configuration) {
+                    product = wirelessFittingInitializer.createProduct(mDeviceInfo!!.productId, mLibrary)
+                    product.initializeDevice(hearingAid.communicationAdaptor)
+                    mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_SUCCESS)
+                    Thread.sleep(2000)
+                }
+            }
+            else
+                mHandler.sendEmptyMessage(WHAT_LIBRARY_NOT_FOUND)
+
+        } catch (ex: NetworkException) {
+            Log.e("NET", ex.message!!)
+            mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_FAIL)
+        } catch (ex: ArkException) {
+            Log.e("ARK", ex.message!!)
+            mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
+        }
+    }
     private fun initializeProduct()
     {
-        val deviceInfo = configuration.hearingAid.communicationAdaptor?.detectDevice()
-        val libFile = wirelessFittingInitializer.findLibraryByLibraryId(deviceInfo?.libraryId?.toString()!!)
+        threadPool.execute { initializeProductCallback() }
+    }
+    private class RemoteHandler(activity: RemoteFittingActivity) : Handler(Looper.myLooper()!!) {
+        private val mWeakReference = WeakReference(activity)
+        private fun handleInitProcessViews(text : String = "")
+        {
+            mWeakReference.get()?.let {
+                if (text.isNotEmpty())
+                    it.mBinding.textViewInitialize.text = text
 
-        if (libFile != null) {
-            mLibrary = productManager.loadLibraryFromFile(libFile.absolutePath)
-            configuration.productLeft = wirelessFittingInitializer.createProduct(deviceInfo.productId)
+                it.mBinding.progressBar.visibility = View.INVISIBLE
+                it.mBinding.buttonRetry.visibility = View.VISIBLE
+            }
         }
-        else
-            Toast.makeText(this, "Library is null", Toast.LENGTH_LONG).show()
+        private fun productCreateSuccess()
+        {
+            mWeakReference.get()?.let {
+                with(it.mBinding) {
+                    progressBar.visibility = View.INVISIBLE
+                    textViewInitialize.text = "Successfully Initialized The Device For Fitting"
+                    textViewDeviceMac.text = it.configuration.product.deviceMACAddress
+                    textViewDeviceModel.text = it.mDeviceInfo?.serialId.toString()
+                    textViewLibraryId.text = Integer.toHexString(it.mDeviceInfo?.libraryId!!.toInt())
+                    textViewFirmwareId.text = it.mDeviceInfo?.firmwareId
+                    textViewFirmwareVersion.text = it.mDeviceInfo?.firmwareVersion.toString()
+                    linearLayoutMain.visibility = View.VISIBLE
+                }
+            }
+        }
+        private fun productCreateFail()
+        {
+            handleInitProcessViews("Unknown Problem Occurred While Initializing The Device")
+        }
+        private fun libraryNotFound()
+        {
+            handleInitProcessViews("Could Not Find The Compatible Library File For The Connected Device")
+        }
+        private fun librarySearchFail()
+        {
+            handleInitProcessViews("Internal Server Error, Please Try To Connect Later")
+        }
+        private fun librarySearchSuccess()
+        {
+            mWeakReference.get()?.let {
+                it.mBinding.textViewInitialize.text = "Successfully Found The Compatible Library, Beginning The Initialize Device"
+            }
+        }
+        private fun readParameterSuccess()
+        {
 
+        }
+        private fun readParameterFail()
+        {
+
+        }
+        override fun handleMessage(msg: Message)
+        {
+            when (msg.what) {
+                10 -> productCreateSuccess()
+                11 -> productCreateFail()
+                12 -> librarySearchSuccess()
+                13 -> librarySearchFail()
+                14 -> readParameterSuccess()
+                15 -> readParameterFail()
+                16 -> libraryNotFound()
+            }
+        }
+    }
+    fun retryButtonClicked()
+    {
+        mBinding.buttonRetry.visibility = View.INVISIBLE
+        mBinding.progressBar.visibility = View.VISIBLE
+        initializeProduct()
     }
 }

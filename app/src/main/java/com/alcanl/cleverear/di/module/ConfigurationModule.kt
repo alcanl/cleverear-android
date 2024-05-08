@@ -2,7 +2,6 @@ package com.alcanl.cleverear.di.module
 
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
-import com.ark.ParameterMemory
 import com.ark.Product
 import dagger.Module
 import dagger.Provides
@@ -25,8 +24,7 @@ object ConfigurationModule {
     var isBluetoothEnabled = false
     var isRemoteFittingConnection = false
     var earSide : EarSide = EarSide.Right
-    lateinit var productLeft: Product
-    lateinit var productRight: Product
+    lateinit var product: Product
     lateinit var doubleDeviceMap : EnumMap<EarSide, HearingAid>
     lateinit var hearingAid: HearingAid
     @Singleton
