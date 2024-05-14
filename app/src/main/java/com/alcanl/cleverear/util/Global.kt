@@ -50,6 +50,7 @@ const val API_QUERY_ID = "id"
 const val API_QUERY_EMAIL = "email"
 const val API_QUERY_PASS = "password"
 const val API_ACTIVE_PARAM_DATA_GET_BY_USER = "user/param/active"
+const val ASHA_UUID = "0xFDF0"
 
 
 @Throws(JSONException::class)

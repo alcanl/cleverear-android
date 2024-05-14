@@ -20,6 +20,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.view.accessibility.AccessibilityManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -31,6 +32,7 @@ import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
+import com.alcanl.cleverear.util.service.broadcast.AshaDeviceConnectionCaptureBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.ArkException
@@ -64,8 +66,11 @@ class AutoConnectService : Service()
     lateinit var mDeviceFoundReceiver : DeviceFoundBroadcastReceiver
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
+    @Inject
+    lateinit var mConnectionCaptureReceiver: AshaDeviceConnectionCaptureBroadcastReceiver
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
+    private var mIsAshaSupport = false
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         initialize(intent)
@@ -82,6 +87,9 @@ class AutoConnectService : Service()
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
 
+            if (mIsAshaSupport)
+                unregisterReceiver(mConnectionCaptureReceiver)
+
             with(configuration) {
                 if (isConnected)
                     if (isDoubleDeviceConnection)
@@ -97,6 +105,11 @@ class AutoConnectService : Service()
     }
     private fun initialize(intent: Intent?)
     {
+        getSystemService(AccessibilityManager::class.java).installedAccessibilityServiceList.forEach {Log.e("test", it.id)}
+        /*if () {
+            registerReceiver(mConnectionCaptureReceiver, IntentFilter(ACTION_ACL_CONNECTED))
+            mIsAshaSupport = true
+        }*/
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
@@ -119,7 +132,7 @@ class AutoConnectService : Service()
     }
     private fun checkDeviceConnectionState(intent: Intent?)
     {
-        scheduledExecutor.scheduleAtFixedRate(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
+        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
     }
     private fun scheduledThreadCallback(intent: Intent?)
     {
