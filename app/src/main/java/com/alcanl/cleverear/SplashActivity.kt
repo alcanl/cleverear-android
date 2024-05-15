@@ -7,15 +7,21 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
+import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.EnumMap
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
@@ -40,16 +46,58 @@ class SplashActivity : AppCompatActivity() {
                     Intent(this@SplashActivity, ControlActivity::class.java).apply { startActivity(this); finish() }
                     return
                 }
-                Intent(this@SplashActivity, MainActivity::class.java).apply { startActivity(this) }
-                finish()
+                else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore) {
+                    AlertDialog.Builder(this@SplashActivity)
+                        .setTitle("Test")
+                        .setMessage("You have a saved connection before. Do you want to continue with device : TEST")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes") {_,_ -> startActivity(Intent(this@SplashActivity, LoadingActivity::class.java)); finish() }
+                        .setNegativeButton("No") {_,_ -> Intent(this@SplashActivity, MainActivity::class.java)
+                            .apply { startActivity(this) }; finish()}
+                        .create().show()
+                }
+                else {
+                    Intent(
+                        this@SplashActivity,
+                        MainActivity::class.java
+                    ).apply { startActivity(this) }
+                    finish()
+                }
             }
         }.start()
+    }
+    private fun checkPrefs()
+    {
+        val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+        val addressLeft = prefs.getString(HA_LEFT_ADDRESS, "")
+        val addressRight = prefs.getString(HA_RIGHT_ADDRESS, "")
+
+        if (addressLeft?.isNotEmpty()!! && addressRight?.isNotEmpty()!!)
+            configuration.apply {
+                isDoubleDeviceConnection = true
+                isConnectedBefore = true
+                doubleDeviceMap = EnumMap(EarSide::class.java)
+            }
+
+        else if (addressLeft.isNotEmpty())
+            configuration.apply {
+                earSide = EarSide.Left
+                isConnectedBefore = true
+            }
+
+        else if (addressRight?.isNotEmpty()!!)
+            configuration.apply {
+                earSide = EarSide.Right
+                isConnectedBefore = true
+            }
+
     }
 
     private fun initialize()
     {
         checkAndRequestNotificationPermission()
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
+        checkPrefs()
         mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
     }
 

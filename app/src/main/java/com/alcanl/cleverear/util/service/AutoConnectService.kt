@@ -41,6 +41,7 @@ import java.lang.IllegalArgumentException
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -65,6 +66,7 @@ class AutoConnectService : Service()
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
 
+    private lateinit var mConnectorThread: Future<*>
     private lateinit var mHandler: Handler
     private lateinit var mConnectedNotification: Notification
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
@@ -130,9 +132,10 @@ class AutoConnectService : Service()
                     if (isConnected) {
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Connected")
                         return
-                    }
-                    else if (isBluetoothEnabled)
+                    } else if (isBluetoothEnabled) {
                         doConnection(hearingAid)
+                        mConnectorThread.get()
+                    }
                 }
                 else {
                     if (doubleDeviceMap.all { it.value.isConnected }) {
@@ -140,14 +143,18 @@ class AutoConnectService : Service()
                         return
                     }
 
-                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled)
+                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled) {
                         doConnection(doubleDeviceMap[EarSide.Left]!!)
+                        mConnectorThread.get()
+                    }
 
-                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled)
+                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled) {
                         doConnection(doubleDeviceMap[EarSide.Right]!!)
+                        mConnectorThread.get()
+                    }
                 }
             }
-            Thread.sleep(23000)
+
             if (isConnected()) {
                 mConnectedNotification = handleConnectedNotification(intent!!)
                 configuration.apply {
@@ -170,13 +177,24 @@ class AutoConnectService : Service()
             Log.e("Bluetooth", "Bluetooth Off")
             return
         }
+
         if (isConnected(adapter.getRemoteDevice(hearingAid.address))) {
-            hearingAid.isConnected = true
-            configuration.setConnections()
+            mConnectorThread = threadPool.submit {
+                try {
+                    hearingAid.apply {
+                        isConnected = true
+                        getPropertiesFromSDK(productManager, eventHandler)
+                        communicationAdaptor?.connect()
+                        Thread.sleep(10000)
+                        readDeviceConfiguration()
+                    }
+                } catch (_: InterruptedException) {}
+                configuration.setConnections()
+            }
             return
         }
 
-        threadPool.execute { scheduledThreadConnectDeviceCallback(adapter, hearingAid) }
+        mConnectorThread = threadPool.submit { scheduledThreadConnectDeviceCallback(adapter, hearingAid) }
     }
     private fun isConnected() : Boolean
     {
@@ -192,6 +210,7 @@ class AutoConnectService : Service()
             Log.e("Connection", isConnected.toString())
         }
     }
+    @Synchronized
     private fun scheduledThreadConnectDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
         try {

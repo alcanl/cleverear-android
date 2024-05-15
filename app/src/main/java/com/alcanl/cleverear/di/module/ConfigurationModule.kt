@@ -33,7 +33,6 @@ object ConfigurationModule {
     {
         return this
     }
-
     fun setConnections()
     {
         isConnected = try {
