@@ -34,4 +34,14 @@ object ConfigurationModule {
         return this
     }
 
+    fun setConnections()
+    {
+        isConnected = try {
+            if (isDoubleDeviceConnection)
+                doubleDeviceMap.all { it.value.isConnected }
+            else
+                hearingAid.isConnected
+        } catch (_ : Throwable) { false }
+    }
+
 }

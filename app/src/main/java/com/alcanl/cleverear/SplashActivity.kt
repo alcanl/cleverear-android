@@ -18,6 +18,7 @@ import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -39,18 +40,19 @@ class SplashActivity : AppCompatActivity() {
                     Intent(this@SplashActivity, ControlActivity::class.java).apply { startActivity(this); finish() }
                     return
                 }
-
                 Intent(this@SplashActivity, MainActivity::class.java).apply { startActivity(this) }
                 finish()
             }
         }.start()
     }
+
     private fun initialize()
     {
         checkAndRequestNotificationPermission()
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
         mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
     }
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,7 @@ class SplashActivity : AppCompatActivity() {
         initCountDownTimer()
         cleanEvents()
     }
+
     private fun checkAndRequestNotificationPermission()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -72,10 +75,12 @@ class SplashActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE), 0)
 
     }
+
     private fun cleanEvents()
     {
         threadPool.execute { cleanEventsCallback() }
     }
+
     @Synchronized
     private fun cleanEventsCallback()
     {
