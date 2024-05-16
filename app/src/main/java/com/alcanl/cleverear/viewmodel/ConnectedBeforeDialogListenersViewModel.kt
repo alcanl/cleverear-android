@@ -1,19 +1,18 @@
 package com.alcanl.cleverear.viewmodel
 
-import android.view.View
-import com.alcanl.cleverear.ConnectionActivity
+import com.alcanl.cleverear.SplashActivity
 import java.lang.ref.WeakReference
 
-class AlertDialogListenersViewModel(activity: ConnectionActivity){
+class ConnectedBeforeDialogListenersViewModel(activity: SplashActivity){
     private val mWeakReference = WeakReference(activity)
 
     fun handlePositiveButton()
     {
         mWeakReference.get()!!.alertDialogPositiveButtonClicked()
     }
-    fun handleNegativeButton(view: View)
+    fun handleNegativeButton()
     {
-        mWeakReference.get()!!.alertDialogNegativeButtonClicked(view)
+        mWeakReference.get()!!.alertDialogNegativeButtonClicked()
     }
 
 }

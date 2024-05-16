@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="com.alcanl.cleverear.viewmodel.AlertDialogListenersViewModel"/>
-        <variable name="viewModel" type="AlertDialogListenersViewModel" />
+        <import type="com.alcanl.cleverear.viewmodel.ActiveConnectionDialogListenersViewModel"/>
+        <variable name="viewModel" type="ActiveConnectionDialogListenersViewModel" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -92,8 +92,8 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.53"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.051"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.112" />
     </androidx.constraintlayout.widget.ConstraintLayout>

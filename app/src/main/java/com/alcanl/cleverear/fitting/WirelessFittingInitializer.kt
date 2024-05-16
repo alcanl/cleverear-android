@@ -11,9 +11,7 @@ import com.ark.Library
 import com.ark.Product
 import com.ark.ProductManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import retrofit2.awaitResponse
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -51,31 +49,24 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return null
         }
     }
-    private fun getLibraryFromService(libId: String) : File?
+    private suspend fun getLibraryFromService(libId: String) : File?
     {
         val call = earTechnicService.findLibraryByLibraryId(libId)
-        var libraryInfo: LibraryInfo?
+        val libraryInfo: LibraryInfo?
         var libFile : File? = null
-
-        call.enqueue(object: Callback<LibraryInfo> {
-            override fun onResponse(call: Call<LibraryInfo>, response: Response<LibraryInfo>)
-            {
-                call.timeout().timeout(30, TimeUnit.SECONDS)
-                call.timeout().deadline(30, TimeUnit.SECONDS)
-                libraryInfo = response.body()
-
-                libraryInfo?.let {
-                    val idHex = Integer.toHexString(libId.toInt())
-                    libFile = writeLibraryToFilesDir(it.convertLibraryData(), "$idHex.library").get()
-                }
+        call.timeout().timeout(20, TimeUnit.SECONDS)
+        call.timeout().deadline(20, TimeUnit.SECONDS)
+        try {
+            val response = call.awaitResponse()
+            libraryInfo = response.body()
+            libraryInfo?.let {
+                val idHex = Integer.toHexString(libId.toInt())
+                libFile = writeLibraryToFilesDir(it.convertLibraryData(), "$idHex.library").get()
             }
-            override fun onFailure(call: Call<LibraryInfo>, ex: Throwable)
-            {
-                throw NetworkException(ex)
-            }
-        })
+        } catch (ex: Throwable) {
+            throw NetworkException(ex)
+        }
 
-        Thread.sleep(10000)
         return libFile
     }
     private fun writeLibraryToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
@@ -84,7 +75,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     }
     fun createProduct(productId : Int, library: Library): Product = library.products.getById(productId).createProduct()
 
-    fun findLibraryByLibraryId(libraryId: String) : File?
+    suspend fun findLibraryByLibraryId(libraryId: String) : File?
     {
         try {
             val idHex = Integer.toHexString(libraryId.toInt())

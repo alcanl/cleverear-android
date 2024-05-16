@@ -5,15 +5,15 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.ConnectionActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.LayoutAlertDialogEndConnectionBinding
-import com.alcanl.cleverear.viewmodel.AlertDialogListenersViewModel
+import com.alcanl.cleverear.viewmodel.ActiveConnectionDialogListenersViewModel
 
-class CustomAlertDialog(activity: ConnectionActivity): Dialog(activity, R.style.DialogStyle) {
+class CustomAlertDialogActiveConnection(activity: ConnectionActivity): Dialog(activity, R.style.DialogStyle) {
     init {
         window?.setBackgroundDrawableResource(R.drawable.drawable_alert_dialog)
         setCancelable(false)
         val binding: LayoutAlertDialogEndConnectionBinding = DataBindingUtil.inflate(layoutInflater,
             R.layout.layout_alert_dialog_end_connection, null, false)
-        binding.viewModel = AlertDialogListenersViewModel(activity)
+        binding.viewModel = ActiveConnectionDialogListenersViewModel(activity)
         setContentView(binding.root)
     }
 }

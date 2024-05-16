@@ -23,6 +23,10 @@ import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -61,7 +65,7 @@ class RemoteFittingActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
         mBinding.viewModel = RemoteFittingActivityListenersViewModel(this)
     }
-    private fun initializeProductCallback()
+    private suspend fun initializeProductCallback()
     {
         try {
             mDeviceInfo = configuration.hearingAid.communicationAdaptor?.detectDevice()
@@ -71,13 +75,17 @@ class RemoteFittingActivity : AppCompatActivity() {
 
             if (libFile != null) {
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
-                Thread.sleep(2000)
+                runBlocking {
+                    delay(2000)
+                }
                 mLibrary = productManager.loadLibraryFromFile(libFile.absolutePath)
                 with(configuration) {
                     product = wirelessFittingInitializer.createProduct(mDeviceInfo!!.productId, mLibrary)
                     product.initializeDevice(hearingAid.communicationAdaptor)
                     mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_SUCCESS)
-                    Thread.sleep(2000)
+                    runBlocking {
+                        delay(2000)
+                    }
                 }
             }
             else
@@ -93,7 +101,7 @@ class RemoteFittingActivity : AppCompatActivity() {
     }
     private fun initializeProduct()
     {
-        threadPool.execute { initializeProductCallback() }
+        MainScope().launch { initializeProductCallback() }
     }
     private class RemoteHandler(activity: RemoteFittingActivity) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(activity)
@@ -112,7 +120,7 @@ class RemoteFittingActivity : AppCompatActivity() {
             mWeakReference.get()?.let {
                 with(it.mBinding) {
                     progressBar.visibility = View.INVISIBLE
-                    textViewInitialize.text = "Successfully Initialized The Device For Fitting"
+                    textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_success_text)
                     textViewDeviceMac.text = it.configuration.product.deviceMACAddress
                     textViewDeviceModel.text = it.mDeviceInfo?.serialId.toString()
                     textViewLibraryId.text = Integer.toHexString(it.mDeviceInfo?.libraryId!!.toInt())
@@ -124,20 +132,20 @@ class RemoteFittingActivity : AppCompatActivity() {
         }
         private fun productCreateFail()
         {
-            handleInitProcessViews("Unknown Problem Occurred While Initializing The Device")
+            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
         }
         private fun libraryNotFound()
         {
-            handleInitProcessViews("Could Not Find The Compatible Library File For The Connected Device")
+            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
         }
         private fun librarySearchFail()
         {
-            handleInitProcessViews("Internal Server Error, Please Try To Connect Later")
+            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
         }
         private fun librarySearchSuccess()
         {
             mWeakReference.get()?.let {
-                it.mBinding.textViewInitialize.text = "Successfully Found The Compatible Library, Beginning The Initialize Device"
+                it.mBinding.textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_library_found_text)
             }
         }
         private fun readParameterSuccess()

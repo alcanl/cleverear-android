@@ -84,6 +84,11 @@
     <string name="battery_level_json" translatable="false">BatteryLevel</string>
     <string name="title_aux_label">Stream</string>
     <string name="title_mic_label">Mic</string>
+    <string name="textview_device_mac" translatable="true">Device Mac:</string>
+    <string name="textview_device_model" translatable="true">Device Model:</string>
+    <string name="textview_library_id" translatable="true">Library Id:</string>
+    <string name="textview_firmware_id" translatable="true">Firmware Id:</string>
+    <string name="textview_firmware_version" translatable="true">Firmware Version:</string>
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
     <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>
@@ -93,5 +98,13 @@
     <string name="service_notification_start_service_text" translatable="true">CleverEar Hearing Aid Configuration</string>
     <string name="service_notification_start_channel_id" translatable="false">CleverEarService</string>
     <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
-
+    <string name="dialog_info_title" translatable="true">Info</string>
+    <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_initializing_text" translatable="true">Please Wait While Initializing The Device</string>
+    <string name="textview_initialize_library_found_text" translatable="true">Successfully Found The Compatible Library, Beginning The Initialize Device</string>
+    <string name="textview_initialize_success_text" translatable="true">Successfully Initialized The Device For Fitting</string>
+    <string name="textview_initialize_unknown_problem_text" translatable="true">Unknown Problem Occurred While Initializing The Device</string>
+    <string name="textview_initialize_network_problem_text" translatable="true">External Server Error, Please Try To Connect Later</string>
+    <string name="textview_initialize_library_not_found_text" translatable="true">Could Not Found The Compatible Library File For The Connected Device</string>
+    <string name="alert_dialog_connected_before_text" translatable="true">Detected A Previous Saved Device Connection. Do You Want To Continue Connection With Previous Device/Devices?</string>
 </resources>

@@ -25,7 +25,7 @@ import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.scan.DeviceScanHandler
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
-import com.alcanl.cleverear.util.dialog.CustomAlertDialog
+import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionActivityListenersViewModel
 import com.ark.ArkException
@@ -51,7 +51,7 @@ class ConnectionActivity : AppCompatActivity() {
     private var mDeviceCount = 0
     private var mIsDeviceFound = false
     private var isScanContinue = false
-    private lateinit var mAlertDialog: CustomAlertDialog
+    private lateinit var mAlertDialog: CustomAlertDialogActiveConnection
     private lateinit var mAdapter: DeviceListAdapter
     private lateinit var scanOnBoard : Thread
     private lateinit var mAsyncResult: AsyncResult
@@ -197,6 +197,7 @@ class ConnectionActivity : AppCompatActivity() {
         }
         Log.e("scan", "Scan ended")
     }
+    @SuppressLint("DefaultLocale")
     private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
     {
         with(mBinding) {
@@ -266,7 +267,7 @@ class ConnectionActivity : AppCompatActivity() {
             stopScanButtonClicked()
 
         if (configuration.isConnected)
-            mAlertDialog = CustomAlertDialog(this).apply { show() }
+            mAlertDialog = CustomAlertDialogActiveConnection(this).apply { show() }
         else
             finish()
     }
@@ -285,7 +286,7 @@ class ConnectionActivity : AppCompatActivity() {
             scanDevices()
             isScanContinue = true
         } else
-            mAlertDialog = CustomAlertDialog(this).apply { show() }
+            mAlertDialog = CustomAlertDialogActiveConnection(this).apply { show() }
     }
     fun alertDialogPositiveButtonClicked()
     {

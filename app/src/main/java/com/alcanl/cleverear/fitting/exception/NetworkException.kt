@@ -4,4 +4,5 @@ class NetworkException(cause: Throwable) : Exception() {
     private val mCause = cause
     override val message: String?
         get() = mCause.message
+
 }

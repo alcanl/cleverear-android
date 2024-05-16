@@ -54,4 +54,18 @@
     <string name="button_previous_activity">Vorherige</string>
     <string name="left_ear_side_text">Linkes Ohr</string>
     <string name="right_ear_side_text">Rechtes Ohr</string>
+    <string name="dialog_info_title">Infos</string>
+    <string name="textview_device_mac">Gerät Mac:</string>
+    <string name="textview_device_model">Gerät Modell:</string>
+    <string name="textview_library_id">Bibliothek Id:</string>
+    <string name="textview_firmware_id">Firmware Id:</string>
+    <string name="textview_firmware_version">Firmware Version:</string>
+    <string name="button_retry_text" translatable="true">Wiederholung</string>
+    <string name="textview_initializing_text" translatable="true">Bitte warten Sie während der Initialisierung des Geräts</string>
+    <string name="textview_initialize_library_found_text" translatable="true">Erfolgreich die kompatible Bibliothek gefunden, Beginn der Initialisierung des Geräts</string>
+    <string name="textview_initialize_success_text" translatable="true">Erfolgreiche Initialisierung des Geräts für die Anpassung</string>
+    <string name="textview_initialize_unknown_problem_text" translatable="true">Während der Initialisierung des Geräts ist ein unbekanntes Problem aufgetreten</string>
+    <string name="textview_initialize_network_problem_text" translatable="true">Externer Serverfehler, bitte versuchen Sie später eine Verbindung herzustellen</string>
+    <string name="textview_initialize_library_not_found_text" translatable="true">Die kompatible Bibliotheksdatei für das angeschlossene Gerät konnte nicht gefunden werden</string>
+    <string name="alert_dialog_connected_before_text">Es wurde eine vorherige gespeicherte Geräteverbindung erkannt. Möchten Sie die Verbindung mit dem vorherigen Gerät/den vorherigen Geräten fortsetzen?</string>
 </resources>
