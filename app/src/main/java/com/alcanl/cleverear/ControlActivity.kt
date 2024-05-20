@@ -172,7 +172,6 @@ class ControlActivity : AppCompatActivity() {
 
         return count
     }
-
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
         (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
@@ -292,23 +291,14 @@ class ControlActivity : AppCompatActivity() {
                                 mBinding.sliderCommon.visibility = View.VISIBLE
                                 mBinding.sliderCommon.isEnabled = true
                             }
-
-                            override fun onAnimationEnd(animation: Animation?) {
-
-                            }
-
-                            override fun onAnimationRepeat(animation: Animation?) {
-
-                            }
+                            override fun onAnimationEnd(animation: Animation?) {}
+                            override fun onAnimationRepeat(animation: Animation?) {}
                         })
 
                         })
                 }
             }
-            override fun onAnimationRepeat(animation: Animation?)
-            {
-
-            }
+            override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
     private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
@@ -328,9 +318,7 @@ class ControlActivity : AppCompatActivity() {
                 mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
             }
 
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
+            override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
     @Synchronized

@@ -40,6 +40,7 @@ import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import javax.inject.Inject
 @AndroidEntryPoint
 class LoadingActivity : AppCompatActivity() {
@@ -53,6 +54,7 @@ class LoadingActivity : AppCompatActivity() {
     lateinit var productManager: ProductManager
     @Inject
     lateinit var mBondRequestReceiver: BondHearingAidBroadcastReceiver
+    private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
     private lateinit var mListener: LoadingActivityEventListener
     private lateinit var mBinding : ActivityLoadingBinding
 
@@ -294,7 +296,7 @@ class LoadingActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonBondDeviceOnTick(millisUntilFinished)
-                if (configuration.isConnected) {
+                if (configuration.isConnected && mConnectorFutures.all { it.isDone }) {
                     finalizeConnectedLoadingTimer()
                     this.cancel()
                 }
@@ -340,8 +342,7 @@ class LoadingActivity : AppCompatActivity() {
     private fun connectToDevice(hearingAid: HearingAid)
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
-
-        threadPool.execute { connectToDeviceCallback(adapter, hearingAid) }
+        mConnectorFutures.add( threadPool.submit { connectToDeviceCallback(adapter, hearingAid) } )
     }
     @SuppressLint("MissingPermission")
     private fun connectToDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)

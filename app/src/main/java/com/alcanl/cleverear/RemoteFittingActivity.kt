@@ -69,7 +69,7 @@ class RemoteFittingActivity : AppCompatActivity() {
     {
         try {
             mDeviceInfo = configuration.hearingAid.communicationAdaptor?.detectDevice()
-            Log.d("libId", mDeviceInfo?.libraryId.toString())
+            Log.d("LIBRARY_ID", mDeviceInfo?.libraryId.toString())
             val libFile =
                 wirelessFittingInitializer.findLibraryByLibraryId(mDeviceInfo?.libraryId?.toString()!!)
 
@@ -92,7 +92,7 @@ class RemoteFittingActivity : AppCompatActivity() {
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_NOT_FOUND)
 
         } catch (ex: NetworkException) {
-            Log.e("NET", ex.message!!)
+            Log.e("NETWORK", ex.message!!)
             mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_FAIL)
         } catch (ex: ArkException) {
             Log.e("ARK", ex.message!!)

@@ -165,6 +165,7 @@ class SplashActivity : AppCompatActivity() {
     }
     fun alertDialogNegativeButtonClicked()
     {
+        configuration.isConnectedBefore = false
         mAlertDialog.dismiss()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
