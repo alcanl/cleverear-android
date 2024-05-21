@@ -67,7 +67,7 @@ class AutoConnectService : Service()
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
 
     private lateinit var mConnectorThread: Future<*>
-    private lateinit var mHandler: Handler
+    private lateinit var mHandler: AutoConnectHandler
     private lateinit var mConnectedNotification: Notification
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {

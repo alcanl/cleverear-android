@@ -23,13 +23,15 @@ import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 @AndroidEntryPoint
 class RemoteFittingActivity : AppCompatActivity() {
     @Inject
@@ -99,9 +101,10 @@ class RemoteFittingActivity : AppCompatActivity() {
             mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
         }
     }
+    @OptIn(DelicateCoroutinesApi::class)
     private fun initializeProduct()
     {
-        MainScope().launch { initializeProductCallback() }
+        GlobalScope.launch { initializeProductCallback() }
     }
     private class RemoteHandler(activity: RemoteFittingActivity) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(activity)

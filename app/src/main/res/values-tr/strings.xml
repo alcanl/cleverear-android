@@ -62,7 +62,7 @@
     <string name="dialog_info_title">Bilgi</string>
     <string name="button_retry_text" translatable="true">Retry</string>
     <string name="textview_initializing_text" translatable="true">Cihaz Hazırlanırken Lütfen Bekleyin</string>
-    <string name="textview_initialize_library_found_text" translatable="true">Uyumlu Kütüphane Başarılı Bir Şekilde Bulundu, Cihaz Konfigürasyon İçin Hazırlanıyor</string>
+    <string name="textview_initialize_library_found_text" translatable="true">Uyumlu Kütüphane Bulundu, Cihaz Konfigürasyon İçin Hazırlanıyor</string>
     <string name="textview_initialize_success_text" translatable="true">Cihaz Konfigürasyon İçin Başarılı Bir Şekilde Hazırlandı</string>
     <string name="textview_initialize_unknown_problem_text" translatable="true">Cihaz Hazırlanırken Bilinmeyen Bir Problem İle Karşılaşıldı</string>
     <string name="textview_initialize_network_problem_text" translatable="true">Uzak Sunucu Hatası, Lütfen Daha Sonra Tekrar Deneyin</string>

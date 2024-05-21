@@ -261,7 +261,7 @@ class LoadingActivity : AppCompatActivity() {
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected) {
+                if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected && mConnectorFutures.all { it.isDone }) {
                     finalizeConnectedLoadingTimer()
                     this.cancel()
                 }

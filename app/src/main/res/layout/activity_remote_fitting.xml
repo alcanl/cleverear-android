@@ -63,6 +63,7 @@
             android:text="@string/button_retry_text"
             android:textSize="20sp"
             android:visibility="invisible"
+            android:textColor="@color/ap_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +95,7 @@
                     android:id="@+id/textView6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text="@string/textview_device_mac"
                     android:textAlignment="center" />
 
@@ -101,6 +103,7 @@
                     android:id="@+id/textView7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text="@string/textview_device_model"
                     android:textAlignment="center" />
 
@@ -108,6 +111,7 @@
                     android:id="@+id/textView11"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text="@string/textview_library_id"
                     android:textAlignment="center" />
 
@@ -115,6 +119,7 @@
                     android:id="@+id/textView13"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text="@string/textview_firmware_id"
                     android:textAlignment="center" />
 
@@ -122,6 +127,7 @@
                     android:id="@+id/textView15"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text="@string/textview_firmware_version"
                     android:textAlignment="center" />
 
@@ -138,6 +144,7 @@
                     android:id="@+id/textViewDeviceMac"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text=""
                     android:textAlignment="center" />
 
@@ -145,6 +152,7 @@
                     android:id="@+id/textViewDeviceModel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text=""
                     android:textAlignment="center" />
 
@@ -152,6 +160,7 @@
                     android:id="@+id/textViewLibraryId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text=""
                     android:textAlignment="center" />
 
@@ -159,6 +168,7 @@
                     android:id="@+id/textViewFirmwareId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text=""
                     android:textAlignment="center" />
 
@@ -166,6 +176,7 @@
                     android:id="@+id/textViewFirmwareVersion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/ap_black"
                     android:text=""
                     android:textAlignment="center" />
 
