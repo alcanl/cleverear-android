@@ -10,4 +10,8 @@ class RemoteFittingActivityListenersViewModel(activity: RemoteFittingActivity) {
     {
         mWeakReference.get()?.retryButtonClicked()
     }
+    fun handleTestParameterButton()
+    {
+        mWeakReference.get()?.testParameterButtonClicked()
+    }
 }

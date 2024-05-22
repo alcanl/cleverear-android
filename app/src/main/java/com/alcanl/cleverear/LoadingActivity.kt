@@ -310,11 +310,11 @@ class LoadingActivity : AppCompatActivity() {
     private fun finalizeConnectedLoadingTimer()
     {
         mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-        Handler(Looper.myLooper()!!).postDelayed({ finish()
+        Handler(Looper.myLooper()!!).postDelayed({
             startActivity(if (!configuration.isRemoteFittingConnection) Intent
                 (this@LoadingActivity, ControlActivity::class.java) else Intent(
                 this@LoadingActivity, RemoteFittingActivity::class.java
-            )) }, 3000)
+            )); finish() }, 3000)
     }
     private fun finalizeLoadingTimer()
     {

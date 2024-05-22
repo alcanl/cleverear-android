@@ -12,6 +12,8 @@ import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.exception.NetworkException
+import com.alcanl.cleverear.fitting.readIntParameter
+import com.alcanl.cleverear.fitting.setParameter
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -56,6 +58,7 @@ class RemoteFittingActivity : AppCompatActivity() {
     {
         super.onStart()
         initializeProduct()
+        Log.e("TEST_VOLUME", configuration.hearingAid.volume.toString())
     }
     private fun initialize()
     {
@@ -105,6 +108,18 @@ class RemoteFittingActivity : AppCompatActivity() {
     private fun initializeProduct()
     {
         GlobalScope.launch { initializeProductCallback() }
+    }
+    fun testParameterButtonClicked()
+    {
+        threadPool.execute {
+            try {
+
+                Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
+                configuration.product.setParameter("X_WDRC_LowLevelThreshold[3]", 31)
+                Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
+
+            } catch (ex: ArkException) { Log.e("TEST_PARAMETER", ex.message!!)}
+        }
     }
     private class RemoteHandler(activity: RemoteFittingActivity) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(activity)
@@ -174,8 +189,11 @@ class RemoteFittingActivity : AppCompatActivity() {
     }
     fun retryButtonClicked()
     {
-        mBinding.buttonRetry.visibility = View.INVISIBLE
-        mBinding.progressBar.visibility = View.VISIBLE
+        with(mBinding) {
+            textViewInitialize.text = getText(R.string.textview_initializing_text)
+            buttonRetry.visibility = View.INVISIBLE
+            progressBar.visibility = View.VISIBLE
+        }
         initializeProduct()
     }
 }

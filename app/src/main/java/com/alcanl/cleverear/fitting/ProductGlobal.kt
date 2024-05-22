@@ -1,35 +1,50 @@
 package com.alcanl.cleverear.fitting
 
-import android.util.Log
+import com.ark.ArkException
+import com.ark.Parameter
 import com.ark.Product
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
-fun Product.setParameter(parameterName: String, value: Int)
+private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
-    val parameter = this.memories.getItem(currentMemory.value()).parameters.getById(parameterName)
+    return this.systemMemory.parameters.containsId(parameterName)
+}
+private fun setParameter(parameter: Parameter, value: Any)
+{
+    if (value is Int && parameter.isValidIntValue(value))
+        parameter.value = value
+    else if (value is Double && parameter.isValidDoubleValue(value))
+        parameter.doubleValue = value
+    else if (value is Boolean && parameter.isValidBooleanValue(value))
+        parameter.isBooleanValue = value
+    else
+        throw ArkException("Invalid Parameter Name And Value Combination")
 
-    if (!parameter.isValidIntValue(value)) {
-        Log.e("Parameter", "Invalid Int Value For Default Range")
-        return
+}
+fun Product.setParameter(parameterName: String, value: Any)
+{
+    if (isSystemParameter(parameterName)) {
+        setParameter(systemMemory.parameters.getById(parameterName), value)
     }
-
-    parameter.value = value
-}
-fun Product.setParameter(parameterName: String, value: Boolean)
-{
-    this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).isBooleanValue = value
-}
-fun Product.setParameter(parameterName: String, value: Double)
-{
-    val parameter = this.memories.getItem(currentMemory.value()).parameters.getById(parameterName)
-
-    if (!parameter.isValidDoubleValue(value)) {
-        Log.e("Parameter", "Invalid Int Value For Default Range")
-        return
+    else {
+        setParameter(
+            this.memories.getItem(currentMemory.value()).parameters.getById(parameterName),
+            value
+        )
     }
-
-    parameter.doubleValue = value
 }
+fun Product.readDoubleParameter(parameterName: String) : Double
+{
+    if (isSystemParameter(parameterName))
+        return this.systemMemory.parameters.getById(parameterName).doubleValue
+
+    return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).doubleValue
+}
+
+fun Product.readIntParameter(parameterName: String) : Int
+{
+    if (isSystemParameter(parameterName))
+        return this.systemMemory.parameters.getById(parameterName).value
+
+    return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).value
+}
+
