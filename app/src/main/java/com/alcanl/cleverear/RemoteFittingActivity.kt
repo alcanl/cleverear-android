@@ -17,6 +17,10 @@ import com.alcanl.cleverear.fitting.setParameter
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
+import com.alcanl.cleverear.util.WHAT_LOADING_PARAM
+import com.alcanl.cleverear.util.WHAT_PARAM_LOAD_SUCCESS
+import com.alcanl.cleverear.util.WHAT_PARAM_NOT_FOUND
+import com.alcanl.cleverear.util.WHAT_PARAM_SEARCH_SUCCESS
 import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_FAIL
 import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_SUCCESS
 import com.alcanl.cleverear.viewmodel.RemoteFittingActivityListenersViewModel
@@ -30,6 +34,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -104,6 +109,37 @@ class RemoteFittingActivity : AppCompatActivity() {
             mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
         }
     }
+    private suspend fun loadDefaultParamCallBack()
+    {
+        try {
+            val paramFile = wirelessFittingInitializer.findDefaultParamByHearingAid(mDeviceInfo?.serialId!!)
+
+            if (paramFile != null) {
+                mHandler.sendEmptyMessage(WHAT_PARAM_SEARCH_SUCCESS)
+                runBlocking {
+                    delay(2000)
+                }
+                mHandler.sendEmptyMessage(WHAT_LOADING_PARAM)
+                with(configuration) {
+                    val path = File(filesDir, "default_${mDeviceInfo?.serialId}.param").absolutePath
+                    product.loadParamFile(path, true, false, false)
+                }
+                runBlocking {
+                    delay(1000)
+                }
+                mHandler.sendEmptyMessage(WHAT_PARAM_LOAD_SUCCESS)
+            }
+            else
+                mHandler.sendEmptyMessage(WHAT_PARAM_NOT_FOUND)
+
+        } catch (ex: NetworkException) {
+            mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_FAIL)
+            Log.e("NETWORK_ERR", ex.message!!)
+        } catch (ex: ArkException) {
+            Log.e("ARK_ERR", ex.message!!)
+            mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
+        }
+    }
     @OptIn(DelicateCoroutinesApi::class)
     private fun initializeProduct()
     {
@@ -115,7 +151,8 @@ class RemoteFittingActivity : AppCompatActivity() {
             try {
 
                 Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
-                configuration.product.setParameter("X_WDRC_LowLevelThreshold[3]", 31)
+                configuration.product.setParameter("X_VolumeRetention_Enable", 1)
+                configuration.hearingAid.wirelessControl?.volume = 90
                 Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
 
             } catch (ex: ArkException) { Log.e("TEST_PARAMETER", ex.message!!)}
@@ -174,6 +211,22 @@ class RemoteFittingActivity : AppCompatActivity() {
         {
 
         }
+        private fun paramSearchSuccess()
+        {
+
+        }
+        private fun paramLoading()
+        {
+
+        }
+        private fun paramNotFound()
+        {
+
+        }
+        private fun paramLoadSuccess()
+        {
+
+        }
         override fun handleMessage(msg: Message)
         {
             when (msg.what) {
@@ -184,6 +237,10 @@ class RemoteFittingActivity : AppCompatActivity() {
                 14 -> readParameterSuccess()
                 15 -> readParameterFail()
                 16 -> libraryNotFound()
+                17 -> paramSearchSuccess()
+                18 -> paramLoading()
+                19 -> paramNotFound()
+                20 -> paramLoadSuccess()
             }
         }
     }
@@ -195,5 +252,10 @@ class RemoteFittingActivity : AppCompatActivity() {
             progressBar.visibility = View.VISIBLE
         }
         initializeProduct()
+    }
+    @OptIn(DelicateCoroutinesApi::class)
+    fun loadDefaultParamButtonClicked()
+    {
+        GlobalScope.launch { loadDefaultParamCallBack() }
     }
 }

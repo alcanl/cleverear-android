@@ -2,6 +2,7 @@ package com.alcanl.cleverear.fitting
 
 import com.ark.ArkException
 import com.ark.Parameter
+import com.ark.ParameterSpace
 import com.ark.Product
 
 private fun Product.isSystemParameter(parameterName: String) : Boolean
@@ -24,12 +25,14 @@ fun Product.setParameter(parameterName: String, value: Any)
 {
     if (isSystemParameter(parameterName)) {
         setParameter(systemMemory.parameters.getById(parameterName), value)
+        writeParameters(ParameterSpace.kSystemNvmMemory)
     }
     else {
         setParameter(
             this.memories.getItem(currentMemory.value()).parameters.getById(parameterName),
             value
         )
+        writeParameters(currentMemory)
     }
 }
 fun Product.readDoubleParameter(parameterName: String) : Double

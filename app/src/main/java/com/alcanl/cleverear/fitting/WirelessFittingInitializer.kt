@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
 import com.alcanl.cleverear.api.library.LibraryInfo
+import com.alcanl.cleverear.api.param.ParamInfo
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.ark.Library
@@ -31,7 +32,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var earTechnicService: IEarTechnicLibraryService
-    private fun writeLibraryToFilesDirCallback(byteArray: ByteArray, fileName: String) : File?
+    private fun writeDataToFilesDirCallback(byteArray: ByteArray, fileName: String) : File?
 
     {
         try {
@@ -49,6 +50,25 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return null
         }
     }
+    private suspend fun getDefaultParamFromService(modelNumber: Int) : File?
+    {
+        val call = earTechnicService.findDefaultParamByHearingAid(modelNumber)
+        val paramInfo: ParamInfo?
+        var paramFile: File? = null
+        call.timeout().timeout(20, TimeUnit.SECONDS)
+        call.timeout().deadline(20, TimeUnit.SECONDS)
+        try {
+            val response = call.awaitResponse()
+            paramInfo = response.body()
+            paramInfo?.let {
+                paramFile = writeDataToFilesDir(it.convertParamData(), "default_$modelNumber.param").get()
+            }
+        } catch (ex: Throwable) {
+            throw NetworkException(ex)
+        }
+
+        return paramFile
+    }
     private suspend fun getLibraryFromService(libId: String) : File?
     {
         val call = earTechnicService.findLibraryByLibraryId(libId)
@@ -61,7 +81,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             libraryInfo = response.body()
             libraryInfo?.let {
                 val idHex = Integer.toHexString(libId.toInt())
-                libFile = writeLibraryToFilesDir(it.convertLibraryData(), "$idHex.library").get()
+                libFile = writeDataToFilesDir(it.convertLibraryData(), "$idHex.library").get()
             }
         } catch (ex: Throwable) {
             throw NetworkException(ex)
@@ -69,9 +89,9 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
 
         return libFile
     }
-    private fun writeLibraryToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
+    private fun writeDataToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
     {
-        return threadPool.submit(Callable { writeLibraryToFilesDirCallback(byteArray, fileName) })
+        return threadPool.submit(Callable { writeDataToFilesDirCallback(byteArray, fileName) })
     }
     fun createProduct(productId : Int, library: Library): Product = library.products.getById(productId).createProduct()
 
@@ -87,6 +107,11 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             Log.e("NumberFormat", ex.message!!)
             return null
         }
+    }
+    suspend fun findDefaultParamByHearingAid(modelNumber: Int) : File?
+    {
+        val paramFile = File(mContext.filesDir, "default_$modelNumber.param")
+        return if (paramFile.exists()) paramFile else getDefaultParamFromService(modelNumber)
     }
 
 }

@@ -14,4 +14,8 @@ class RemoteFittingActivityListenersViewModel(activity: RemoteFittingActivity) {
     {
         mWeakReference.get()?.testParameterButtonClicked()
     }
+    fun handleLoadDefaultParamButton()
+    {
+        mWeakReference.get()?.loadDefaultParamButtonClicked()
+    }
 }

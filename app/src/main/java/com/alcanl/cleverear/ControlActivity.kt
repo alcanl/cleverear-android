@@ -58,7 +58,7 @@ class ControlActivity : AppCompatActivity() {
         runOnUiThread { initActiveMemory(if (configuration.isDoubleDeviceConnection)
             configuration.doubleDeviceMap[EarSide.Left]?.currentMemory?.value()!!
         else
-            configuration.hearingAid.currentMemory?.value()!!
+            configuration.hearingAid.currentMemory.value()
         ) }
 
         if (!mListener.isListenerOnBoard())
