@@ -12,8 +12,8 @@ import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.exception.NetworkException
+import com.alcanl.cleverear.fitting.readAllParameters
 import com.alcanl.cleverear.fitting.readIntParameter
-import com.alcanl.cleverear.fitting.setParameter
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -23,6 +23,9 @@ import com.alcanl.cleverear.util.WHAT_PARAM_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_PARAM_SEARCH_SUCCESS
 import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_FAIL
 import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_SUCCESS
+import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_FAIL
+import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_PROCESS
+import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_SUCCESS
 import com.alcanl.cleverear.viewmodel.RemoteFittingActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.DeviceInfo
@@ -96,6 +99,13 @@ class RemoteFittingActivity : AppCompatActivity() {
                     runBlocking {
                         delay(2000)
                     }
+                    mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_PROCESS)
+
+                    if (product.readAllParameters(configuration.hearingAid))
+                        mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_SUCCESS)
+                    else
+                        mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_FAIL)
+
                 }
             }
             else
@@ -150,10 +160,9 @@ class RemoteFittingActivity : AppCompatActivity() {
         threadPool.execute {
             try {
 
-                Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
-                configuration.product.setParameter("X_VolumeRetention_Enable", 1)
-                configuration.hearingAid.wirelessControl?.volume = 90
-                Log.e("TEST_VOLUME_RETENTION", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
+                Log.e("TEST_PARAMETER", configuration.product.readIntParameter("X_WDRC_CrossoverFrequency[0]").toString())
+                //configuration.product.setParameter("X_WDRC_CrossoverFrequency[0]", 6)
+                Log.e("TEST_PARAMETER", configuration.product.readIntParameter("X_WDRC_NumberOfChannels").toString())
 
             } catch (ex: ArkException) { Log.e("TEST_PARAMETER", ex.message!!)}
         }
@@ -174,7 +183,6 @@ class RemoteFittingActivity : AppCompatActivity() {
         {
             mWeakReference.get()?.let {
                 with(it.mBinding) {
-                    progressBar.visibility = View.INVISIBLE
                     textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_success_text)
                     textViewDeviceMac.text = it.configuration.product.deviceMACAddress
                     textViewDeviceModel.text = it.mDeviceInfo?.serialId.toString()
@@ -205,11 +213,16 @@ class RemoteFittingActivity : AppCompatActivity() {
         }
         private fun readParameterSuccess()
         {
-
+            mWeakReference.get()?.let {
+                it.mBinding.progressBar.visibility = View.INVISIBLE
+                it.mBinding.textViewInitialize.text = "The Parameters Has Successfully Read From The Device"
+            }
         }
         private fun readParameterFail()
         {
-
+            mWeakReference.get()?.let {
+                it.mBinding.textViewInitialize.text = "Unknown Problem Occurred While Reading Parameters, Please Contact With Your Delegate"
+            }
         }
         private fun paramSearchSuccess()
         {
@@ -227,6 +240,12 @@ class RemoteFittingActivity : AppCompatActivity() {
         {
 
         }
+        private fun readingParameters()
+        {
+            mWeakReference.get()?.let {
+                it.mBinding.textViewInitialize.text = "Please Wait While Reading Inscribed Parameters From The Device"
+            }
+        }
         override fun handleMessage(msg: Message)
         {
             when (msg.what) {
@@ -241,6 +260,7 @@ class RemoteFittingActivity : AppCompatActivity() {
                 18 -> paramLoading()
                 19 -> paramNotFound()
                 20 -> paramLoadSuccess()
+                21 -> readingParameters()
             }
         }
     }

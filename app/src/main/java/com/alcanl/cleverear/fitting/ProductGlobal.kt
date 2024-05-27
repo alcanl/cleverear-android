@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.fitting
 
+import com.alcanl.cleverear.entity.HearingAid
 import com.ark.ArkException
 import com.ark.Parameter
 import com.ark.ParameterSpace
@@ -49,5 +50,17 @@ fun Product.readIntParameter(parameterName: String) : Int
         return this.systemMemory.parameters.getById(parameterName).value
 
     return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).value
+}
+fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
+{
+    try {
+        this.readParameters(ParameterSpace.kSystemNvmMemory)
+
+        (0..<hearingAid.numberOfMemories).forEach {
+            this.readParameters(ParameterSpace.value(it))
+        }
+
+        return true
+    } catch (_: Throwable) { return false }
 }
 
