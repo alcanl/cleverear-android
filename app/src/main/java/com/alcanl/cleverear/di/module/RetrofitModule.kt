@@ -1,6 +1,6 @@
 package com.alcanl.cleverear.di.module
 
-import com.alcanl.cleverear.util.API_BASE_URL
+import com.alcanl.cleverear.api.API_BASE_URL
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides

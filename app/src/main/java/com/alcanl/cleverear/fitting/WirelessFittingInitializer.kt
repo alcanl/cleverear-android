@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
+import com.alcanl.cleverear.api.dto.HearingAidDTO
 import com.alcanl.cleverear.api.library.LibraryInfo
 import com.alcanl.cleverear.api.param.ParamInfo
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -48,6 +49,18 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         } catch (ex: IOException) {
             Log.e("writeLibraryToFilesDir", ex.message!!)
             return null
+        }
+    }
+    private suspend fun getHearingAidDTOFromService(modelNumber: Int) : HearingAidDTO?
+    {
+        val call = earTechnicService.findHearingAidPropertiesByModelNumber(modelNumber)
+        call.timeout().timeout(20, TimeUnit.SECONDS)
+        call.timeout().deadline(20, TimeUnit.SECONDS)
+        try {
+            return call.awaitResponse().body()
+
+        } catch (ex: Throwable) {
+            throw NetworkException(ex)
         }
     }
     private suspend fun getDefaultParamFromService(modelNumber: Int) : File?
