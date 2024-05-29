@@ -10,10 +10,13 @@ import com.ark.ParameterSpace
 import com.ark.Product
 
 const val WDRC_ENABLE = "X_WDRC_Enable"
+const val EQ_ENABLE = "X_EQ_Enable"
 const val WDRC_CROSSOVER_FREQUENCY = "X_WDRC_CrossoverFrequency[%d]"
 const val EQ_CHANNEL_GAIN = "X_EQ_ChannelGain_dB[%d]"
 const val EQ_CROSSOVER_FREQUENCY = "X_EQ_CrossoverFrequency[%d]"
 const val WDRC_EXPANSION_THRESHOLD = "X_WDRC_ExpansionThreshold[%d]"
+const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
+const val WDRC_NOISE_REDUCTION_ENABLE = "X_WDRC_INR_Enable[%d]"
 private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
     return this.systemMemory.parameters.containsId(parameterName)
@@ -47,14 +50,32 @@ fun Product.setParameter(parameterName: String, value: Any)
 {
     if (isSystemParameter(parameterName)) {
         setParameter(systemMemory.parameters.getById(parameterName), value)
-        writeParameters(ParameterSpace.kSystemNvmMemory)
     }
     else {
         setParameter(
             this.memories.getItem(currentMemory.value()).parameters.getById(parameterName),
             value
         )
-        writeParameters(currentMemory)
+    }
+}
+fun Product.enableEqualizer(memory: ParameterSpace)
+{
+    this.memories.getItem(memory.value()).parameters.getById(EQ_ENABLE).value = 1
+}
+fun Product.disableEqualizer(memory: ParameterSpace)
+{
+    this.memories.getItem(memory.value()).parameters.getById(EQ_ENABLE).value = 0
+}
+fun Product.enableEqualizerForAllMemories(hearingAid: HearingAid)
+{
+    (0..< hearingAid.numberOfMemories).forEach {
+        enableEqualizer(ParameterSpace.value(it))
+    }
+}
+fun Product.disableEqualizerForAllMemories(hearingAid: HearingAid)
+{
+    (0..< hearingAid.numberOfMemories).forEach {
+        disableEqualizer(ParameterSpace.value(it))
     }
 }
 fun Product.readDoubleParameter(parameterName: String) : Double
@@ -84,7 +105,6 @@ fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
         return true
     } catch (_: Throwable) { return false }
 }
-
 fun Product.increaseWDRCCrossOverFrequency(dto: HearingAidDTO, amount: Int)
 {
     setFittingValues(dto.wdrcChannelCount - 1, amount, WDRC_CROSSOVER_FREQUENCY)
@@ -109,13 +129,71 @@ fun Product.decreaseEqualizerCrossOverFrequency(dto: HearingAidDTO, amount: Int)
 {
     setFittingValues(dto.frequencyChannelCount - 1, -1 * amount, EQ_CROSSOVER_FREQUENCY)
 }
-fun Product.increaseExpansionThreshold(dto: HearingAidDTO, amount: Int)
+fun Product.increaseWDRCExpansionThreshold(dto: HearingAidDTO, amount: Int)
 {
     setFittingValues(dto.wdrcChannelCount, amount, WDRC_EXPANSION_THRESHOLD)
 }
-fun Product.decreaseExpansionThreshold(dto: HearingAidDTO, amount: Int)
+fun Product.decreaseWDRCExpansionThreshold(dto: HearingAidDTO, amount: Int)
 {
     setFittingValues(dto.wdrcChannelCount, -1 * amount, WDRC_EXPANSION_THRESHOLD)
 }
+fun Product.enableFeedBackCanceler()
+{
+    this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 1
+}
+fun Product.disableFeedBackCanceler()
+{
+    this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 0
+}
+fun Product.burnChangesToMemory(memory: ParameterSpace)
+{
+    this.writeParameters(ParameterSpace.value(memory.value()))
+    this.writeParameters(ParameterSpace.kSystemNvmMemory)
+}
+fun Product.burnChangesToAllMemories(hearingAid: HearingAid)
+{
+    (0..< hearingAid.numberOfMemories).forEach {
+        this.writeParameters(ParameterSpace.value(it))
+    }
+}
+fun Product.enableWDRC(memory: ParameterSpace)
+{
+    this.memories.getItem(memory.value()).parameters.getById(WDRC_ENABLE).value = 1
+}
+fun Product.disableWDRC(memory: ParameterSpace)
+{
+    this.memories.getItem(memory.value()).parameters.getById(WDRC_ENABLE).value = 0
+}
+fun Product.enableWDRCForAllMemories(hearingAid: HearingAid)
+{
+    (0..< hearingAid.numberOfMemories).forEach {
+        enableWDRC(ParameterSpace.value(it))
+    }
+}
+fun Product.disableWDRCForAllMemories(hearingAid: HearingAid)
+{
+    (0..< hearingAid.numberOfMemories).forEach {
+        disableWDRC(ParameterSpace.value(it))
+    }
+}
+@SuppressLint("DefaultLocale")
+fun Product.enableNoiseReduction(hearingAidDTO: HearingAidDTO)
+{
+    (0..< hearingAidDTO.wdrcChannelCount).forEach {
+        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
+            WDRC_NOISE_REDUCTION_ENABLE, it))
+            .value = 1
+    }
+}
+@SuppressLint("DefaultLocale")
+fun Product.disableNoiseReduction(hearingAidDTO: HearingAidDTO)
+{
+    (0..< hearingAidDTO.wdrcChannelCount).forEach {
+        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
+            WDRC_NOISE_REDUCTION_ENABLE, it))
+            .value = 0
+    }
+}
+
 
 

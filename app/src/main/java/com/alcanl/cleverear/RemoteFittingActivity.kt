@@ -14,6 +14,7 @@ import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
 import com.alcanl.cleverear.fitting.readIntParameter
+import com.alcanl.cleverear.fitting.setParameter
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -160,9 +161,8 @@ class RemoteFittingActivity : AppCompatActivity() {
         threadPool.execute {
             try {
 
-                Log.e("TEST_PARAMETER", configuration.product.readIntParameter("X_WDRC_CrossoverFrequency[0]").toString())
-                //configuration.product.setParameter("X_WDRC_CrossoverFrequency[0]", 6)
-                Log.e("TEST_PARAMETER", configuration.product.readIntParameter("X_WDRC_NumberOfChannels").toString())
+                Log.e("TEST_PARAMETER", configuration.product.readIntParameter("X_VolumeRetention_Enable").toString())
+                configuration.product.setParameter("X_VolumeRetention_Enable", 0)
 
             } catch (ex: ArkException) { Log.e("TEST_PARAMETER", ex.message!!)}
         }

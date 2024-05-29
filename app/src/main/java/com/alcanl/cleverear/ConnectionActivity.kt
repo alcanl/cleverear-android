@@ -58,7 +58,7 @@ class ConnectionActivity : AppCompatActivity() {
     private lateinit var mSelectedHearingAid: HearingAid
     private lateinit var mBinding: ActivityConnectionBinding
     @Volatile
-    private var mBleDeviceList = HashSet<DiscoveredDeviceInfo>()
+    private var mBleDeviceSet = HashSet<DiscoveredDeviceInfo>()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -179,7 +179,7 @@ class ConnectionActivity : AppCompatActivity() {
     private fun scanThreadCallBack()
     {
         scanOnBoard = Thread.currentThread()
-        mBleDeviceList.clear()
+        mBleDeviceSet.clear()
         runOnUiThread {
             mBinding.adapter!!.clear()
             mBinding.adapter!!.notifyDataSetChanged() }
@@ -190,7 +190,7 @@ class ConnectionActivity : AppCompatActivity() {
                 Log.e(ScanEvent::class.java.simpleName, event.data)
                 val device = parseJsonScanData(event.data, this)
                     if (isHearingAid(device.manufacturerData)) {
-                        mBleDeviceList.add(device)
+                        mBleDeviceSet.add(device)
                         runOnUiThread { addHearingAidToListCallback(device) }
                    }
             }
@@ -221,7 +221,7 @@ class ConnectionActivity : AppCompatActivity() {
     private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo?
     {
         val device = mBinding.adapter!!.getItem(pos)
-        return mBleDeviceList.find { it.toString() == device }
+        return mBleDeviceSet.find { it.toString() == device }
     }
     private fun selectDoubleItem(pos: Int)
     {
@@ -274,7 +274,7 @@ class ConnectionActivity : AppCompatActivity() {
     fun buttonDetectDeviceClicked()
     {
         if (!configuration.isConnected) {
-            mBleDeviceList.clear()
+            mBleDeviceSet.clear()
             mDeviceCount = 0
             mIsDeviceFound = false
             scanDevicesWithBluetooth()
