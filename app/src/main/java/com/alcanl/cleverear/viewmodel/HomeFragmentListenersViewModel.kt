@@ -1,10 +1,10 @@
 package com.alcanl.cleverear.viewmodel
 
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.fitting.fragment.HomeFragment
 import java.lang.ref.WeakReference
 
-class RemoteFittingActivityListenersViewModel(activity: RemoteFittingActivity) {
-    private val mWeakReference = WeakReference(activity)
+class HomeFragmentListenersViewModel(fragment: HomeFragment) {
+    private val mWeakReference = WeakReference(fragment)
 
     fun handleRetryButton()
     {

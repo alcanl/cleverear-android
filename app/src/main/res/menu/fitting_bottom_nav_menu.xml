@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/navbar_home_text"
+        android:icon="@drawable/control"
+        android:id="@+id/navbar_home"
+        />
+    <item
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/navbar_insitu_text"
+        android:icon="@drawable/control"
+        android:id="@+id/navbar_insitu"/>
+    <item
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/navbar_audiogram_text"
+        android:icon="@drawable/control"
+        android:id="@+id/navbar_audiogram"/>
+
+    <item
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/control"
+        android:title="@string/navbar_fitting_text"
+        android:id="@+id/navbar_fitting"/>
+</menu>
