@@ -17,6 +17,7 @@ const val EQ_CROSSOVER_FREQUENCY = "X_EQ_CrossoverFrequency[%d]"
 const val WDRC_EXPANSION_THRESHOLD = "X_WDRC_ExpansionThreshold[%d]"
 const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
 const val WDRC_NOISE_REDUCTION_ENABLE = "X_WDRC_INR_Enable[%d]"
+const val GAP_DEVICE_NAME = "X_RF_GAPDeviceName%d"
 private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
     return this.systemMemory.parameters.containsId(parameterName)
@@ -93,6 +94,29 @@ fun Product.readIntParameter(parameterName: String) : Int
 
     return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).value
 }
+@SuppressLint("DefaultLocale")
+fun Product.writeDeviceGapName(name: String)
+{
+    if (name.length > 22)
+        throw UnsupportedOperationException("Name must be maximum 22 characters")
+
+    val arr = name.toCharArray()
+    val sb = StringBuilder()
+    var gapNameParameterIndex = 0
+
+    for (i in arr.indices) {
+        val hex = Integer.toHexString(arr[i].code)
+        sb.append(hex)
+
+        if (i % 3 == 2 || i == arr.size - 1) {
+            this.systemMemory.parameters.getById(String.format(GAP_DEVICE_NAME, gapNameParameterIndex))
+                .value = Integer.parseInt(sb.toString())
+
+            ++gapNameParameterIndex
+            sb.clear()
+        }
+    }
+}
 fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
 {
     try {
@@ -148,13 +172,13 @@ fun Product.disableFeedBackCanceler()
 fun Product.burnChangesToMemory(memory: ParameterSpace)
 {
     this.writeParameters(ParameterSpace.value(memory.value()))
-    this.writeParameters(ParameterSpace.kSystemNvmMemory)
 }
 fun Product.burnChangesToAllMemories(hearingAid: HearingAid)
 {
     (0..< hearingAid.numberOfMemories).forEach {
         this.writeParameters(ParameterSpace.value(it))
     }
+    this.writeParameters(ParameterSpace.kSystemNvmMemory)
 }
 fun Product.enableWDRC(memory: ParameterSpace)
 {
