@@ -55,11 +55,11 @@
     <string name="left_ear_side_text">Linkes Ohr</string>
     <string name="right_ear_side_text">Rechtes Ohr</string>
     <string name="dialog_info_title">Infos</string>
-    <string name="textview_device_mac">Gerät Mac:</string>
-    <string name="textview_device_model">Gerät Modell:</string>
-    <string name="textview_library_id">Bibliothek Id:</string>
-    <string name="textview_firmware_id">Firmware Id:</string>
-    <string name="textview_firmware_version">Firmware Version:</string>
+    <string name="textview_device_mac"><u>Gerät Mac</u></string>
+    <string name="textview_device_model"><u>Gerät Modell</u></string>
+    <string name="textview_library_id"><u>Bibliothek Id</u></string>
+    <string name="textview_firmware_id"><u>Firmware Id</u></string>
+    <string name="textview_firmware_version"><u>Firmware Version</u></string>
     <string name="button_retry_text" translatable="true">Wiederholung</string>
     <string name="textview_initializing_text" translatable="true">Bitte warten Sie während der Initialisierung des Geräts</string>
     <string name="textview_initialize_library_found_text" translatable="true">Erfolgreich die kompatible Bibliothek gefunden, Beginn der Initialisierung des Geräts</string>

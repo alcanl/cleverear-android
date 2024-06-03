@@ -2,48 +2,31 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fitting_navigations"
-    app:startDestination="@id/homeFragment">
+    android:id="@+id/fitting_navigation"
+    app:startDestination="@+id/navbar_home">
 
     <fragment
-        android:id="@+id/homeFragment"
+        android:id="@+id/navbar_home"
         android:name="com.alcanl.cleverear.fitting.fragment.HomeFragment"
-        android:label="Home" >
-        <action
-            android:id="@+id/action_homeFragment_to_inSituFragment2"
-            app:destination="@id/inSituFragment" />
-    </fragment>
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
     <fragment
-        android:id="@+id/inSituFragment"
+        android:id="@+id/navbar_insitu"
         android:name="com.alcanl.cleverear.fitting.fragment.InSituFragment"
         android:label="In Situ"
-        tools:layout="@layout/fragment_in_situ" >
-        <action
-            android:id="@+id/action_inSituFragment2_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_inSituFragment2_to_audiogramFragment"
-            app:destination="@id/audiogramFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_in_situ" />
+
     <fragment
-        android:id="@+id/audiogramFragment"
-        android:name="com.alcanl.cleverear.fitting.fragment.AudiogramFragment"
+        android:id="@+id/navbar_audiogram"
+        android:name="com.alcanl.cleverear.fitting.fragment.AudioGramFragment"
         android:label="Audiogram"
-        tools:layout="@layout/fragment_audiogram" >
-        <action
-            android:id="@+id/action_audiogramFragment_to_fittingFragment"
-            app:destination="@id/fittingFragment" />
-        <action
-            android:id="@+id/action_audiogramFragment_to_inSituFragment2"
-            app:destination="@id/inSituFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_audiogram" />
+
     <fragment
-        android:id="@+id/fittingFragment"
+        android:id="@+id/navbar_fitting"
         android:name="com.alcanl.cleverear.fitting.fragment.FittingFragment"
         android:label="Fitting"
-        tools:layout="@layout/fragment_fitting" >
-        <action
-            android:id="@+id/action_fittingFragment_to_audiogramFragment"
-            app:destination="@id/audiogramFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_fitting"/>
+
 </navigation>

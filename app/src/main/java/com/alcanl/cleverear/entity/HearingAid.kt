@@ -5,11 +5,13 @@ import android.util.Log
 import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
+import com.ark.DeviceInfo
 import com.ark.EventHandler
 import com.ark.ParameterList
 import com.ark.ParameterMemory
 import com.ark.ParameterMemoryList
 import com.ark.ParameterSpace
+import com.ark.Product
 import com.ark.ProductManager
 import com.ark.WirelessControl
 import java.util.Objects
@@ -20,9 +22,11 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                       var wirelessControl: WirelessControl? = null, var currentMemory :  ParameterSpace = ParameterSpace.kNvmMemory0,
                       var auxAttenuation : Int = 45, var micAttenuation : Int = 8, var streamAddress : Int = 16,
                       var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
-                      var memories: ParameterMemoryList? = null, var parameters: ParameterList? = null, val systemMemory: ParameterMemory? = null,
-                      @Volatile var isConnected : Boolean = false, @Volatile var isDeviceInRange: Boolean = false)
+                      var memories: ParameterMemoryList? = null, var parameters: ParameterList? = null,
+                      val systemMemory: ParameterMemory? = null, @Volatile var isConnected : Boolean = false,
+                      @Volatile var isDeviceInRange: Boolean = false)
 {
+
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
     {
         try {

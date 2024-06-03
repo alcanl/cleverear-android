@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.api.dto.HearingAidDTO
 import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
@@ -55,24 +57,34 @@ class HomeFragment : Fragment() {
     lateinit var productManager: ProductManager
     @Inject
     lateinit var threadPool: ExecutorService
-
     private var mDeviceInfo: DeviceInfo? = null
+    private var mHearingAidDTO: HearingAidDTO? = null
     private lateinit var mHandler: RemoteHandler
     private lateinit var mLibrary: Library
     private lateinit var mBinding: FragmentHomeBinding
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        mBinding.emptyString = ""
         initialize()
         return mBinding.root
     }
-    override fun onStart()
+    override fun onResume()
     {
-        super.onStart()
-        initializeProduct()
+        super.onResume()
+        if (mDeviceInfo == null)
+            initializeProduct()
+        else {
+            with(mBinding) {
+                progressBar.visibility = View.INVISIBLE
+                buttonRetry.visibility = View.INVISIBLE
+            }
+        }
+
     }
     private fun initialize()
     {
@@ -86,8 +98,9 @@ class HomeFragment : Fragment() {
             Log.d("LIBRARY_ID", mDeviceInfo?.libraryId.toString())
             val libFile =
                 wirelessFittingInitializer.findLibraryByLibraryId(mDeviceInfo?.libraryId?.toString()!!)
+            mHearingAidDTO = wirelessFittingInitializer.findHearingAidDTO(mDeviceInfo!!)
 
-            if (libFile != null) {
+            if (libFile != null && mHearingAidDTO?.modelName?.isNotEmpty()!!) {
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
                 runBlocking {
                     delay(2000)
@@ -183,13 +196,19 @@ class HomeFragment : Fragment() {
         {
             mWeakReference.get()?.let {
                 with(it.mBinding) {
+
                     textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_success_text)
-                    textViewDeviceMac.text = it.configuration.product.deviceMACAddress
-                    textViewDeviceModel.text = it.mDeviceInfo?.serialId.toString()
-                    textViewLibraryId.text = Integer.toHexString(it.mDeviceInfo?.libraryId!!.toInt())
-                    textViewFirmwareId.text = it.mDeviceInfo?.firmwareId
-                    textViewFirmwareVersion.text = it.mDeviceInfo?.firmwareVersion.toString()
-                    linearLayoutMain.visibility = View.VISIBLE
+                    it.mBinding.invalidateAll()
+                    frameLayoutDeviceMac.visibility = View.VISIBLE
+                    frameLayoutDeviceMac.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.translate_ear_button_up_to_down))
+                    frameLayoutDeviceModel.visibility = View.VISIBLE
+                    frameLayoutDeviceModel.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.translate_ear_button_up_to_down))
+                    frameLayoutLibraryId.visibility = View.VISIBLE
+                    frameLayoutLibraryId.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.translate_ear_button_up_to_down))
+                    frameLayoutFirmwareId.visibility = View.VISIBLE
+                    frameLayoutFirmwareId.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.translate_ear_button_up_to_down))
+                    frameLayoutFirmwareVersion.visibility = View.VISIBLE
+                    frameLayoutFirmwareVersion.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.translate_ear_button_up_to_down))
                 }
             }
         }

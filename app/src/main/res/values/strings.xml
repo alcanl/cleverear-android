@@ -84,11 +84,11 @@
     <string name="battery_level_json" translatable="false">BatteryLevel</string>
     <string name="title_aux_label">Stream</string>
     <string name="title_mic_label">Mic</string>
-    <string name="textview_device_mac" translatable="true">Device Mac:</string>
-    <string name="textview_device_model" translatable="true">Device Model:</string>
-    <string name="textview_library_id" translatable="true">Library Id:</string>
-    <string name="textview_firmware_id" translatable="true">Firmware Id:</string>
-    <string name="textview_firmware_version" translatable="true">Firmware Version:</string>
+    <string name="textview_device_mac" translatable="true"><u>Device Mac</u></string>
+    <string name="textview_device_model" translatable="true"><u>Device Model</u></string>
+    <string name="textview_library_id" translatable="true"><u>Library Id</u></string>
+    <string name="textview_firmware_id" translatable="true"><u>Firmware Id</u></string>
+    <string name="textview_firmware_version" translatable="true"><u>Firmware Version</u></string>
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
     <string name="toast_connection_problem_text">"Failed While Connecting To Device"</string>

@@ -50,11 +50,11 @@
     <string name="textview_channel_text">Kanal</string>
     <string name="title_aux_label">Stream</string>
     <string name="title_mic_label">Mic</string>
-    <string name="textview_device_mac">Cihaz Mac:</string>
-    <string name="textview_device_model">Cihaz Model:</string>
-    <string name="textview_library_id">Kütüphane Kimlik:</string>
-    <string name="textview_firmware_id">Firmware Kimlik:</string>
-    <string name="textview_firmware_version">Firmware Versiyon:</string>
+    <string name="textview_device_mac"><u>Cihaz Mac</u></string>
+    <string name="textview_device_model"><u>Cihaz Model</u></string>
+    <string name="textview_library_id"><u>Kütüphane Kimlik</u></string>
+    <string name="textview_firmware_id"><u>Firmware Kimlik</u></string>
+    <string name="textview_firmware_version"><u>Firmware Versiyon</u></string>
     <string name="alert_dialog_connection_problem_title">Uyarı</string>
     <string name="alert_dialog_connection_problem_ok_button">Tamam</string>
     <string name="toast_connection_problem_text">Cihaza Bağlanılamadı</string>

@@ -4,7 +4,14 @@ xmlns:tools="http://schemas.android.com/tools"
 xmlns:android="http://schemas.android.com/apk/res/android">
 <data>
     <import type="com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel"/>
+    <import type="com.alcanl.cleverear.api.dto.HearingAidDTO"/>
+    <import type="com.alcanl.cleverear.entity.HearingAid"/>
+    <import type="String"/>
+    <variable name="hearingAid" type="HearingAid" />
     <variable name="viewModel" type="HomeFragmentListenersViewModel" />
+    <variable name="hearingAidDTO" type="HearingAidDTO" />
+    <variable name="emptyString" type="java.lang.String" />
+
 </data>
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,15 +26,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:text="@string/textview_initializing_text"
+        android:textAlignment="center"
         android:textColor="@color/ap_black"
         android:textSize="20sp"
-        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.267" />
+        app:layout_constraintTop_toBottomOf="@+id/button4"
+        app:layout_constraintVertical_bias="0.132" />
 
     <ImageView
         android:layout_width="90dp"
@@ -51,155 +58,197 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewInitialize"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintVertical_bias="0.071" />
 
     <Button
         android:id="@+id/buttonRetry"
         android:layout_width="wrap_content"
         android:layout_height="57dp"
+        android:layout_marginTop="36dp"
         android:backgroundTint="@color/design_default_color_secondary_variant"
         android:onClick="@{()->viewModel.handleRetryButton()}"
         android:text="@string/button_retry_text"
+        android:textColor="@color/ap_black"
         android:textSize="20sp"
         android:visibility="invisible"
-        android:textColor="@color/ap_black"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewInitialize" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="112dp"
+        android:onClick="@{()-> viewModel.handleTestParameterButton()}"
+        android:text="Test Parameter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewInitialize"
-        app:layout_constraintVertical_bias="0.098" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/linearLayoutMain"
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:onClick="@{()-> viewModel.handleLoadDefaultParamButton()}"
+        android:text="Load Param"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
+
+    <FrameLayout
+        android:id="@+id/frameLayoutDeviceMac"
         android:layout_width="0dp"
-        android:layout_height="350dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar">
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:text="@string/textview_device_mac"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_device_mac"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_device_model"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_library_id"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_firmware_id"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_firmware_version"
-                android:textAlignment="center" />
-
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/textViewDeviceMac"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@{hearingAid.address}"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp" />
+    </FrameLayout>
 
-            <TextView
-                android:id="@+id/textViewDeviceMac"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text=""
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/textViewDeviceModel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text=""
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/textViewLibraryId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text=""
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/textViewFirmwareId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text=""
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/textViewFirmwareVersion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/ap_black"
-                android:text=""
-                android:textAlignment="center" />
-
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/frameLayoutDeviceModel"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Test Parameter"
-        android:onClick="@{()-> viewModel.handleTestParameterButton()}"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.124" />
+        app:layout_constraintTop_toBottomOf="@+id/frameLayoutDeviceMac">
 
-    <Button
-        android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textview_device_model"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewDeviceModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@{hearingAidDTO.modelName  == null ? emptyString : hearingAidDTO.modelName}"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayoutLibraryId"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="Load Param"
-        android:onClick="@{()-> viewModel.handleLoadDefaultParamButton()}"
-        app:layout_constraintBottom_toTopOf="@+id/textViewInitialize"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayoutDeviceModel">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textview_library_id"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewLibraryId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@{hearingAidDTO.libraryId == null ? emptyString : hearingAidDTO.libraryId}"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayoutFirmwareId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayoutLibraryId">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textview_firmware_id"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewFirmwareId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@{hearingAidDTO.firmwareId == null ? emptyString : hearingAidDTO.firmwareId}"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayoutFirmwareVersion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayoutFirmwareId">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textview_firmware_version"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewFirmwareVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@{hearingAidDTO.firmwareVersion == null ? emptyString : hearingAidDTO.firmwareVersion}"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="15sp" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
