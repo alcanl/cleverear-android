@@ -10,12 +10,12 @@ class HomeFragmentListenersViewModel(fragment: HomeFragment) {
     {
         mWeakReference.get()?.retryButtonClicked()
     }
-    fun handleTestParameterButton()
+    fun handleLeftEarButton()
     {
-        mWeakReference.get()?.testParameterButtonClicked()
+        mWeakReference.get()?.leftEarButtonClicked()
     }
-    fun handleLoadDefaultParamButton()
+    fun handleRightEarButton()
     {
-        mWeakReference.get()?.loadDefaultParamButtonClicked()
+        mWeakReference.get()?.rightEarButtonClicked()
     }
 }

@@ -8,19 +8,17 @@ import android.util.Log
 import com.alcanl.cleverear.api.IEarTechnicLibraryService
 import com.alcanl.cleverear.api.PREF_ACTIVE_PARAM_ID
 import com.alcanl.cleverear.api.PREF_DEFAULT_PARAM_ID
-import com.alcanl.cleverear.api.PREF_FIRMWARE_ID
-import com.alcanl.cleverear.api.PREF_FIRMWARE_VERSION
 import com.alcanl.cleverear.api.PREF_FREQUENCY_CHANNEL_COUNT
 import com.alcanl.cleverear.api.PREF_LIBRARY_ID
 import com.alcanl.cleverear.api.PREF_MODEL_NAME
 import com.alcanl.cleverear.api.PREF_MODEL_NUMBER
 import com.alcanl.cleverear.api.PREF_WDRC_CHANNEL_COUNT
-import com.alcanl.cleverear.api.SHARED_PREF_DTO
 import com.alcanl.cleverear.api.dto.HearingAidDTO
 import com.alcanl.cleverear.api.library.LibraryInfo
 import com.alcanl.cleverear.api.param.ParamInfo
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.exception.NetworkException
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.Product
@@ -140,10 +138,10 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
     {
         try {
             val hearingAidDTO: HearingAidDTO?
-            val pref = mContext.getSharedPreferences(SHARED_PREF_DTO, MODE_PRIVATE)
+            val pref = mContext.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
             if (pref.getString(PREF_MODEL_NAME, "")?.isEmpty()!!) {
                 hearingAidDTO = getHearingAidDTOFromService(deviceInfo.serialId)
-                hearingAidDTO?.setDeviceProperties(deviceInfo)
+                //hearingAidDTO?.setDeviceProperties(deviceInfo)
                 saveDTOPref(pref, hearingAidDTO)
                 return hearingAidDTO
             }
@@ -163,8 +161,6 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         val editor = pref.edit()
         editor.putString(PREF_MODEL_NAME, hearingAidDTO.modelName)
         editor.putString(PREF_LIBRARY_ID, Integer.toHexString(hearingAidDTO.libraryId.toInt()))
-        editor.putString(PREF_FIRMWARE_ID, hearingAidDTO.firmwareId)
-        editor.putString(PREF_FIRMWARE_VERSION, hearingAidDTO.firmwareVersion)
         editor.putString(PREF_ACTIVE_PARAM_ID, hearingAidDTO.activeParamId)
         editor.putString(PREF_DEFAULT_PARAM_ID, hearingAidDTO.defaultParamId)
         editor.putInt(PREF_WDRC_CHANNEL_COUNT, hearingAidDTO.wdrcChannelCount)
@@ -177,8 +173,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         return HearingAidDTO(pref.getString(PREF_MODEL_NAME, "")!!, pref.getInt(PREF_MODEL_NUMBER, 0),
             pref.getString(PREF_LIBRARY_ID, "")!!, pref.getString(PREF_DEFAULT_PARAM_ID, "")!!,
             pref.getString(PREF_ACTIVE_PARAM_ID, "")!!, pref.getInt(PREF_WDRC_CHANNEL_COUNT, 0),
-            pref.getInt(PREF_FREQUENCY_CHANNEL_COUNT, 0), pref.getString(PREF_FIRMWARE_ID, ""),
-            pref.getString(PREF_FIRMWARE_VERSION, "")
+            pref.getInt(PREF_FREQUENCY_CHANNEL_COUNT, 0)
         )
     }
 }

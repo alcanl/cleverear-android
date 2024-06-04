@@ -100,6 +100,7 @@
     <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
     <string name="dialog_info_title" translatable="true">Info</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_initializing_text" translatable="true">Please Wait While Initializing The Device</string>
     <string name="textview_initialize_library_found_text" translatable="true">Successfully Found The Compatible Library, Beginning The Initialize Device</string>
     <string name="textview_initialize_success_text" translatable="true">Successfully Initialized The Device For Fitting</string>
@@ -111,6 +112,8 @@
     <string name="navbar_insitu_text" translatable="false">In Situ</string>
     <string name="navbar_audiogram_text" translatable="false">Audiogram</string>
     <string name="navbar_fitting_text" translatable="false">Fitting</string>
+    <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>
+    <string name="textview_parameter_read_fail_text" translatable="true">Unknown Problem Occurred While Reading Parameters, Please Contact With Your Delegate</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 </resources>

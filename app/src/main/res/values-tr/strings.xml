@@ -61,6 +61,9 @@
     <string name="button_previous_activity">Önceki</string>
     <string name="dialog_info_title">Bilgi</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_parameter_read_process_text" translatable="true">Dahili Parametreler Cihazdan Okunurken Lütfen Bekleyin</string>
+    <string name="textview_parameter_read_success_text" translatable="true">Parametreler Başarılı Bir Şekilde Cihazdan Okundu</string>
+    <string name="textview_parameter_read_fail_text" translatable="true">Parametreler Okunurken Bilinmeyen Bir Problem Oluştu, Lütfen Temsilciniz İle İletişime Geçiniz</string>
     <string name="textview_initializing_text" translatable="true">Cihaz Hazırlanırken Lütfen Bekleyin</string>
     <string name="textview_initialize_library_found_text" translatable="true">Uyumlu Kütüphane Bulundu, Cihaz Konfigürasyon İçin Hazırlanıyor</string>
     <string name="textview_initialize_success_text" translatable="true">Cihaz Konfigürasyon İçin Başarılı Bir Şekilde Hazırlandı</string>
