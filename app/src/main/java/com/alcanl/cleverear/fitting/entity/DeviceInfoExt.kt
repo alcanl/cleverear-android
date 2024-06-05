@@ -5,13 +5,14 @@ import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.Product
 
-data class DeviceInfoExt(val product: Product, val deviceInfo: DeviceInfo,
-                        val hearingAidDTO: HearingAidDTO, val library: Library) {
+data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
+                        val hearingAidDTO: HearingAidDTO?, val library: Library?) {
 
-    fun getDeviceMac() = product.deviceMACAddress
-    fun getDeviceModelName() = hearingAidDTO.modelName
-    fun getDeviceFirmwareId() = deviceInfo.firmwareId
-    fun getDeviceFirmwareVersion() = deviceInfo.firmwareVersion
-    fun getDeviceModelNumber() = deviceInfo.serialId.toString()
-    fun getDeviceLibraryId() = Integer.toHexString(deviceInfo.libraryId)
+    constructor() : this(null, null, null, null)
+    fun getDeviceMac(): String = product?.deviceMACAddress ?: ""
+    fun getDeviceModelName() : String = hearingAidDTO?.modelName ?: ""
+    fun getDeviceFirmwareId() : String = deviceInfo?.firmwareId ?: ""
+    fun getDeviceFirmwareVersion() : String = deviceInfo?.firmwareVersion ?: ""
+    fun getDeviceModelNumber() : String = deviceInfo?.serialId?.toString() ?: ""
+    fun getDeviceLibraryId() : String = if (deviceInfo == null) "" else Integer.toHexString(deviceInfo.libraryId)
 }

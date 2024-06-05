@@ -6,6 +6,11 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <import type="com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel"/>
     <import type="com.alcanl.cleverear.di.module.FittingConfigurationModule"/>
     <import type="com.alcanl.cleverear.util.EarSide"/>
+    <import type="android.view.View"/>
+    <import type="android.content.Context"/>
+    <import type="androidx.core.content.ContextCompat"/>
+    <import type="androidx.appcompat.content.res.AppCompatResources"/>
+    <import type="com.alcanl.cleverear.R"/>
     <variable name="config" type="FittingConfigurationModule" />
     <variable name="viewModel" type="HomeFragmentListenersViewModel" />
 
@@ -31,7 +36,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.215" />
+        app:layout_constraintVertical_bias="0.16" />
 
     <ImageView
         android:layout_width="100dp"
@@ -80,8 +85,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:layout_height="wrap_content"
         android:layout_marginStart="56dp"
         android:layout_marginBottom="36dp"
-        android:backgroundTint="@color/ap_gray"
-        android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left) != null}"
+        android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+        android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
         android:onClick="@{()-> viewModel.handleLeftEarButton()}"
         android:text="@string/left_ear_side_text"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -93,8 +98,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:layout_height="wrap_content"
         android:layout_marginEnd="56dp"
         android:layout_marginBottom="36dp"
-        android:backgroundTint="@color/ap_gray"
-        android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right) != null}"
+        android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+        android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
         android:onClick="@{()-> viewModel.handleRightEarButton()}"
         android:text="@string/right_ear_side_text"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -125,7 +130,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text=""
+            android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceMac : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceMac}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="15sp" />
@@ -155,7 +160,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text=""
+            android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceModelName : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceModelName}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="15sp" />
@@ -185,7 +190,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text=""
+            android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceLibraryId : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceLibraryId}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="15sp" />
@@ -215,7 +220,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text=""
+            android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceFirmwareId : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceFirmwareId}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="15sp" />
@@ -245,7 +250,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text=""
+            android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceFirmwareVersion : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceFirmwareVersion}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="15sp" />
@@ -259,7 +264,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonLeft"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/lefteargray"
+        app:srcCompat="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.leftear_blue) : AppCompatResources.getDrawable(context, R.drawable.lefteargray)}"
         tools:ignore="ContentDescription" />
 
     <ImageView
@@ -270,7 +275,29 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonRight"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/righteargray"
+        app:srcCompat="@{config.INSTANCE.rightButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.rightear_red) : AppCompatResources.getDrawable(context, R.drawable.righteargray) }"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewLeftEar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.358"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/check_tick"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewRightEar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.636"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/check_tick"
         tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

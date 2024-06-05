@@ -10,9 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.RemoteFittingActivity
 import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
@@ -21,9 +22,10 @@ import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.entity.DeviceInfoExt
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
+import com.alcanl.cleverear.fitting.util.getAnimationListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_CHANGE_FRAME_LAYOUTS
-import com.alcanl.cleverear.util.WHAT_LEFT_EAR_INITIALIZED
+import com.alcanl.cleverear.util.WHAT_HIDE_FRAME_LAYOUTS
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -31,7 +33,6 @@ import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_FAIL
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_FAIL
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_PROCESS
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_SUCCESS
-import com.alcanl.cleverear.util.WHAT_RIGHT_EAR_INITIALIZED
 import com.alcanl.cleverear.util.postDelayAnimation
 import com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel
 import com.ark.ArkException
@@ -73,9 +74,7 @@ class HomeFragment : Fragment() {
     override fun onResume()
     {
         super.onResume()
-        if (fittingConfig.deviceInfoExtMap.isEmpty())
-            initializeProduct()
-        else {
+        if (fittingConfig.isLeftButtonSelected || fittingConfig.isRightButtonSelected) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
                 buttonRetry.visibility = View.INVISIBLE
@@ -84,8 +83,12 @@ class HomeFragment : Fragment() {
                 frameLayoutFirmwareId.visibility = View.VISIBLE
                 frameLayoutFirmwareVersion.visibility = View.VISIBLE
                 frameLayoutDeviceModel.visibility = View.VISIBLE
+                textViewInitialize.text = getText(R.string.textview_initialize_success_text)
             }
         }
+        else
+            initializeProduct()
+
     }
     private fun initialize()
     {
@@ -118,15 +121,21 @@ class HomeFragment : Fragment() {
                     if (product.ear == 0) {
                         deviceInfoExtMap[EarSide.Left] =
                             DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
-                        mHandler.sendEmptyMessage(WHAT_LEFT_EAR_INITIALIZED)
+                        with(mBinding) {
+                            imageViewLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim)
+                                .also { it.setAnimationListener(imageViewLeftEar.getAnimationListener(EarSide.Left, this, mHandler)) })
+                        }
                     }
                     else {
                         deviceInfoExtMap[EarSide.Right] =
                             DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
-                        mHandler.sendEmptyMessage(WHAT_RIGHT_EAR_INITIALIZED)
+                        with(mBinding) {
+                            imageViewRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim)
+                                .also { it.setAnimationListener(imageViewRightEar.getAnimationListener(EarSide.Right, this, mHandler)) })
+
+                        }
                     }
                 }
-
                 runBlocking {
                     delay(2000)
                 }
@@ -154,10 +163,15 @@ class HomeFragment : Fragment() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun initializeProduct()
     {
+        activity?.runOnUiThread {
+            (activity as RemoteFittingActivity).binding.navigationView.menu.forEach {
+                it.isEnabled= false
+            }
+        }
+
         runBlocking {
             if (configuration.isDoubleDeviceConnection) {
                 fittingConfig.isBinauralConnection = true
-                fittingConfig.selectedEarSide = EarSide.Left
                 GlobalScope.launch { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Left]!!) }.join()
                 GlobalScope.launch { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Right]!!) }
             }
@@ -167,21 +181,9 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    private fun fillTextViews(earSide: EarSide)
-    {
-        fittingConfig.deviceInfoExtMap[earSide]?.let {
-            with(mBinding) {
-                textViewDeviceMac.text = it.getDeviceMac()
-                textViewDeviceModel.text = it.getDeviceModelName()
-                textViewLibraryId.text = it.getDeviceLibraryId()
-                textViewFirmwareId.text = it.getDeviceFirmwareId()
-                textViewFirmwareVersion.text = it.getDeviceFirmwareVersion()
-            }
-        }
-    }
     private class RemoteHandler(fragment: HomeFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
-        private fun handleInitProcessViews(text : String = "")
+        private fun handleInitProcessFail(text : String = "")
         {
             mWeakReference.get()?.let {
                 if (text.isNotEmpty())
@@ -189,6 +191,18 @@ class HomeFragment : Fragment() {
 
                 it.mBinding.progressBar.visibility = View.INVISIBLE
                 it.mBinding.buttonRetry.visibility = View.VISIBLE
+            }
+        }
+        private fun hideFrameLayouts()
+        {
+            mWeakReference.get()?.let {
+                with(it.mBinding) {
+                    frameLayoutLibraryId.visibility = View.INVISIBLE
+                    frameLayoutFirmwareId.visibility = View.INVISIBLE
+                    frameLayoutFirmwareVersion.visibility = View.INVISIBLE
+                    frameLayoutDeviceModel.visibility = View.INVISIBLE
+                    frameLayoutDeviceMac.visibility = View.INVISIBLE
+                }
             }
         }
         private fun startFrameAnimations()
@@ -203,91 +217,56 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        private fun productCreateSuccess()
-        {
-            mWeakReference.get()?.let {
-                with(it.mBinding) {
-                    textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_success_text)
-                    if (it.configuration.isDoubleDeviceConnection)
-                        it.leftEarButtonClicked()
-                    else
-                        it.fillTextViews(it.fittingConfig.selectedEarSide)
-                }
-            }
-            startFrameAnimations()
-        }
-        private fun productCreateFail()
-        {
-            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
-        }
-        private fun libraryNotFound()
-        {
-            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
-        }
-        private fun librarySearchFail()
-        {
-            handleInitProcessViews(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
-        }
-        private fun librarySearchSuccess()
-        {
-            mWeakReference.get()?.let {
-                it.mBinding.textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_library_found_text)
-            }
-        }
         private fun readParameterSuccess() {
             mWeakReference.get()?.let {
                 it.mBinding.progressBar.visibility = View.INVISIBLE
-                it.mBinding.textViewInitialize.text =
-                    it.getText(R.string.textview_parameter_read_success_text)
-            }
-        }
-        private fun readParameterFail()
-        {
-            mWeakReference.get()?.let {
-                it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_fail_text)
-            }
-        }
-        private fun readingParameters()
-        {
-            mWeakReference.get()?.let {
-                it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_process_text)
+                it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_success_text)
+                postDelayed({
+                    (it.activity as RemoteFittingActivity).binding.navigationView.menu.forEach {item ->
+                        item.isEnabled = true
+                    }
+                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_initialize_success_text)
+                }, 2000)
             }
         }
         private fun leftEarInitializeFinished()
         {
             mWeakReference.get()?.let {
-                with(it.mBinding) {
-                    imageViewLeftEar.startAnimation(AnimationUtils.loadAnimation(it.requireContext(), R.anim.alpha_blink_anim))
-                    imageViewLeftEar.setImageDrawable(AppCompatResources.getDrawable(it.requireContext(), R.drawable.leftear_blue))
-                    buttonLeft.isEnabled = true
+                with(it.fittingConfig) {
+                    isLeftButtonSelected = true
+                    isRightButtonSelected = false
                 }
-                it.mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+
+                startFrameAnimations()
             }
         }
         private fun rightEarInitializeFinished()
         {
             mWeakReference.get()?.let {
-                with(it.mBinding) {
-                    imageViewRightEar.startAnimation(AnimationUtils.loadAnimation(it.requireContext(), R.anim.alpha_blink_anim))
-                    imageViewRightEar.setImageDrawable(AppCompatResources.getDrawable(it.requireContext(), R.drawable.rightear_red))
-                    buttonRight.isEnabled = true
+                with(it.fittingConfig) {
+                    isRightButtonSelected = true
+                    isLeftButtonSelected= false
                 }
-                it.mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+
+                startFrameAnimations()
             }
         }
         override fun handleMessage(msg: Message)
         {
             when (msg.what) {
-                10 -> productCreateSuccess()
-                11 -> productCreateFail()
-                12 -> librarySearchSuccess()
-                13 -> librarySearchFail()
+                11 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
+                12 -> { mWeakReference.get()?.let {
+                        it.mBinding.textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_library_found_text) }}
+                13 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
                 14 -> readParameterSuccess()
-                15 -> readParameterFail()
-                16 -> libraryNotFound()
+                15 -> { mWeakReference.get()?.let {
+                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_fail_text) }}
+                16 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
                 17 -> leftEarInitializeFinished()
                 18 -> rightEarInitializeFinished()
-                21 -> readingParameters()
+                19 -> hideFrameLayouts()
+                21 -> { mWeakReference.get()?.let {
+                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_process_text) }}
                 22 -> startFrameAnimations()
             }
         }
@@ -303,18 +282,29 @@ class HomeFragment : Fragment() {
     }
     fun rightEarButtonClicked()
     {
-        mBinding.buttonLeft.backgroundTintList = AppCompatResources.getColorStateList(this.requireContext(), com.androidplot.R.color.ap_gray)
-        mBinding.buttonRight.backgroundTintList = AppCompatResources.getColorStateList(this.requireContext(), com.google.android.material.R.color.design_default_color_secondary_variant)
-        fittingConfig.selectedEarSide = EarSide.Right
-        fillTextViews(EarSide.Right)
-        mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+        threadPool.execute {
+            mHandler.sendEmptyMessage(WHAT_HIDE_FRAME_LAYOUTS)
+
+            fittingConfig.apply {
+                selectedEarSide = EarSide.Right
+                isRightButtonSelected = true
+                isLeftButtonSelected = false
+            }
+            mBinding.invalidateAll()
+            mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+        }
     }
     fun leftEarButtonClicked()
     {
-        mBinding.buttonRight.backgroundTintList = AppCompatResources.getColorStateList(this.requireContext(), com.androidplot.R.color.ap_gray)
-        mBinding.buttonLeft.backgroundTintList = AppCompatResources.getColorStateList(this.requireContext(), com.google.android.material.R.color.design_default_color_secondary_variant)
-        fittingConfig.selectedEarSide = EarSide.Left
-        fillTextViews(EarSide.Left)
-        mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+        threadPool.execute {
+            mHandler.sendEmptyMessage(WHAT_HIDE_FRAME_LAYOUTS)
+            fittingConfig.apply {
+                selectedEarSide = EarSide.Left
+                isLeftButtonSelected = true
+                isRightButtonSelected = false
+            }
+            mBinding.invalidateAll()
+            mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+        }
     }
 }

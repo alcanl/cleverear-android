@@ -11,9 +11,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object FittingConfigurationModule {
-    lateinit var selectedEarSide : EarSide
+    var selectedEarSide : EarSide = EarSide.Left
     var deviceInfoExtMap: MutableMap<EarSide, DeviceInfoExt> = mutableMapOf()
     var isBinauralConnection = false
+    var isLeftButtonSelected = false
+    var isRightButtonSelected = false
+    init {
+        deviceInfoExtMap[EarSide.Left] = DeviceInfoExt()
+        deviceInfoExtMap[EarSide.Right] = DeviceInfoExt()
+    }
     @Provides
     @Singleton
     fun create() : FittingConfigurationModule = this

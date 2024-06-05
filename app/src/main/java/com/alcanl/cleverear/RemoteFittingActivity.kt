@@ -10,13 +10,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RemoteFittingActivity : AppCompatActivity() {
-    private lateinit var mBinding : ActivityRemoteFittingBinding
+    lateinit var binding : ActivityRemoteFittingBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
         val navController = findNavController(R.id.navHostFragmentActivityRemote)
-        mBinding.navigationView.setupWithNavController(navController)
+        binding.navigationView.setupWithNavController(navController)
 
     }
 }
