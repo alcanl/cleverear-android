@@ -80,6 +80,7 @@ class HomeFragment : Fragment() {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
                 buttonRetry.visibility = View.INVISIBLE
+                imageViewHearingAid.visibility = View.VISIBLE
                 showFrames()
                 textViewInitialize.text = getText(R.string.textview_initialize_success_text)
             }
@@ -206,14 +207,18 @@ class HomeFragment : Fragment() {
         }
         private fun readParameterSuccess() {
             mWeakReference.get()?.let {
-                it.mBinding.progressBar.visibility = View.INVISIBLE
-                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
-                postDelayed({
-                    (it.activity as RemoteFittingActivity).binding.navigationView.menu.forEach {item ->
-                        item.isEnabled = true
-                    }
-                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
-                }, 2000)
+                with(it.mBinding) {
+                    progressBar.visibility = View.INVISIBLE
+                    imageViewHearingAid.startAlphaAnimation(it.requireContext())
+                    textViewInitialize.startAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
+                    postDelayed({
+                        (it.activity as RemoteFittingActivity).binding.navigationView.menu.forEach {item ->
+                            item.isEnabled = true
+                        }
+                        textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
+                    }, 2000)
+                }
+
             }
         }
         private fun leftEarInitializeFinished()
@@ -233,7 +238,6 @@ class HomeFragment : Fragment() {
                     isRightButtonSelected = true
                     isLeftButtonSelected= false
                 }
-
                 startFrameAnimations()
             }
         }
@@ -265,27 +269,15 @@ class HomeFragment : Fragment() {
         }
         initializeProduct()
     }
-    fun rightEarButtonClicked()
+    fun commonEarButtonsClicked(earSide: EarSide)
     {
         mBinding.hideFrames()
 
         threadPool.execute {
             fittingConfig.apply {
-                selectedEarSide = EarSide.Right
-                isRightButtonSelected = true
-                isLeftButtonSelected = false
-            }
-            mBinding.invalidateAll()
-            mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
-        }
-    }
-    fun leftEarButtonClicked()
-    {
-        threadPool.execute {
-            fittingConfig.apply {
-                selectedEarSide = EarSide.Left
-                isLeftButtonSelected = true
-                isRightButtonSelected = false
+                selectedEarSide = earSide
+                isRightButtonSelected = earSide == EarSide.Right
+                isLeftButtonSelected = earSide == EarSide.Left
             }
             activity?.runOnUiThread { mBinding.hideFrames() }
             mBinding.invalidateAll()

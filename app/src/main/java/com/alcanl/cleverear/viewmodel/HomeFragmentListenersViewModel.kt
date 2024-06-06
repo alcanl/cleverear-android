@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.viewmodel
 
 import com.alcanl.cleverear.fitting.fragment.HomeFragment
+import com.alcanl.cleverear.util.EarSide
 import java.lang.ref.WeakReference
 
 class HomeFragmentListenersViewModel(fragment: HomeFragment) {
@@ -12,10 +13,10 @@ class HomeFragmentListenersViewModel(fragment: HomeFragment) {
     }
     fun handleLeftEarButton()
     {
-        mWeakReference.get()?.leftEarButtonClicked()
+        mWeakReference.get()?.commonEarButtonsClicked(EarSide.Left)
     }
     fun handleRightEarButton()
     {
-        mWeakReference.get()?.rightEarButtonClicked()
+        mWeakReference.get()?.commonEarButtonsClicked(EarSide.Right)
     }
 }

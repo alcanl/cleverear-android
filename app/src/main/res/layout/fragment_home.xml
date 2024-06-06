@@ -21,10 +21,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     android:layout_height="match_parent"
     android:background="@drawable/background">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textViewInitialize"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:textStyle="normal"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:text="@string/textview_initializing_text"
@@ -38,7 +40,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.16" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="100dp"
         android:layout_height="88dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -65,7 +67,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.298" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonRetry"
         android:layout_width="wrap_content"
         android:layout_height="57dp"
@@ -74,6 +76,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:text="@string/button_retry_text"
         android:textColor="@color/ap_black"
         android:textSize="20sp"
+        android:textStyle="normal"
+        android:textAllCaps="false"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -252,7 +256,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_gravity="center"
             android:layout_marginBottom="8dp"
             app:srcCompat="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.leftear_blue) : AppCompatResources.getDrawable(context, R.drawable.lefteargray)}"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
         <ImageView
             android:layout_width="20dp"
@@ -262,12 +266,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_marginTop="15dp"
             android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
             app:srcCompat="@drawable/check_tick"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonLeft"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="normal"
+            android:textAllCaps="false"
+            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
@@ -296,12 +303,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_gravity="center"
             android:layout_marginBottom="8dp"
             app:srcCompat="@{config.INSTANCE.rightButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.rightear_red) : AppCompatResources.getDrawable(context, R.drawable.righteargray) }"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonRight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:textStyle="normal"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
@@ -317,8 +326,21 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:layout_marginEnd="40dp"
             android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
             app:srcCompat="@drawable/check_tick"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck" />
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/imageViewHearingAid"
+        android:layout_width="75dp"
+        android:layout_height="70dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.255"
+        app:srcCompat="@drawable/tie_ha"
+        tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
