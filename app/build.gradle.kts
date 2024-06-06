@@ -63,6 +63,7 @@ android {
 
 dependencies {
 
+    implementation("com.github.razaghimahdi:Android-Loading-Dots:1.3.2")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar", "*.so"))))
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")

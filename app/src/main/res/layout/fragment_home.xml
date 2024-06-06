@@ -50,17 +50,20 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:srcCompat="@drawable/eartechnic_logo"
         tools:ignore="ContentDescription" />
 
-    <ProgressBar
+    <com.razzaghimahdi78.dotsloading.linear.LoadingScaly
         android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="59dp"
-        android:layout_height="57dp"
-        android:indeterminateTint="@color/design_default_color_secondary_variant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:dots_color="@color/design_default_color_secondary_variant"
+        app:dots_count="5"
+        app:dots_duration="400"
+        app:dots_size="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.29" />
+        app:layout_constraintVertical_bias="0.298" />
 
     <Button
         android:id="@+id/buttonRetry"
@@ -83,7 +86,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:id="@+id/frameLayoutDeviceMac"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -263,13 +266,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
         <Button
             android:id="@+id/buttonLeft"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
             android:onClick="@{()-> viewModel.handleLeftEarButton()}"
-            android:text="@string/left_ear_side_text" />
+            android:text="@string/left_ear_side_text"
+            app:cornerRadius = "0dp"/>
 
     </FrameLayout>
 
@@ -296,13 +300,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
         <Button
             android:id="@+id/buttonRight"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
             android:onClick="@{()-> viewModel.handleRightEarButton()}"
-            android:text="@string/right_ear_side_text" />
+            android:text="@string/right_ear_side_text"
+            app:cornerRadius = "0dp" />
 
         <ImageView
             android:layout_width="20dp"
