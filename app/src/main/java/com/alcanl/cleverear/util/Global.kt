@@ -39,7 +39,6 @@ const val WHAT_LEFT_EAR_INITIALIZED = 17
 const val WHAT_RIGHT_EAR_INITIALIZED = 18
 const val WHAT_READ_PARAMETERS_PROCESS = 21
 const val WHAT_CHANGE_FRAME_LAYOUTS = 22
-const val WHAT_HIDE_FRAME_LAYOUTS = 19
 const val TURKISH = "tr"
 const val GERMAN = "de"
 const val TURKISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_tr.pdf"""

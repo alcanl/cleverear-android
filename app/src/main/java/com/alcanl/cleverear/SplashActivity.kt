@@ -50,7 +50,6 @@ class SplashActivity : AppCompatActivity() {
                 val adapter = getSystemService(BluetoothManager::class.java).adapter
                 if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
                     isAshaConnected = true
-
             }
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish()
@@ -108,13 +107,15 @@ class SplashActivity : AppCompatActivity() {
                 isConnectedBefore = true
                 mAddressArray = arrayOf(addressRight)
             }
+        else
+            mAddressArray = emptyArray()
 
     }
 
     private fun initialize()
     {
-        checkAndRequestNotificationPermission()
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
+        checkAndRequestNotificationPermission()
         checkPrefs()
         mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
         mAlertDialog = CustomAlertDialogConnectedBefore(this)

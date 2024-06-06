@@ -22,10 +22,8 @@ import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.entity.DeviceInfoExt
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
-import com.alcanl.cleverear.fitting.util.getAnimationListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_CHANGE_FRAME_LAYOUTS
-import com.alcanl.cleverear.util.WHAT_HIDE_FRAME_LAYOUTS
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -33,7 +31,11 @@ import com.alcanl.cleverear.util.WHAT_PRODUCT_CREATE_FAIL
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_FAIL
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_PROCESS
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_SUCCESS
-import com.alcanl.cleverear.util.postDelayAnimation
+import com.alcanl.cleverear.util.extension.getFrameLayoutAnimationListener
+import com.alcanl.cleverear.util.extension.hideFrames
+import com.alcanl.cleverear.util.extension.postDelayAnimation
+import com.alcanl.cleverear.util.extension.showFrames
+import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.ProductManager
@@ -78,11 +80,7 @@ class HomeFragment : Fragment() {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
                 buttonRetry.visibility = View.INVISIBLE
-                frameLayoutDeviceMac.visibility = View.VISIBLE
-                frameLayoutLibraryId.visibility = View.VISIBLE
-                frameLayoutFirmwareId.visibility = View.VISIBLE
-                frameLayoutFirmwareVersion.visibility = View.VISIBLE
-                frameLayoutDeviceModel.visibility = View.VISIBLE
+                showFrames()
                 textViewInitialize.text = getText(R.string.textview_initialize_success_text)
             }
         }
@@ -122,16 +120,16 @@ class HomeFragment : Fragment() {
                         deviceInfoExtMap[EarSide.Left] =
                             DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
                         with(mBinding) {
-                            imageViewLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim)
-                                .also { it.setAnimationListener(imageViewLeftEar.getAnimationListener(EarSide.Left, this, mHandler)) })
+                            frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim_fit_image)
+                                .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Left, this, mHandler)) })
                         }
                     }
                     else {
                         deviceInfoExtMap[EarSide.Right] =
                             DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
                         with(mBinding) {
-                            imageViewRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim)
-                                .also { it.setAnimationListener(imageViewRightEar.getAnimationListener(EarSide.Right, this, mHandler)) })
+                            frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim_fit_image)
+                                .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Right, this, mHandler)) })
 
                         }
                     }
@@ -187,28 +185,17 @@ class HomeFragment : Fragment() {
         {
             mWeakReference.get()?.let {
                 if (text.isNotEmpty())
-                    it.mBinding.textViewInitialize.text = text
+                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), text)
 
                 it.mBinding.progressBar.visibility = View.INVISIBLE
                 it.mBinding.buttonRetry.visibility = View.VISIBLE
-            }
-        }
-        private fun hideFrameLayouts()
-        {
-            mWeakReference.get()?.let {
-                with(it.mBinding) {
-                    frameLayoutLibraryId.visibility = View.INVISIBLE
-                    frameLayoutFirmwareId.visibility = View.INVISIBLE
-                    frameLayoutFirmwareVersion.visibility = View.INVISIBLE
-                    frameLayoutDeviceModel.visibility = View.INVISIBLE
-                    frameLayoutDeviceMac.visibility = View.INVISIBLE
-                }
             }
         }
         private fun startFrameAnimations()
         {
             mWeakReference.get()?.let {
                 with(it.mBinding) {
+                    invalidateAll()
                     frameLayoutDeviceMac.postDelayAnimation(0L, it.requireContext())
                     frameLayoutDeviceModel.postDelayAnimation(700L, it.requireContext())
                     frameLayoutLibraryId.postDelayAnimation(1400L, it.requireContext())
@@ -220,12 +207,12 @@ class HomeFragment : Fragment() {
         private fun readParameterSuccess() {
             mWeakReference.get()?.let {
                 it.mBinding.progressBar.visibility = View.INVISIBLE
-                it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_success_text)
+                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
                 postDelayed({
                     (it.activity as RemoteFittingActivity).binding.navigationView.menu.forEach {item ->
                         item.isEnabled = true
                     }
-                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_initialize_success_text)
+                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
                 }, 2000)
             }
         }
@@ -236,7 +223,6 @@ class HomeFragment : Fragment() {
                     isLeftButtonSelected = true
                     isRightButtonSelected = false
                 }
-
                 startFrameAnimations()
             }
         }
@@ -256,17 +242,16 @@ class HomeFragment : Fragment() {
             when (msg.what) {
                 11 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
                 12 -> { mWeakReference.get()?.let {
-                        it.mBinding.textViewInitialize.text = mWeakReference.get()?.getText(R.string.textview_initialize_library_found_text) }}
+                        it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_library_found_text)) }}
                 13 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
                 14 -> readParameterSuccess()
                 15 -> { mWeakReference.get()?.let {
-                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_fail_text) }}
+                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_fail_text)) }}
                 16 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
                 17 -> leftEarInitializeFinished()
                 18 -> rightEarInitializeFinished()
-                19 -> hideFrameLayouts()
                 21 -> { mWeakReference.get()?.let {
-                    it.mBinding.textViewInitialize.text = it.getText(R.string.textview_parameter_read_process_text) }}
+                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_process_text)) }}
                 22 -> startFrameAnimations()
             }
         }
@@ -274,7 +259,7 @@ class HomeFragment : Fragment() {
     fun retryButtonClicked()
     {
         with(mBinding) {
-            textViewInitialize.text = getText(R.string.textview_initializing_text)
+            textViewInitialize.startAlphaAnimation(requireContext(), getString(R.string.textview_initializing_text))
             buttonRetry.visibility = View.INVISIBLE
             progressBar.visibility = View.VISIBLE
         }
@@ -282,9 +267,9 @@ class HomeFragment : Fragment() {
     }
     fun rightEarButtonClicked()
     {
-        threadPool.execute {
-            mHandler.sendEmptyMessage(WHAT_HIDE_FRAME_LAYOUTS)
+        mBinding.hideFrames()
 
+        threadPool.execute {
             fittingConfig.apply {
                 selectedEarSide = EarSide.Right
                 isRightButtonSelected = true
@@ -297,12 +282,12 @@ class HomeFragment : Fragment() {
     fun leftEarButtonClicked()
     {
         threadPool.execute {
-            mHandler.sendEmptyMessage(WHAT_HIDE_FRAME_LAYOUTS)
             fittingConfig.apply {
                 selectedEarSide = EarSide.Left
                 isLeftButtonSelected = true
                 isRightButtonSelected = false
             }
+            activity?.runOnUiThread { mBinding.hideFrames() }
             mBinding.invalidateAll()
             mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
         }

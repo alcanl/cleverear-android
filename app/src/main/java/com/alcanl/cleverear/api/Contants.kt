@@ -1,6 +1,6 @@
 package com.alcanl.cleverear.api
 
-const val API_BASE_URL = "http://192.168.2.112:50531/api/ear-technic/"
+const val API_BASE_URL = "http://10.22.239.169:50531/api/ear-technic/"
 const val API_LIB_INFO_GET_BY_HA_URL = "library/model/info"
 const val API_LIB_INFO_GET_BY_LIB_ID_URL = "library"
 const val API_PARAM_DEFAULT_DATA_GET_BY_HA_NAME = "param/model/data"
@@ -19,5 +19,3 @@ const val PREF_DEFAULT_PARAM_ID = "PREF_DEFAULT_PARAM_ID"
 const val PREF_ACTIVE_PARAM_ID = "PREF_ACTIVE_PARAM_ID"
 const val PREF_WDRC_CHANNEL_COUNT = "PREF_WDRC_CHANNEL_COUNT"
 const val PREF_FREQUENCY_CHANNEL_COUNT = "PREF_FREQUENCY_CHANNEL_COUNT"
-const val PREF_FIRMWARE_ID = "PREF_FIRMWARE_ID"
-const val PREF_FIRMWARE_VERSION = "PREF_FIRMWARE_VERSION"
