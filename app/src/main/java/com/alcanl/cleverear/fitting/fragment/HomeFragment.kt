@@ -14,6 +14,7 @@ import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.api.dto.HearingAidDTO
 import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
@@ -38,6 +39,7 @@ import com.alcanl.cleverear.util.extension.showFrames
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel
 import com.ark.ArkException
+import com.ark.DeviceInfo
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -45,6 +47,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -94,6 +97,52 @@ class HomeFragment : Fragment() {
         mBinding.viewModel = HomeFragmentListenersViewModel(this)
         mHandler = RemoteHandler(this)
     }
+    private fun handleServiceResponseSuccess(deviceInfo: DeviceInfo, libFile: File, hearingAid: HearingAid,
+                                             hearingAidDTO: HearingAidDTO)
+    {
+        mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
+        runBlocking {
+            delay(2000)
+        }
+        val library = productManager.loadLibraryFromFile(libFile.absolutePath)
+        val product = wirelessFittingInitializer.createProduct(deviceInfo.productId, library)
+
+        product.initializeDevice(hearingAid.communicationAdaptor)
+
+        with(fittingConfig) {
+            if (product.ear == 0) {
+                deviceInfoExtMap[EarSide.Left] =
+                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                with(mBinding) {
+                    frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
+                        R.anim.alpha_blink_anim_fit_image)
+                        .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Left,
+                            this, mHandler)) })
+                }
+            }
+            else {
+                deviceInfoExtMap[EarSide.Right] =
+                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                with(mBinding) {
+                    frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
+                        R.anim.alpha_blink_anim_fit_image)
+                        .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Right,
+                            this, mHandler)) })
+
+                }
+            }
+        }
+        runBlocking {
+            delay(2000)
+        }
+
+        mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_PROCESS)
+
+        if (product.readAllParameters(hearingAid))
+            mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_SUCCESS)
+        else
+            mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_FAIL)
+    }
     private suspend fun initializeProductCallback(hearingAid: HearingAid)
     {
         try {
@@ -106,47 +155,8 @@ class HomeFragment : Fragment() {
                 delay(1000)
             }
 
-            if (libFile != null && hearingAidDTO?.modelName?.isNotEmpty()!!) {
-                mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
-                runBlocking {
-                    delay(2000)
-                }
-                val library = productManager.loadLibraryFromFile(libFile.absolutePath)
-                val product = wirelessFittingInitializer.createProduct(deviceInfo.productId, library)
-
-                product.initializeDevice(hearingAid.communicationAdaptor)
-
-                with(fittingConfig) {
-                    if (product.ear == 0) {
-                        deviceInfoExtMap[EarSide.Left] =
-                            DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
-                        with(mBinding) {
-                            frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim_fit_image)
-                                .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Left, this, mHandler)) })
-                        }
-                    }
-                    else {
-                        deviceInfoExtMap[EarSide.Right] =
-                            DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
-                        with(mBinding) {
-                            frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.alpha_blink_anim_fit_image)
-                                .also { it.setAnimationListener(getFrameLayoutAnimationListener(EarSide.Right, this, mHandler)) })
-
-                        }
-                    }
-                }
-                runBlocking {
-                    delay(2000)
-                }
-
-                mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_PROCESS)
-
-                if (product.readAllParameters(hearingAid))
-                    mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_SUCCESS)
-                else
-                    mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_FAIL)
-
-            }
+            if (libFile != null && hearingAidDTO?.modelName?.isNotEmpty()!!)
+                handleServiceResponseSuccess(deviceInfo, libFile, hearingAid, hearingAidDTO)
             else
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_NOT_FOUND)
 
@@ -182,12 +192,10 @@ class HomeFragment : Fragment() {
     }
     private class RemoteHandler(fragment: HomeFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
-        private fun handleInitProcessFail(text : String = "")
+        private fun handleInitializeDeviceFail(text : String)
         {
             mWeakReference.get()?.let {
-                if (text.isNotEmpty())
-                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), text)
-
+                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), text)
                 it.mBinding.progressBar.visibility = View.INVISIBLE
                 it.mBinding.buttonRetry.visibility = View.VISIBLE
             }
@@ -228,6 +236,9 @@ class HomeFragment : Fragment() {
                     isLeftButtonSelected = true
                     isRightButtonSelected = false
                 }
+                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
+                    "Device %s successfully initialized",
+                    it.fittingConfig.deviceInfoExtMap[EarSide.Left]?.hearingAidDTO?.modelName))
                 startFrameAnimations()
             }
         }
@@ -238,20 +249,23 @@ class HomeFragment : Fragment() {
                     isRightButtonSelected = true
                     isLeftButtonSelected= false
                 }
+                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
+                    "Device %s successfully initialized",
+                    it.fittingConfig.deviceInfoExtMap[EarSide.Right]?.hearingAidDTO?.modelName))
                 startFrameAnimations()
             }
         }
         override fun handleMessage(msg: Message)
         {
             when (msg.what) {
-                11 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
+                11 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
                 12 -> { mWeakReference.get()?.let {
                         it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_library_found_text)) }}
-                13 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
+                13 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
                 14 -> readParameterSuccess()
                 15 -> { mWeakReference.get()?.let {
                     it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_fail_text)) }}
-                16 -> handleInitProcessFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
+                16 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
                 17 -> leftEarInitializeFinished()
                 18 -> rightEarInitializeFinished()
                 21 -> { mWeakReference.get()?.let {

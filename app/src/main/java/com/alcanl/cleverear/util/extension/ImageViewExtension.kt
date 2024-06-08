@@ -10,7 +10,7 @@ import com.alcanl.cleverear.R
 
 fun ImageView.startAlphaAnimation(context: Context)
 {
-    this.startAnimation(AnimationUtils.loadAnimation(context, R.anim.translate_textview_device_init)
+    this.startAnimation(AnimationUtils.loadAnimation(context, R.anim.alpha_blink_anim)
         .also { it.setAnimationListener(object: AnimationListener {
             override fun onAnimationStart(p0: Animation?) {
                 this@startAlphaAnimation.visibility = View.VISIBLE

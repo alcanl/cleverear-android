@@ -41,6 +41,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:layout_constraintVertical_bias="0.16" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView"
         android:layout_width="100dp"
         android:layout_height="88dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -241,13 +242,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:id="@+id/frameLayoutLeftEar"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.123"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayoutFirmwareVersion"
-        app:layout_constraintVertical_bias="0.828">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.917">
 
         <ImageView
             android:id="@+id/imageViewLeftEar"
@@ -270,17 +270,17 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonLeft"
+            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="normal"
-            android:textAllCaps="false"
-            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
             android:onClick="@{()-> viewModel.handleLeftEarButton()}"
             android:text="@string/left_ear_side_text"
-            app:cornerRadius = "0dp"/>
+            android:textAllCaps="false"
+            android:textStyle="normal"
+            app:cornerRadius="0dp" />
 
     </FrameLayout>
 
@@ -288,13 +288,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:id="@+id/frameLayoutRightEar"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.872"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayoutFirmwareVersion"
-        app:layout_constraintVertical_bias="0.828">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.917">
 
         <ImageView
             android:id="@+id/imageViewRightEar"
@@ -309,14 +308,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:id="@+id/buttonRight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:textStyle="normal"
             android:layout_gravity="bottom | center"
             android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
             android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
             android:onClick="@{()-> viewModel.handleRightEarButton()}"
             android:text="@string/right_ear_side_text"
-            app:cornerRadius = "0dp" />
+            android:textAllCaps="false"
+            android:textStyle="normal"
+            app:cornerRadius="0dp" />
 
         <ImageView
             android:layout_width="20dp"

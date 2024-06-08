@@ -1,14 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fitting.fragment.FittingFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <data>
+        <import type="com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel"/>
+        <import type="com.alcanl.cleverear.di.module.FittingConfigurationModule"/>
+        <import type="com.alcanl.cleverear.util.EarSide"/>
+        <import type="android.view.View"/>
+        <import type="android.content.Context"/>
+        <import type="androidx.core.content.ContextCompat"/>
+        <import type="androidx.appcompat.content.res.AppCompatResources"/>
+        <import type="com.alcanl.cleverear.R"/>
+        <variable name="config" type="FittingConfigurationModule" />
+        <variable name="viewModel" type="InSituFragmentListenersViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="@drawable/background"
+        tools:context=".fitting.fragment.InSituFragment">
 
-</FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="100dp"
+            android:layout_height="88dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.95"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.019"
+            app:srcCompat="@drawable/eartechnic_logo"
+            tools:ignore="ContentDescription" />
+
+        <FrameLayout
+            android:id="@+id/frameLayoutLeftEar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.131"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.946">
+
+            <ImageView
+                android:id="@+id/imageViewLeftEar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                app:srcCompat="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.leftear_blue) : AppCompatResources.getDrawable(context, R.drawable.lefteargray)}"
+                tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top | center"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="15dp"
+                android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                app:srcCompat="@drawable/check_tick"
+                tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonLeft"
+                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom | center"
+                android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
+                android:onClick="@{()-> viewModel.handleLeftEarButton()}"
+                android:text="@string/left_ear_side_text"
+                android:textAllCaps="false"
+                android:textStyle="normal"
+                app:cornerRadius="0dp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/frameLayoutRightEar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.88"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.945">
+
+            <ImageView
+                android:id="@+id/imageViewRightEar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                app:srcCompat="@{config.INSTANCE.rightButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.rightear_red) : AppCompatResources.getDrawable(context, R.drawable.righteargray) }"
+                tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonRight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom | center"
+                android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
+                android:onClick="@{()-> viewModel.handleRightEarButton()}"
+                android:text="@string/right_ear_side_text"
+                android:textAllCaps="false"
+                android:textStyle="normal"
+                app:cornerRadius="0dp" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top | center"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="40dp"
+                android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                app:srcCompat="@drawable/check_tick"
+                tools:ignore="ContentDescription,ImageContrastCheck" />
+        </FrameLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
