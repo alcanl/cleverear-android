@@ -322,7 +322,9 @@ class LoadingActivity : AppCompatActivity() {
             finalizeConnectedLoadingTimer()
         else {
             mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
-            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
+            Handler(Looper.myLooper()!!).postDelayed(
+                { startActivity(Intent(this, MainActivity::class.java)); finish() },
+                3000)
         }
     }
     private fun initialize()

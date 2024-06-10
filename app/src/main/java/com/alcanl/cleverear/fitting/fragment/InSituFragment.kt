@@ -32,7 +32,7 @@ class InSituFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_in_situ, container, false)
         initialize()
         return mBinding.root
     }

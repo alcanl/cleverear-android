@@ -44,6 +44,7 @@ import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -79,7 +80,7 @@ class HomeFragment : Fragment() {
     override fun onResume()
     {
         super.onResume()
-        if (fittingConfig.isLeftButtonSelected || fittingConfig.isRightButtonSelected) {
+        if (fittingConfig.deviceInfoExtMap.all { it.value.isInitFinished }) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
                 buttonRetry.visibility = View.INVISIBLE
@@ -90,7 +91,6 @@ class HomeFragment : Fragment() {
         }
         else
             initializeProduct()
-
     }
     private fun initialize()
     {
@@ -178,11 +178,11 @@ class HomeFragment : Fragment() {
             }
         }
 
-        runBlocking {
+        GlobalScope.launch {
             if (configuration.isDoubleDeviceConnection) {
                 fittingConfig.isBinauralConnection = true
-                GlobalScope.launch { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Left]!!) }.join()
-                GlobalScope.launch { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Right]!!) }
+                async { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Left]!!) }.await()
+                run { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Right]!!) }
             }
             else {
                 fittingConfig.selectedEarSide = configuration.hearingAid.side
@@ -206,10 +206,10 @@ class HomeFragment : Fragment() {
                 with(it.mBinding) {
                     invalidateAll()
                     frameLayoutDeviceMac.postDelayAnimation(0L, it.requireContext())
-                    frameLayoutDeviceModel.postDelayAnimation(700L, it.requireContext())
-                    frameLayoutLibraryId.postDelayAnimation(1400L, it.requireContext())
-                    frameLayoutFirmwareId.postDelayAnimation(2100L, it.requireContext())
-                    frameLayoutFirmwareVersion.postDelayAnimation(2800L, it.requireContext())
+                    frameLayoutDeviceModel.postDelayAnimation(800L, it.requireContext())
+                    frameLayoutLibraryId.postDelayAnimation(1500L, it.requireContext())
+                    frameLayoutFirmwareId.postDelayAnimation(2200L, it.requireContext())
+                    frameLayoutFirmwareVersion.postDelayAnimation(2900L, it.requireContext())
                 }
             }
         }
@@ -235,6 +235,7 @@ class HomeFragment : Fragment() {
                 with(it.fittingConfig) {
                     isLeftButtonSelected = true
                     isRightButtonSelected = false
+                    deviceInfoExtMap[EarSide.Left]?.isInitFinished = true
                 }
                 it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
                     "Device %s successfully initialized",
@@ -248,6 +249,7 @@ class HomeFragment : Fragment() {
                 with(it.fittingConfig) {
                     isRightButtonSelected = true
                     isLeftButtonSelected= false
+                    deviceInfoExtMap[EarSide.Right]?.isInitFinished = true
                 }
                 it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
                     "Device %s successfully initialized",

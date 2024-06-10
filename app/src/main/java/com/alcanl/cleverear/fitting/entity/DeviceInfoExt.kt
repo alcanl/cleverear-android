@@ -6,7 +6,7 @@ import com.ark.Library
 import com.ark.Product
 
 data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
-                        val hearingAidDTO: HearingAidDTO?, val library: Library?) {
+                        val hearingAidDTO: HearingAidDTO?, val library: Library?, var isInitFinished: Boolean = false) {
 
     constructor() : this(null, null, null, null)
     fun getDeviceMac(): String = product?.deviceMACAddress ?: ""
