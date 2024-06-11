@@ -11,12 +11,8 @@ class HomeFragmentListenersViewModel(fragment: HomeFragment) {
     {
         mWeakReference.get()?.retryButtonClicked()
     }
-    fun handleLeftEarButton()
+    fun handleEarSideButtons(earSide: EarSide)
     {
-        mWeakReference.get()?.commonEarButtonsClicked(EarSide.Left)
-    }
-    fun handleRightEarButton()
-    {
-        mWeakReference.get()?.commonEarButtonsClicked(EarSide.Right)
+        mWeakReference.get()?.commonEarButtonsClicked(earSide)
     }
 }

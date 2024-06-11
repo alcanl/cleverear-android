@@ -32,7 +32,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:navGraph="@navigation/fitting_navigation" />
+            app:navGraph="@navigation/fitting_navigation"
+            tools:ignore="FragmentTagUsage" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

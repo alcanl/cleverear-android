@@ -8,10 +8,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentInSituBinding
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
@@ -24,7 +27,10 @@ class InSituFragment : Fragment() {
     lateinit var fittingConfig : FittingConfigurationModule
     @Inject
     lateinit var threadPool : ExecutorService
+    @Inject
+    lateinit var frequencyArray: Array<Int>
 
+    private var mFrequencyIndex = 0
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
 
@@ -49,6 +55,58 @@ class InSituFragment : Fragment() {
         {
 
         }
+
+    }
+    private fun changeFrequencyText(value: Int)
+    {
+        mBinding.textViewFrequency.startAlphaAnimation(requireContext(),
+            String.format(getString(R.string.textview_frequency_hertz_text), frequencyArray[value]))
+    }
+    fun earSideButtonClicked(earSide: EarSide)
+    {
+        fittingConfig.apply {
+            selectedEarSide = earSide
+            isRightButtonSelected = earSide == EarSide.Right
+            isLeftButtonSelected = earSide == EarSide.Left
+        }
+        mBinding.invalidateAll()
+    }
+    fun playSoundButtonClicked()
+    {
+
+    }
+    fun decibelButtonsClicked(value: Int)
+    {
+        mBinding.apply {
+            val currentVal = textViewDecibel.text.substring(0, 3).trim().toInt()
+            if (currentVal <= 10 || currentVal >= 100)
+                return
+
+            textViewDecibel.startAlphaAnimation(this@InSituFragment.requireContext(),
+                String.format(getString(R.string.textview_decibel_text), currentVal + value))
+        }
+    }
+    fun frequencyButtonsClicked(imageButton: ImageButton)
+    {
+        if (imageButton == mBinding.imageButtonIncreaseFrequency) {
+            if (mFrequencyIndex >= frequencyArray.size - 1)
+                return
+
+            changeFrequencyText(frequencyArray[mFrequencyIndex++])
+        }
+        else {
+            if (mFrequencyIndex <= 0)
+                return
+
+            changeFrequencyText(frequencyArray[mFrequencyIndex--])
+        }
+    }
+    fun saveButtonClicked()
+    {
+
+    }
+    fun autoFitButtonClicked()
+    {
 
     }
 }

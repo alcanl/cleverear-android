@@ -61,6 +61,8 @@
     <string name="textview_firmware_id"><u>Firmware Id</u></string>
     <string name="textview_firmware_version"><u>Firmware Version</u></string>
     <string name="button_retry_text" translatable="true">Wiederholung</string>
+    <string name="button_play_sound_text" translatable="true">Play Sound</string>
+    <string name="button_save_in_situ_text" translatable="true">Save In-Situ Test</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>
     <string name="textview_parameter_read_fail_text" translatable="true">Unknown Problem Occurred While Reading Parameters, Please Contact With Your Delegate</string>

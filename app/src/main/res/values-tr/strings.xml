@@ -60,6 +60,8 @@
     <string name="toast_connection_problem_text">Cihaza Bağlanılamadı</string>
     <string name="button_previous_activity">Önceki</string>
     <string name="dialog_info_title">Bilgi</string>
+    <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
+    <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>
     <string name="textview_parameter_read_process_text" translatable="true">Dahili Parametreler Cihazdan Okunurken Lütfen Bekleyin</string>
     <string name="textview_parameter_read_success_text" translatable="true">Parametreler Başarılı Bir Şekilde Cihazdan Okundu</string>
