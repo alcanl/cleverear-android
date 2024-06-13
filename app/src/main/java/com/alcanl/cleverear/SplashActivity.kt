@@ -109,7 +109,6 @@ class SplashActivity : AppCompatActivity() {
             }
         else
             mAddressArray = emptyArray()
-
     }
 
     private fun initialize()
@@ -127,6 +126,7 @@ class SplashActivity : AppCompatActivity() {
         initialize()
         initCountDownTimer()
         cleanEvents()
+
     }
 
     private fun checkAndRequestNotificationPermission()

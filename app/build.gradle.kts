@@ -36,6 +36,13 @@ android {
             abiFilters.add("x86")
             abiFilters.add("mips")
         }
+        externalNativeBuild {
+            cmake {
+                cppFlags.add("-frtti")
+                cppFlags.add("-fexceptions")
+                cppFlags.add("-frtti -fexceptions")
+            }
+        }
         signingConfig = signingConfigs.getByName("release")
     }
     buildTypes {
@@ -92,8 +99,8 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.51")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.7")
-    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
 }
 
 kapt {

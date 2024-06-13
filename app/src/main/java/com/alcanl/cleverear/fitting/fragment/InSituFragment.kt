@@ -20,7 +20,7 @@ import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
-import com.ark.ProductManager
+import com.ark.Manufacturing
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
@@ -33,7 +33,7 @@ class InSituFragment : Fragment() {
     @Inject
     lateinit var configuration : ConfigurationModule
     @Inject
-    lateinit var productManager: ProductManager
+    lateinit var manufacturing: Manufacturing
     @Inject
     lateinit var threadPool : ExecutorService
     @Inject
@@ -76,27 +76,27 @@ class InSituFragment : Fragment() {
     }
     private fun initializeDeviceForInSituTest()
     {
-        with(fittingConfig) {
-           /* if (configuration.isDoubleDeviceConnection) {
-                deviceInfoExtMap.forEach {
-                    productManager.manufacturing.setProduct(it.value.product!!)
-                }
-                configuration.doubleDeviceMap.forEach {
-                    productManager.manufacturing.initializeDevice(it.value.communicationAdaptor!!)
-                }
-            }
-            else {
-                if (selectedEarSide == EarSide.Left)
-                    productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Left]?.product!!)
-                else
-                    productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Right]?.product!!)
+        /* with(fittingConfig) {
+             if (configuration.isDoubleDeviceConnection) {
+                 deviceInfoExtMap.forEach {
+                     productManager.manufacturing.setProduct(it.value.product!!)
+                 }
+                 configuration.doubleDeviceMap.forEach {
+                     productManager.manufacturing.initializeDevice(it.value.communicationAdaptor!!)
+                 }
+             }
+             else {
+                 if (selectedEarSide == EarSide.Left)
+                     productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Left]?.product!!)
+                 else
+                     productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Right]?.product!!)
 
-                */
-            productManager.manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
-            productManager.manufacturing.prepareDeviceForModeling(true)
-            productManager.manufacturing.setProduct(fittingConfig.deviceInfoExtMap[EarSide.Left]?.product!!)
+                 }*/
 
-        }
+        manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
+        manufacturing.setProduct(fittingConfig.deviceInfoExtMap[EarSide.Left]?.product!!)
+        manufacturing.prepareDeviceForModeling(true)
+
 
     }
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
@@ -126,14 +126,14 @@ class InSituFragment : Fragment() {
     }
     fun playSoundButtonClicked()
     {
-        productManager.manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
+        manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
     }
     fun decibelButtonsClicked(value: Int)
     {
         if (mDecibelIndex <= 0 && value < 0)
             return
 
-        if (mDecibelIndex >= 19 && value > 0)
+        if (mDecibelIndex >= 18 && value > 0)
             return
 
         mBinding.apply {

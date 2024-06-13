@@ -5,13 +5,11 @@ import android.util.Log
 import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
-import com.ark.DeviceInfo
 import com.ark.EventHandler
 import com.ark.ParameterList
 import com.ark.ParameterMemory
 import com.ark.ParameterMemoryList
 import com.ark.ParameterSpace
-import com.ark.Product
 import com.ark.ProductManager
 import com.ark.WirelessControl
 import java.util.Objects
