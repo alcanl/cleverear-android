@@ -16,6 +16,16 @@ object FittingConfigurationModule {
     var isBinauralConnection = false
     var isLeftButtonSelected = false
     var isRightButtonSelected = false
+    val isInitializeCompleted : Boolean
+        get(){
+            return if (deviceInfoExtMap.all { it.value.product != null })
+                deviceInfoExtMap.all { it.value.isInitFinished }
+            else if (deviceInfoExtMap[EarSide.Left]?.product != null)
+                deviceInfoExtMap[EarSide.Left]?.isInitFinished!!
+            else
+                deviceInfoExtMap[EarSide.Right]?.isInitFinished!!
+        }
+
     init {
         deviceInfoExtMap[EarSide.Left] = DeviceInfoExt()
         deviceInfoExtMap[EarSide.Right] = DeviceInfoExt()

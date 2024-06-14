@@ -80,7 +80,7 @@ class HomeFragment : Fragment() {
     override fun onResume()
     {
         super.onResume()
-        if (fittingConfig.deviceInfoExtMap.all { it.value.isInitFinished }) {
+        if (fittingConfig.isInitializeCompleted) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
                 buttonRetry.visibility = View.INVISIBLE

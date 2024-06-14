@@ -18,10 +18,16 @@ import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import com.ark.Manufacturing
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -56,6 +62,11 @@ class InSituFragment : Fragment() {
         initialize()
         return mBinding.root
     }
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        manufacturing.prepareDeviceForModeling(false)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
@@ -74,37 +85,30 @@ class InSituFragment : Fragment() {
         mHandler = InSituHandler(this)
         threadPool.execute { initializeDeviceForInSituTest() }
     }
-    private fun initializeDeviceForInSituTest()
-    {
-        /* with(fittingConfig) {
-             if (configuration.isDoubleDeviceConnection) {
-                 deviceInfoExtMap.forEach {
-                     productManager.manufacturing.setProduct(it.value.product!!)
-                 }
-                 configuration.doubleDeviceMap.forEach {
-                     productManager.manufacturing.initializeDevice(it.value.communicationAdaptor!!)
-                 }
-             }
-             else {
-                 if (selectedEarSide == EarSide.Left)
-                     productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Left]?.product!!)
-                 else
-                     productManager.manufacturing.setProduct(deviceInfoExtMap[EarSide.Right]?.product!!)
+    private fun initializeDeviceForInSituTest() {
+        with(fittingConfig) {
+            if (configuration.isDoubleDeviceConnection)
+                manufacturing.initializeDevice(configuration.doubleDeviceMap[selectedEarSide]?.communicationAdaptor!!)
+            else
+                manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
 
-                 }*/
-
-        manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
-        manufacturing.setProduct(fittingConfig.deviceInfoExtMap[EarSide.Left]?.product!!)
-        manufacturing.prepareDeviceForModeling(true)
-
-
+            manufacturing.prepareDeviceForModeling(true)
+            manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
+        }
     }
+
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
 
         override fun handleMessage(msg: Message)
         {
-
+            when(msg.what) {
+                19 -> showDialog()
+            }
+        }
+        private fun showDialog()
+        {
+            TODO("Not implemented yet")
         }
 
     }
@@ -117,16 +121,28 @@ class InSituFragment : Fragment() {
     }
     fun earSideButtonClicked(earSide: EarSide)
     {
+        manufacturing.prepareDeviceForModeling(false)
+
         fittingConfig.apply {
             selectedEarSide = earSide
             isRightButtonSelected = earSide == EarSide.Right
             isLeftButtonSelected = earSide == EarSide.Left
         }
+
+        threadPool.execute { initializeDeviceForInSituTest() }
         mBinding.invalidateAll()
     }
+    @OptIn(DelicateCoroutinesApi::class)
     fun playSoundButtonClicked()
     {
-        manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
+        GlobalScope.launch {
+            async {
+                manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex] - 120)
+                delay(2000)
+            }.await()
+            manufacturing.stopTone()
+            mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
+        }
     }
     fun decibelButtonsClicked(value: Int)
     {
