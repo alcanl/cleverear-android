@@ -7,8 +7,10 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class DeviceListAdapter(context: Context) : ArrayAdapter<String>(context, R.layout.listview_item_layout, ArrayList<String>(emptyList())) {
+class DeviceListAdapter @Inject constructor(@ApplicationContext context: Context) : ArrayAdapter<String>(context, R.layout.listview_item_layout, ArrayList<String>(emptyList())) {
     private var mIndex = 0
     private var mManufacturerData = ""
 

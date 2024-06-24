@@ -18,10 +18,12 @@ import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import com.ark.Manufacturing
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -51,6 +53,10 @@ class InSituFragment : Fragment() {
 
     private var mFrequencyIndex = 0
     private var mDecibelIndex = 0
+    private lateinit var lineDataSet: LineDataSet
+    private lateinit var lineData: LineData
+    @Inject
+    private lateinit var dataList: ArrayList<Entry>
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
 
@@ -95,6 +101,10 @@ class InSituFragment : Fragment() {
             manufacturing.prepareDeviceForModeling(true)
             manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
         }
+    }
+    private fun test()
+    {
+
     }
 
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
@@ -141,7 +151,7 @@ class InSituFragment : Fragment() {
                 delay(2000)
             }.await()
             manufacturing.stopTone()
-            mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
+            //mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         }
     }
     fun decibelButtonsClicked(value: Int)

@@ -5,8 +5,11 @@ import com.ark.AsyncResult
 import com.ark.CommunicationPort
 import com.ark.ProductManager
 import com.ark.WirelessProgrammerType
+import javax.inject.Inject
 
-class DeviceScanHandler(private val productManager: ProductManager){
+class DeviceScanner @Inject constructor(){
+    @Inject
+    lateinit var productManager: ProductManager
     private fun scanDevice(earSide: EarSide) : AsyncResult
     {
         return productManager.beginScanForWirelessDevices(WirelessProgrammerType.kPlatformDefault, "",

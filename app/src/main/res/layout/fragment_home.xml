@@ -32,7 +32,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:text="@string/textview_initializing_text"
         android:textAlignment="center"
         android:textColor="@color/design_default_color_secondary_variant"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -60,13 +60,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         app:dots_color="@color/design_default_color_secondary_variant"
         app:dots_count="5"
         app:dots_duration="400"
-        app:dots_size="8dp"
+        app:dots_size="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.298" />
+        app:layout_constraintVertical_bias="0.251" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonRetry"
@@ -75,23 +74,23 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:backgroundTint="@color/design_default_color_secondary_variant"
         android:onClick="@{()->viewModel.handleRetryButton()}"
         android:text="@string/button_retry_text"
+        android:textAllCaps="false"
         android:textColor="@color/ap_black"
         android:textSize="20sp"
         android:textStyle="normal"
-        android:textAllCaps="false"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.29" />
+        app:layout_constraintVertical_bias="0.234" />
 
     <FrameLayout
         android:id="@+id/frameLayoutDeviceMac"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="45dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -240,14 +239,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ImageView
         android:id="@+id/imageViewHearingAid"
-        android:layout_width="75dp"
-        android:layout_height="70dp"
+        android:layout_width="65dp"
+        android:layout_height="60dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.27"
+        app:layout_constraintVertical_bias="0.236"
         app:srcCompat="@drawable/tie_ha"
         tools:ignore="ContentDescription" />
 

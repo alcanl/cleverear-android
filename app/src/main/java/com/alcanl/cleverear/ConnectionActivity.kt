@@ -22,7 +22,7 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
-import com.alcanl.cleverear.util.scan.DeviceScanHandler
+import com.alcanl.cleverear.util.scan.DeviceScanner
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
@@ -40,25 +40,27 @@ import javax.inject.Inject
 class ConnectionActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var deviceConnectionHandler: DeviceScanHandler
+    lateinit var deviceScanner: DeviceScanner
     @Inject
     lateinit var eventHandler: EventHandler
     @Inject
     lateinit var configuration: ConfigurationModule
     @Inject
     lateinit var threadPool: ExecutorService
+    @Inject
+    lateinit var deviceListAdapter: DeviceListAdapter
     @Volatile
     private var mDeviceCount = 0
+    @Volatile
+    private var mBleDeviceSet = HashSet<DiscoveredDeviceInfo>()
     private var mIsDeviceFound = false
     private var isScanContinue = false
     private lateinit var mAlertDialog: CustomAlertDialogActiveConnection
-    private lateinit var mAdapter: DeviceListAdapter
     private lateinit var scanOnBoard : Thread
     private lateinit var mAsyncResult: AsyncResult
     private lateinit var mSelectedHearingAid: HearingAid
     private lateinit var mBinding: ActivityConnectionBinding
-    @Volatile
-    private var mBleDeviceSet = HashSet<DiscoveredDeviceInfo>()
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -129,12 +131,11 @@ class ConnectionActivity : AppCompatActivity() {
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_connection)
         mBinding.viewModel = ConnectionActivityListenersViewModel(this)
-        mAdapter = DeviceListAdapter(this)
-            .apply {
+        deviceListAdapter.apply {
                 if (configuration.isDoubleDeviceConnection) mBinding.listView.choiceMode =
                     ListView.CHOICE_MODE_MULTIPLE
             }
-        mBinding.adapter = mAdapter
+        mBinding.adapter = deviceListAdapter
     }
     private fun isHearingAid(manufacturerCode: String): Boolean {
         var manufacturerCodeSub = ""
@@ -167,8 +168,8 @@ class ConnectionActivity : AppCompatActivity() {
     {
         try {
             mAsyncResult =
-                if (configuration.earSide == EarSide.Right) deviceConnectionHandler.scanForRightDevice()
-                else deviceConnectionHandler.scanForLeftDevice()
+                if (configuration.earSide == EarSide.Right) deviceScanner.scanForRightDevice()
+                else deviceScanner.scanForLeftDevice()
 
         } catch (ex: ArkException) {
             Log.e("", ex.message!!)
@@ -205,10 +206,10 @@ class ConnectionActivity : AppCompatActivity() {
             adapter!!.add(device.toString())
 
             if (configuration.isDoubleDeviceConnection && recognizeEarSide(device.manufacturerData) == EarSide.Right)
-                mAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
+                deviceListAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
 
             else if (configuration.earSide == EarSide.Right)
-                mAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
+                deviceListAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
 
             adapter!!.notifyDataSetChanged()
 
@@ -359,7 +360,7 @@ class ConnectionActivity : AppCompatActivity() {
             }
             stop()
             isScanContinue = false
-            deviceConnectionHandler.endScanProcess(mAsyncResult)
+            deviceScanner.endScanProcess(mAsyncResult)
 
             with(mBinding) {
                 imageButtonDetect.isEnabled = true

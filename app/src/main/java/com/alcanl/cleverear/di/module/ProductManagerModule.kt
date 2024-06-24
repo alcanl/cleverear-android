@@ -1,7 +1,5 @@
 package com.alcanl.cleverear.di.module
 
-
-import com.alcanl.cleverear.util.scan.DeviceScanHandler
 import com.ark.EventHandler
 import com.ark.Manufacturing
 import com.ark.ProductManager
@@ -24,10 +22,5 @@ object ProductManagerModule {
     @Provides
     @Singleton
     fun createManufacturing() : Manufacturing = mProductManager.manufacturing
-    @Provides
-    @Singleton
-    fun createDeviceConnectionHandler() : DeviceScanHandler
-    {
-        return DeviceScanHandler(mProductManager)
-    }
+
 }

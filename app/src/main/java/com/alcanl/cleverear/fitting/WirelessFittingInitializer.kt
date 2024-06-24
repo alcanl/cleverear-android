@@ -141,7 +141,6 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             val pref = mContext.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
             if (pref.getString(PREF_MODEL_NAME, "")?.isEmpty()!!) {
                 hearingAidDTO = getHearingAidDTOFromService(deviceInfo.serialId)
-                //hearingAidDTO?.setDeviceProperties(deviceInfo)
                 saveDTOPref(pref, hearingAidDTO)
                 return hearingAidDTO
             }

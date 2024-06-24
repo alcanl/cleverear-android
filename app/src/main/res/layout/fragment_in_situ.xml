@@ -24,27 +24,13 @@
     tools:context=".fitting.fragment.InSituFragment">
 
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/appCompatImageView2"
-        android:layout_width="90dp"
-        android:layout_height="55dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.948"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.008"
-        app:srcCompat="@drawable/eartechnic_logo"
-        tools:ignore="ContentDescription" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout7"
+        android:id="@+id/constraintLayoutFooter"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout8">
+        app:layout_constraintStart_toStartOf="parent">
 
         <FrameLayout
             android:id="@+id/frameLayoutLeftEar"
@@ -124,1091 +110,25 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout8"
+        android:id="@+id/constraintLayoutSoundGenerate"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout7"
+        android:layout_height="120dp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayoutFooter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appCompatImageView2"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintStart_toStartOf="parent">
 
-        <FrameLayout
-            android:id="@+id/frameLayoutChart"
-            android:layout_width="0dp"
-            android:layout_height="380dp"
-            android:layout_margin="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="TextSizeCheck">
-
-            <ImageView
-                android:id="@+id/circle125"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_gravity="center |start"
-                android:layout_marginStart="23dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:translationZ="90dp"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <ImageView
-                android:id="@+id/circle250"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_gravity="center |start"
-                android:layout_marginStart="68dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:translationZ="90dp"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <ImageView
-                android:id="@+id/circle500"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_gravity="center |start"
-                android:layout_marginStart="113dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:translationZ="90dp"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <ImageView
-                android:id="@+id/circle750"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="142dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center |start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle1000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="172dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center |start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle1500"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="201dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center |start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle2000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="228dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center |start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle3000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="260dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center |start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle4000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:translationZ="90dp"
-                android:layout_marginStart="288dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:layout_gravity="center | start"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/circle6000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_gravity="center | start"
-                android:layout_marginStart="318dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:translationZ="90dp"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <ImageView
-                android:id="@+id/circle8000"
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_gravity="center | start"
-                android:layout_marginStart="345dp"
-                android:src="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.chart_circle_left) : AppCompatResources.getDrawable(context, R.drawable.chart_circle_right)}"
-                android:translationZ="90dp"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                android:orientation="vertical"
-                android:paddingBottom="20dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_10_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_20_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_30_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_40_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_50_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_60_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_70_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_80_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_90_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:text="@string/textview_100_text"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    tools:ignore="VisualLintLocaleText" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center | top"
-                android:layout_marginTop="5dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/textview_in_situ_chart_header_text"
-                android:textColor="@color/design_default_color_secondary_variant"
-                android:textSize="14sp"
-                tools:ignore="TextContrastCheck,TextContrastCheck,VisualLintOverlap" />
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingStart="30dp"
-                android:paddingTop="30dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="30dp"
-                android:shrinkColumns="*"
-                android:stretchColumns="*"
-                tools:layout_editor_absoluteX="401dp">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="18dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="18dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text"
-                        tools:ignore="TooManyViews" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text"
-                        tools:ignore="TooManyViews" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_max_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@drawable/chart_textview_background"
-                        android:text="@string/chart_empty_min_cell_text" />
-
-                </TableRow>
-            </TableLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="15dp"
-                android:layout_gravity="bottom"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                tools:ignore="RtlSymmetry,TextSizeCheck">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_125_text"
-                    android:textAlignment="center"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_10_text"
-                    android:textAlignment="viewEnd"
-                    android:textSize="12sp"
-                    android:visibility="invisible" />
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_250_text"
-                    android:textAlignment="viewStart"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_500_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_750_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_1k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_1_5k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_2k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_3k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_4k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_6k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/textview_8k_text"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-        </FrameLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout9"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent">
 
             <Button
                 android:id="@+id/buttonMinusFiveDecibel"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="74dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
+                android:onClick="@{()-> viewModel.handleDecibelButtons(-5)}"
                 android:text="@string/button_minus_five_text"
                 android:textAlignment="center"
                 android:textColor="@color/right_device_slider"
-                android:textSize="14sp"
-                android:onClick="@{()-> viewModel.handleDecibelButtons(-5)}"
+                android:textSize="11sp"
                 app:cornerRadius="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -1216,26 +136,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.047"
-                app:strokeColor="@color/right_device_slider" />
+                app:strokeColor="@color/right_device_slider"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Button
                 android:id="@+id/buttonPlusFiveDecibel"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="74dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
+                android:onClick="@{()-> viewModel.handleDecibelButtons(5)}"
                 android:text="@string/button_plus_five_text"
                 android:textAlignment="center"
                 android:textColor="@color/right_device_slider"
-                android:textSize="14sp"
-                android:onClick="@{()-> viewModel.handleDecibelButtons(5)}"
+                android:textSize="11sp"
                 app:cornerRadius="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.821"
+                app:layout_constraintHorizontal_bias="0.818"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.047"
-                app:strokeColor="@color/right_device_slider" />
+                app:strokeColor="@color/right_device_slider"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/textViewDecibel"
@@ -1244,28 +166,28 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/textview_decibel_text"
                 android:textColor="@color/right_device_slider"
-                android:textSize="18sp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonPlusFiveDecibel"
-                app:layout_constraintHorizontal_bias="0.479"
+                app:layout_constraintHorizontal_bias="0.478"
                 app:layout_constraintStart_toEndOf="@+id/buttonMinusFiveDecibel"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.105" />
+                app:layout_constraintVertical_bias="0.156" />
 
             <ImageButton
                 android:id="@+id/imageButtonDecreaseFrequency"
                 android:layout_width="74dp"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:background="@drawable/in_situ_buttons_border"
-                android:scaleType="centerInside"
                 android:onClick="@{(view)-> viewModel.handleFrequencyButtons(view)}"
+                android:scaleType="centerInside"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.175"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.496"
+                app:layout_constraintVertical_bias="0.433"
                 app:srcCompat="@drawable/baseline_arrow_back_ios_24"
                 app:strokeColor="@color/left_device_slider"
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
@@ -1273,16 +195,16 @@
             <ImageButton
                 android:id="@+id/imageButtonIncreaseFrequency"
                 android:layout_width="74dp"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:background="@drawable/in_situ_buttons_border"
-                android:scaleType="centerInside"
                 android:onClick="@{(view)-> viewModel.handleFrequencyButtons(view)}"
+                android:scaleType="centerInside"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.821"
+                app:layout_constraintHorizontal_bias="0.818"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.496"
+                app:layout_constraintVertical_bias="0.433"
                 app:srcCompat="@drawable/baseline_arrow_forward_ios_24"
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck,TouchTargetSizeCheck,TouchTargetSizeCheck" />
 
@@ -1293,23 +215,24 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/textview_frequency_hertz_text"
                 android:textColor="@color/left_device_slider"
-                android:textSize="18sp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageButtonIncreaseFrequency"
-                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintHorizontal_bias="0.512"
                 app:layout_constraintStart_toEndOf="@+id/imageButtonDecreaseFrequency"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.496" />
+                app:layout_constraintVertical_bias="0.48" />
 
             <Button
                 android:id="@+id/buttonPlaySound"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="180dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
+                android:onClick="@{()-> viewModel.handlePlaySoundButton()}"
                 android:text="@string/button_play_sound_text"
                 android:textColor="@color/design_default_color_secondary_variant"
-                android:onClick="@{()-> viewModel.handlePlaySoundButton()}"
+                android:textSize="11sp"
                 app:cornerRadius="0dp"
                 app:icon="@drawable/baseline_play_arrow_24"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -1319,49 +242,88 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1.0"
                 app:strokeColor="@color/design_default_color_secondary_variant"
-                tools:ignore="TextContrastCheck" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/button3"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutHeader"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/button_save_in_situ_text"
-        android:textColor="@color/design_default_color_secondary_variant"
-        android:textSize="11sp"
-        android:onClick="@{()-> viewModel.handleSaveButton()}"
-        app:cornerRadius="0dp"
-        app:icon="@drawable/baseline_save_alt_24"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout8"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.024"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:strokeColor="@color/design_default_color_secondary_variant"
-        tools:ignore="TextContrastCheck" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="@{()-> viewModel.handleAutoFitButton()}"
-        android:text="@string/button_auto_fit_text"
-        android:textColor="@color/design_default_color_secondary_variant"
-        android:textSize="11sp"
-        app:cornerRadius="0dp"
-        app:icon="@drawable/baseline_add_circle_outline_24"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout8"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/appCompatImageView2"
+            android:layout_width="90dp"
+            android:layout_height="65dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.983"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.024"
+            app:srcCompat="@drawable/eartechnic_logo"
+            tools:ignore="ContentDescription" />
+
+        <Button
+            android:id="@+id/button3"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:onClick="@{()-> viewModel.handleSaveButton()}"
+            android:text="@string/button_save_in_situ_text"
+            android:textColor="@color/design_default_color_secondary_variant"
+            android:textSize="11sp"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/baseline_save_alt_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.533"
+            app:strokeColor="@color/design_default_color_secondary_variant"
+            tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+
+        <Button
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="8dp"
+            android:onClick="@{()-> viewModel.handleAutoFitButton()}"
+            android:text="@string/button_auto_fit_text"
+            android:textColor="@color/design_default_color_secondary_variant"
+            android:textSize="11sp"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/baseline_add_circle_outline_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/design_default_color_secondary_variant"
+            tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutChart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayoutSoundGenerate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.062"
-        app:layout_constraintStart_toEndOf="@+id/button3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:strokeColor="@color/design_default_color_secondary_variant"
-        tools:ignore="TextContrastCheck" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutHeader">
+
+        <com.github.mikephil.charting.charts.BubbleChart
+            android:id="@+id/bubbleChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
