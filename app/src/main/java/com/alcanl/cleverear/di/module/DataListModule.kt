@@ -20,7 +20,7 @@ object DataListModule {
     {
         val dataList = ArrayList<Entry>()
         for (i in frequencyArray.indices)
-            dataList.add(Entry(decibelArray[0].toFloat(), frequencyArray[i].toFloat()))
+            dataList.add(Entry(i.toFloat(), decibelArray[2].toFloat()))
 
         return dataList
     }

@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentInSituBinding
 import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
@@ -18,12 +18,17 @@ import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import com.ark.Manufacturing
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -50,13 +55,16 @@ class InSituFragment : Fragment() {
     @Inject
     @DecibelArrayInterceptor
     lateinit var decibelArray: Array<Int>
+    @Inject
+    lateinit var lineDataSet: LineDataSet
+    @Inject
+    lateinit var dataList: ArrayList<Entry>
+    @Inject
+    lateinit var lineData: LineData
 
     private var mFrequencyIndex = 0
     private var mDecibelIndex = 0
-    private lateinit var lineDataSet: LineDataSet
-    private lateinit var lineData: LineData
-    @Inject
-    private lateinit var dataList: ArrayList<Entry>
+    private lateinit var mDialog: CustomDialogInSituSoundCheck
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
 
@@ -83,12 +91,14 @@ class InSituFragment : Fragment() {
             textViewDecibel.text = String.format(
                 getString(R.string.textview_decibel_text), decibelArray[mDecibelIndex])
         }
+        initializeChart()
     }
     private fun initialize()
     {
         mBinding.viewModel = InSituFragmentListenersViewModel(this)
         mBinding.config = fittingConfig
         mHandler = InSituHandler(this)
+        mDialog = CustomDialogInSituSoundCheck(this)
         threadPool.execute { initializeDeviceForInSituTest() }
     }
     private fun initializeDeviceForInSituTest() {
@@ -102,10 +112,39 @@ class InSituFragment : Fragment() {
             manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
         }
     }
-    private fun test()
+    private fun initializeChart()
     {
+        lineDataSet.apply {
+            setColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
+            setValueTextColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
+            setDrawCircles(true)
+            circleRadius = 5F
+            setDrawCircleHole(false)
+            setCircleColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
+            mode= LineDataSet.Mode.STEPPED
+        }
 
+        mBinding.lineChart.apply {
+            val desc = Description()
+            desc.text = ""
+            description = desc
+            setData(this@InSituFragment.lineData)
+            with(xAxis) {
+                position = XAxis.XAxisPosition.BOTTOM
+                setLabelCount(11, true)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                        return frequencyArray[value.toInt()].toString()
+                    }
+                }
+            }
+            axisRight.isEnabled = false
+            axisLeft.axisMaximum = 100F
+            axisLeft.axisMinimum = 0F
+            invalidate()
+        }
     }
+
 
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
