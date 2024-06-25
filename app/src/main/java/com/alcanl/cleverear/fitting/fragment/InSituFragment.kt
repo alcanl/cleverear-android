@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.collection.IntIntPair
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.R
@@ -18,6 +19,8 @@ import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
+import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
 import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
@@ -38,6 +41,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class InSituFragment : Fragment() {
@@ -61,12 +65,15 @@ class InSituFragment : Fragment() {
     lateinit var dataList: ArrayList<Entry>
     @Inject
     lateinit var lineData: LineData
+    @Inject
+    lateinit var inSituResultMap: MutableMap<Float, Float>
 
     private var mFrequencyIndex = 0
-    private var mDecibelIndex = 0
+    private var mDecibelIndex = 2
     private lateinit var mDialog: CustomDialogInSituSoundCheck
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -118,10 +125,11 @@ class InSituFragment : Fragment() {
             setColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
             setValueTextColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
             setDrawCircles(true)
+            setDrawValues(true)
             circleRadius = 5F
             setDrawCircleHole(false)
             setCircleColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
-            mode= LineDataSet.Mode.STEPPED
+            mode= LineDataSet.Mode.LINEAR
         }
 
         mBinding.lineChart.apply {
@@ -144,7 +152,13 @@ class InSituFragment : Fragment() {
             invalidate()
         }
     }
-
+    private fun changeText(textView: TextView, value: Int)
+    {
+        textView.startAlphaAnimation(requireContext(),
+            String.format(getString(
+                if (textView == mBinding.textViewFrequency) R.string.textview_frequency_hertz_text
+                else R.string.textview_decibel_text), value))
+    }
 
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
@@ -153,21 +167,34 @@ class InSituFragment : Fragment() {
         {
             when(msg.what) {
                 19 -> showDialog()
+                20 -> updateChartPoint(msg.obj as IntIntPair)
             }
         }
         private fun showDialog()
         {
-            TODO("Not implemented yet")
+            mWeakReference.get()?.let {
+                it.mDialog.apply {
+                    updateDialogText(it.frequencyArray[it.mFrequencyIndex], it.decibelArray[it.mDecibelIndex])
+                    show()
+                }
+            }
         }
+        private fun updateChartPoint(pair: IntIntPair)
+        {
+            val (index, heardDecibel) = pair
+            mWeakReference.get()?.let {
+                it.dataList[index] = Entry(index.toFloat(), heardDecibel.toFloat())
+                it.lineDataSet.values = it.dataList
+                it.lineDataSet.notifyDataSetChanged()
+                it.lineData.notifyDataChanged()
+                it.mBinding.lineChart.apply {
+                    notifyDataSetChanged()
+                    invalidate()
+                }
+            }
+        }
+    }
 
-    }
-    private fun changeText(textView: TextView, value: Int)
-    {
-        textView.startAlphaAnimation(requireContext(),
-            String.format(getString(
-                if (textView == mBinding.textViewFrequency) R.string.textview_frequency_hertz_text
-            else R.string.textview_decibel_text), value))
-    }
     fun earSideButtonClicked(earSide: EarSide)
     {
         manufacturing.prepareDeviceForModeling(false)
@@ -184,13 +211,13 @@ class InSituFragment : Fragment() {
     @OptIn(DelicateCoroutinesApi::class)
     fun playSoundButtonClicked()
     {
+        mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         GlobalScope.launch {
             async {
                 manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex] - 120)
-                delay(2000)
+                delay(1500)
             }.await()
             manufacturing.stopTone()
-            //mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         }
     }
     fun decibelButtonsClicked(value: Int)
@@ -225,10 +252,51 @@ class InSituFragment : Fragment() {
     }
     fun saveButtonClicked()
     {
-
+        mBinding.lineChart.saveToGallery("TEST")
     }
     fun autoFitButtonClicked()
     {
+        TODO("Not Implemented Yet!")
+    }
+    fun dialogPositiveButtonClicked()
+    {
+        if (mFrequencyIndex == frequencyArray.size - 1) {
+            mFrequencyIndex = 0
+            mDecibelIndex = 2
+            mDialog.dismiss()
+            return
+        }
+        inSituResultMap[frequencyArray[mFrequencyIndex++].toFloat()] = decibelArray[mDecibelIndex].toFloat()
+        mDecibelIndex = 2
+        changeText(mBinding.textViewFrequency, frequencyArray[mFrequencyIndex])
+        changeText(mBinding.textViewDecibel, decibelArray[mDecibelIndex])
+
+        mDialog.apply {
+            updateDialogText(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
+            dismiss()
+        }
+
+        mHandler.postDelayed(this::playSoundButtonClicked, 1000)
+
+    }
+    fun dialogNegativeButtonClicked()
+    {
+        if (mDecibelIndex == decibelArray.size - 1) {
+            dialogPositiveButtonClicked()
+            mDialog.dismiss()
+            return
+        }
+
+        mHandler.apply {
+            sendMessage(obtainMessage(WHAT_UPDATE_CHART, IntIntPair(mFrequencyIndex, decibelArray[++mDecibelIndex])))
+            postDelayed(this@InSituFragment::playSoundButtonClicked, 1000)
+        }
+
+        changeText(mBinding.textViewDecibel, decibelArray[mDecibelIndex])
+        mDialog.apply {
+            updateDialogText(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
+            dismiss()
+        }
 
     }
 }

@@ -146,6 +146,8 @@
     <string name="textview_80_text" translatable="false">80</string>
     <string name="textview_90_text" translatable="false">90</string>
     <string name="textview_100_text" translatable="false">100</string>
+    <string name="dialog_textview_hear_sound_text" translatable="true">Are You Hearing The Signal?</string>
+    <string name="dialog_textview_check_text" translatable="true">Frequency %d Hz db SPL %d</string>
 
 
 </resources>
