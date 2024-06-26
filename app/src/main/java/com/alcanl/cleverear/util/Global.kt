@@ -41,6 +41,7 @@ const val WHAT_SHOW_IN_SITU_DIALOG = 19
 const val WHAT_UPDATE_CHART = 20
 const val WHAT_READ_PARAMETERS_PROCESS = 21
 const val WHAT_CHANGE_FRAME_LAYOUTS = 22
+const val WHAT_SOUND_GENERATE_ERROR = 23
 const val TURKISH = "tr"
 const val GERMAN = "de"
 const val TURKISH_MANUAL_URL = """http://dosya.eartechnic.com/cleverear/cleverear_android_tr.pdf"""

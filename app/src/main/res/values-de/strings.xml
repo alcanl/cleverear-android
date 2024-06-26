@@ -37,7 +37,7 @@
     <string name="toast_bt_on" translatable="true">Bluetooth Ein</string>
     <string name="toast_gps_on" translatable="true">GPS Ein</string>
     <string name="toast_connection_established_text">Verbindung mit dem Gerät hergestellt</string>
-    <string name="toast_problem_occured_text">Problem beim Verbinden mit dem Gerät aufgetreten</string>
+    <string name="toast_problem_occurred_text">Problem beim Verbinden mit dem Gerät aufgetreten</string>
     <string name="navbar_connection_text">Verbindung</string>
     <string name="navbar_control_text">Kontrolle</string>
     <string name="navbar_advanced_text">Erweitert</string>
@@ -64,6 +64,7 @@
     <string name="button_play_sound_text" translatable="true">Play Sound</string>
     <string name="button_save_in_situ_text" translatable="true">Save In-Situ Test</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Hörst Du Das Signal?</string>
+    <string name="toast_test_result_saved_text" translatable="true">Testergebnisse in der Galerie gespeichert</string>
     <string name="dialog_textview_check_text" translatable="true">Frequenz %d Hz db SPL %d</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>

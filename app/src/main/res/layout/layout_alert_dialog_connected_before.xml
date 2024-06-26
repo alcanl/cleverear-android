@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:padding="5dp"
+            android:layout_margin="10dp"
             android:text="@string/alert_dialog_connected_before_text"
             android:textAlignment="center"
             android:textColor="@color/ap_black"

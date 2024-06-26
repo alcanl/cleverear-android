@@ -363,7 +363,7 @@ class LoadingActivity : AppCompatActivity() {
         catch (ex: ArkException) {
             Log.e("connect", ex.message!!)
             runOnUiThread {
-                Toast.makeText(this, R.string.toast_problem_occured_text, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, R.string.toast_problem_occurred_text, Toast.LENGTH_LONG).show()
             }
         }
         catch (ex: InterruptedException) {

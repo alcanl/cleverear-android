@@ -1,17 +1,26 @@
 package com.alcanl.cleverear.fitting.fragment
 
+import android.content.ContentValues
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.collection.IntIntPair
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentInSituBinding
 import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
@@ -20,6 +29,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
+import com.alcanl.cleverear.util.WHAT_SOUND_GENERATE_ERROR
 import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
 import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
@@ -38,6 +48,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -159,6 +172,34 @@ class InSituFragment : Fragment() {
                 if (textView == mBinding.textViewFrequency) R.string.textview_frequency_hertz_text
                 else R.string.textview_decibel_text), value))
     }
+    private fun saveMediaToStorage(bitmap: Bitmap) {
+        val filename = "${System.currentTimeMillis()}.jpg"
+        var fos: OutputStream? = null
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context?.contentResolver?.also { resolver ->
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
+
+                val imageUri: Uri? =
+                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                fos = imageUri?.let { resolver.openOutputStream(it) }
+            }
+        } else {
+            val imagesDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val image = File(imagesDir, filename)
+            fos = FileOutputStream(image)
+        }
+
+        fos?.use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+    }
 
     private class InSituHandler(fragment: InSituFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
@@ -168,6 +209,18 @@ class InSituFragment : Fragment() {
             when(msg.what) {
                 19 -> showDialog()
                 20 -> updateChartPoint(msg.obj as IntIntPair)
+                23 -> handleLibraryError()
+            }
+        }
+        private fun handleLibraryError()
+        {
+            mWeakReference.get()?.let {
+                Toast.makeText(it.requireContext(), R.string.toast_unknown_problem_text,
+                    Toast.LENGTH_LONG).show()
+                Intent(it.requireContext(), MainActivity::class.java).apply {
+                    it.activity?.startActivity(this)
+                    it.activity?.finish()
+                }
             }
         }
         private fun showDialog()
@@ -213,11 +266,20 @@ class InSituFragment : Fragment() {
     {
         mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         GlobalScope.launch {
-            async {
-                manufacturing.generateTone(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex] - 120)
-                delay(1500)
-            }.await()
-            manufacturing.stopTone()
+            try {
+                async {
+                    try {
+                        manufacturing.generateTone(
+                            frequencyArray[mFrequencyIndex],
+                            decibelArray[mDecibelIndex] - 120
+                        )
+                        delay(1500)
+                    } catch (_: Throwable) {
+                        mHandler.sendEmptyMessage(WHAT_SOUND_GENERATE_ERROR)
+                    }
+                }.await()
+                manufacturing.stopTone()
+            } catch (_: Throwable) { mHandler.sendEmptyMessage(WHAT_SOUND_GENERATE_ERROR) }
         }
     }
     fun decibelButtonsClicked(value: Int)
@@ -250,9 +312,14 @@ class InSituFragment : Fragment() {
             changeText(mBinding.textViewFrequency ,frequencyArray[--mFrequencyIndex])
         }
     }
+    @OptIn(DelicateCoroutinesApi::class)
     fun saveButtonClicked()
     {
-        mBinding.lineChart.saveToGallery("TEST")
+        GlobalScope.launch {
+            saveMediaToStorage(mBinding.lineChart.chartBitmap)
+        }
+
+        Toast.makeText(requireContext(), R.string.toast_test_result_saved_text, Toast.LENGTH_LONG).show()
     }
     fun autoFitButtonClicked()
     {
@@ -261,6 +328,7 @@ class InSituFragment : Fragment() {
     fun dialogPositiveButtonClicked()
     {
         if (mFrequencyIndex == frequencyArray.size - 1) {
+            manufacturing.prepareDeviceForModeling(false)
             mFrequencyIndex = 0
             mDecibelIndex = 2
             mDialog.dismiss()

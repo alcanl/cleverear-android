@@ -5,7 +5,7 @@
     <string name="main_logo_description_text" translatable="false">Ear Technic Logo</string>
     <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
-    <string name="toast_unknown_problem_text" translatable="true">Some unknown problem occurred. Please restart the application.</string>
+    <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
     <string name="app_version_text" translatable="false">v 3.1.3</string>
     <string name="button_info_context_text" translatable="false">User Manual</string>
@@ -45,7 +45,7 @@
     <string name="toast_connection_established_text" translatable="true">Connection Established With The Device</string>
     <string name="toast_double_device_connection_established_text" translatable="true">Connection Established With The Devices</string>
     <string name="listener_volume_level_text" translatable="true">Volume Level: </string>
-    <string name="toast_problem_occured_text" translatable="true">Problem occurred while connecting to device</string>
+    <string name="toast_problem_occurred_text" translatable="true">Problem occurred while connecting to device</string>
     <string name="toast_channel_error_text" translatable="true">Unsupported Value for Channel. Must be in 1 to 255</string>
     <string name="toast_device_must_pair_text" translatable="true">Hearing Aid Must Be Paired With Mobile Phone</string>
     <string name="toast_bt_on" translatable="true">Bluetooth On</string>
@@ -148,6 +148,7 @@
     <string name="textview_100_text" translatable="false">100</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Are You Hearing The Signal?</string>
     <string name="dialog_textview_check_text" translatable="true">Frequency %d Hz db SPL %d</string>
+    <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
 
 
 </resources>
