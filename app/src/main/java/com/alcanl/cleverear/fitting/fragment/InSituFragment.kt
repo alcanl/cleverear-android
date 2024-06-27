@@ -28,6 +28,8 @@ import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_INVALIDATE_BINDING
+import com.alcanl.cleverear.util.WHAT_INVALIDATE_CHART
 import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
 import com.alcanl.cleverear.util.WHAT_SOUND_GENERATE_ERROR
 import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
@@ -122,15 +124,17 @@ class InSituFragment : Fragment() {
         threadPool.execute { initializeDeviceForInSituTest() }
     }
     private fun initializeDeviceForInSituTest() {
-        with(fittingConfig) {
-            if (configuration.isDoubleDeviceConnection)
-                manufacturing.initializeDevice(configuration.doubleDeviceMap[selectedEarSide]?.communicationAdaptor!!)
-            else
-                manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
+        try {
+            with(fittingConfig) {
+                if (configuration.isDoubleDeviceConnection)
+                    manufacturing.initializeDevice(configuration.doubleDeviceMap[selectedEarSide]?.communicationAdaptor!!)
+                else
+                    manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
 
-            manufacturing.prepareDeviceForModeling(true)
-            manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
-        }
+                manufacturing.prepareDeviceForModeling(true)
+                manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
+            }
+        } catch (_: Throwable) { mHandler.sendEmptyMessage(WHAT_SOUND_GENERATE_ERROR) }
     }
     private fun initializeChart()
     {
@@ -210,6 +214,8 @@ class InSituFragment : Fragment() {
                 19 -> showDialog()
                 20 -> updateChartPoint(msg.obj as IntIntPair)
                 23 -> handleLibraryError()
+                24 -> mWeakReference.get()?.initializeChart()
+                25 -> mWeakReference.get()?.mBinding?.invalidateAll()
             }
         }
         private fun handleLibraryError()
@@ -258,8 +264,15 @@ class InSituFragment : Fragment() {
             isLeftButtonSelected = earSide == EarSide.Left
         }
 
-        threadPool.execute { initializeDeviceForInSituTest() }
-        mBinding.invalidateAll()
+        threadPool.apply {
+            execute {
+                submit { initializeDeviceForInSituTest() }.get()
+                mHandler.apply {
+                    sendEmptyMessage(WHAT_INVALIDATE_BINDING)
+                    sendEmptyMessage(WHAT_INVALIDATE_CHART)
+                }
+            }
+        }
     }
     @OptIn(DelicateCoroutinesApi::class)
     fun playSoundButtonClicked()

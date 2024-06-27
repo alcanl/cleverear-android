@@ -65,7 +65,8 @@
     <string name="button_retry_text" translatable="true">Retry</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Sonucu Galeriye Kaydedildi</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Sinyal Sesini Duyuyor Musunuz?</string>
-    <string name="dialog_textview_check_text" translatable="true">Frekans %d Hz db SPL %d</string>
+    <string name="dialog_textview_check_text" translatable="true">%d Hz Frekans / %d db</string>
+    <string name="textview_device_initialized_text" translatable="true">Cihaz %s Konfigürasyona Hazırlandı</string>
     <string name="textview_parameter_read_process_text" translatable="true">Dahili Parametreler Cihazdan Okunurken Lütfen Bekleyin</string>
     <string name="textview_parameter_read_success_text" translatable="true">Parametreler Başarılı Bir Şekilde Cihazdan Okundu</string>
     <string name="textview_parameter_read_fail_text" translatable="true">Parametreler Okunurken Bilinmeyen Bir Problem Oluştu, Lütfen Temsilciniz İle İletişime Geçiniz</string>

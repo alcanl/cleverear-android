@@ -218,6 +218,10 @@ fun Product.disableNoiseReduction(hearingAidDTO: HearingAidDTO)
             .value = 0
     }
 }
+fun Product.isEqualizerEnabled() : Boolean
+{
+    return this.memories.getItem(currentMemory.value()).parameters.getById(EQ_ENABLE).value == 1
+}
 
 
 

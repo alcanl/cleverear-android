@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.fitting.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,8 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
+import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.RemoteFittingActivity
 import com.alcanl.cleverear.api.dto.HearingAidDTO
@@ -25,6 +28,7 @@ import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_CHANGE_FRAME_LAYOUTS
+import com.alcanl.cleverear.util.WHAT_CONNECTION_LOST
 import com.alcanl.cleverear.util.WHAT_LIBRARY_NOT_FOUND
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_FAIL
 import com.alcanl.cleverear.util.WHAT_LIBRARY_SEARCH_SUCCESS
@@ -133,7 +137,7 @@ class HomeFragment : Fragment() {
             }
         }
         runBlocking {
-            delay(2000)
+            delay(2500)
         }
 
         mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_PROCESS)
@@ -229,32 +233,28 @@ class HomeFragment : Fragment() {
 
             }
         }
-        private fun leftEarInitializeFinished()
+        private fun deviceInitializeFinished(earSide: EarSide)
         {
             mWeakReference.get()?.let {
                 with(it.fittingConfig) {
-                    isLeftButtonSelected = true
-                    isRightButtonSelected = false
-                    deviceInfoExtMap[EarSide.Left]?.isInitFinished = true
+                    isLeftButtonSelected = earSide == EarSide.Left
+                    isRightButtonSelected = earSide == EarSide.Right
+                    deviceInfoExtMap[earSide]?.isInitFinished = true
                 }
                 it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
-                    "Device %s successfully initialized",
-                    it.fittingConfig.deviceInfoExtMap[EarSide.Left]?.hearingAidDTO?.modelName))
+                    it.requireContext().getString(R.string.textview_device_initialized_text),
+                    it.fittingConfig.deviceInfoExtMap[earSide]?.hearingAidDTO?.modelName))
                 startFrameAnimations()
             }
         }
-        private fun rightEarInitializeFinished()
+        private fun handleConnectionLost()
         {
             mWeakReference.get()?.let {
-                with(it.fittingConfig) {
-                    isRightButtonSelected = true
-                    isLeftButtonSelected= false
-                    deviceInfoExtMap[EarSide.Right]?.isInitFinished = true
+                Toast.makeText(it.requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_LONG).show()
+                Intent(it.requireContext(), AutoConnectActivity::class.java).apply {
+                    it.requireContext().startActivity(this)
+                    it.activity?.finish()
                 }
-                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
-                    "Device %s successfully initialized",
-                    it.fittingConfig.deviceInfoExtMap[EarSide.Right]?.hearingAidDTO?.modelName))
-                startFrameAnimations()
             }
         }
         override fun handleMessage(msg: Message)
@@ -268,11 +268,12 @@ class HomeFragment : Fragment() {
                 15 -> { mWeakReference.get()?.let {
                     it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_fail_text)) }}
                 16 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
-                17 -> leftEarInitializeFinished()
-                18 -> rightEarInitializeFinished()
+                17 -> deviceInitializeFinished(EarSide.Left)
+                18 -> deviceInitializeFinished(EarSide.Right)
                 21 -> { mWeakReference.get()?.let {
                     it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_process_text)) }}
                 22 -> startFrameAnimations()
+                26 -> handleConnectionLost()
             }
         }
     }
@@ -295,9 +296,11 @@ class HomeFragment : Fragment() {
                 isRightButtonSelected = earSide == EarSide.Right
                 isLeftButtonSelected = earSide == EarSide.Left
             }
-            activity?.runOnUiThread { mBinding.hideFrames() }
-            mBinding.invalidateAll()
-            mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+            try {
+                activity?.runOnUiThread { mBinding.hideFrames() }
+                mBinding.invalidateAll()
+                mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
+            } catch (_ : Throwable) { mHandler.sendEmptyMessage(WHAT_CONNECTION_LOST) }
         }
     }
 }

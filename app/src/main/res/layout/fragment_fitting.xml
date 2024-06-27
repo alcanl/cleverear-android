@@ -4,16 +4,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-        <import type="com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel"/>
+        <import type="com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel"/>
         <import type="com.alcanl.cleverear.di.module.FittingConfigurationModule"/>
         <import type="com.alcanl.cleverear.util.EarSide"/>
+        <import type="android.widget.ArrayAdapter"/>
+        <import type="com.ark.ParameterSpace"/>
         <import type="android.view.View"/>
         <import type="android.content.Context"/>
         <import type="androidx.core.content.ContextCompat"/>
         <import type="androidx.appcompat.content.res.AppCompatResources"/>
         <import type="com.alcanl.cleverear.R"/>
+        <variable type="ArrayAdapter&lt;ParameterSpace&gt;" name="memoryAdapter" />
         <variable name="config" type="FittingConfigurationModule" />
-        <variable name="viewModel" type="InSituFragmentListenersViewModel" />
+        <variable name="viewModel" type="FittingFragmentListenersViewModel" />
 
     </data>
 
@@ -24,107 +27,332 @@
         tools:context=".fitting.fragment.InSituFragment">
 
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutFooter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <FrameLayout
+                android:id="@+id/frameLayoutLeftEar"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.061"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.6">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="start"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="14dp"
+                    android:translationZ="90dp"
+                    android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                    app:srcCompat="@drawable/check_tick"
+                    tools:ignore="ContentDescription,ImageContrastCheck" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/buttonLeft"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom | center"
+                    android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                    android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
+                    android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Left)}"
+                    android:text="@string/left_ear_side_text"
+                    android:textAllCaps="false"
+                    android:textStyle="normal"
+                    app:cornerRadius="0dp" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/frameLayoutRightEar"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.938"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.6">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/buttonRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom | center"
+                    android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                    android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
+                    android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Right)}"
+                    android:text="@string/right_ear_side_text"
+                    android:textAllCaps="false"
+                    android:textStyle="normal"
+                    app:cornerRadius="0dp" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:translationZ="90dp"
+                    android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                    app:srcCompat="@drawable/check_tick"
+                    tools:ignore="ContentDescription,ImageContrastCheck" />
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/appCompatImageView3"
             android:layout_width="100dp"
             android:layout_height="88dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.95"
+            app:layout_constraintHorizontal_bias="0.945"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.019"
+            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/eartechnic_logo"
             tools:ignore="ContentDescription" />
 
-        <FrameLayout
-            android:id="@+id/frameLayoutLeftEar"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutBurn"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/table_layout_border"
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutFooter"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.131"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.946">
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent">
 
-            <ImageView
-                android:id="@+id/imageViewLeftEar"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                app:srcCompat="@{config.INSTANCE.leftButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.leftear_blue) : AppCompatResources.getDrawable(context, R.drawable.lefteargray)}"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="top | center"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="15dp"
-                android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
-                app:srcCompat="@drawable/check_tick"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buttonLeft"
-                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-                android:layout_width="match_parent"
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom | center"
-                android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
-                android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
-                android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Left)}"
-                android:text="@string/left_ear_side_text"
-                android:textAllCaps="false"
-                android:textStyle="normal"
-                app:cornerRadius="0dp" />
+                android:text="CheckBox"
+                tools:layout_editor_absoluteX="25dp"
+                tools:layout_editor_absoluteY="18dp" />
 
-        </FrameLayout>
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CheckBox"
+                tools:layout_editor_absoluteX="25dp"
+                tools:layout_editor_absoluteY="66dp" />
 
-        <FrameLayout
-            android:id="@+id/frameLayoutRightEar"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burn"
+                app:cornerRadius="0dp"
+                tools:layout_editor_absoluteX="203dp"
+                tools:layout_editor_absoluteY="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burn All Memories"
+                app:cornerRadius="0dp"
+                tools:layout_editor_absoluteX="163dp"
+                tools:layout_editor_absoluteY="92dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutEqualizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/table_layout_border"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutBurn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.88"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.945">
+            app:layout_constraintTop_toBottomOf="@+id/appCompatImageView3"
+            app:layout_constraintVertical_bias="0.0">
 
             <ImageView
-                android:id="@+id/imageViewRightEar"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                app:srcCompat="@{config.INSTANCE.rightButtonSelected ? AppCompatResources.getDrawable(context, R.drawable.rightear_red) : AppCompatResources.getDrawable(context, R.drawable.righteargray) }"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
+                android:id="@+id/imageView5"
+                android:layout_width="120dp"
+                android:layout_height="90dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/baseline_equalizer_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.063"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.327" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buttonRight"
-                android:layout_width="match_parent"
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderTreble"
+                android:layout_width="166dp"
+                android:layout_height="55dp"
+                app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.922"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.717"
+                app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
+                app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbRadius="16dp"
+                app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:trackColorInactive="#A8A3A3"
+                app:trackHeight="12dp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderBass"
+                android:layout_width="166dp"
+                android:layout_height="55dp"
+                app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.932"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.145"
+                app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
+                app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbRadius="16dp"
+                app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:trackColorInactive="#A8A3A3"
+                app:trackHeight="12dp" />
+
+            <CheckBox
+                android:id="@+id/checkBoxEqualizer"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom | center"
-                android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
-                android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
-                android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Right)}"
-                android:text="@string/right_ear_side_text"
-                android:textAllCaps="false"
-                android:textStyle="normal"
-                app:cornerRadius="0dp" />
+                android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isEqualizerEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isEqualizerEnabled()}"
+                android:onCheckedChanged="@{() -> viewModel.handleCheckBoxCheckedChanged()}"
+                android:text="Equalizer"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.117"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView5"
+                app:layout_constraintVertical_bias="0.076" />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="top | center"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="40dp"
-                android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
-                app:srcCompat="@drawable/check_tick"
-                tools:ignore="ContentDescription,ImageContrastCheck" />
-        </FrameLayout>
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderMid"
+                android:layout_width="166dp"
+                android:layout_height="55dp"
+                app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.932"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.44"
+                app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
+                app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbRadius="16dp"
+                app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:trackColorInactive="#A8A3A3"
+                app:trackHeight="12dp" />
+
+            <TextView
+                android:id="@+id/textViewMid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:text="Mid"
+                android:textAlignment="center"
+                android:textColor="@color/ap_black"
+                app:layout_constraintBottom_toTopOf="@+id/sliderMid"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sliderBass" />
+
+            <TextView
+                android:id="@+id/textViewTreble"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:text="Treble"
+                android:textAlignment="center"
+                android:textColor="@color/ap_black"
+                app:layout_constraintBottom_toTopOf="@+id/sliderTreble"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sliderMid" />
+
+            <TextView
+                android:id="@+id/textViewBass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:text="Bass"
+                android:textAlignment="center"
+                android:textColor="@color/ap_black"
+                app:layout_constraintBottom_toTopOf="@+id/sliderBass"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sliderTreble">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:text="Wideband Gain"
+                    android:textAlignment="center" />
+
+                <com.google.android.material.slider.Slider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="3" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Spinner
+            android:id="@+id/spinnerMemory"
+            android:layout_width="146dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:adapter="@{memoryAdapter}"
+            android:onItemSelected="@{(av, v, pos, i) -> viewModel.handleSpinnerItemSelect(pos)}"
+            android:selectedItemPosition="@={}"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout8"
+            app:layout_constraintEnd_toStartOf="@+id/appCompatImageView3"
+            app:layout_constraintHorizontal_bias="0.431"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

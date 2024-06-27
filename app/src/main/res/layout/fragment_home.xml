@@ -25,20 +25,21 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:id="@+id/textViewInitialize"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:textStyle="normal"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:text="@string/textview_initializing_text"
         android:textAlignment="center"
+        android:textAllCaps="false"
         android:textColor="@color/design_default_color_secondary_variant"
-        android:textSize="18sp"
+        android:textSize="14sp"
+        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.16" />
+        app:layout_constraintVertical_bias="0.16"
+        tools:ignore="TextContrastCheck" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/appCompatImageView"

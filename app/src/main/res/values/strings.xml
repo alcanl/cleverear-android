@@ -147,8 +147,9 @@
     <string name="textview_90_text" translatable="false">90</string>
     <string name="textview_100_text" translatable="false">100</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Are You Hearing The Signal?</string>
-    <string name="dialog_textview_check_text" translatable="true">Frequency %d Hz db SPL %d</string>
+    <string name="dialog_textview_check_text" translatable="true">%d Hz Frequency / %d db</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
+    <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
 
 
 </resources>

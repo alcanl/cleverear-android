@@ -257,7 +257,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/appCompatImageView2"
-            android:layout_width="75dp"
+            android:layout_width="65dp"
             android:layout_height="65dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -291,7 +291,7 @@
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:onClick="@{()-> viewModel.handleAutoFitButton()}"
             android:text="@string/button_auto_fit_text"
             android:textColor="@color/design_default_color_secondary_variant"
@@ -301,6 +301,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/button3"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.533"
             app:strokeColor="@color/design_default_color_secondary_variant"
             tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
     </androidx.constraintlayout.widget.ConstraintLayout>
