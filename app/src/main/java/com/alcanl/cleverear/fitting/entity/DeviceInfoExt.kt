@@ -17,5 +17,5 @@ data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
     fun getDeviceFirmwareVersion() : String = deviceInfo?.firmwareVersion ?: ""
     fun getDeviceModelNumber() : String = deviceInfo?.serialId?.toString() ?: ""
     fun getDeviceLibraryId() : String = if (deviceInfo == null) "" else Integer.toHexString(deviceInfo.libraryId)
-    fun isEqualizerEnabled() = product?.isEqualizerEnabled()
+    fun isEqualizerEnabled() = product?.isEqualizerEnabled() ?: false
 }

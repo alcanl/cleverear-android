@@ -113,7 +113,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/appCompatImageView3"
+            android:id="@+id/appCompatImageViewLogo"
             android:layout_width="100dp"
             android:layout_height="88dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -121,56 +121,69 @@
             app:layout_constraintHorizontal_bias="0.945"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_bias="0.00999999"
             app:srcCompat="@drawable/eartechnic_logo"
             tools:ignore="ContentDescription" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutBurn"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/table_layout_border"
             android:layout_width="0dp"
             android:layout_height="180dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/table_layout_border"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayoutFooter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-            <CheckBox
-                android:id="@+id/checkBox2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CheckBox"
-                tools:layout_editor_absoluteX="25dp"
-                tools:layout_editor_absoluteY="18dp" />
-
-            <CheckBox
-                android:id="@+id/checkBox3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CheckBox"
-                tools:layout_editor_absoluteX="25dp"
-                tools:layout_editor_absoluteY="66dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonBurn"
+                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="32dp"
                 android:text="Burn"
+                android:textAllCaps="false"
+                android:textColor="@color/ap_black"
                 app:cornerRadius="0dp"
-                tools:layout_editor_absoluteX="203dp"
-                tools:layout_editor_absoluteY="16dp" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.17"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/design_default_color_secondary_variant"
+                tools:ignore="TouchTargetSizeCheck" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonBurnAll"
+                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                android:layout_width="160dp"
+                android:layout_height="40dp"
                 android:text="Burn All Memories"
+                android:textAllCaps="false"
+                android:textColor="@color/ap_black"
                 app:cornerRadius="0dp"
-                tools:layout_editor_absoluteX="163dp"
-                tools:layout_editor_absoluteY="92dp" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.034"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/buttonBurn"
+                app:layout_constraintVertical_bias="0.333"
+                app:strokeColor="@color/design_default_color_secondary_variant"
+                tools:ignore="TouchTargetSizeCheck,TextSizeCheck" />
+
+            <ImageView
+                android:id="@+id/imageViewSave"
+                android:layout_width="120dp"
+                android:layout_height="110dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/baseline_save_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.9"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -178,62 +191,69 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/table_layout_border"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutBurn"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appCompatImageView3"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toBottomOf="@+id/appCompatImageViewLogo">
 
             <ImageView
                 android:id="@+id/imageView5"
                 android:layout_width="120dp"
-                android:layout_height="90dp"
+                android:layout_height="100dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/baseline_equalizer_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.063"
+                app:layout_constraintHorizontal_bias="0.099"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.327" />
+                app:layout_constraintVertical_bias="0.41000003"
+                tools:ignore="ContentDescription" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderTreble"
                 android:layout_width="166dp"
                 android:layout_height="55dp"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="100"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.922"
+                app:layout_constraintHorizontal_bias="0.96"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.717"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTreble"
                 app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
                 app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbHeight="30dp"
                 app:thumbRadius="16dp"
                 app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:trackColorInactive="#A8A3A3"
-                app:trackHeight="12dp" />
+                app:trackHeight="12dp"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderBass"
                 android:layout_width="166dp"
                 android:layout_height="55dp"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="100"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.932"
+                app:layout_constraintHorizontal_bias="0.966"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.145"
+                app:layout_constraintTop_toBottomOf="@+id/textViewBass"
                 app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
                 app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbHeight="30dp"
                 app:thumbRadius="16dp"
                 app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:trackColorInactive="#A8A3A3"
-                app:trackHeight="12dp" />
+                app:trackHeight="12dp"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <CheckBox
                 android:id="@+id/checkBoxEqualizer"
@@ -242,43 +262,44 @@
                 android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isEqualizerEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isEqualizerEnabled()}"
                 android:onCheckedChanged="@{() -> viewModel.handleCheckBoxCheckedChanged()}"
                 android:text="Equalizer"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.117"
+                app:layout_constraintHorizontal_bias="0.14"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                app:layout_constraintVertical_bias="0.076" />
+                app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sliderMid"
                 android:layout_width="166dp"
                 android:layout_height="55dp"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="100"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.932"
+                app:layout_constraintHorizontal_bias="0.96"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.44"
+                app:layout_constraintTop_toBottomOf="@+id/textViewMid"
                 app:onValueChangeListener="@{(view) -> viewModel.handleSliderOnValueChanged(view)}"
                 app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbHeight="30dp"
                 app:thumbRadius="16dp"
                 app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:trackColorInactive="#A8A3A3"
-                app:trackHeight="12dp" />
+                app:trackHeight="12dp"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <TextView
                 android:id="@+id/textViewMid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
                 android:text="Mid"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
-                app:layout_constraintBottom_toTopOf="@+id/sliderMid"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintHorizontal_bias="0.767"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sliderBass" />
 
@@ -287,13 +308,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
                 android:text="Treble"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
-                app:layout_constraintBottom_toTopOf="@+id/sliderTreble"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintHorizontal_bias="0.771"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sliderMid" />
 
@@ -302,57 +322,124 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
                 android:text="Bass"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
-                app:layout_constraintBottom_toTopOf="@+id/sliderBass"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.722"
+                app:layout_constraintHorizontal_bias="0.768"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sliderTreble">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="7"
-                    android:text="Wideband Gain"
-                    android:textAlignment="center" />
-
-                <com.google.android.material.slider.Slider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="3" />
-            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Spinner
             android:id="@+id/spinnerMemory"
-            android:layout_width="146dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
+            android:layout_marginTop="10dp"
             android:adapter="@{memoryAdapter}"
             android:onItemSelected="@{(av, v, pos, i) -> viewModel.handleSpinnerItemSelect(pos)}"
             android:selectedItemPosition="@={}"
             android:textAlignment="center"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout8"
-            app:layout_constraintEnd_toStartOf="@+id/appCompatImageView3"
-            app:layout_constraintHorizontal_bias="0.431"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
+            app:layout_constraintHorizontal_bias="0.51"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Program"
+            android:textColor="@color/design_default_color_secondary_variant"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutEqualizer"
+            app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
+            app:layout_constraintHorizontal_bias="0.492"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.329"
+            tools:ignore="TextContrastCheck" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/table_layout_border"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutBurn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.476"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="100"
+                app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:thumbHeight="30dp"
+                app:thumbRadius="16dp"
+                app:trackColorActive="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
+                app:trackColorInactive="#A8A3A3"
+                app:trackHeight="12dp"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="7"
+                android:text="Wideband Gain"
+                android:textAlignment="center"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/table_layout_border"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.761"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutEqualizer">
+
+            <CheckBox
+                android:id="@+id/checkBoxFeedbackCanceler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:text="Feedback Canceler"
+                android:textColor="@color/ap_black"
+                android:textSize="12sp" />
+
+            <CheckBox
+                android:id="@+id/checkBoxNoiseReduction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:text="Noise Reduction"
+                android:textColor="@color/ap_black"
+                android:textSize="12sp" />
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

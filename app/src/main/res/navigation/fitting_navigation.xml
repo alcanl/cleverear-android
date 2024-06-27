@@ -19,9 +19,9 @@
 
     <fragment
         android:id="@+id/navbar_audiogram"
-        android:name="com.alcanl.cleverear.fitting.fragment.AudioGramFragment"
+        android:name="com.alcanl.cleverear.fitting.fragment.RemoteConfigurationFragment"
         android:label="Audiogram"
-        tools:layout="@layout/fragment_audiogram" />
+        tools:layout="@layout/fragment_remote_configuration" />
 
     <fragment
         android:id="@+id/navbar_fitting"

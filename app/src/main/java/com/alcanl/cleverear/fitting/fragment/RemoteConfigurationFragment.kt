@@ -5,21 +5,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.databinding.FragmentRemoteConfigurationBinding
 import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
-class AudioGramFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+class RemoteConfigurationFragment : Fragment() {
+    private lateinit var mBinding : FragmentRemoteConfigurationBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_audiogram, container, false)
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_remote_configuration, container, false)
+        return mBinding.root
     }
 
 }
