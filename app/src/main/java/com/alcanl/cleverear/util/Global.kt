@@ -139,9 +139,7 @@ fun isConnected(device: BluetoothDevice): Boolean
     return try {
         val m: Method = device.javaClass.getMethod("isConnected")
         m.invoke(device) as Boolean
-    } catch (ex: Exception) {
-        throw IllegalStateException(ex)
-    }
+    } catch (_: Exception) { false }
 }
 
 fun getSystemLanguage() : String

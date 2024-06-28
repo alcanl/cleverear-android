@@ -151,5 +151,15 @@
     <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
 
+    <string-array name="programs">
+        <item>Program 1</item>
+        <item>Program 2</item>
+        <item>Program 3</item>
+        <item>Program 4</item>
+        <item>Program 5</item>
+        <item>Program 6</item>
+        <item>Program 7</item>
+        <item>Program 8</item>
+    </string-array>
 
 </resources>

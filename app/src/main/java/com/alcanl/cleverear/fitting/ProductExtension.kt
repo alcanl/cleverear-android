@@ -222,6 +222,19 @@ fun Product.isEqualizerEnabled() : Boolean
 {
     return this.memories.getItem(currentMemory.value()).parameters.getById(EQ_ENABLE).value == 1
 }
+fun Product.isFeedbackCancelerEnabled() : Boolean
+{
+    return this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value == 1
+}
+@SuppressLint("DefaultLocale")
+fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean
+{
+    return (0..< hearingAidDTO.wdrcChannelCount).all {
+        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
+            WDRC_NOISE_REDUCTION_ENABLE, it)).value == 1
+    }
+
+}
 
 
 
