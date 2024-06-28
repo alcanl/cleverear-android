@@ -55,6 +55,16 @@
     <string name="left_ear_side_text">Linkes Ohr</string>
     <string name="right_ear_side_text">Rechtes Ohr</string>
     <string name="dialog_info_title">Infos</string>
+    <string name="checkbox_feedback_text" translatable="true">Rückkopplungsabsteller</string>
+    <string name="checkbox_noise_reduction_text" translatable="true">Rauschunterdrückung</string>
+    <string name="checkbox_equalizer_text" translatable="true">Equalizer</string>
+    <string name="textview_bass_text" translatable="true">Bass</string>
+    <string name="textview_treble_text" translatable="true">Dreifach</string>
+    <string name="textview_mid_text" translatable="true">MitteMid</string>
+    <string name="textview_active_memory_text" translatable="true"><u>Aktives Programm</u></string>
+    <string name="textview_wideband_text" translatable="true">Breitbandverstärkung</string>
+    <string name="button_burn_text" translatable="true">Speichern</string>
+    <string name="button_burn_to_all_text" translatable="true">Für Alle Speichern</string>
     <string name="textview_device_mac"><u>Gerät Mac</u></string>
     <string name="textview_device_model"><u>Gerät Modell</u></string>
     <string name="textview_library_id"><u>Bibliothek Id</u></string>

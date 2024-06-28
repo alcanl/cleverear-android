@@ -24,13 +24,13 @@ object SliderListener {
     @BindingAdapter(value = ["app:thumbColor"])
     fun bindSliderThumbColor(slider: Slider?, id: Int)
     {
-        slider?.haloTintList = ColorStateList.valueOf(id)
+        slider?.thumbTintList = ColorStateList.valueOf(id)
     }
     @JvmStatic
     @BindingAdapter(value = ["app:trackColorActive"])
     fun bindSliderTrackColorActive(slider: Slider?, id: Int)
     {
-        slider?.haloTintList = ColorStateList.valueOf(id)
+        slider?.trackActiveTintList = ColorStateList.valueOf(id)
     }
 
     interface OnValueChangeListener {

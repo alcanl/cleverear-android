@@ -144,7 +144,7 @@
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_width="80dp"
                 android:layout_height="40dp"
-                android:text="Burn"
+                android:text="@string/button_burn_text"
                 android:textAllCaps="false"
                 android:textColor="@color/ap_black"
                 android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
@@ -163,7 +163,7 @@
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_width="160dp"
                 android:layout_height="40dp"
-                android:text="Burn All Memories"
+                android:text="@string/button_burn_to_all_text"
                 android:textAllCaps="false"
                 android:textColor="@color/ap_black"
                 android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
@@ -266,7 +266,7 @@
                 android:layout_height="wrap_content"
                 android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isEqualizerEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isEqualizerEnabled()}"
                 android:onCheckedChanged="@{() -> viewModel.handleCheckBoxEqualizerCheckedChanged()}"
-                android:text="Equalizer"
+                android:text="@string/checkbox_equalizer_text"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.14"
@@ -298,8 +298,7 @@
                 android:id="@+id/textViewMid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Mid"
+                android:text="@string/textview_mid_text"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
                 android:textSize="14sp"
@@ -312,8 +311,7 @@
                 android:id="@+id/textViewTreble"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Treble"
+                android:text="@string/textview_treble_text"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
                 android:textSize="14sp"
@@ -326,8 +324,7 @@
                 android:id="@+id/textViewBass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Bass"
+                android:text="@string/textview_bass_text"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
                 android:textSize="14sp"
@@ -340,12 +337,12 @@
 
         <Spinner
             android:id="@+id/spinnerMemory"
-            android:layout_width="110dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:adapter="@{memoryAdapter}"
-            android:selectedItemPosition="@{selectedPosition}"
             android:onItemSelected="@{(av, v, pos, i) -> viewModel.handleSpinnerItemSelect(pos)}"
+            android:selectedItemPosition="@{selectedPosition}"
             android:textAlignment="center"
             android:textSize="11sp"
             app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
@@ -358,7 +355,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Active Program"
+            android:text="@string/textview_active_memory_text"
             android:textColor="@color/design_default_color_secondary_variant"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -367,7 +364,7 @@
             app:layout_constraintHorizontal_bias="0.351"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.042"
+            app:layout_constraintVertical_bias="0.01999998"
             tools:ignore="TextContrastCheck" />
 
         <LinearLayout
@@ -406,7 +403,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="7"
-                android:text="Wideband Gain"
+                android:text="@string/textview_wideband_text"
                 android:textAlignment="center"
                 android:textSize="14sp" />
 
@@ -433,9 +430,10 @@
                 android:padding="10dp"
                 android:onCheckedChanged="@{() -> viewModel.handleCheckBoxFeedbackCancelerCheckedChanged()}"
                 android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isFeedbackCancelerEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isFeedbackCancelerEnabled()}"
-                android:text="Feedback Canceler"
+                android:text="@string/checkbox_feedback_text"
                 android:textColor="@color/ap_black"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:ignore="VisualLintButtonSize" />
 
             <CheckBox
                 android:id="@+id/checkBoxNoiseReduction"
@@ -446,9 +444,10 @@
                 android:onCheckedChanged="@{()-> viewModel.handleCheckBoxNoiseReductionCheckedChanged()}"
                 android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isNoiseReductionEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isNoiseReductionEnabled()}"
                 android:layout_weight="1"
-                android:text="Noise Reduction"
+                android:text="@string/checkbox_noise_reduction_text"
                 android:textColor="@color/ap_black"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:ignore="VisualLintButtonSize" />
         </LinearLayout>
 
 

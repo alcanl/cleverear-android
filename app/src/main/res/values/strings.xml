@@ -150,6 +150,16 @@
     <string name="dialog_textview_check_text" translatable="true">%d Hz Frequency / %d db</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
+    <string name="checkbox_feedback_text" translatable="true">Feedback Canceler</string>
+    <string name="checkbox_noise_reduction_text" translatable="true">Noise Reduction</string>
+    <string name="checkbox_equalizer_text" translatable="true">Equalizer</string>
+    <string name="textview_bass_text" translatable="true">Bass</string>
+    <string name="textview_treble_text" translatable="true">Treble</string>
+    <string name="textview_mid_text" translatable="true">Mid</string>
+    <string name="textview_active_memory_text" translatable="true"><u>Active Program</u></string>
+    <string name="textview_wideband_text" translatable="true">WideBand Gain</string>
+    <string name="button_burn_text" translatable="true">Burn</string>
+    <string name="button_burn_to_all_text" translatable="true">Burn To All</string>
 
     <string-array name="programs">
         <item>Program 1</item>

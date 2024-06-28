@@ -60,6 +60,16 @@
     <string name="toast_connection_problem_text">Cihaza Bağlanılamadı</string>
     <string name="button_previous_activity">Önceki</string>
     <string name="dialog_info_title">Bilgi</string>
+    <string name="checkbox_feedback_text" translatable="true">Geri Besleme Önleyici</string>
+    <string name="checkbox_noise_reduction_text" translatable="true">Gürültü Azaltma</string>
+    <string name="checkbox_equalizer_text" translatable="true">Ekolayzır</string>
+    <string name="textview_bass_text" translatable="true">Bas</string>
+    <string name="textview_treble_text" translatable="true">Tiz</string>
+    <string name="textview_mid_text" translatable="true">Orta</string>
+    <string name="textview_active_memory_text" translatable="true"><u>Aktif Program</u></string>
+    <string name="textview_wideband_text" translatable="true">Geniş Bant Kazancı</string>
+    <string name="button_burn_text" translatable="true">Yaz</string>
+    <string name="button_burn_to_all_text" translatable="true">Tüm Programlara Yaz</string>
     <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
     <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>

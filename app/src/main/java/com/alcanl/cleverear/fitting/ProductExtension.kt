@@ -163,11 +163,11 @@ fun Product.decreaseWDRCExpansionThreshold(dto: HearingAidDTO, amount: Int)
 }
 fun Product.enableFeedBackCanceler()
 {
-    this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 1
+    this.memories.getItem(currentMemory.value()).parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 1
 }
 fun Product.disableFeedBackCanceler()
 {
-    this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 0
+    this.memories.getItem(currentMemory.value()).parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 0
 }
 fun Product.burnChangesToMemory(memory: ParameterSpace)
 {
@@ -224,7 +224,7 @@ fun Product.isEqualizerEnabled() : Boolean
 }
 fun Product.isFeedbackCancelerEnabled() : Boolean
 {
-    return this.systemMemory.parameters.getById(FEEDBACK_CANCELER_ENABLE).value == 1
+    return this.memories.getItem(currentMemory.value()).parameters.getById(FEEDBACK_CANCELER_ENABLE).value == 1
 }
 @SuppressLint("DefaultLocale")
 fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean

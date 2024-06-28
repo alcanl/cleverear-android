@@ -43,7 +43,7 @@ class FittingFragmentListenersViewModel(fragment: FittingFragment) {
     }
     fun handleSpinnerItemSelect(pos: Int)
     {
-
+        mWeakReference.get()?.spinnerItemSelected(pos)
     }
     fun handleBurnButtonsClicked(view: View)
     {
