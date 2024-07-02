@@ -44,7 +44,7 @@ class AdvancedActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         initialize()
         mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
-            .apply { startEventListener() }
+            .also { it.startEventListener() }
     }
     override fun onResume()
     {
@@ -277,7 +277,7 @@ class AdvancedActivity : AppCompatActivity(){
     {
         if (channel !in 1..255) {
             Toast.makeText(this, R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
-            mBinding.editTextChannel.setText("")
+            mBinding.editTextChannel.setText(getString(R.string.empty_string))
             return
         }
         val addressShift: Int = channel shl 16

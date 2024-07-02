@@ -4,7 +4,6 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
@@ -42,8 +41,8 @@ class ControlActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initialize()
         mListener =
-            ControlActivityEventListener(this, eventHandler, threadPool, configuration).apply {
-                startEventListener()
+            ControlActivityEventListener(this, eventHandler, threadPool, configuration).also {
+                it.startEventListener()
             }
     }
     override fun onResume()
