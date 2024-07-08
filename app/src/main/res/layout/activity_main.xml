@@ -14,6 +14,36 @@
         android:layout_height="match_parent"
         android:background="@drawable/background">
 
+        <com.daasuu.bl.BubbleLayout
+            android:layout_width="111dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:padding="8dp"
+            app:bl_arrowDirection="top_right"
+            app:bl_arrowHeight="8dp"
+            app:bl_arrowPosition="16dp"
+            app:bl_arrowWidth="8dp"
+            app:bl_cornersRadius="6dp"
+            app:bl_strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.056"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonDoubleDevice"
+            tools:ignore="TextSizeCheck">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="4dp"
+                android:text="If you are user of both ear side of hearing aids, you can continue with..."
+                android:textAlignment="center"
+                android:textColor="@color/ap_gray"
+                android:textSize="8sp"
+                tools:ignore="SmallSp,TextContrastCheck" />
+
+        </com.daasuu.bl.BubbleLayout>
+
         <Button
             android:id="@+id/buttonDoubleDevice"
             android:layout_width="271dp"
@@ -28,8 +58,38 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonSingleDevice"
-            app:layout_constraintVertical_bias="0.149"
+            app:layout_constraintVertical_bias="0.091"
             tools:ignore="TextContrastCheck" />
+
+        <com.daasuu.bl.BubbleLayout
+            android:layout_width="111dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:padding="8dp"
+            app:bl_arrowDirection="bottom"
+            app:bl_arrowHeight="8dp"
+            app:bl_arrowPosition="16dp"
+            app:bl_arrowWidth="8dp"
+            app:bl_cornersRadius="6dp"
+            app:bl_strokeWidth="1dp"
+            app:layout_constraintBottom_toTopOf="@+id/buttonSingleDevice"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.943"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="TextSizeCheck">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginEnd="4dp"
+                android:text="If you are user of just a single hearing aid, you can continue with..."
+                android:textAlignment="center"
+                android:textColor="@color/ap_gray"
+                android:textSize="8sp"
+                tools:ignore="SmallSp" />
+
+        </com.daasuu.bl.BubbleLayout>
 
         <Button
             android:id="@+id/buttonSingleDevice"

@@ -7,7 +7,7 @@
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
     <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
-    <string name="app_version_text" translatable="false">v 3.1.3</string>
+    <string name="app_version_text" translatable="false">v 3.2.0</string>
     <string name="button_info_context_text" translatable="false">User Manual</string>
     <string name="volume_common_slider_desc" translatable="false">Dual Volume Slider</string>
     <string name="aux_common_slider_desc" translatable="false">Dual Aux Slider</string>

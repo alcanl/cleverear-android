@@ -71,6 +71,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.MasayukiSuda:BubbleLayout:v1.2.2")
     implementation("com.github.skydoves:powerspinner:1.2.7")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.github.razaghimahdi:Android-Loading-Dots:1.3.2")

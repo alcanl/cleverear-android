@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:title="@string/navbar_audiogram_text"
         android:icon="@drawable/baseline_settings_24"
-        android:id="@+id/navbar_audiogram"/>
+        android:id="@+id/navbar_remote_configuration"/>
 
 
 </menu>
