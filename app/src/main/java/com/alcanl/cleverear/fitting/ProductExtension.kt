@@ -18,6 +18,8 @@ const val WDRC_EXPANSION_THRESHOLD = "X_WDRC_ExpansionThreshold[%d]"
 const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
 const val WDRC_NOISE_REDUCTION_ENABLE = "X_WDRC_INR_Enable[%d]"
 const val GAP_DEVICE_NAME = "X_RF_GAPDeviceName%d"
+const val WIDE_BAND_GAIN = "X_LIM_TargetGain_dB"
+
 private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
     return this.systemMemory.parameters.containsId(parameterName)
@@ -235,6 +237,13 @@ fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean
     }
 
 }
+
+fun Product.setWideBandGain(value: Int)
+{
+    setParameter(WIDE_BAND_GAIN, value)
+}
+
+
 
 
 

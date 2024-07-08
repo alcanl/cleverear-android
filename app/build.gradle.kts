@@ -71,6 +71,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.skydoves:powerspinner:1.2.7")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.github.razaghimahdi:Android-Loading-Dots:1.3.2")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar", "*.so"))))

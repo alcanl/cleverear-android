@@ -14,18 +14,28 @@ object SliderListener {
                 listener.onValueChanged(value)
         }
     }
+
+    @JvmStatic
+    @BindingAdapter(value = ["enabled"])
+    fun bindSliderEnabled(slider: Slider?, isEnabled: Boolean)
+    {
+        slider?.isEnabled = isEnabled
+    }
+
     @JvmStatic
     @BindingAdapter(value = ["app:haloColor"])
     fun bindSliderHaloColor(slider: Slider?, id: Int)
     {
         slider?.haloTintList = ColorStateList.valueOf(id)
     }
+
     @JvmStatic
     @BindingAdapter(value = ["app:thumbColor"])
     fun bindSliderThumbColor(slider: Slider?, id: Int)
     {
         slider?.thumbTintList = ColorStateList.valueOf(id)
     }
+
     @JvmStatic
     @BindingAdapter(value = ["app:trackColorActive"])
     fun bindSliderTrackColorActive(slider: Slider?, id: Int)

@@ -14,14 +14,15 @@
         <import type="androidx.core.content.ContextCompat"/>
         <import type="androidx.appcompat.content.res.AppCompatResources"/>
         <import type="com.alcanl.cleverear.R"/>
+        <variable name="isEqualizerEnabled" type="boolean" />
         <variable name="selectedPosition" type="int" />
-        <variable type="ArrayAdapter&lt;String&gt;" name="memoryAdapter" />
         <variable name="config" type="FittingConfigurationModule" />
         <variable name="viewModel" type="FittingFragmentListenersViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background"
@@ -225,6 +226,7 @@
                 android:value="50"
                 android:valueFrom="0"
                 android:valueTo="100"
+                android:enabled="@{isEqualizerEnabled}"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.96"
@@ -246,6 +248,7 @@
                 android:value="50"
                 android:valueFrom="0"
                 android:valueTo="100"
+                android:enabled="@{isEqualizerEnabled}"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.966"
@@ -264,7 +267,7 @@
                 android:id="@+id/checkBoxEqualizer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@{config.INSTANCE.leftButtonSelected ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).isEqualizerEnabled() : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).isEqualizerEnabled()}"
+                android:checked="@={isEqualizerEnabled}"
                 android:onCheckedChanged="@{() -> viewModel.handleCheckBoxEqualizerCheckedChanged()}"
                 android:text="@string/checkbox_equalizer_text"
                 android:textSize="14sp"
@@ -280,6 +283,7 @@
                 android:value="50"
                 android:valueFrom="0"
                 android:valueTo="100"
+                android:enabled="@{isEqualizerEnabled}"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.96"
@@ -335,37 +339,27 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Spinner
+        <com.skydoves.powerspinner.PowerSpinnerView
             android:id="@+id/spinnerMemory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:adapter="@{memoryAdapter}"
-            android:onItemSelected="@{(av, v, pos, i) -> viewModel.handleSpinnerItemSelect(pos)}"
-            android:selectedItemPosition="@{selectedPosition}"
+            android:hint="@string/textview_active_memory_text"
             android:textAlignment="center"
-            android:textSize="11sp"
-            app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
-            app:layout_constraintHorizontal_bias="0.35"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:ignore="TouchTargetSizeCheck" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/textview_active_memory_text"
             android:textColor="@color/design_default_color_secondary_variant"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textColorHint="@color/design_default_color_secondary_variant"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
-            app:layout_constraintHorizontal_bias="0.351"
+            app:layout_constraintHorizontal_bias="0.391"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.01999998"
-            tools:ignore="TextContrastCheck" />
+            app:layout_constraintVertical_bias="0.053"
+            app:onItemSelected="@{(pos) -> viewModel.handleSpinnerItemSelect(pos)}"
+            app:selectedItemPosition="@{selectedPosition}"
+            app:spinner_arrow_tint="@color/design_default_color_secondary_variant"
+            app:spinner_popup_animation="fade"
+            app:spinner_popup_background="@color/ap_gray"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck,TextContrastCheck" />
 
         <LinearLayout
             android:id="@+id/linearLayout2"
@@ -385,9 +379,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="3"
-                android:value="50"
+                android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductWideBandValue()}"
                 android:valueFrom="0"
-                android:valueTo="100"
+                android:valueTo="42"
                 app:onValueChangeListener="@{(value)-> viewModel.handleWideBandSliderOnValueChanged(value)}"
                 app:haloColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:thumbColor="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
@@ -449,6 +443,31 @@
                 android:textSize="12sp"
                 tools:ignore="VisualLintButtonSize" />
         </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutLoading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:background="@drawable/background"
+            android:backgroundTint="#CEFFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.razzaghimahdi78.dotsloading.circle.LoadingCircleFady
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:dots_color="@color/design_default_color_secondary_variant"
+                app:dots_duration="5000"
+                app:dots_size="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

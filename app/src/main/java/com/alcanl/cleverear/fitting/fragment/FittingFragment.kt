@@ -5,13 +5,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -24,9 +23,15 @@ import com.alcanl.cleverear.fitting.disableNoiseReduction
 import com.alcanl.cleverear.fitting.enableEqualizer
 import com.alcanl.cleverear.fitting.enableFeedBackCanceler
 import com.alcanl.cleverear.fitting.enableNoiseReduction
+import com.alcanl.cleverear.fitting.setWideBandGain
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
+import com.alcanl.cleverear.util.WHAT_ENABLE_EQUALIZER_SLIDERS
+import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
+import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
 import com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel
 import com.ark.ParameterSpace
+import com.skydoves.powerspinner.IconSpinnerItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -34,6 +39,7 @@ import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class FittingFragment : Fragment() {
@@ -63,25 +69,42 @@ class FittingFragment : Fragment() {
         mHandler = FittingHandler(this)
         initializeSpinner()
         initializeSelectedMemory()
+        initializeEqualizer()
     }
     private fun initializeSelectedMemory()
     {
         mSelectedMemory = ParameterSpace.value(mBinding.selectedPosition - 1)
     }
+    private fun initializeEqualizer()
+    {
+        mBinding.isEqualizerEnabled = with(fittingConfig) {
+            if (isLeftButtonSelected)
+                deviceInfoExtMap[EarSide.Left]?.isEqualizerEnabled()!!
+            else
+                deviceInfoExtMap[EarSide.Right]?.isEqualizerEnabled()!!
+        }
+
+    }
     private fun initializeSpinnerAdapter(memoryCount: Int)
     {
-        try {
-            mBinding.apply {
-                memoryAdapter = ArrayAdapter(requireContext(),
-                    androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
-                    resources.getStringArray(R.array.programs).copyOfRange(0, memoryCount))
+        threadPool.execute {
+            try {
+                mBinding.apply {
+                    val iconAdapterList = ArrayList<IconSpinnerItem>(memoryCount)
+                    val itemArray = resources.getStringArray(R.array.programs)
 
-                selectedPosition = if (fittingConfig.isLeftButtonSelected)
-                    fittingConfig.deviceInfoExtMap[EarSide.Left]?.product?.currentMemory?.value()!! else
-                    fittingConfig.deviceInfoExtMap[EarSide.Right]?.product?.currentMemory?.value()!!
+                    (0..< memoryCount).forEach {
+                        iconAdapterList.add(IconSpinnerItem(text = itemArray[it]))
+                    }
+                    spinnerMemory.setItems(iconAdapterList)
+
+                    selectedPosition = if (fittingConfig.isLeftButtonSelected)
+                        fittingConfig.deviceInfoExtMap[EarSide.Left]?.product?.currentMemory?.value()!! else
+                        fittingConfig.deviceInfoExtMap[EarSide.Right]?.product?.currentMemory?.value()!!
+                }
+            } catch (ex: Throwable) {
+                Log.e("initializeSpinnerAdapter", ex.message!!)
             }
-        } catch (ex: Throwable) {
-            Log.e("initializeSpinnerAdapter", ex.message!!)
         }
     }
     private fun initializeSpinner()
@@ -100,11 +123,27 @@ class FittingFragment : Fragment() {
 
         initializeSpinnerAdapter(memoryCount)
     }
+
+    @Synchronized
+    private fun wideBandSliderValueChangedCallback(value: Int)
+    {
+        try {
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    it.product?.setWideBandGain(value)
+                }
+            }
+        } catch (ex: Throwable) {
+            Log.e("wideBandSliderValueChanged", ex.message!!)
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     private fun burnParametersToSelectedMemory()
     {
         GlobalScope.launch {
             try {
+                mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
                 with(fittingConfig) {
                     if (selectedEarSide == EarSide.Left)
                         deviceInfoExtMap[EarSide.Left]?.product?.burnChangesToMemory(mSelectedMemory)
@@ -113,6 +152,7 @@ class FittingFragment : Fragment() {
                             mSelectedMemory
                         )
                 }
+                mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
             } catch (ex: Throwable) {
                 Log.e("burnParametersToSelectedMemory", ex.message!!)
             }
@@ -123,6 +163,7 @@ class FittingFragment : Fragment() {
     {
         GlobalScope.launch {
             try {
+                mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
                 with(fittingConfig) {
                     if (selectedEarSide == EarSide.Left)
                         deviceInfoExtMap[EarSide.Left]?.product?.burnChangesToAllMemories(
@@ -139,37 +180,86 @@ class FittingFragment : Fragment() {
                                 configuration.hearingAid
                         )
                 }
+                mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
             } catch (ex: Throwable) {
                 Log.e("burnParametersToAllMemories", ex.message!!)
             }
         }
     }
+
+    private fun invalidateBindingsCallback()
+    {
+        mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
+        mBinding.invalidateAll()
+        mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
+    }
+
     private class FittingHandler(fragment: FittingFragment) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(fragment)
 
         override fun handleMessage(msg: Message)
         {
             when (msg.what) {
-
+                27 -> mWeakReference.get()?.let {
+                    it.mBinding.apply {
+                        constraintLayoutMain.isEnabled = true
+                        constraintLayoutLoading.visibility = View.GONE
+                    }
+                }
+                28 -> mWeakReference.get()?.let {
+                    it.mBinding.apply {
+                        constraintLayoutMain.isEnabled = false
+                        constraintLayoutLoading.visibility = View.VISIBLE
+                    }
+                }
+                29 -> mWeakReference.get()?.let {
+                    it.mBinding.apply {
+                        sliderMid.isEnabled = true
+                        sliderBass.isEnabled = true
+                        sliderTreble.isEnabled = true
+                    }
+                }
+                30 -> mWeakReference.get()?.let {
+                    it.mBinding.apply {
+                        sliderMid.isEnabled = false
+                        sliderBass.isEnabled = false
+                        sliderTreble.isEnabled = false
+                    }
+                }
             }
         }
     }
 
     fun equalizerBassSliderValueChanged(value: Float)
     {
-
+        @Synchronized
+        fun handleSynchronized()
+        {
+            TODO("Not Implemented Yet")
+        }
+        handleSynchronized()
     }
     fun equalizerMidSliderValueChanged(value: Float)
     {
-
+        @Synchronized
+        fun handleSynchronized()
+        {
+            TODO("Not Implemented Yet")
+        }
+        handleSynchronized()
     }
     fun equalizerTrebleSliderValueChanged(value: Float)
     {
-
+        @Synchronized
+        fun handleSynchronized()
+        {
+            TODO("Not Implemented Yet")
+        }
+        handleSynchronized()
     }
     fun wideBandSliderValueChanged(value: Float)
     {
-
+        threadPool.execute { wideBandSliderValueChangedCallback(value.toInt()) }
     }
     fun equalizerCheckedChanged()
     {
@@ -177,14 +267,18 @@ class FittingFragment : Fragment() {
             try {
                 mBinding.checkBoxEqualizer.apply {
                     fittingConfig.apply {
-                        if (isChecked)
+                        if (isChecked) {
+                            mHandler.sendEmptyMessage(WHAT_DISABLE_EQUALIZER_SLIDERS)
                             deviceInfoExtMap[selectedEarSide]?.let {
                                 it.product?.disableEqualizer(mSelectedMemory)
                             }
-                        else
+                        }
+                        else {
+                            mHandler.sendEmptyMessage(WHAT_ENABLE_EQUALIZER_SLIDERS)
                             deviceInfoExtMap[selectedEarSide]?.let {
                                 it.product?.enableEqualizer(mSelectedMemory)
                             }
+                        }
                     }
                 }
 
@@ -248,14 +342,14 @@ class FittingFragment : Fragment() {
             isLeftButtonSelected = earSide == EarSide.Left
         }
 
-        threadPool.execute { mBinding.invalidateAll() }
+        threadPool.execute(this::invalidateBindingsCallback)
 
     }
     fun spinnerItemSelected(pos: Int)
     {
         mSelectedMemory = ParameterSpace.value(pos)
         mBinding.selectedPosition = pos
-        threadPool.execute { mBinding.invalidateAll() }
+        threadPool.execute(this::invalidateBindingsCallback)
 
     }
 

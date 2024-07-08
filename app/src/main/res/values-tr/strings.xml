@@ -66,7 +66,7 @@
     <string name="textview_bass_text" translatable="true">Bas</string>
     <string name="textview_treble_text" translatable="true">Tiz</string>
     <string name="textview_mid_text" translatable="true">Orta</string>
-    <string name="textview_active_memory_text" translatable="true"><u>Aktif Program</u></string>
+    <string name="textview_active_memory_text" translatable="true"><u><b>Aktif Program</b></u></string>
     <string name="textview_wideband_text" translatable="true">Geniş Bant Kazancı</string>
     <string name="button_burn_text" translatable="true">Yaz</string>
     <string name="button_burn_to_all_text" translatable="true">Tüm Programlara Yaz</string>
