@@ -6,7 +6,7 @@ import com.skydoves.powerspinner.PowerSpinnerView
 object SpinnerListener {
 
     @JvmStatic
-    @BindingAdapter(value = ["app:onItemSelected"])
+    @BindingAdapter(value = ["onItemSelected"])
     fun setOnValueChangeListener(spinner: PowerSpinnerView, listener: OnItemSelected)
     {
         spinner.setOnSpinnerItemSelectedListener<Int> { _,_,index,_ ->
@@ -19,7 +19,7 @@ object SpinnerListener {
     }
 
     @JvmStatic
-    @BindingAdapter(value = ["app:selectedItemPosition"])
+    @BindingAdapter(value = ["selectedItemPosition"])
     fun setSelectedItemPosition(spinner: PowerSpinnerView, pos: Int)
     {
         spinner.selectItemByIndex(pos)

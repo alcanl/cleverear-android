@@ -41,17 +41,17 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
         with(configuration) {
 
             if (!isDoubleDeviceConnection)
-                hearingAid.apply {
+                hearingAidMap[earSide]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
                 }
             else if (earSide == EarSide.Left)
-                doubleDeviceMap[EarSide.Left]?.apply {
+                hearingAidMap[EarSide.Left]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
                 }
             else
-                doubleDeviceMap[EarSide.Right]?.apply {
+                hearingAidMap[EarSide.Right]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
                 }

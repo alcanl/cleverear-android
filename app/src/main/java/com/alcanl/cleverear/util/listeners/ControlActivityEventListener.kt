@@ -103,21 +103,21 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                 runOnUiThread {
                     with(mConfiguration) {
                         if (!isDoubleDeviceConnection) {
-                            if (hearingAid.side == EarSide.Left)
+                            if (earSide == EarSide.Left)
                                 mBinding.batteryViewLeftDevice.batteryLevel = batteryState
                             else
                                 mBinding.batteryViewRightDevice.batteryLevel = batteryState
 
-                            hearingAid.batteryLevel = batteryState
+                            hearingAidMap[earSide]?.batteryLevel = batteryState
                         }
                         else
-                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address) {
+                            if (eventSender == hearingAidMap[EarSide.Left]?.address) {
                                 mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                                doubleDeviceMap[EarSide.Left]?.batteryLevel = batteryState
+                                hearingAidMap[EarSide.Left]?.batteryLevel = batteryState
                             }
                             else {
                                 mBinding.batteryViewRightDevice.batteryLevel = batteryState
-                                doubleDeviceMap[EarSide.Right]?.batteryLevel = batteryState
+                                hearingAidMap[EarSide.Right]?.batteryLevel = batteryState
                             }
                     }
                 }
@@ -140,12 +140,12 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             mThreadPool.execute {
                 with(mConfiguration) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.currentMemory = ParameterSpace.value(memoryState)
+                        hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(memoryState)
                     else
-                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address!!)
-                            doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
+                        if (eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                            hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
                         else
-                            doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
+                            hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
                 }
 
                 actCont.setSelectedMemoryButtonView(getMemoryEventButton(memoryState), memoryState)
@@ -167,22 +167,22 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
             actCont.runOnUiThread {
                 with(mConfiguration) {
                     if (!isDoubleDeviceConnection) {
-                        hearingAid.volume = volumeState
-                        actCont.mBinding.sliderCommon.value = hearingAid.volume.toFloat()
+                        hearingAidMap[earSide]?.volume = volumeState
+                        actCont.mBinding.sliderCommon.value = hearingAidMap[earSide]?.volume?.toFloat() ?: 0F
                     }
                     else
                         if (isDualDeviceConfig) {
-                            doubleDeviceMap.forEach {  it.value.volume = volumeState  }
-                            actCont.mBinding.sliderCommon.value = doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                            hearingAidMap.forEach {  it.value.volume = volumeState  }
+                            actCont.mBinding.sliderCommon.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
                         }
                         else
-                            if (eventSender == doubleDeviceMap[EarSide.Left]?.address) {
-                                doubleDeviceMap[EarSide.Left]?.volume = volumeState
-                                actCont.mBinding.sliderLeft.value = doubleDeviceMap[EarSide.Left]?.volume!!.toFloat()
+                            if (eventSender == hearingAidMap[EarSide.Left]?.address) {
+                                hearingAidMap[EarSide.Left]?.volume = volumeState
+                                actCont.mBinding.sliderLeft.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
                             }
                             else {
-                                doubleDeviceMap[EarSide.Right]?.volume = volumeState
-                                actCont.mBinding.sliderRight.value = doubleDeviceMap[EarSide.Right]?.volume!!.toFloat()
+                                hearingAidMap[EarSide.Right]?.volume = volumeState
+                                actCont.mBinding.sliderRight.value = hearingAidMap[EarSide.Right]?.volume!!.toFloat()
                             }
                 }
             }

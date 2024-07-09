@@ -73,9 +73,10 @@
     <string name="button_retry_text" translatable="true">Wiederholung</string>
     <string name="button_play_sound_text" translatable="true">Play Sound</string>
     <string name="button_save_in_situ_text" translatable="true">Save In-Situ Test</string>
+    <string name="textview_click_for_connect_text" translatable="true">Klicken für Verbindung</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Hörst Du Das Signal?</string>
     <string name="toast_test_result_saved_text" translatable="true">Testergebnisse in der Galerie gespeichert</string>
-    <string name="dialog_textview_check_text" translatable="true">%d Hz Frequenz / %d db</string>
+    <string name="dialog_textview_check_text" translatable="true" formatted="false">%d Hz Frequenz / %d db</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>

@@ -6,7 +6,7 @@ import androidx.databinding.BindingAdapter
 
 object ImageViewSrcCompat {
     @JvmStatic
-    @BindingAdapter(value = ["app:srcCompat"])
+    @BindingAdapter(value = ["srcCompat"])
     fun bindSrcCompat(imageView: ImageView?, drawable: Drawable?)
     {
         imageView?.setImageDrawable(drawable)

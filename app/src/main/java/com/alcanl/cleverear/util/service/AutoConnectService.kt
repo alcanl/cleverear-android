@@ -86,9 +86,9 @@ class AutoConnectService : Service()
             with(configuration) {
                 if (isConnected)
                     if (isDoubleDeviceConnection)
-                        doubleDeviceMap.forEach { it.value.endConnectionSession() }
+                        hearingAidMap.forEach { it.value.endConnectionSession() }
                     else
-                        hearingAid.endConnectionSession()
+                        hearingAidMap[earSide]?.endConnectionSession()
 
                 isServiceOnBoard = false
             }
@@ -132,23 +132,23 @@ class AutoConnectService : Service()
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Single Device Connected")
                         return
                     } else if (isBluetoothEnabled) {
-                        doConnection(hearingAid)
+                        doConnection(hearingAidMap[earSide]!!)
                         mConnectorThread.get()
                     }
                 }
                 else {
-                    if (doubleDeviceMap.all { it.value.isConnected }) {
+                    if (hearingAidMap.all { it.value.isConnected }) {
                         Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Double Device Connected")
                         return
                     }
 
-                    if (!doubleDeviceMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled) {
-                        doConnection(doubleDeviceMap[EarSide.Left]!!)
+                    if (!hearingAidMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled) {
+                        doConnection(hearingAidMap[EarSide.Left]!!)
                         mConnectorThread.get()
                     }
 
-                    if (!doubleDeviceMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled) {
-                        doConnection(doubleDeviceMap[EarSide.Right]!!)
+                    if (!hearingAidMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled) {
+                        doConnection(hearingAidMap[EarSide.Right]!!)
                         mConnectorThread.get()
                     }
                 }
@@ -198,9 +198,9 @@ class AutoConnectService : Service()
     private fun isConnected() : Boolean
     {
         return if (configuration.isDoubleDeviceConnection)
-                configuration.doubleDeviceMap[EarSide.Left]?.isConnected!! && configuration.doubleDeviceMap[EarSide.Right]?.isConnected!!
+                configuration.hearingAidMap[EarSide.Left]?.isConnected!! && configuration.hearingAidMap[EarSide.Right]?.isConnected!!
             else
-                configuration.hearingAid.isConnected
+                configuration.hearingAidMap[configuration.earSide]?.isConnected ?: false
     }
     private fun checkDeviceConnectionState(hearingAid: HearingAid, adapter: BluetoothAdapter)
     {

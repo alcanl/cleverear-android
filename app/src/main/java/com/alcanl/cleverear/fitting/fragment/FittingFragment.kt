@@ -113,12 +113,12 @@ class FittingFragment : Fragment() {
             if (isDoubleDeviceConnection)
                 with(fittingConfig) {
                     if (isLeftButtonSelected)
-                        doubleDeviceMap[EarSide.Left]?.numberOfMemories ?: 8
+                        hearingAidMap[EarSide.Left]?.numberOfMemories ?: 8
                     else
-                        doubleDeviceMap[EarSide.Right]?.numberOfMemories ?: 8
+                        hearingAidMap[EarSide.Right]?.numberOfMemories ?: 8
                 }
             else
-                hearingAid.numberOfMemories
+                hearingAidMap[fittingConfig.selectedEarSide]?.numberOfMemories ?: 8
         }
 
         initializeSpinnerAdapter(memoryCount)
@@ -168,16 +168,16 @@ class FittingFragment : Fragment() {
                     if (selectedEarSide == EarSide.Left)
                         deviceInfoExtMap[EarSide.Left]?.product?.burnChangesToAllMemories(
                             if (configuration.isDoubleDeviceConnection)
-                                configuration.doubleDeviceMap[EarSide.Left]!!
+                                configuration.hearingAidMap[EarSide.Left]!!
                             else
-                                configuration.hearingAid
+                                configuration.hearingAidMap[selectedEarSide]!!
                         )
                     else
                         deviceInfoExtMap[EarSide.Right]?.product?.burnChangesToAllMemories(
                             if (configuration.isDoubleDeviceConnection)
-                                configuration.doubleDeviceMap[EarSide.Right]!!
+                                configuration.hearingAidMap[EarSide.Right]!!
                             else
-                                configuration.hearingAid
+                                configuration.hearingAidMap[selectedEarSide]!!
                         )
                 }
                 mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)

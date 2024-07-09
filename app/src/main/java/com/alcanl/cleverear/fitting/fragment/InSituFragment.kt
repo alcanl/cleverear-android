@@ -126,11 +126,7 @@ class InSituFragment : Fragment() {
     private fun initializeDeviceForInSituTest() {
         try {
             with(fittingConfig) {
-                if (configuration.isDoubleDeviceConnection)
-                    manufacturing.initializeDevice(configuration.doubleDeviceMap[selectedEarSide]?.communicationAdaptor!!)
-                else
-                    manufacturing.initializeDevice(configuration.hearingAid.communicationAdaptor!!)
-
+                manufacturing.initializeDevice(configuration.hearingAidMap[selectedEarSide]?.communicationAdaptor!!)
                 manufacturing.prepareDeviceForModeling(true)
                 manufacturing.setProduct(deviceInfoExtMap[selectedEarSide]?.product!!)
             }

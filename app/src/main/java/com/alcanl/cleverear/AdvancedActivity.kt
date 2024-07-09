@@ -120,7 +120,7 @@ class AdvancedActivity : AppCompatActivity(){
     }
     private fun initCommonSliderTheme() : ColorStateList
     {
-        return if (configuration.hearingAid.side == EarSide.Left)
+        return if (configuration.earSide == EarSide.Left)
             AppCompatResources.getColorStateList(
                 this@AdvancedActivity,
                 R.color.left_device_slider
@@ -287,10 +287,10 @@ class AdvancedActivity : AppCompatActivity(){
         with(configuration) {
             if (isConnected)
                 if (isDoubleDeviceConnection)
-                    doubleDeviceMap.forEach {
+                    hearingAidMap.forEach {
                         setStreamAddressButtonClickedCallback(result,channel, it.value) }
                 else
-                    setStreamAddressButtonClickedCallback(result, channel, hearingAid)
+                    setStreamAddressButtonClickedCallback(result, channel, hearingAidMap[earSide]!!)
         }
     }
     private fun initSwitch()
@@ -386,14 +386,8 @@ class AdvancedActivity : AppCompatActivity(){
         try {
             with(configuration) {
                 if (isConnected) {
-                    if (!isDoubleDeviceConnection) {
-                        hearingAid.wirelessControl?.micAttenuation = value.toInt()
-                        hearingAid.micAttenuation = value.toInt()
-                    }
-                    else {
-                        doubleDeviceMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
-                        doubleDeviceMap[earSide]?.micAttenuation = value.toInt()
-                    }
+                    hearingAidMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+                    hearingAidMap[earSide]?.micAttenuation = value.toInt()
                 }
             }
         } catch (ex: ArkException) {
@@ -410,17 +404,10 @@ class AdvancedActivity : AppCompatActivity(){
         try {
             with(configuration) {
                 if (isConnected) {
-                    if (!isDoubleDeviceConnection) {
-                        hearingAid.wirelessControl?.auxAttenuation = value.toInt()
-                        hearingAid.auxAttenuation = value.toInt()
-
-                    } else {
-                        doubleDeviceMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
-                        doubleDeviceMap[earSide]?.auxAttenuation = value.toInt()
-                    }
+                    hearingAidMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                    hearingAidMap[earSide]?.auxAttenuation = value.toInt()
                 }
             }
-
         } catch (ex: ArkException) {
             Log.e("aux", ex.message!!)
         }
@@ -454,9 +441,9 @@ class AdvancedActivity : AppCompatActivity(){
                 setSelectedModeButtonView(view as Button)
 
                 if (!isDoubleDeviceConnection)
-                    modeButtonClickedCallback(view, hearingAid)
+                    modeButtonClickedCallback(view, hearingAidMap[earSide]!!)
                 else
-                    doubleDeviceMap.forEach { modeButtonClickedCallback(view, it.component2()) }
+                    hearingAidMap.forEach { modeButtonClickedCallback(view, it.component2()) }
             }
         }
     }

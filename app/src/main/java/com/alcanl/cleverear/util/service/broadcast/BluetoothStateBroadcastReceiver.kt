@@ -23,9 +23,9 @@ class BluetoothStateBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
                         isBluetoothEnabled = false
 
                         if (isDoubleDeviceConnection)
-                            doubleDeviceMap.forEach { it.value.isConnected = false }
+                            hearingAidMap.forEach { it.value.isConnected = false }
                         else
-                            hearingAid.isConnected = false
+                            hearingAidMap[earSide]?.isConnected = false
 
                     } catch (_: UninitializedPropertyAccessException) {}
                     finally {

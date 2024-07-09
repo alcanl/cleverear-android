@@ -101,12 +101,12 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             mThreadPool.execute {
                 with(mConfiguration) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.batteryLevel = batteryState
+                        hearingAidMap[earSide]?.batteryLevel = batteryState
                     else
-                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
-                            doubleDeviceMap[EarSide.Left]?.batteryLevel = batteryState
+                        if (eventSender == hearingAidMap[EarSide.Left]?.address)
+                            hearingAidMap[EarSide.Left]?.batteryLevel = batteryState
                         else
-                            doubleDeviceMap[EarSide.Right]?.batteryLevel = batteryState
+                            hearingAidMap[EarSide.Right]?.batteryLevel = batteryState
                 }
             }
 
@@ -128,12 +128,12 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             mThreadPool.execute {
                 with(mConfiguration) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.currentMemory = ParameterSpace.value(memoryState)
+                        hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(memoryState)
                     else
-                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address!!)
-                            doubleDeviceMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
+                        if (eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                            hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
                         else
-                            doubleDeviceMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
+                            hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
                 }
             }
             actAdv.runOnUiThread {
@@ -157,12 +157,12 @@ class AdvancedActivityEventListener(activity: AdvancedActivity, private val mEve
             mThreadPool.execute {
                 with(mConfiguration) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.volume = volumeState
+                        hearingAidMap[earSide]?.volume = volumeState
                     else
-                        if (eventSender == doubleDeviceMap[EarSide.Left]?.address)
-                            doubleDeviceMap[EarSide.Left]?.volume = volumeState
+                        if (eventSender == hearingAidMap[EarSide.Left]?.address)
+                            hearingAidMap[EarSide.Left]?.volume = volumeState
                         else
-                            doubleDeviceMap[EarSide.Right]?.volume = volumeState
+                            hearingAidMap[EarSide.Right]?.volume = volumeState
                 }
             }
 

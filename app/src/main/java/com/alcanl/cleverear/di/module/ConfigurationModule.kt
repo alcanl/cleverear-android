@@ -2,7 +2,6 @@ package com.alcanl.cleverear.di.module
 
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
-import com.ark.Product
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,9 +23,8 @@ object ConfigurationModule {
     var isBluetoothEnabled = false
     var isRemoteFittingConnection = false
     var earSide : EarSide = EarSide.Right
-    lateinit var product: Product
-    lateinit var doubleDeviceMap : EnumMap<EarSide, HearingAid>
-    lateinit var hearingAid: HearingAid
+    val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)
+
     @Singleton
     @Provides
     fun createConfiguration() : ConfigurationModule
@@ -37,9 +35,9 @@ object ConfigurationModule {
     {
         isConnected = try {
             if (isDoubleDeviceConnection)
-                doubleDeviceMap.all { it.value.isConnected }
+                hearingAidMap.all { it.value.isConnected }
             else
-                hearingAid.isConnected
+                hearingAidMap[earSide]?.isConnected ?: false
         } catch (_ : Throwable) { false }
     }
 

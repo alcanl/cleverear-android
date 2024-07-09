@@ -73,9 +73,10 @@
     <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
     <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_click_for_connect_text" translatable="true">Bağlanmak İçin Tıkla</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Sonucu Galeriye Kaydedildi</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Sinyal Sesini Duyuyor Musunuz?</string>
-    <string name="dialog_textview_check_text" translatable="true">%d Hz Frekans / %d db</string>
+    <string name="dialog_textview_check_text" translatable="true" formatted="false">%d Hz Frekans / %d db</string>
     <string name="textview_device_initialized_text" translatable="true">Cihaz %s Konfigürasyona Hazırlandı</string>
     <string name="textview_parameter_read_process_text" translatable="true">Dahili Parametreler Cihazdan Okunurken Lütfen Bekleyin</string>
     <string name="textview_parameter_read_success_text" translatable="true">Parametreler Başarılı Bir Şekilde Cihazdan Okundu</string>

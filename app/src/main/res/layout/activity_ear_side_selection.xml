@@ -39,7 +39,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView2"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            tools:ignore="VisualLintBounds">
 
             <FrameLayout
                 android:id="@+id/frameLayoutLeftEar"

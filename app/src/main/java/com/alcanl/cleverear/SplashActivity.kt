@@ -23,7 +23,6 @@ import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.EnumMap
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
@@ -91,7 +90,6 @@ class SplashActivity : AppCompatActivity() {
                 isDoubleDeviceConnection = true
                 isConnectedBefore = true
                 mAddressArray = arrayOf(addressLeft, addressRight)
-                doubleDeviceMap = EnumMap(EarSide::class.java)
             }
 
         else if (addressLeft.isNotEmpty())

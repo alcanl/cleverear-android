@@ -35,7 +35,6 @@ import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.EnumMap
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -302,7 +301,6 @@ class MainActivity : AppCompatActivity() {
 
         if (mIsBluetoothPermissionsGranted) {
             configuration.apply {
-                doubleDeviceMap = EnumMap(EarSide::class.java)
                 isDoubleDeviceConnection = true
                 earSide = EarSide.Left
             }

@@ -56,9 +56,9 @@ class ControlActivity : AppCompatActivity() {
         runOnUiThread { initSliders() }
         runOnUiThread { initTextViews() }
         runOnUiThread { initActiveMemory(if (configuration.isDoubleDeviceConnection)
-            configuration.doubleDeviceMap[EarSide.Left]?.currentMemory?.value()!!
+            configuration.hearingAidMap[EarSide.Left]?.currentMemory?.value()!!
         else
-            configuration.hearingAid.currentMemory.value()
+            configuration.hearingAidMap[configuration.earSide]?.currentMemory?.value() ?: 0
         ) }
 
         if (!mListener.isListenerOnBoard())
@@ -85,7 +85,7 @@ class ControlActivity : AppCompatActivity() {
     private fun initBatteryViews()
     {
         if (configuration.isDoubleDeviceConnection) {
-            with(configuration.doubleDeviceMap) {
+            with(configuration.hearingAidMap) {
 
                 mBinding.batteryViewLeftDevice. apply {
                     batteryLevel = this@with[EarSide.Left]?.batteryLevel!!
@@ -99,7 +99,7 @@ class ControlActivity : AppCompatActivity() {
         }
         else {
 
-            with(configuration.hearingAid) {
+            with(configuration.hearingAidMap[configuration.earSide]!!) {
                 if (side == EarSide.Left)
                     mBinding.batteryViewLeftDevice.apply {
                         batteryLevel = this@with.batteryLevel
@@ -143,8 +143,8 @@ class ControlActivity : AppCompatActivity() {
     private fun initMemoryButtons()
     {
         runOnUiThread {
-            initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
-            else configuration.doubleDeviceMap[EarSide.Left]!!)
+            initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAidMap[configuration.earSide]!!
+            else configuration.hearingAidMap[EarSide.Left]!!)
         }
     }
     private fun initMemoryButtons(hearingAid: HearingAid)
@@ -212,7 +212,7 @@ class ControlActivity : AppCompatActivity() {
     {
         if (configuration.isConnected) {
             if (!configuration.isDoubleDeviceConnection)
-                initSliders(mBinding.sliderCommon, configuration.hearingAid)
+                initSliders(mBinding.sliderCommon, configuration.hearingAidMap[configuration.earSide]!!)
 
             else
                 initDoubleDeviceConnectionSliders()
@@ -328,12 +328,12 @@ class ControlActivity : AppCompatActivity() {
             configuration.apply {
                 if (isConnected) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.apply {
+                        hearingAidMap[earSide]?.apply {
                             wirelessControl?.volume = value.toInt()
                             volume = value.toInt()
                         }
                     else
-                        doubleDeviceMap[EarSide.Left]?.apply {
+                        hearingAidMap[EarSide.Left]?.apply {
                             wirelessControl?.volume = value.toInt()
                             volume = value.toInt()
                         }
@@ -364,12 +364,12 @@ class ControlActivity : AppCompatActivity() {
             configuration.apply {
                 if (isConnected) {
                     if (!isDoubleDeviceConnection)
-                        hearingAid.apply {
+                        hearingAidMap[earSide]?.apply {
                             wirelessControl?.volume = value.toInt()
                             volume = value.toInt()
                         }
                     else
-                        doubleDeviceMap[EarSide.Right]?.apply {
+                        hearingAidMap[EarSide.Right]?.apply {
                             wirelessControl?.volume = value.toInt()
                             volume = value.toInt()
                         }
@@ -382,11 +382,11 @@ class ControlActivity : AppCompatActivity() {
         try {
             with(configuration) {
                 if (isDoubleDeviceConnection)
-                    doubleDeviceMap.forEach {
+                    hearingAidMap.forEach {
                         it.value.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
                     }
                 else
-                    hearingAid.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
+                    hearingAidMap[earSide]?.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
             }
             setSelectedMemoryButtonView(button, buttonNumber)
         } catch (_: ArkException) {}
@@ -401,8 +401,8 @@ class ControlActivity : AppCompatActivity() {
             button.foregroundTintList = AppCompatResources.getColorStateList(
                 this@ControlActivity, R.color.white)
 
-            setButtonsDefaultColor(if (!configuration.isDoubleDeviceConnection) configuration.hearingAid
-            else configuration.doubleDeviceMap[EarSide.Left]!!, num)
+            setButtonsDefaultColor(if (!configuration.isDoubleDeviceConnection) configuration.hearingAidMap[configuration.earSide]!!
+            else configuration.hearingAidMap[EarSide.Left]!!, num)
         }
     }
     fun sliderDualOnValueChanged(value: Float)
@@ -412,7 +412,7 @@ class ControlActivity : AppCompatActivity() {
                 sliderLeftEarOnValueChanged(value)
                 sliderRightEarOnValueChanged(value)
             }
-            else if (hearingAid.side == EarSide.Left)
+            else if (earSide == EarSide.Left)
                 sliderLeftEarOnValueChanged(value)
             else
                 sliderRightEarOnValueChanged(value)

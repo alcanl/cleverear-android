@@ -33,12 +33,12 @@ class SplashActivityEventListener(private val mEventHandler: EventHandler,
                         val sender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
                         mConfiguration.apply {
                             if (isDoubleDeviceConnection)
-                                if (sender == doubleDeviceMap[EarSide.Left]?.address)
-                                    doubleDeviceMap[EarSide.Left]?.batteryLevel = battery
+                                if (sender == hearingAidMap[EarSide.Left]?.address)
+                                    hearingAidMap[EarSide.Left]?.batteryLevel = battery
                                 else
-                                    doubleDeviceMap[EarSide.Right]?.batteryLevel = battery
+                                    hearingAidMap[EarSide.Right]?.batteryLevel = battery
                             else
-                                hearingAid.batteryLevel = battery
+                                hearingAidMap[earSide]?.batteryLevel = battery
                         }
                     }
                 }

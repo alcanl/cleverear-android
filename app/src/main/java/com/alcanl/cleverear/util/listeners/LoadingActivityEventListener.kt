@@ -57,17 +57,17 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
             val connectionState = parseJsonConnectionData(event.data, actLoad)
             if (connectionState == 3) {
                 if (!mConfiguration.isDoubleDeviceConnection) {
-                    mConfiguration.hearingAid.isConnected = true
+                    mConfiguration.hearingAidMap[mConfiguration.earSide]?.isConnected = true
                     mConfiguration.isConnected = true
                 }
                 else {
-                    if (eventSender == mConfiguration.doubleDeviceMap[EarSide.Left]?.address) {
-                        mConfiguration.doubleDeviceMap[EarSide.Left]?.isConnected = true
+                    if (eventSender == mConfiguration.hearingAidMap[EarSide.Left]?.address) {
+                        mConfiguration.hearingAidMap[EarSide.Left]?.isConnected = true
                     }
                     else
-                        mConfiguration.doubleDeviceMap[EarSide.Right]?.isConnected = true
+                        mConfiguration.hearingAidMap[EarSide.Right]?.isConnected = true
 
-                    if (mConfiguration.doubleDeviceMap.all { it.value.isConnected })
+                    if (mConfiguration.hearingAidMap.all { it.value.isConnected })
                         mConfiguration.isConnected = true
 
                 }

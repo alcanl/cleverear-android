@@ -185,12 +185,12 @@ class HomeFragment : Fragment() {
         GlobalScope.launch {
             if (configuration.isDoubleDeviceConnection) {
                 fittingConfig.isBinauralConnection = true
-                async { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Left]!!) }.await()
-                run { initializeProductCallback(configuration.doubleDeviceMap[EarSide.Right]!!) }
+                async { initializeProductCallback(configuration.hearingAidMap[EarSide.Left]!!) }.await()
+                run { initializeProductCallback(configuration.hearingAidMap[EarSide.Right]!!) }
             }
             else {
-                fittingConfig.selectedEarSide = configuration.hearingAid.side
-                GlobalScope.launch { initializeProductCallback(configuration.hearingAid) }
+                fittingConfig.selectedEarSide = configuration.earSide
+                GlobalScope.launch { initializeProductCallback(configuration.hearingAidMap[configuration.earSide]!!) }
             }
         }
     }

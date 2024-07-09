@@ -153,8 +153,8 @@
             android:layout_width="90dp"
             android:layout_height="80dp"
             android:backgroundTint="#00FFFFFF"
-            android:scaleType="fitXY"
             android:onClick="@{()->viewModel.handleRemoteFittingButtonClick()}"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -162,7 +162,7 @@
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             app:layout_constraintVertical_bias="0.79"
             app:srcCompat="@drawable/baseline_rss_feed_24"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

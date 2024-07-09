@@ -147,7 +147,7 @@
     <string name="textview_90_text" translatable="false">90</string>
     <string name="textview_100_text" translatable="false">100</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Are You Hearing The Signal?</string>
-    <string name="dialog_textview_check_text" translatable="true">%d Hz Frequency / %d db</string>
+    <string name="dialog_textview_check_text" translatable="true" formatted="false">%d Hz Frequency / %d db</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
     <string name="checkbox_feedback_text" translatable="true">Feedback Canceler</string>
@@ -160,6 +160,7 @@
     <string name="textview_wideband_text" translatable="true">WideBand Gain</string>
     <string name="button_burn_text" translatable="true">Burn</string>
     <string name="button_burn_to_all_text" translatable="true">Burn To All</string>
+    <string name="textview_click_for_connect_text" translatable="true">Click For Connect</string>
 
     <string-array name="programs">
         <item>Program 1</item>

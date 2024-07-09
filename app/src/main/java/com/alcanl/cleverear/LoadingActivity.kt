@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.di.module.ConfigurationModule.earSide
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
@@ -102,11 +103,11 @@ class LoadingActivity : AppCompatActivity() {
 
         with(configuration) {
             if (isDoubleDeviceConnection) {
-                if (!isServiceOnBoard && isConnected && doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
+                if (!isServiceOnBoard && isConnected && hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
                     startService()
             }
 
-            else if (!isServiceOnBoard && isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
+            else if (!isServiceOnBoard && isConnected && hearingAidMap[earSide]?.bondStatus == BluetoothDevice.BOND_BONDED)
                 startService()
 
         }
@@ -126,10 +127,10 @@ class LoadingActivity : AppCompatActivity() {
                 val editor = prefs.edit()
 
                 if (isDoubleDeviceConnection)
-                    doubleDeviceMap.forEach { handleSharedPrefs(editor, it.value) }
+                    hearingAidMap.forEach { handleSharedPrefs(editor, it.value) }
 
                 else
-                    handleSharedPrefs(editor, hearingAid)
+                    handleSharedPrefs(editor, hearingAidMap[earSide]!!)
 
                 editor.apply()
             }
@@ -145,40 +146,40 @@ class LoadingActivity : AppCompatActivity() {
     private fun handleSingleDeviceConnection()
     {
         with(configuration) {
-            checkDeviceBondStatus(hearingAid)
+            checkDeviceBondStatus(hearingAidMap[earSide]!!)
 
-            hearingAid.getPropertiesFromSDK(productManager, eventHandler)
+            hearingAidMap[earSide]!!.getPropertiesFromSDK(productManager, eventHandler)
             connectForSingleDevice()
 
-            if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED) {
+            if (hearingAidMap[earSide]!!.bondStatus == BluetoothDevice.BOND_BONDED) {
                 initBondedDeviceCountDownTimer()
                 return
             }
 
-            initUnBondSingleDeviceCountDownTimer(hearingAid)
+            initUnBondSingleDeviceCountDownTimer(hearingAidMap[earSide]!!)
         }
     }
     private fun handleDoubleDeviceConnection()
     {
         with(configuration) {
-            doubleDeviceMap.forEach { checkDeviceBondStatus(it.value) }
+            hearingAidMap.forEach { checkDeviceBondStatus(it.value) }
 
-            if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED }) {
-                doubleDeviceMap.forEach {
+            if (hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED }) {
+                hearingAidMap.forEach {
                     it.value.getPropertiesFromSDK(productManager, eventHandler)
                     connectToDevice(it.value)
                 }
                 initBondedDeviceCountDownTimer()
             }
 
-            else if (doubleDeviceMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE })
-                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Left]!!, true)
+            else if (hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE })
+                unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Left]!!, true)
 
-            else if (doubleDeviceMap[EarSide.Right]?.bondStatus == BluetoothDevice.BOND_NONE)
-                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Right]!!, false)
+            else if (hearingAidMap[EarSide.Right]?.bondStatus == BluetoothDevice.BOND_NONE)
+                unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Right]!!, false)
 
             else
-                unBoundDoubleDeviceInitialization(doubleDeviceMap[EarSide.Left]!!, false)
+                unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Left]!!, false)
 
         }
     }
@@ -203,8 +204,8 @@ class LoadingActivity : AppCompatActivity() {
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (configuration.doubleDeviceMap[EarSide.Left]?.bondStatus == BluetoothDevice.BOND_BONDED &&
-                    configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
+                if (configuration.hearingAidMap[EarSide.Left]?.bondStatus == BluetoothDevice.BOND_BONDED &&
+                    configuration.hearingAidMap[EarSide.Left]?.isConnected!!) {
 
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
                     Handler(Looper.myLooper()!!).postDelayed({ startActivity(
@@ -217,7 +218,7 @@ class LoadingActivity : AppCompatActivity() {
             }
             override fun onFinish()
             {
-                if (!configuration.doubleDeviceMap[EarSide.Left]?.isConnected!!) {
+                if (!configuration.hearingAidMap[EarSide.Left]?.isConnected!!) {
                     mBinding.textViewConnecting.text =
                         getString(R.string.textview_device_detection_not_connected_text)
                     Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
@@ -232,8 +233,8 @@ class LoadingActivity : AppCompatActivity() {
                     }
                     finish()
                     threadPool.execute {
-                        configuration.doubleDeviceMap[EarSide.Left]?.endConnectionSession()
-                        configuration.doubleDeviceMap[EarSide.Left]?.isConnected = false
+                        configuration.hearingAidMap[EarSide.Left]?.endConnectionSession()
+                        configuration.hearingAidMap[EarSide.Left]?.isConnected = false
                     }
                 }
             }
@@ -283,7 +284,7 @@ class LoadingActivity : AppCompatActivity() {
                     }
                     finish()
                     threadPool.execute {
-                        configuration.hearingAid.endConnectionSession()
+                        configuration.hearingAidMap[earSide]?.endConnectionSession()
                         configuration.isConnected = false
                     }
                 }
@@ -338,7 +339,7 @@ class LoadingActivity : AppCompatActivity() {
     }
     private fun connectForSingleDevice()
     {
-        connectToDevice(configuration.hearingAid)
+        connectToDevice(configuration.hearingAidMap[earSide]!!)
     }
 
     private fun connectToDevice(hearingAid: HearingAid)
@@ -385,11 +386,11 @@ class LoadingActivity : AppCompatActivity() {
 
         with(configuration) {
             if (isDoubleDeviceConnection) {
-                doubleDeviceMap[EarSide.Left] = getLeftDevice(prefs)
-                doubleDeviceMap[EarSide.Right] = getRightDevice(prefs)
+                hearingAidMap[EarSide.Left] = getLeftDevice(prefs)
+                hearingAidMap[EarSide.Right] = getRightDevice(prefs)
             }
             else
-                hearingAid = if (earSide == EarSide.Left) getLeftDevice(prefs) else getRightDevice(prefs)
+                hearingAidMap[earSide] = if (earSide == EarSide.Left) getLeftDevice(prefs) else getRightDevice(prefs)
         }
 
     }

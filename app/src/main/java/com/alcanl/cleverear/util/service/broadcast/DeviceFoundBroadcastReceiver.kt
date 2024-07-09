@@ -27,18 +27,18 @@ class DeviceFoundBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver(
             if (device != null && isHearingAid(device)) {
                 with(configuration) {
                     if (!isDoubleDeviceConnection) {
-                        hearingAid.isDeviceInRange = true
-                        Log.d("deviceFound", hearingAid.name)
+                        hearingAidMap[earSide]?.isDeviceInRange = true
+                        Log.d("deviceFound", hearingAidMap[earSide]?.name ?: "null")
                     }
 
                     else
-                        if (device.address == doubleDeviceMap[EarSide.Left]?.address) {
-                            doubleDeviceMap[EarSide.Left]?.isDeviceInRange = true
-                            Log.d("deviceFound", doubleDeviceMap[EarSide.Left]?.name!!)
+                        if (device.address == hearingAidMap[EarSide.Left]?.address) {
+                            hearingAidMap[EarSide.Left]?.isDeviceInRange = true
+                            Log.d("deviceFound", hearingAidMap[EarSide.Left]?.name!!)
                         }
                         else {
-                            doubleDeviceMap[EarSide.Right]?.isDeviceInRange = true
-                            Log.d("deviceFound", doubleDeviceMap[EarSide.Right]?.name!!)
+                            hearingAidMap[EarSide.Right]?.isDeviceInRange = true
+                            Log.d("deviceFound", hearingAidMap[EarSide.Right]?.name!!)
                         }
 
                     canBondDeviceReConnect = true
@@ -49,7 +49,7 @@ class DeviceFoundBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver(
     }
     private fun isHearingAid(device: BluetoothDevice) : Boolean
     {
-        return if (!configuration.isDoubleDeviceConnection) device.address == configuration.hearingAid.address
-            else configuration.doubleDeviceMap.any { it.value.address == device.address }
+        return if (!configuration.isDoubleDeviceConnection) device.address == configuration.hearingAidMap[configuration.earSide]?.address
+            else configuration.hearingAidMap.any { it.value.address == device.address }
     }
 }

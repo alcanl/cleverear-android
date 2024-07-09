@@ -152,10 +152,10 @@ class ConnectionActivity : AppCompatActivity() {
     }
     private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
     {
-        if (configuration.doubleDeviceMap.containsKey(earSide))
+        if (configuration.hearingAidMap.containsKey(earSide))
             return
 
-        configuration.doubleDeviceMap[earSide] = HearingAid(
+        configuration.hearingAidMap[earSide] = HearingAid(
             device.address,
             device.name, device.rssi, device.manufacturerData, earSide
         )
@@ -234,7 +234,7 @@ class ConnectionActivity : AppCompatActivity() {
             else
                 putItemToDeviceMap(EarSide.Left, selectedDevice)
 
-            if (configuration.doubleDeviceMap.size == 2)
+            if (configuration.hearingAidMap.size == 2)
                 finalizeConnectionConfiguration()
         }
         else
@@ -250,7 +250,7 @@ class ConnectionActivity : AppCompatActivity() {
                 selectedDevice.manufacturerData, recognizeEarSide(selectedDevice.manufacturerData)
             )
 
-            configuration.hearingAid = mSelectedHearingAid
+            configuration.hearingAidMap[configuration.earSide] = mSelectedHearingAid
             finalizeConnectionConfiguration()
 
         } else
@@ -306,9 +306,9 @@ class ConnectionActivity : AppCompatActivity() {
             {
                 with(configuration) {
                     if (isDoubleDeviceConnection)
-                        doubleDeviceMap.forEach {it.value.endConnectionSession()}
+                        hearingAidMap.forEach {it.value.endConnectionSession()}
                     else
-                        hearingAid.endConnectionSession()
+                        hearingAidMap[earSide]?.endConnectionSession()
 
                     isConnected = false
                 }

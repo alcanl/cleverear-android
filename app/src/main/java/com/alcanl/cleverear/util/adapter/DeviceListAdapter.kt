@@ -3,6 +3,7 @@ package com.alcanl.cleverear.util.adapter
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.alcanl.cleverear.R
@@ -22,13 +23,19 @@ class DeviceListAdapter @Inject constructor(@ApplicationContext context: Context
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v = super.getView(position, convertView, parent)
 
-        val tv = v.findViewById<TextView>(R.id.textViewAdapter)
+        val textViewAdapter = v.findViewById<TextView>(R.id.textViewAdapter)
+        val textViewBubble = v.findViewById<TextView>(R.id.textViewBubble)
+
+        textViewBubble.startAnimation(AnimationUtils.loadAnimation(context, R.anim.translate_textview_left_to_right))
 
         if (mIndex == position && mManufacturerData == MANUFACTURER_CODE_RIGHT) {
-            tv.setTextColor(context.getColor(R.color.right_device_slider))
+            textViewAdapter.setTextColor(context.getColor(R.color.right_device_slider))
+            textViewBubble.setTextColor(context.getColor(R.color.right_device_slider))
         }
-        else
-            tv.setTextColor(context.getColor(R.color.left_device_slider))
+        else {
+            textViewAdapter.setTextColor(context.getColor(R.color.left_device_slider))
+            textViewBubble.setTextColor(context.getColor(R.color.left_device_slider))
+        }
 
         return v
     }

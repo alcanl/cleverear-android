@@ -70,12 +70,12 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     {
         with(configuration) {
             if (isDoubleDeviceConnection)
-                doubleDeviceMap[EarSide.Left]?.apply {
+                hearingAidMap[EarSide.Left]?.apply {
                     isConnected = false
                     isDeviceInRange = false
                 }
             else
-                hearingAid.apply {
+                hearingAidMap[earSide]?.apply {
                     isConnected = false
                     isDeviceInRange = false
                 }
@@ -88,13 +88,13 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     {
         with(configuration) {
             if (isDoubleDeviceConnection) {
-                doubleDeviceMap[EarSide.Right]?.apply {
+                hearingAidMap[EarSide.Right]?.apply {
                     isConnected = false
                     isDeviceInRange = false
                 }
             }
             else {
-                hearingAid.apply {
+                hearingAidMap[earSide]?.apply {
                     isConnected = false
                     isDeviceInRange = false
                 }

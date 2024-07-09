@@ -1,7 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<FrameLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.daasuu.bl.BubbleLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end | center"
+        android:padding="8dp"
+        app:bl_arrowDirection="left_center"
+        app:bl_arrowHeight="8dp"
+        app:bl_arrowPosition="16dp"
+        app:bl_arrowWidth="8dp"
+        app:bl_cornersRadius="6dp"
+        app:bl_strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonDoubleDevice"
+        tools:ignore="TextSizeCheck">
+
+        <TextView
+            android:id="@+id/textViewBubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="4dp"
+            android:text="@string/textview_click_for_connect_text"
+            android:textAlignment="center"
+            android:textSize="6sp"
+            tools:ignore="SmallSp,TextContrastCheck" />
+
+    </com.daasuu.bl.BubbleLayout>
+
+<TextView
     android:id="@+id/textViewAdapter"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,3 +49,4 @@
     android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
     android:textAppearance="?android:attr/textAppearanceListItem"
     app:drawableStartCompat="@drawable/baseline_rss_feed_24" />
+</FrameLayout>
