@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<FrameLayout android:layout_width="match_parent"
+<FrameLayout
+    android:id="@+id/frameLayoutMain"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.daasuu.bl.BubbleLayout
+        android:id="@+id/layoutBubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end | center"
@@ -21,11 +24,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.056"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonDoubleDevice"
         tools:ignore="TextSizeCheck">
 
         <TextView
-            android:id="@+id/textViewBubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -37,16 +38,17 @@
 
     </com.daasuu.bl.BubbleLayout>
 
-<TextView
-    android:id="@+id/textViewAdapter"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:drawablePadding="0dp"
-    android:textColor="@color/left_device_slider"
-    android:gravity="center"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-    android:textAppearance="?android:attr/textAppearanceListItem"
-    app:drawableStartCompat="@drawable/baseline_rss_feed_24" />
+    <TextView
+        android:id="@+id/textViewAdapter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:drawablePadding="0dp"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:gravity="start | center"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:textColor="@color/left_device_slider"
+        app:drawableStartCompat="@drawable/baseline_rss_feed_24" />
 </FrameLayout>

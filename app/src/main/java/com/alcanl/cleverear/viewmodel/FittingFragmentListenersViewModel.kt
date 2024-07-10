@@ -49,4 +49,12 @@ class FittingFragmentListenersViewModel(fragment: FittingFragment) {
     {
         mWeakReference.get()?.burnButtonsClicked(view as AppCompatButton)
     }
+    fun handleMemoryRetentionCheckedChanged()
+    {
+        mWeakReference.get()?.memoryRetentionCheckedChanged()
+    }
+    fun handleVolumeRetentionCheckedChanged()
+    {
+        mWeakReference.get()?.volumeRetentionCheckedChanged()
+    }
 }

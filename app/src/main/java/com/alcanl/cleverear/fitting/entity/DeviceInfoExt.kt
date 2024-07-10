@@ -4,7 +4,9 @@ import com.alcanl.cleverear.api.dto.HearingAidDTO
 import com.alcanl.cleverear.fitting.WIDE_BAND_GAIN
 import com.alcanl.cleverear.fitting.isEqualizerEnabled
 import com.alcanl.cleverear.fitting.isFeedbackCancelerEnabled
+import com.alcanl.cleverear.fitting.isMemoryRetentionEnabled
 import com.alcanl.cleverear.fitting.isNoiseReductionEnabled
+import com.alcanl.cleverear.fitting.isVolumeRetentionEnabled
 import com.alcanl.cleverear.fitting.readIntParameter
 import com.ark.DeviceInfo
 import com.ark.Library
@@ -26,5 +28,7 @@ data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
     fun isNoiseReductionEnabled() = product?.isNoiseReductionEnabled(hearingAidDTO!!) ?: false
     fun isFeedbackCancelerEnabled() = product?.isFeedbackCancelerEnabled() ?: false
     fun getProductWideBandValue() = product?.readIntParameter(WIDE_BAND_GAIN) ?: 17
+    fun isMemoryRetentionEnabled() = product?.isMemoryRetentionEnabled() ?: false
+    fun isVolumeRetentionEnabled() = product?.isVolumeRetentionEnabled() ?: false
 
 }

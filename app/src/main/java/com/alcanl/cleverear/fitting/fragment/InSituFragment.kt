@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
 import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
+import com.ark.ArkException
 import com.ark.Manufacturing
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Description
@@ -98,10 +100,15 @@ class InSituFragment : Fragment() {
         initialize()
         return mBinding.root
     }
-    override fun onDestroy()
+
+    override fun onPause()
     {
-        super.onDestroy()
-        manufacturing.prepareDeviceForModeling(false)
+        try {
+            manufacturing.prepareDeviceForModeling(false)
+        } catch (ex: ArkException) {
+            Log.e("onPause", ex.message!!)
+        }
+        super.onPause()
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
@@ -252,7 +259,11 @@ class InSituFragment : Fragment() {
 
     fun earSideButtonClicked(earSide: EarSide)
     {
-        manufacturing.prepareDeviceForModeling(false)
+        try {
+            manufacturing.prepareDeviceForModeling(false)
+        } catch (ex: ArkException) {
+            Log.e("earSideButtonClicked", ex.message!!)
+        }
 
         fittingConfig.apply {
             selectedEarSide = earSide
@@ -336,24 +347,30 @@ class InSituFragment : Fragment() {
     }
     fun dialogPositiveButtonClicked()
     {
-        if (mFrequencyIndex == frequencyArray.size - 1) {
-            manufacturing.prepareDeviceForModeling(false)
-            mFrequencyIndex = 0
+        try {
+            if (mFrequencyIndex == frequencyArray.size - 1) {
+                manufacturing.prepareDeviceForModeling(false)
+                mFrequencyIndex = 0
+                mDecibelIndex = 2
+                mDialog.dismiss()
+                return
+            }
+            inSituResultMap[frequencyArray[mFrequencyIndex++].toFloat()] =
+                decibelArray[mDecibelIndex].toFloat()
             mDecibelIndex = 2
-            mDialog.dismiss()
-            return
-        }
-        inSituResultMap[frequencyArray[mFrequencyIndex++].toFloat()] = decibelArray[mDecibelIndex].toFloat()
-        mDecibelIndex = 2
-        changeText(mBinding.textViewFrequency, frequencyArray[mFrequencyIndex])
-        changeText(mBinding.textViewDecibel, decibelArray[mDecibelIndex])
+            changeText(mBinding.textViewFrequency, frequencyArray[mFrequencyIndex])
+            changeText(mBinding.textViewDecibel, decibelArray[mDecibelIndex])
 
-        mDialog.apply {
-            updateDialogText(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
-            dismiss()
-        }
+            mDialog.apply {
+                updateDialogText(frequencyArray[mFrequencyIndex], decibelArray[mDecibelIndex])
+                dismiss()
+            }
 
-        mHandler.postDelayed(this::playSoundButtonClicked, 1000)
+            mHandler.postDelayed(this::playSoundButtonClicked, 1000)
+
+        } catch (ex: Throwable) {
+            Log.e("dialogPositiveButtonClicked", ex.message!!)
+        }
 
     }
     fun dialogNegativeButtonClicked()

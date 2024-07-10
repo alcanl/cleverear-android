@@ -91,7 +91,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         android:id="@+id/frameLayoutDeviceMac"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="35dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/ap_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -115,7 +115,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceMac : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceMac}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
     </FrameLayout>
 
     <FrameLayout
@@ -134,7 +134,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@string/textview_device_model"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -145,7 +145,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceModelName : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceModelName}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
     </FrameLayout>
 
     <FrameLayout
@@ -164,7 +164,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@string/textview_library_id"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -175,7 +175,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceLibraryId : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceLibraryId}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
     </FrameLayout>
 
     <FrameLayout
@@ -194,7 +194,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@string/textview_firmware_id"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -205,7 +205,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceFirmwareId : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceFirmwareId}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
     </FrameLayout>
 
     <FrameLayout
@@ -224,7 +224,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@string/textview_firmware_version"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -235,7 +235,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:text="@{config.INSTANCE.selectedEarSide == EarSide.Left ? config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).deviceFirmwareVersion : config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).deviceFirmwareVersion}"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
     </FrameLayout>
 
     <ImageView

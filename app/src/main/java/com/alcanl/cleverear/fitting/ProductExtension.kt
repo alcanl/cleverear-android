@@ -9,6 +9,8 @@ import com.ark.Parameter
 import com.ark.ParameterSpace
 import com.ark.Product
 
+const val VOLUME_RETENTION_ENABLE = "X_VolumeRetention_Enable"
+const val MEMORY_RETENTION_ENABLE = "X_MemoryRetention_Enable"
 const val WDRC_ENABLE = "X_WDRC_Enable"
 const val EQ_ENABLE = "X_EQ_Enable"
 const val WDRC_CROSSOVER_FREQUENCY = "X_WDRC_CrossoverFrequency[%d]"
@@ -241,6 +243,30 @@ fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean
 fun Product.setWideBandGain(value: Int)
 {
     setParameter(WIDE_BAND_GAIN, value)
+}
+fun Product.isMemoryRetentionEnabled() : Boolean
+{
+    return readIntParameter(MEMORY_RETENTION_ENABLE) == 1
+}
+fun Product.isVolumeRetentionEnabled() : Boolean
+{
+    return readIntParameter(VOLUME_RETENTION_ENABLE) == 1
+}
+fun Product.enableMemoryRetention()
+{
+    setParameter(MEMORY_RETENTION_ENABLE, 1)
+}
+fun Product.enableVolumeRetention()
+{
+    setParameter(VOLUME_RETENTION_ENABLE, 1)
+}
+fun Product.disableMemoryRetention()
+{
+    setParameter(MEMORY_RETENTION_ENABLE, 0)
+}
+fun Product.disableVolumeRetention()
+{
+    setParameter(VOLUME_RETENTION_ENABLE, 0)
 }
 
 

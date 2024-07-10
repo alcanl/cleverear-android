@@ -19,10 +19,14 @@ import com.alcanl.cleverear.fitting.burnChangesToAllMemories
 import com.alcanl.cleverear.fitting.burnChangesToMemory
 import com.alcanl.cleverear.fitting.disableEqualizer
 import com.alcanl.cleverear.fitting.disableFeedBackCanceler
+import com.alcanl.cleverear.fitting.disableMemoryRetention
 import com.alcanl.cleverear.fitting.disableNoiseReduction
+import com.alcanl.cleverear.fitting.disableVolumeRetention
 import com.alcanl.cleverear.fitting.enableEqualizer
 import com.alcanl.cleverear.fitting.enableFeedBackCanceler
+import com.alcanl.cleverear.fitting.enableMemoryRetention
 import com.alcanl.cleverear.fitting.enableNoiseReduction
+import com.alcanl.cleverear.fitting.enableVolumeRetention
 import com.alcanl.cleverear.fitting.setWideBandGain
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
@@ -31,11 +35,14 @@ import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
 import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
 import com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel
 import com.ark.ParameterSpace
+import com.skydoves.powerspinner.IconSpinnerAdapter
 import com.skydoves.powerspinner.IconSpinnerItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
@@ -73,7 +80,7 @@ class FittingFragment : Fragment() {
     }
     private fun initializeSelectedMemory()
     {
-        mSelectedMemory = ParameterSpace.value(mBinding.selectedPosition - 1)
+        mSelectedMemory = ParameterSpace.value(mBinding.spinnerMemory.selectedIndex)
     }
     private fun initializeEqualizer()
     {
@@ -87,24 +94,25 @@ class FittingFragment : Fragment() {
     }
     private fun initializeSpinnerAdapter(memoryCount: Int)
     {
-        threadPool.execute {
-            try {
-                mBinding.apply {
-                    val iconAdapterList = ArrayList<IconSpinnerItem>(memoryCount)
-                    val itemArray = resources.getStringArray(R.array.programs)
+        try {
+            mBinding.apply {
+                spinnerMemory.setSpinnerAdapter(IconSpinnerAdapter(spinnerMemory))
+                val iconAdapterList = ArrayList<IconSpinnerItem>(memoryCount)
+                val itemArray = resources.getStringArray(R.array.programs)
 
-                    (0..< memoryCount).forEach {
-                        iconAdapterList.add(IconSpinnerItem(text = itemArray[it]))
-                    }
-                    spinnerMemory.setItems(iconAdapterList)
-
-                    selectedPosition = if (fittingConfig.isLeftButtonSelected)
-                        fittingConfig.deviceInfoExtMap[EarSide.Left]?.product?.currentMemory?.value()!! else
-                        fittingConfig.deviceInfoExtMap[EarSide.Right]?.product?.currentMemory?.value()!!
+                (0..< memoryCount).forEach {
+                    iconAdapterList.add(IconSpinnerItem(text = itemArray[it]))
                 }
-            } catch (ex: Throwable) {
-                Log.e("initializeSpinnerAdapter", ex.message!!)
+                spinnerMemory.setItems(iconAdapterList)
+
+                spinnerMemory.selectItemByIndex(if (fittingConfig.isLeftButtonSelected)
+                    fittingConfig.deviceInfoExtMap[EarSide.Left]?.product?.currentMemory?.value()!! else fittingConfig.deviceInfoExtMap[EarSide.Right]?.product?.currentMemory?.value()!!)
+
+                spinnerMemory.lifecycleOwner = this@FittingFragment
+
             }
+        } catch (ex: Throwable) {
+            Log.e("initializeSpinnerAdapter", ex.message!!)
         }
     }
     private fun initializeSpinner()
@@ -191,6 +199,9 @@ class FittingFragment : Fragment() {
     {
         mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
         mBinding.invalidateAll()
+        runBlocking {
+            delay(1500)
+        }
         mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
     }
 
@@ -202,14 +213,14 @@ class FittingFragment : Fragment() {
             when (msg.what) {
                 27 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutMain.isEnabled = true
-                        constraintLayoutLoading.visibility = View.GONE
+                        constraintLayoutMain.isEnabled = false
+                        constraintLayoutLoading.visibility = View.VISIBLE
                     }
                 }
                 28 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutMain.isEnabled = false
-                        constraintLayoutLoading.visibility = View.VISIBLE
+                        constraintLayoutMain.isEnabled = true
+                        constraintLayoutLoading.visibility = View.GONE
                     }
                 }
                 29 -> mWeakReference.get()?.let {
@@ -267,7 +278,7 @@ class FittingFragment : Fragment() {
             try {
                 mBinding.checkBoxEqualizer.apply {
                     fittingConfig.apply {
-                        if (isChecked) {
+                        if (!isChecked) {
                             mHandler.sendEmptyMessage(WHAT_DISABLE_EQUALIZER_SLIDERS)
                             deviceInfoExtMap[selectedEarSide]?.let {
                                 it.product?.disableEqualizer(mSelectedMemory)
@@ -293,7 +304,7 @@ class FittingFragment : Fragment() {
             try {
                 mBinding.checkBoxNoiseReduction.apply {
                     fittingConfig.apply {
-                        if (isChecked)
+                        if (!isChecked)
                             deviceInfoExtMap[selectedEarSide]?.let {
                                 it.product?.disableNoiseReduction(it.hearingAidDTO!!)
                             }
@@ -315,7 +326,7 @@ class FittingFragment : Fragment() {
             try {
                 mBinding.checkBoxFeedbackCanceler.apply {
                     fittingConfig.apply {
-                        if (isChecked)
+                        if (!isChecked)
                             deviceInfoExtMap[selectedEarSide]?.product?.disableFeedBackCanceler()
                         else
                             deviceInfoExtMap[selectedEarSide]?.product?.enableFeedBackCanceler()
@@ -348,9 +359,47 @@ class FittingFragment : Fragment() {
     fun spinnerItemSelected(pos: Int)
     {
         mSelectedMemory = ParameterSpace.value(pos)
-        mBinding.selectedPosition = pos
+        configuration.hearingAidMap[fittingConfig.selectedEarSide]
+            ?.wirelessControl?.currentMemory = ParameterSpace.value(pos)
+
         threadPool.execute(this::invalidateBindingsCallback)
 
+    }
+    fun memoryRetentionCheckedChanged()
+    {
+        threadPool.execute {
+            try {
+                mBinding.checkBoxMemoryRetention.apply {
+                    fittingConfig.apply {
+                        if (!isChecked)
+                            deviceInfoExtMap[selectedEarSide]?.product?.disableMemoryRetention()
+                        else
+                            deviceInfoExtMap[selectedEarSide]?.product?.enableMemoryRetention()
+                    }
+                }
+
+            } catch (ex: Throwable) {
+                Log.e("feedbackCancelerCheckedChanged", ex.message!!)
+            }
+        }
+    }
+    fun volumeRetentionCheckedChanged()
+    {
+        threadPool.execute {
+            try {
+                mBinding.checkBoxVolumeRetention.apply {
+                    fittingConfig.apply {
+                        if (!isChecked)
+                            deviceInfoExtMap[selectedEarSide]?.product?.disableVolumeRetention()
+                        else
+                            deviceInfoExtMap[selectedEarSide]?.product?.enableVolumeRetention()
+                    }
+                }
+
+            } catch (ex: Throwable) {
+                Log.e("feedbackCancelerCheckedChanged", ex.message!!)
+            }
+        }
     }
 
 }

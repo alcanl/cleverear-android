@@ -73,6 +73,8 @@
     <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
     <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="checkbox_memory_retention_text" translatable="true">Program Hafızası</string>
+    <string name="checkbox_volume_retention_text" translatable="true">Ses Hafızası</string>
     <string name="textview_click_for_connect_text" translatable="true">Bağlanmak İçin Tıkla</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Sonucu Galeriye Kaydedildi</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Sinyal Sesini Duyuyor Musunuz?</string>

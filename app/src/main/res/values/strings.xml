@@ -161,6 +161,8 @@
     <string name="button_burn_text" translatable="true">Burn</string>
     <string name="button_burn_to_all_text" translatable="true">Burn To All</string>
     <string name="textview_click_for_connect_text" translatable="true">Click For Connect</string>
+    <string name="checkbox_memory_retention_text" translatable="true">Memory Retention</string>
+    <string name="checkbox_volume_retention_text" translatable="true">Volume Retention</string>
 
     <string-array name="programs">
         <item>Program 1</item>
