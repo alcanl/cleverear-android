@@ -49,7 +49,7 @@
         tools:ignore="DiscouragedApi">
         <activity
             android:name=".RemoteFittingActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".AutoConnectActivity"
             android:exported="true" />

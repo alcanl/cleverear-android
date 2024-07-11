@@ -88,6 +88,7 @@
     <string name="textview_device_model" translatable="true"><u>Device Model</u></string>
     <string name="textview_library_id" translatable="true"><u>Library Id</u></string>
     <string name="textview_firmware_id" translatable="true"><u>Firmware Id</u></string>
+    <string name="dialog_textview_unsaved_fitting_text" translatable="true">There is unsaved fitting changes. Do you want to burn changes before continue?</string>
     <string name="textview_firmware_version" translatable="true"><u>Firmware Version</u></string>
     <string name="alert_dialog_connection_problem_title" translatable="true">Warning</string>
     <string name="alert_dialog_connection_problem_ok_button" translatable="true">OK</string>
@@ -163,6 +164,7 @@
     <string name="textview_click_for_connect_text" translatable="true">Click For Connect</string>
     <string name="checkbox_memory_retention_text" translatable="true">Memory Retention</string>
     <string name="checkbox_volume_retention_text" translatable="true">Volume Retention</string>
+    <string name="textview_insitu_warning_text" translatable="true">This test has been designed just for information and device configuration and is not a substitute for official health organizations hearing tests.</string>
 
     <string-array name="programs">
         <item>Program 1</item>

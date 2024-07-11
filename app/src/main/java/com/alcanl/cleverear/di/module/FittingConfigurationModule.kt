@@ -14,8 +14,6 @@ object FittingConfigurationModule {
     var selectedEarSide : EarSide = EarSide.Left
     var deviceInfoExtMap: MutableMap<EarSide, DeviceInfoExt> = mutableMapOf()
     var isBinauralConnection = false
-    var isLeftButtonSelected = false
-    var isRightButtonSelected = false
     val isInitializeCompleted : Boolean
         get(){
             return if (deviceInfoExtMap.all { it.value.product != null })

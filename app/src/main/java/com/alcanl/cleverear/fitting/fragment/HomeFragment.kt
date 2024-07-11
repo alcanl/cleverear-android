@@ -83,7 +83,6 @@ class HomeFragment : Fragment() {
     }
     override fun onResume()
     {
-        super.onResume()
         if (fittingConfig.isInitializeCompleted) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
@@ -95,6 +94,8 @@ class HomeFragment : Fragment() {
         }
         else
             initializeProduct()
+
+        super.onResume()
     }
     private fun initialize()
     {
@@ -237,8 +238,7 @@ class HomeFragment : Fragment() {
         {
             mWeakReference.get()?.let {
                 with(it.fittingConfig) {
-                    isLeftButtonSelected = earSide == EarSide.Left
-                    isRightButtonSelected = earSide == EarSide.Right
+                    selectedEarSide = earSide
                     deviceInfoExtMap[earSide]?.isInitFinished = true
                 }
                 it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
@@ -289,13 +289,9 @@ class HomeFragment : Fragment() {
     fun commonEarButtonsClicked(earSide: EarSide)
     {
         mBinding.hideFrames()
+        fittingConfig.selectedEarSide = earSide
 
         threadPool.execute {
-            fittingConfig.apply {
-                selectedEarSide = earSide
-                isRightButtonSelected = earSide == EarSide.Right
-                isLeftButtonSelected = earSide == EarSide.Left
-            }
             try {
                 activity?.runOnUiThread { mBinding.hideFrames() }
                 mBinding.invalidateAll()

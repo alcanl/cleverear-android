@@ -23,11 +23,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.RemoteFittingActivity
 import com.alcanl.cleverear.databinding.FragmentInSituBinding
 import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
 import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
+import com.alcanl.cleverear.fitting.event.InSituEvent
+import com.alcanl.cleverear.fitting.event.listener.InSituFragmentListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_BINDING
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_CHART
@@ -52,6 +55,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -61,7 +67,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class InSituFragment : Fragment() {
+class InSituFragment : Fragment(), InSituFragmentListener {
     @Inject
     lateinit var fittingConfig : FittingConfigurationModule
     @Inject
@@ -84,12 +90,13 @@ class InSituFragment : Fragment() {
     lateinit var lineData: LineData
     @Inject
     lateinit var inSituResultMap: MutableMap<Float, Float>
-
-    private var mFrequencyIndex = 0
-    private var mDecibelIndex = 2
-    private lateinit var mDialog: CustomDialogInSituSoundCheck
+    private val mDialog: CustomDialogInSituSoundCheck by lazy {
+        CustomDialogInSituSoundCheck(this)
+    }
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
+    private var mFrequencyIndex = 0
+    private var mDecibelIndex = 2
 
 
     override fun onCreateView(
@@ -101,6 +108,17 @@ class InSituFragment : Fragment() {
         return mBinding.root
     }
 
+    override fun onStart()
+    {
+        EventBus.getDefault().register(this)
+        super.onStart()
+    }
+
+    override fun onStop()
+    {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
     override fun onPause()
     {
         try {
@@ -122,12 +140,17 @@ class InSituFragment : Fragment() {
         }
         initializeChart()
     }
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: InSituEvent)
+    {
+        saveButtonClicked()
+    }
+
     private fun initialize()
     {
         mBinding.viewModel = InSituFragmentListenersViewModel(this)
         mBinding.config = fittingConfig
         mHandler = InSituHandler(this)
-        mDialog = CustomDialogInSituSoundCheck(this)
         threadPool.execute { initializeDeviceForInSituTest() }
     }
     private fun initializeDeviceForInSituTest() {
@@ -142,13 +165,13 @@ class InSituFragment : Fragment() {
     private fun initializeChart()
     {
         lineDataSet.apply {
-            setColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
-            setValueTextColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
+            setColor(context?.getColor(if (fittingConfig.selectedEarSide == EarSide.Left) R.color.left_device_slider else R.color.right_device_slider)!!)
+            setValueTextColor(context?.getColor(if (fittingConfig.selectedEarSide == EarSide.Left) R.color.left_device_slider else R.color.right_device_slider)!!)
             setDrawCircles(true)
             setDrawValues(true)
             circleRadius = 5F
             setDrawCircleHole(false)
-            setCircleColor(context?.getColor(if (fittingConfig.isLeftButtonSelected) R.color.left_device_slider else R.color.right_device_slider)!!)
+            setCircleColor(context?.getColor(if (fittingConfig.selectedEarSide == EarSide.Left) R.color.left_device_slider else R.color.right_device_slider)!!)
             mode= LineDataSet.Mode.LINEAR
         }
 
@@ -265,11 +288,7 @@ class InSituFragment : Fragment() {
             Log.e("earSideButtonClicked", ex.message!!)
         }
 
-        fittingConfig.apply {
-            selectedEarSide = earSide
-            isRightButtonSelected = earSide == EarSide.Right
-            isLeftButtonSelected = earSide == EarSide.Left
-        }
+        fittingConfig.selectedEarSide = earSide
 
         threadPool.apply {
             execute {
@@ -284,6 +303,7 @@ class InSituFragment : Fragment() {
     @OptIn(DelicateCoroutinesApi::class)
     fun playSoundButtonClicked()
     {
+        (activity as RemoteFittingActivity).isInSituInProgress = true
         mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         GlobalScope.launch {
             try {
@@ -335,6 +355,8 @@ class InSituFragment : Fragment() {
     @OptIn(DelicateCoroutinesApi::class)
     fun saveButtonClicked()
     {
+        (activity as RemoteFittingActivity).isInSituInProgress = false
+
         GlobalScope.launch {
             saveMediaToStorage(mBinding.lineChart.chartBitmap)
         }

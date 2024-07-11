@@ -18,12 +18,6 @@
         tools:layout="@layout/fragment_in_situ" />
 
     <fragment
-        android:id="@+id/navbar_remote_configuration"
-        android:name="com.alcanl.cleverear.fitting.fragment.RemoteConfigurationFragment"
-        android:label="Audiogram"
-        tools:layout="@layout/fragment_remote_configuration" />
-
-    <fragment
         android:id="@+id/navbar_fitting"
         android:name="com.alcanl.cleverear.fitting.fragment.FittingFragment"
         android:label="Fitting"

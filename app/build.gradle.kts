@@ -71,6 +71,7 @@ android {
 }
 
 dependencies {
+    implementation("org.greenrobot:eventbus:3.3.1")
     implementation("com.github.MasayukiSuda:BubbleLayout:v1.2.2")
     implementation("com.github.skydoves:powerspinner:1.2.7")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")

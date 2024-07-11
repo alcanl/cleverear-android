@@ -30,7 +30,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutSoundGenerate">
 
         <FrameLayout
             android:id="@+id/frameLayoutLeftEar"
@@ -51,7 +52,7 @@
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="14dp"
                 android:translationZ="90dp"
-                android:visibility="@{config.INSTANCE.leftButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                android:visibility="@{config.INSTANCE.selectedEarSide == EarSide.Left ? View.VISIBLE : View.INVISIBLE}"
                 app:srcCompat="@drawable/check_tick"
                 tools:ignore="ContentDescription,ImageContrastCheck" />
 
@@ -61,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom | center"
-                android:backgroundTint="@{config.INSTANCE.leftButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                android:backgroundTint="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
                 android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
                 android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Left)}"
                 android:text="@string/left_ear_side_text"
@@ -88,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom | center"
-                android:backgroundTint="@{config.INSTANCE.rightButtonSelected ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
+                android:backgroundTint="@{config.INSTANCE.selectedEarSide == EarSide.Right ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
                 android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
                 android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Right)}"
                 android:text="@string/right_ear_side_text"
@@ -103,7 +104,7 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="14dp"
                 android:translationZ="90dp"
-                android:visibility="@{config.INSTANCE.rightButtonSelected ? View.VISIBLE : View.INVISIBLE}"
+                android:visibility="@{config.INSTANCE.selectedEarSide == EarSide.Right ? View.VISIBLE : View.INVISIBLE}"
                 app:srcCompat="@drawable/check_tick"
                 tools:ignore="ContentDescription,ImageContrastCheck" />
         </FrameLayout>
@@ -117,7 +118,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutChart">
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout">
 
 
         <Button
@@ -312,7 +313,7 @@
         android:id="@+id/constraintLayoutChart"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayoutSoundGenerate"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayoutHeader">
@@ -321,13 +322,39 @@
             android:id="@+id/lineChart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayoutSoundGenerate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutChart">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/textview_insitu_warning_text"
+            android:textAlignment="center"
+            android:textColor="@color/ap_black"
+            android:textSize="8sp"
+            tools:ignore="SmallSp,VisualLintLongText" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

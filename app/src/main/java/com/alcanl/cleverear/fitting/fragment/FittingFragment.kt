@@ -12,6 +12,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.RemoteFittingActivity
 import com.alcanl.cleverear.databinding.FragmentFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
@@ -27,12 +28,15 @@ import com.alcanl.cleverear.fitting.enableFeedBackCanceler
 import com.alcanl.cleverear.fitting.enableMemoryRetention
 import com.alcanl.cleverear.fitting.enableNoiseReduction
 import com.alcanl.cleverear.fitting.enableVolumeRetention
+import com.alcanl.cleverear.fitting.event.FittingEvent
+import com.alcanl.cleverear.fitting.event.listener.FittingFragmentListener
 import com.alcanl.cleverear.fitting.setWideBandGain
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_ENABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
 import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
+import com.alcanl.cleverear.util.extension.handleFittingCheckedChanged
 import com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel
 import com.ark.ParameterSpace
 import com.skydoves.powerspinner.IconSpinnerAdapter
@@ -43,13 +47,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class FittingFragment : Fragment() {
+class FittingFragment : Fragment(), FittingFragmentListener {
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
     @Inject
@@ -69,6 +76,20 @@ class FittingFragment : Fragment() {
         initialize()
         return mBinding.root
     }
+    override fun onStart()
+    {
+        EventBus.getDefault().register(this)
+        super.onStart()
+    }
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: FittingEvent)
+    {
+        burnParametersToAllMemories()
+    }
 
     private fun initialize()
     {
@@ -85,12 +106,8 @@ class FittingFragment : Fragment() {
     private fun initializeEqualizer()
     {
         mBinding.isEqualizerEnabled = with(fittingConfig) {
-            if (isLeftButtonSelected)
-                deviceInfoExtMap[EarSide.Left]?.isEqualizerEnabled()!!
-            else
-                deviceInfoExtMap[EarSide.Right]?.isEqualizerEnabled()!!
+            deviceInfoExtMap[selectedEarSide]?.isEqualizerEnabled()!!
         }
-
     }
     private fun initializeSpinnerAdapter(memoryCount: Int)
     {
@@ -105,8 +122,10 @@ class FittingFragment : Fragment() {
                 }
                 spinnerMemory.setItems(iconAdapterList)
 
-                spinnerMemory.selectItemByIndex(if (fittingConfig.isLeftButtonSelected)
-                    fittingConfig.deviceInfoExtMap[EarSide.Left]?.product?.currentMemory?.value()!! else fittingConfig.deviceInfoExtMap[EarSide.Right]?.product?.currentMemory?.value()!!)
+                spinnerMemory.selectItemByIndex(
+                    with(fittingConfig) {
+                        deviceInfoExtMap[selectedEarSide]?.product?.currentMemory?.value() ?: 1
+                    })
 
                 spinnerMemory.lifecycleOwner = this@FittingFragment
 
@@ -118,15 +137,9 @@ class FittingFragment : Fragment() {
     private fun initializeSpinner()
     {
         val memoryCount = with(configuration) {
-            if (isDoubleDeviceConnection)
-                with(fittingConfig) {
-                    if (isLeftButtonSelected)
-                        hearingAidMap[EarSide.Left]?.numberOfMemories ?: 8
-                    else
-                        hearingAidMap[EarSide.Right]?.numberOfMemories ?: 8
-                }
-            else
-                hearingAidMap[fittingConfig.selectedEarSide]?.numberOfMemories ?: 8
+            with(fittingConfig) {
+                hearingAidMap[selectedEarSide]?.numberOfMemories ?: 8
+            }
         }
 
         initializeSpinnerAdapter(memoryCount)
@@ -135,6 +148,7 @@ class FittingFragment : Fragment() {
     @Synchronized
     private fun wideBandSliderValueChangedCallback(value: Int)
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         try {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
@@ -152,13 +166,8 @@ class FittingFragment : Fragment() {
         GlobalScope.launch {
             try {
                 mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
-                with(fittingConfig) {
-                    if (selectedEarSide == EarSide.Left)
-                        deviceInfoExtMap[EarSide.Left]?.product?.burnChangesToMemory(mSelectedMemory)
-                    else
-                        deviceInfoExtMap[EarSide.Right]?.product?.burnChangesToMemory(
-                            mSelectedMemory
-                        )
+                fittingConfig.apply {
+                    deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToMemory(mSelectedMemory)
                 }
                 mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
             } catch (ex: Throwable) {
@@ -173,20 +182,9 @@ class FittingFragment : Fragment() {
             try {
                 mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
                 with(fittingConfig) {
-                    if (selectedEarSide == EarSide.Left)
-                        deviceInfoExtMap[EarSide.Left]?.product?.burnChangesToAllMemories(
-                            if (configuration.isDoubleDeviceConnection)
-                                configuration.hearingAidMap[EarSide.Left]!!
-                            else
-                                configuration.hearingAidMap[selectedEarSide]!!
-                        )
-                    else
-                        deviceInfoExtMap[EarSide.Right]?.product?.burnChangesToAllMemories(
-                            if (configuration.isDoubleDeviceConnection)
-                                configuration.hearingAidMap[EarSide.Right]!!
-                            else
-                                configuration.hearingAidMap[selectedEarSide]!!
-                        )
+                    deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToAllMemories(
+                        configuration.hearingAidMap[selectedEarSide]!!
+                    )
                 }
                 mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
             } catch (ex: Throwable) {
@@ -248,6 +246,7 @@ class FittingFragment : Fragment() {
         {
             TODO("Not Implemented Yet")
         }
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         handleSynchronized()
     }
     fun equalizerMidSliderValueChanged(value: Float)
@@ -257,6 +256,7 @@ class FittingFragment : Fragment() {
         {
             TODO("Not Implemented Yet")
         }
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         handleSynchronized()
     }
     fun equalizerTrebleSliderValueChanged(value: Float)
@@ -266,6 +266,7 @@ class FittingFragment : Fragment() {
         {
             TODO("Not Implemented Yet")
         }
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         handleSynchronized()
     }
     fun wideBandSliderValueChanged(value: Float)
@@ -274,72 +275,47 @@ class FittingFragment : Fragment() {
     }
     fun equalizerCheckedChanged()
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute {
-            try {
-                mBinding.checkBoxEqualizer.apply {
-                    fittingConfig.apply {
-                        if (!isChecked) {
-                            mHandler.sendEmptyMessage(WHAT_DISABLE_EQUALIZER_SLIDERS)
-                            deviceInfoExtMap[selectedEarSide]?.let {
-                                it.product?.disableEqualizer(mSelectedMemory)
-                            }
-                        }
-                        else {
-                            mHandler.sendEmptyMessage(WHAT_ENABLE_EQUALIZER_SLIDERS)
-                            deviceInfoExtMap[selectedEarSide]?.let {
-                                it.product?.enableEqualizer(mSelectedMemory)
-                            }
-                        }
-                    }
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    mBinding.checkBoxEqualizer.handleFittingCheckedChanged(
+                        { mHandler.sendEmptyMessage(WHAT_DISABLE_EQUALIZER_SLIDERS)
+                            it.product?.disableEqualizer(mSelectedMemory)  },
+                        { mHandler.sendEmptyMessage(WHAT_ENABLE_EQUALIZER_SLIDERS)
+                            it.product?.enableEqualizer(mSelectedMemory) })
                 }
-
-            } catch (ex: Throwable) {
-                Log.e("equalizerCheckedChange", ex.message!!)
             }
         }
     }
     fun noiseReductionCheckedChanged()
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute {
-            try {
-                mBinding.checkBoxNoiseReduction.apply {
-                    fittingConfig.apply {
-                        if (!isChecked)
-                            deviceInfoExtMap[selectedEarSide]?.let {
-                                it.product?.disableNoiseReduction(it.hearingAidDTO!!)
-                            }
-                        else
-                            deviceInfoExtMap[selectedEarSide]?.let {
-                                it.product?.enableNoiseReduction(it.hearingAidDTO!!)
-                            }
-                    }
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    mBinding.checkBoxNoiseReduction.handleFittingCheckedChanged(
+                        { it.product?.disableNoiseReduction(it.hearingAidDTO!!) },
+                        { it.product?.enableNoiseReduction(it.hearingAidDTO!!) })
                 }
-
-            } catch (ex: Throwable) {
-                Log.e("noiseReductionCheckedChanged", ex.message!!)
             }
         }
     }
     fun feedbackCancelerCheckedChanged()
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute {
-            try {
-                mBinding.checkBoxFeedbackCanceler.apply {
-                    fittingConfig.apply {
-                        if (!isChecked)
-                            deviceInfoExtMap[selectedEarSide]?.product?.disableFeedBackCanceler()
-                        else
-                            deviceInfoExtMap[selectedEarSide]?.product?.enableFeedBackCanceler()
-                    }
-                }
-
-            } catch (ex: Throwable) {
-                Log.e("feedbackCancelerCheckedChanged", ex.message!!)
+            fittingConfig.apply {
+                mBinding.checkBoxFeedbackCanceler.handleFittingCheckedChanged(
+                    { deviceInfoExtMap[selectedEarSide]?.product?.disableFeedBackCanceler() },
+                    { deviceInfoExtMap[selectedEarSide]?.product?.enableFeedBackCanceler() })
             }
         }
     }
     fun burnButtonsClicked(button: AppCompatButton)
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = false
+
         if (button.id == mBinding.buttonBurn.id)
             burnParametersToSelectedMemory()
         else
@@ -347,12 +323,7 @@ class FittingFragment : Fragment() {
     }
     fun earSideButtonClicked(earSide: EarSide)
     {
-        fittingConfig.apply {
-            selectedEarSide = earSide
-            isRightButtonSelected = earSide == EarSide.Right
-            isLeftButtonSelected = earSide == EarSide.Left
-        }
-
+        fittingConfig.selectedEarSide = earSide
         threadPool.execute(this::invalidateBindingsCallback)
 
     }
@@ -367,39 +338,25 @@ class FittingFragment : Fragment() {
     }
     fun memoryRetentionCheckedChanged()
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute {
-            try {
-                mBinding.checkBoxMemoryRetention.apply {
-                    fittingConfig.apply {
-                        if (!isChecked)
-                            deviceInfoExtMap[selectedEarSide]?.product?.disableMemoryRetention()
-                        else
-                            deviceInfoExtMap[selectedEarSide]?.product?.enableMemoryRetention()
-                    }
-                }
+            fittingConfig.apply {
+                mBinding.checkBoxMemoryRetention.handleFittingCheckedChanged(
+                    { deviceInfoExtMap[selectedEarSide]?.product?.disableMemoryRetention() },
+                    { deviceInfoExtMap[selectedEarSide]?.product?.enableMemoryRetention() })
 
-            } catch (ex: Throwable) {
-                Log.e("feedbackCancelerCheckedChanged", ex.message!!)
             }
         }
     }
     fun volumeRetentionCheckedChanged()
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute {
-            try {
-                mBinding.checkBoxVolumeRetention.apply {
-                    fittingConfig.apply {
-                        if (!isChecked)
-                            deviceInfoExtMap[selectedEarSide]?.product?.disableVolumeRetention()
-                        else
-                            deviceInfoExtMap[selectedEarSide]?.product?.enableVolumeRetention()
-                    }
-                }
-
-            } catch (ex: Throwable) {
-                Log.e("feedbackCancelerCheckedChanged", ex.message!!)
+            fittingConfig.apply {
+                mBinding.checkBoxVolumeRetention.handleFittingCheckedChanged(
+                    { deviceInfoExtMap[selectedEarSide]?.product?.disableVolumeRetention() },
+                    { deviceInfoExtMap[selectedEarSide]?.product?.enableVolumeRetention() })
             }
         }
     }
-
 }
