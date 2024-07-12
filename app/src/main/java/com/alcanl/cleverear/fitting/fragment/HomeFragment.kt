@@ -118,6 +118,7 @@ class HomeFragment : Fragment() {
             if (product.ear == 0) {
                 deviceInfoExtMap[EarSide.Left] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                deviceInfoViewModelMap[EarSide.Left]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Left]!!)
                 with(mBinding) {
                     frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
@@ -128,6 +129,7 @@ class HomeFragment : Fragment() {
             else {
                 deviceInfoExtMap[EarSide.Right] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                deviceInfoViewModelMap[EarSide.Right]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Right]!!)
                 with(mBinding) {
                     frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
