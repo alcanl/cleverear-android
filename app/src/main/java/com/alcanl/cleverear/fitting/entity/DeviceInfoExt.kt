@@ -1,6 +1,9 @@
 package com.alcanl.cleverear.fitting.entity
 
 import com.alcanl.cleverear.api.dto.HearingAidDTO
+import com.alcanl.cleverear.fitting.getEqualizerBassValue
+import com.alcanl.cleverear.fitting.getEqualizerMidValue
+import com.alcanl.cleverear.fitting.getEqualizerTrebleValue
 import com.alcanl.cleverear.fitting.getWideBandGainValue
 import com.alcanl.cleverear.fitting.isEqualizerEnabled
 import com.alcanl.cleverear.fitting.isFeedbackCancelerEnabled
@@ -29,5 +32,7 @@ data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
     fun getProductWideBandValue() = product?.getWideBandGainValue() ?: 17
     fun isMemoryRetentionEnabled() = product?.isMemoryRetentionEnabled() ?: false
     fun isVolumeRetentionEnabled() = product?.isVolumeRetentionEnabled() ?: false
-
+    fun getProductEqualizerBassValue() = product?.getEqualizerBassValue(hearingAidDTO!!) ?: 20
+    fun getProductEqualizerMidValue() = product?.getEqualizerMidValue(hearingAidDTO!!) ?: 20
+    fun getProductEqualizerTrebleValue() = product?.getEqualizerTrebleValue(hearingAidDTO!!) ?: 20
 }

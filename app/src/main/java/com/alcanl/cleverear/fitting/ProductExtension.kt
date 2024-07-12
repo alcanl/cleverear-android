@@ -272,6 +272,18 @@ fun Product.getWideBandGainValue() : Int
 {
     return readIntParameter(WIDE_BAND_GAIN)
 }
+fun Product.getEqualizerBassValue(hearingAidDTO: HearingAidDTO) : Int
+{
+    TODO("Not Implemented Yet")
+}
+fun Product.getEqualizerMidValue(hearingAidDTO: HearingAidDTO) : Int
+{
+    TODO("Not Implemented Yet")
+}
+fun Product.getEqualizerTrebleValue(hearingAidDTO: HearingAidDTO) : Int
+{
+    TODO("Not Implemented Yet")
+}
 
 
 
