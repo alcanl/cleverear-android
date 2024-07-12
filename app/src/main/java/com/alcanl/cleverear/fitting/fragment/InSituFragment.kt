@@ -29,8 +29,8 @@ import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
 import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
-import com.alcanl.cleverear.fitting.event.InSituEvent
-import com.alcanl.cleverear.fitting.event.listener.InSituFragmentListener
+import com.alcanl.cleverear.fitting.event.EventObject
+import com.alcanl.cleverear.fitting.event.listener.FragmentListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_BINDING
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_CHART
@@ -67,7 +67,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class InSituFragment : Fragment(), InSituFragmentListener {
+class InSituFragment : Fragment(), FragmentListener {
     @Inject
     lateinit var fittingConfig : FittingConfigurationModule
     @Inject
@@ -140,8 +140,9 @@ class InSituFragment : Fragment(), InSituFragmentListener {
         }
         initializeChart()
     }
+
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: InSituEvent)
+    override fun onEventReceive(event: EventObject)
     {
         saveButtonClicked()
     }

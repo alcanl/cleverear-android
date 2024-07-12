@@ -176,6 +176,7 @@ fun Product.disableFeedBackCanceler()
 fun Product.burnChangesToMemory(memory: ParameterSpace)
 {
     this.writeParameters(ParameterSpace.value(memory.value()))
+    this.writeParameters(ParameterSpace.kSystemNvmMemory)
 }
 fun Product.burnChangesToAllMemories(hearingAid: HearingAid)
 {
@@ -237,7 +238,6 @@ fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean
         this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
             WDRC_NOISE_REDUCTION_ENABLE, it)).value == 1
     }
-
 }
 
 fun Product.setWideBandGain(value: Int)
@@ -267,6 +267,10 @@ fun Product.disableMemoryRetention()
 fun Product.disableVolumeRetention()
 {
     setParameter(VOLUME_RETENTION_ENABLE, 0)
+}
+fun Product.getWideBandGainValue() : Int
+{
+    return readIntParameter(WIDE_BAND_GAIN)
 }
 
 

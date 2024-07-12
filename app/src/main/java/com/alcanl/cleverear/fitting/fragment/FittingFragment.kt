@@ -28,8 +28,8 @@ import com.alcanl.cleverear.fitting.enableFeedBackCanceler
 import com.alcanl.cleverear.fitting.enableMemoryRetention
 import com.alcanl.cleverear.fitting.enableNoiseReduction
 import com.alcanl.cleverear.fitting.enableVolumeRetention
-import com.alcanl.cleverear.fitting.event.FittingEvent
-import com.alcanl.cleverear.fitting.event.listener.FittingFragmentListener
+import com.alcanl.cleverear.fitting.event.EventObject
+import com.alcanl.cleverear.fitting.event.listener.FragmentListener
 import com.alcanl.cleverear.fitting.setWideBandGain
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
@@ -37,6 +37,8 @@ import com.alcanl.cleverear.util.WHAT_ENABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
 import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
 import com.alcanl.cleverear.util.extension.handleFittingCheckedChanged
+import com.alcanl.cleverear.util.extension.setLayoutDisable
+import com.alcanl.cleverear.util.extension.setLayoutEnable
 import com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel
 import com.ark.ParameterSpace
 import com.skydoves.powerspinner.IconSpinnerAdapter
@@ -56,7 +58,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class FittingFragment : Fragment(), FittingFragmentListener {
+class FittingFragment : Fragment(), FragmentListener {
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
     @Inject
@@ -86,7 +88,7 @@ class FittingFragment : Fragment(), FittingFragmentListener {
         super.onStop()
     }
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: FittingEvent)
+    override fun onEventReceive(event: EventObject)
     {
         burnParametersToAllMemories()
     }
@@ -211,14 +213,14 @@ class FittingFragment : Fragment(), FittingFragmentListener {
             when (msg.what) {
                 27 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutMain.isEnabled = false
                         constraintLayoutLoading.visibility = View.VISIBLE
+                        constraintLayoutMain.setLayoutDisable()
                     }
                 }
                 28 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutMain.isEnabled = true
                         constraintLayoutLoading.visibility = View.GONE
+                        constraintLayoutMain.setLayoutEnable()
                     }
                 }
                 29 -> mWeakReference.get()?.let {

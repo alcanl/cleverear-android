@@ -71,6 +71,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.homayoonahmadi:GroupBoxLayout:1.2.0")
     implementation("org.greenrobot:eventbus:3.3.1")
     implementation("com.github.MasayukiSuda:BubbleLayout:v1.2.2")
     implementation("com.github.skydoves:powerspinner:1.2.7")

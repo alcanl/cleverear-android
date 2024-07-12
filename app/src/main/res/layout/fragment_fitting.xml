@@ -35,8 +35,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutBurn">
+            app:layout_constraintStart_toStartOf="parent">
 
             <FrameLayout
                 android:id="@+id/frameLayoutLeftEar"
@@ -128,71 +127,86 @@
             app:srcCompat="@drawable/eartechnic_logo"
             tools:ignore="ContentDescription" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayoutBurn"
-            android:layout_width="0dp"
+        <ir.programmerplus.groupbox.GroupBoxLayout
+            android:id="@+id/groupBoxLayout4"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/table_layout_border"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layoutDirection="ltr"
+            android:padding="8dp"
+            app:borderColor="#A8A3A3"
+            app:borderCornerRadius="8dp"
+            app:borderStrokeWidth="2.2dp"
+            app:labelText="Save Changes To The Device"
+            app:labelTextColor="@color/ap_black"
+            app:labelTextSize="10dp"
             app:layout_constraintBottom_toTopOf="@+id/constraintLayoutFooter"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutRetentions">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buttonBurn"
-                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-                android:layout_width="80dp"
-                android:layout_height="36dp"
-                android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
-                android:text="@string/button_burn_text"
-                android:textAllCaps="false"
-                android:textColor="@color/ap_black"
-                android:textSize="12sp"
-                app:cornerRadius="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.167"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.111"
-                app:strokeColor="@color/design_default_color_secondary_variant"
-                tools:ignore="TouchTargetSizeCheck" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/buttonBurnAll"
-                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-                android:layout_width="160dp"
-                android:layout_height="36dp"
-                android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
-                android:text="@string/button_burn_to_all_text"
-                android:textAllCaps="false"
-                android:textColor="@color/ap_black"
-                android:textSize="12sp"
-                app:cornerRadius="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.034"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonBurn"
-                app:layout_constraintVertical_bias="0.333"
-                app:strokeColor="@color/design_default_color_secondary_variant"
-                tools:ignore="TouchTargetSizeCheck,TextSizeCheck" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageViewSave"
-                android:layout_width="80dp"
-                android:layout_height="70dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/baseline_save_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/buttonBurn"
+                        style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                        android:layout_width="80dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center | top"
+                        android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
+                        android:text="@string/button_burn_text"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ap_black"
+                        android:textSize="12sp"
+                        app:cornerRadius="0dp"
+                        app:strokeColor="@color/design_default_color_secondary_variant"
+                        tools:ignore="TouchTargetSizeCheck" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/buttonBurnAll"
+                        style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                        android:layout_width="160dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:onClick="@{(view) -> viewModel.handleBurnButtonsClicked(view)}"
+                        android:text="@string/button_burn_to_all_text"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ap_black"
+                        android:textSize="12sp"
+                        app:cornerRadius="0dp"
+                        app:strokeColor="@color/design_default_color_secondary_variant"
+                        tools:ignore="TouchTargetSizeCheck,TextSizeCheck" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/imageViewSave"
+                        android:layout_width="80dp"
+                        android:layout_height="70dp"
+                        android:layout_gravity="center"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/baseline_save_24"
+                        tools:ignore="ContentDescription" />
+                </FrameLayout>
+
+            </LinearLayout>
+        </ir.programmerplus.groupbox.GroupBoxLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutEqualizer"
@@ -202,7 +216,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="10dp"
             android:background="@drawable/table_layout_border"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayoutFeedbackAndNoiseReduction"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -375,25 +389,33 @@
             app:spinner_popup_elevation="8dp"
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck,TextContrastCheck" />
 
-        <LinearLayout
-            android:id="@+id/linearLayoutWideBandGain"
-            android:layout_width="0dp"
+        <ir.programmerplus.groupbox.GroupBoxLayout
+            android:id="@+id/groupBoxLayout2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/table_layout_border"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayoutRetentions"
+            android:layoutDirection="ltr"
+            app:borderColor="#A8A3A3"
+            app:borderCornerRadius="8dp"
+            app:borderStrokeWidth="2.2dp"
+            app:labelText="@string/textview_wideband_text"
+            app:labelTextColor="@color/ap_black"
+            app:labelTextSize="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.476"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutFeedbackAndNoiseReduction">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout3">
 
             <com.google.android.material.slider.Slider
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="5dp"
                 android:layout_weight="3"
                 android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductWideBandValue()}"
                 android:valueFrom="0"
@@ -408,108 +430,133 @@
                 app:trackHeight="12dp"
                 tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="7"
-                android:textColor="@color/ap_black"
-                android:text="@string/textview_wideband_text"
-                android:textAlignment="center"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
 
-        </LinearLayout>
+        </ir.programmerplus.groupbox.GroupBoxLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayoutFeedbackAndNoiseReduction"
-            android:layout_width="0dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="10dp"
+        <ir.programmerplus.groupbox.GroupBoxLayout
+            android:id="@+id/groupBoxLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/table_layout_border"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayoutWideBandGain"
+            android:layoutDirection="ltr"
+            android:paddingTop="5dp"
+            app:borderColor="#A8A3A3"
+            app:borderCornerRadius="8dp"
+            app:borderStrokeWidth="2.2dp"
+            app:labelText="Active Program Properties"
+            app:labelTextColor="@color/ap_black"
+            app:labelTextSize="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.761"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayoutEqualizer">
 
-            <CheckBox
-                android:id="@+id/checkBoxFeedbackCanceler"
+            <LinearLayout
+                android:id="@+id/linearLayoutFeedbackAndNoiseReduction"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:buttonTint="@color/design_default_color_secondary_variant"
-                android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isFeedbackCancelerEnabled()}"
-                android:onCheckedChanged="@{() -> viewModel.handleCheckBoxFeedbackCancelerCheckedChanged()}"
-                android:padding="5dp"
-                android:text="@string/checkbox_feedback_text"
-                android:textColor="@color/ap_black"
-                android:textSize="10sp"
-                tools:ignore="SmallSp,TouchTargetSizeCheck,VisualLintButtonSize" />
+                android:layout_height="53dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayoutWideBandGain"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.761"
+                app:layout_constraintStart_toStartOf="parent">
 
-            <CheckBox
-                android:id="@+id/checkBoxNoiseReduction"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_weight="1"
-                android:buttonTint="@color/design_default_color_secondary_variant"
-                android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isNoiseReductionEnabled()}"
-                android:onCheckedChanged="@{()-> viewModel.handleCheckBoxNoiseReductionCheckedChanged()}"
-                android:padding="5dp"
-                android:text="@string/checkbox_noise_reduction_text"
-                android:textColor="@color/ap_black"
-                android:textSize="10sp"
-                tools:ignore="SmallSp,VisualLintButtonSize,TouchTargetSizeCheck" />
-        </LinearLayout>
+                <CheckBox
+                    android:id="@+id/checkBoxFeedbackCanceler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/design_default_color_secondary_variant"
+                    android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isFeedbackCancelerEnabled()}"
+                    android:onCheckedChanged="@{() -> viewModel.handleCheckBoxFeedbackCancelerCheckedChanged()}"
+                    android:padding="5dp"
+                    android:text="@string/checkbox_feedback_text"
+                    android:textColor="@color/ap_black"
+                    android:textSize="10sp"
+                    tools:ignore="SmallSp,TouchTargetSizeCheck,VisualLintButtonSize" />
 
-        <LinearLayout
-            android:id="@+id/linearLayoutRetentions"
-            android:layout_width="0dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="10dp"
+                <CheckBox
+                    android:id="@+id/checkBoxNoiseReduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/design_default_color_secondary_variant"
+                    android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isNoiseReductionEnabled()}"
+                    android:onCheckedChanged="@{()-> viewModel.handleCheckBoxNoiseReductionCheckedChanged()}"
+                    android:padding="5dp"
+                    android:text="@string/checkbox_noise_reduction_text"
+                    android:textColor="@color/ap_black"
+                    android:textSize="10sp"
+                    tools:ignore="SmallSp,VisualLintButtonSize,TouchTargetSizeCheck" />
+            </LinearLayout>
+
+        </ir.programmerplus.groupbox.GroupBoxLayout>
+
+        <ir.programmerplus.groupbox.GroupBoxLayout
+            android:id="@+id/groupBoxLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/table_layout_border"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayoutBurn"
+            android:layoutDirection="ltr"
+            android:paddingTop="5dp"
+            app:borderColor="#A8A3A3"
+            app:borderCornerRadius="8dp"
+            app:borderStrokeWidth="2.2dp"
+            app:labelText="Common Properties For All Programs"
+            app:labelTextColor="@color/ap_black"
+            app:labelTextSize="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout4"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.761"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutWideBandGain">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout2">
 
-            <CheckBox
-                android:id="@+id/checkBoxMemoryRetention"
+            <LinearLayout
+                android:id="@+id/linearLayoutRetentions"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:buttonTint="@color/design_default_color_secondary_variant"
-                android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isMemoryRetentionEnabled()}"
-                android:onCheckedChanged="@{()-> viewModel.handleMemoryRetentionCheckedChanged()}"
-                android:padding="5dp"
-                android:text="@string/checkbox_memory_retention_text"
-                android:textColor="@color/ap_black"
-                android:textSize="10sp"
-                tools:ignore="SmallSp,VisualLintButtonSize,TouchTargetSizeCheck" />
+                android:layout_height="53dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.761"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="644dp">
 
-            <CheckBox
-                android:id="@+id/checkBoxVolumeRetention"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_weight="1"
-                android:buttonTint="@color/design_default_color_secondary_variant"
-                android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isVolumeRetentionEnabled()}"
-                android:onCheckedChanged="@{()-> viewModel.handleVolumeRetentionCheckedChanged()}"
-                android:padding="5dp"
-                android:text="@string/checkbox_volume_retention_text"
-                android:textColor="@color/ap_black"
-                android:textSize="10sp"
-                tools:ignore="SmallSp,TouchTargetSizeCheck,VisualLintButtonSize" />
-        </LinearLayout>
+                <CheckBox
+                    android:id="@+id/checkBoxMemoryRetention"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/design_default_color_secondary_variant"
+                    android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isMemoryRetentionEnabled()}"
+                    android:onCheckedChanged="@{()-> viewModel.handleMemoryRetentionCheckedChanged()}"
+                    android:padding="5dp"
+                    android:text="@string/checkbox_memory_retention_text"
+                    android:textColor="@color/ap_black"
+                    android:textSize="10sp"
+                    tools:ignore="SmallSp,VisualLintButtonSize,TouchTargetSizeCheck" />
+
+                <CheckBox
+                    android:id="@+id/checkBoxVolumeRetention"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:buttonTint="@color/design_default_color_secondary_variant"
+                    android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isVolumeRetentionEnabled()}"
+                    android:onCheckedChanged="@{()-> viewModel.handleVolumeRetentionCheckedChanged()}"
+                    android:padding="5dp"
+                    android:text="@string/checkbox_volume_retention_text"
+                    android:textColor="@color/ap_black"
+                    android:textSize="10sp"
+                    tools:ignore="SmallSp,TouchTargetSizeCheck,VisualLintButtonSize" />
+            </LinearLayout>
+        </ir.programmerplus.groupbox.GroupBoxLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayoutLoading"

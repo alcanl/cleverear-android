@@ -3,6 +3,7 @@ package com.alcanl.cleverear.util.extension
 import android.content.Context
 import android.os.Handler
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
@@ -46,5 +47,23 @@ fun FrameLayout.setChildrenVisible()
     this.visibility = View.INVISIBLE
     this.children.forEach {
         it.visibility = View.VISIBLE
+    }
+}
+fun ViewGroup.setLayoutDisable()
+{
+    this.children.iterator().forEachRemaining {
+        if (it is ViewGroup)
+            it.setLayoutDisable()
+        else
+            it.isEnabled = false
+    }
+}
+fun ViewGroup.setLayoutEnable()
+{
+    this.children.iterator().forEachRemaining {
+        if (it is ViewGroup)
+            it.setLayoutEnable()
+        else
+            it.isEnabled = true
     }
 }

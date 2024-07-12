@@ -6,7 +6,7 @@ import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
-import com.alcanl.cleverear.fitting.event.FittingEvent
+import com.alcanl.cleverear.fitting.event.EventObject
 import com.alcanl.cleverear.fitting.event.InSituEvent
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogFittingUnsaved
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogInSituInProgress
@@ -37,6 +37,7 @@ class RemoteFittingActivity : AppCompatActivity() {
     private fun navigateTo(id: Int)
     {
         findNavController(R.id.navHostFragmentActivityRemote).navigate(id)
+
     }
     private fun initializeNavController()
     {
@@ -62,7 +63,7 @@ class RemoteFittingActivity : AppCompatActivity() {
     }
     fun unsavedFittingDialogPositiveButtonClicked()
     {
-        EventBus.getDefault().post(FittingEvent(this))
+        EventBus.getDefault().post(EventObject(this))
         mUnsavedFittingDialog.dismiss()
     }
     fun unsavedFittingDialogNegativeButtonClicked()
