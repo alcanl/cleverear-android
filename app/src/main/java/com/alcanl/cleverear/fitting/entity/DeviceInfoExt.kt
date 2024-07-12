@@ -32,7 +32,7 @@ data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
     fun getProductWideBandValue() = product?.getWideBandGainValue() ?: 17
     fun isMemoryRetentionEnabled() = product?.isMemoryRetentionEnabled() ?: false
     fun isVolumeRetentionEnabled() = product?.isVolumeRetentionEnabled() ?: false
-    fun getProductEqualizerBassValue() = product?.getEqualizerBassValue(hearingAidDTO!!) ?: 20
-    fun getProductEqualizerMidValue() = product?.getEqualizerMidValue(hearingAidDTO!!) ?: 20
-    fun getProductEqualizerTrebleValue() = product?.getEqualizerTrebleValue(hearingAidDTO!!) ?: 20
+    fun getProductEqualizerBassValue() = product?.getEqualizerBassValue(hearingAidDTO!!) ?: 0
+    fun getProductEqualizerMidValue() = product?.getEqualizerMidValue(hearingAidDTO!!) ?: 0
+    fun getProductEqualizerTrebleValue() = product?.getEqualizerTrebleValue(hearingAidDTO!!) ?: 0
 }

@@ -30,6 +30,9 @@ import com.alcanl.cleverear.fitting.enableNoiseReduction
 import com.alcanl.cleverear.fitting.enableVolumeRetention
 import com.alcanl.cleverear.fitting.event.EventObject
 import com.alcanl.cleverear.fitting.event.listener.FragmentListener
+import com.alcanl.cleverear.fitting.setEqualizerBassValue
+import com.alcanl.cleverear.fitting.setEqualizerMidValue
+import com.alcanl.cleverear.fitting.setEqualizerTrebleValue
 import com.alcanl.cleverear.fitting.setWideBandGain
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
@@ -246,30 +249,42 @@ class FittingFragment : Fragment(), FragmentListener {
         @Synchronized
         fun handleSynchronized()
         {
-            TODO("Not Implemented Yet")
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    it.product?.setEqualizerBassValue(it.hearingAidDTO!!, value.toInt())
+                }
+            }
         }
         (activity as RemoteFittingActivity).isFittingChangesMade = true
-        handleSynchronized()
+        threadPool.execute { handleSynchronized() }
     }
     fun equalizerMidSliderValueChanged(value: Float)
     {
         @Synchronized
         fun handleSynchronized()
         {
-            TODO("Not Implemented Yet")
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    it.product?.setEqualizerMidValue(it.hearingAidDTO!!, value.toInt())
+                }
+            }
         }
         (activity as RemoteFittingActivity).isFittingChangesMade = true
-        handleSynchronized()
+        threadPool.execute { handleSynchronized() }
     }
     fun equalizerTrebleSliderValueChanged(value: Float)
     {
         @Synchronized
         fun handleSynchronized()
         {
-            TODO("Not Implemented Yet")
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.let {
+                    it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, value.toInt())
+                }
+            }
         }
         (activity as RemoteFittingActivity).isFittingChangesMade = true
-        handleSynchronized()
+        threadPool.execute { handleSynchronized() }
     }
     fun wideBandSliderValueChanged(value: Float)
     {

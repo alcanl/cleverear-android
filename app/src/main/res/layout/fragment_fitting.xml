@@ -128,7 +128,7 @@
             tools:ignore="ContentDescription" />
 
         <ir.programmerplus.groupbox.GroupBoxLayout
-            android:id="@+id/groupBoxLayout4"
+            android:id="@+id/groupBoxLayoutBurn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -145,7 +145,7 @@
             app:layout_constraintBottom_toTopOf="@+id/constraintLayoutFooter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutSystemProperties">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -216,7 +216,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="10dp"
             android:background="@drawable/table_layout_border"
-            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout3"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayoutActiveMemory"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -242,9 +242,9 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="50"
-                android:valueFrom="0"
-                android:valueTo="100"
+                android:value="0"
+                android:valueFrom="-18"
+                android:valueTo="18"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.96"
@@ -264,9 +264,9 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="50"
-                android:valueFrom="0"
-                android:valueTo="100"
+                android:value="0"
+                android:valueFrom="-18"
+                android:valueTo="18"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.96"
@@ -301,9 +301,9 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="50"
-                android:valueFrom="0"
-                android:valueTo="100"
+                android:value="0"
+                android:valueFrom="-18"
+                android:valueTo="18"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.96"
@@ -390,7 +390,7 @@
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck,TextContrastCheck" />
 
         <ir.programmerplus.groupbox.GroupBoxLayout
-            android:id="@+id/groupBoxLayout2"
+            android:id="@+id/groupBoxLayoutWideBandGain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -403,10 +403,10 @@
             app:labelText="@string/textview_wideband_text"
             app:labelTextColor="@color/ap_black"
             app:labelTextSize="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayoutSystemProperties"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout3">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutActiveMemory">
 
             <com.google.android.material.slider.Slider
                 android:layout_width="match_parent"
@@ -434,7 +434,7 @@
         </ir.programmerplus.groupbox.GroupBoxLayout>
 
         <ir.programmerplus.groupbox.GroupBoxLayout
-            android:id="@+id/groupBoxLayout3"
+            android:id="@+id/groupBoxLayoutActiveMemory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -448,7 +448,7 @@
             app:labelText="Active Program Properties"
             app:labelTextColor="@color/ap_black"
             app:labelTextSize="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout2"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayoutWideBandGain"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayoutEqualizer">
@@ -498,7 +498,7 @@
         </ir.programmerplus.groupbox.GroupBoxLayout>
 
         <ir.programmerplus.groupbox.GroupBoxLayout
-            android:id="@+id/groupBoxLayout"
+            android:id="@+id/groupBoxLayoutSystemProperties"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -512,10 +512,10 @@
             app:labelText="Common Properties For All Programs"
             app:labelTextColor="@color/ap_black"
             app:labelTextSize="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayout4"
+            app:layout_constraintBottom_toTopOf="@+id/groupBoxLayoutBurn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutWideBandGain">
 
             <LinearLayout
                 android:id="@+id/linearLayoutRetentions"

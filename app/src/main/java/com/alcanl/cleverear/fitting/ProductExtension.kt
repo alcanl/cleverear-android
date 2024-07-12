@@ -11,12 +11,8 @@ import com.ark.Product
 
 const val VOLUME_RETENTION_ENABLE = "X_VolumeRetention_Enable"
 const val MEMORY_RETENTION_ENABLE = "X_MemoryRetention_Enable"
-const val WDRC_ENABLE = "X_WDRC_Enable"
 const val EQ_ENABLE = "X_EQ_Enable"
-const val WDRC_CROSSOVER_FREQUENCY = "X_WDRC_CrossoverFrequency[%d]"
 const val EQ_CHANNEL_GAIN = "X_EQ_ChannelGain_dB[%d]"
-const val EQ_CROSSOVER_FREQUENCY = "X_EQ_CrossoverFrequency[%d]"
-const val WDRC_EXPANSION_THRESHOLD = "X_WDRC_ExpansionThreshold[%d]"
 const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
 const val WDRC_NOISE_REDUCTION_ENABLE = "X_WDRC_INR_Enable[%d]"
 const val GAP_DEVICE_NAME = "X_RF_GAPDeviceName%d"
@@ -26,17 +22,29 @@ private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
     return this.systemMemory.parameters.containsId(parameterName)
 }
+
 @SuppressLint("DefaultLocale")
-private fun Product.setFittingValues(bound: Int, amount: Int, parameterName: String)
+private fun Product.getEqualizerValue(from: Int, to: Int) : Int
+{
+    var sum = 0
+    (from..< to).forEach {
+        sum += this.readIntParameter(String.format(EQ_CHANNEL_GAIN, it))
+    }
+
+    return sum / (to - from)
+}
+
+@SuppressLint("DefaultLocale")
+private fun Product.setEqualizerValue(from: Int, to: Int, value: Int)
 {
     try {
-        (0..< bound).forEach {
+        (from..< to).forEach {
             this.memories.getItem(currentMemory.value()).parameters.getById(
-                String.format(parameterName, it)).value += amount
+                String.format(EQ_CHANNEL_GAIN, it)).value = value
         }
 
     } catch (ex: ArkException) {
-        Log.e("WDRC_Increase", ex.message!!)
+        Log.e("Product::setFittingValues", ex.message!!)
     }
 }
 private fun setParameter(parameter: Parameter, value: Any)
@@ -133,38 +141,40 @@ fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
         return true
     } catch (_: Throwable) { return false }
 }
-fun Product.increaseWDRCCrossOverFrequency(dto: HearingAidDTO, amount: Int)
+
+fun Product.setEqualizerBassValue(dto: HearingAidDTO, value: Int)
 {
-    setFittingValues(dto.wdrcChannelCount - 1, amount, WDRC_CROSSOVER_FREQUENCY)
+    when (dto.wdrcChannelCount) {
+        49 -> this.setEqualizerValue(0, 17, value)
+        36 -> this.setEqualizerValue(0, 12, value)
+        24 -> this.setEqualizerValue(0, 8, value)
+        16 -> this.setEqualizerValue(0, 6, value)
+        12 -> this.setEqualizerValue(0, 4, value)
+    }
 }
-fun Product.decreaseWDRCCrossOverFrequency(dto: HearingAidDTO, amount: Int)
+
+fun Product.setEqualizerMidValue(dto: HearingAidDTO, value: Int)
 {
-    setFittingValues(dto.wdrcChannelCount - 1, -1 * amount, WDRC_CROSSOVER_FREQUENCY)
+    when (dto.wdrcChannelCount) {
+        49 -> this.setEqualizerValue(17, 34, value)
+        36 -> this.setEqualizerValue(12, 24, value)
+        24 -> this.setEqualizerValue(8, 16, value)
+        16 -> this.setEqualizerValue(6, 11, value)
+        12 -> this.setEqualizerValue(4, 8, value)
+    }
 }
-fun Product.increaseEqualizerChannelGain(dto: HearingAidDTO, amount: Int)
+
+fun Product.setEqualizerTrebleValue(dto: HearingAidDTO, value: Int)
 {
-    setFittingValues(dto.frequencyChannelCount, amount, EQ_CHANNEL_GAIN)
+    when (dto.wdrcChannelCount) {
+        49 -> this.setEqualizerValue(34, 49, value)
+        36 -> this.setEqualizerValue(24, 36, value)
+        24 -> this.setEqualizerValue(16, 24, value)
+        16 -> this.setEqualizerValue(11, 16, value)
+        12 -> this.setEqualizerValue(8, 12, value)
+    }
 }
-fun Product.decreaseEqualizerChannelGain(dto: HearingAidDTO, amount: Int)
-{
-    setFittingValues(dto.frequencyChannelCount, -1 * amount, EQ_CHANNEL_GAIN)
-}
-fun Product.increaseEqualizerCrossOverFrequency(dto: HearingAidDTO, amount: Int)
-{
-    setFittingValues(dto.frequencyChannelCount - 1, amount, EQ_CROSSOVER_FREQUENCY)
-}
-fun Product.decreaseEqualizerCrossOverFrequency(dto: HearingAidDTO, amount: Int)
-{
-    setFittingValues(dto.frequencyChannelCount - 1, -1 * amount, EQ_CROSSOVER_FREQUENCY)
-}
-fun Product.increaseWDRCExpansionThreshold(dto: HearingAidDTO, amount: Int)
-{
-    setFittingValues(dto.wdrcChannelCount, amount, WDRC_EXPANSION_THRESHOLD)
-}
-fun Product.decreaseWDRCExpansionThreshold(dto: HearingAidDTO, amount: Int)
-{
-    setFittingValues(dto.wdrcChannelCount, -1 * amount, WDRC_EXPANSION_THRESHOLD)
-}
+
 fun Product.enableFeedBackCanceler()
 {
     this.memories.getItem(currentMemory.value()).parameters.getById(FEEDBACK_CANCELER_ENABLE).value = 1
@@ -185,26 +195,7 @@ fun Product.burnChangesToAllMemories(hearingAid: HearingAid)
     }
     this.writeParameters(ParameterSpace.kSystemNvmMemory)
 }
-fun Product.enableWDRC(memory: ParameterSpace)
-{
-    this.memories.getItem(memory.value()).parameters.getById(WDRC_ENABLE).value = 1
-}
-fun Product.disableWDRC(memory: ParameterSpace)
-{
-    this.memories.getItem(memory.value()).parameters.getById(WDRC_ENABLE).value = 0
-}
-fun Product.enableWDRCForAllMemories(hearingAid: HearingAid)
-{
-    (0..< hearingAid.numberOfMemories).forEach {
-        enableWDRC(ParameterSpace.value(it))
-    }
-}
-fun Product.disableWDRCForAllMemories(hearingAid: HearingAid)
-{
-    (0..< hearingAid.numberOfMemories).forEach {
-        disableWDRC(ParameterSpace.value(it))
-    }
-}
+
 @SuppressLint("DefaultLocale")
 fun Product.enableNoiseReduction(hearingAidDTO: HearingAidDTO)
 {
@@ -274,16 +265,35 @@ fun Product.getWideBandGainValue() : Int
 }
 fun Product.getEqualizerBassValue(hearingAidDTO: HearingAidDTO) : Int
 {
-    TODO("Not Implemented Yet")
+    return when (hearingAidDTO.wdrcChannelCount) {
+        49 -> this.getEqualizerValue(0, 17)
+        36 -> this.getEqualizerValue(0, 12)
+        24 -> this.getEqualizerValue(0, 8)
+        16 -> this.getEqualizerValue(0, 6)
+        else -> this.getEqualizerValue(0, 4)
+    }
 }
 fun Product.getEqualizerMidValue(hearingAidDTO: HearingAidDTO) : Int
 {
-    TODO("Not Implemented Yet")
+    return when (hearingAidDTO.wdrcChannelCount) {
+        49 -> this.getEqualizerValue(17, 34)
+        36 -> this.getEqualizerValue(12, 24)
+        24 -> this.getEqualizerValue(8, 16)
+        16 -> this.getEqualizerValue(6, 11)
+        else -> this.getEqualizerValue(4, 8)
+    }
 }
 fun Product.getEqualizerTrebleValue(hearingAidDTO: HearingAidDTO) : Int
 {
-    TODO("Not Implemented Yet")
+    return when (hearingAidDTO.wdrcChannelCount) {
+        49 -> this.getEqualizerValue(34, 49)
+        36 -> this.getEqualizerValue(24, 36)
+        24 -> this.getEqualizerValue(16, 24)
+        16 -> this.getEqualizerValue(11, 16)
+        else -> this.getEqualizerValue(8, 12)
+    }
 }
+
 
 
 
