@@ -17,10 +17,6 @@ class FittingFragmentListenersViewModel(fragment: FittingFragment) {
     {
         mWeakReference.get()?.feedbackCancelerCheckedChanged()
     }
-    fun handleCheckBoxNoiseReductionCheckedChanged()
-    {
-        mWeakReference.get()?.noiseReductionCheckedChanged()
-    }
     fun handleEarSideSelectButton(earSide: EarSide)
     {
         mWeakReference.get()?.earSideButtonClicked(earSide)
@@ -41,9 +37,13 @@ class FittingFragmentListenersViewModel(fragment: FittingFragment) {
     {
         mWeakReference.get()?.equalizerMidSliderValueChanged(value)
     }
-    fun handleSpinnerItemSelect(pos: Int)
+    fun handleMemorySpinnerItemSelect(pos: Int)
     {
         mWeakReference.get()?.spinnerItemSelected(pos)
+    }
+    fun handleFeedbackCancelerSpinnerItemSelect(pos: Int)
+    {
+        mWeakReference.get()?.spinnerFeedbackCancelerItemSelected(pos)
     }
     fun handleBurnButtonsClicked(view: View)
     {

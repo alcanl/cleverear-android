@@ -23,6 +23,9 @@
     <string name="toast_no_previous_device_for_selection">Kayıtlı Cihaz Bilgisi Bulunmamaktadır</string>
     <string name="textview_control_ha">Cihazı Kontrol Et</string>
     <string name="toast_connection_lost_text">Bağlantı Kaybedildi</string>
+    <string name="groupbox_active_title_text" translatable="true">Aktif Program Özellikleri</string>
+    <string name="groupbox_common_title_text" translatable="true">Tüm Programlar İçin Ortak Özellikler</string>
+    <string name="groupbox_burn_title_text" translatable="true">Değişiklikleri Cihaza Kaydet</string>
     <string name="dialog_unpaired_device_text" translatable="true">Cihaz Konfigürasyon İçin Telefon İle EŞlenmek Zorundadır</string>
     <string name="notification_disconnect_text" translatable="true">İşitme Cihazı Bağlantısı Kaybedildi</string>
     <string name="toast_connection_established_text">Cihaz İle Bağlantı Kuruldu</string>
@@ -67,14 +70,15 @@
     <string name="textview_treble_text" translatable="true">Tiz</string>
     <string name="textview_mid_text" translatable="true">Orta</string>
     <string name="textview_active_memory_text" translatable="true"><u><b>Aktif Program</b></u></string>
-    <string name="textview_wideband_text" translatable="true">Geniş Bant Kazancı</string>
+    <string name="textview_wide_band_text" translatable="true">Geniş Bant Kazancı</string>
     <string name="button_burn_text" translatable="true">Yaz</string>
     <string name="button_burn_to_all_text" translatable="true">Tüm Programlara Yaz</string>
     <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
     <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="spinner_feedback_hint_text" translatable="true">Geri Besleme Ortamı</string>
     <string name="dialog_textview_unsaved_fitting_text" translatable="true">Cihaza kaydedilmemiş değişiklikler bulunmaktadır. Devam etmeden önce kaydetmek ister misiniz?</string>
-    <string name="textview_insitu_warning_text" translatable="true">Bu test sadece bilgilendirme ve cihaz konfigürasyonu için uygulanmakta olup, resmi sağlık kuruluşlarında uygulanan işitme testlerinin yerine geçmemektedir.</string>
+    <string name="textview_in_situ_warning_text" translatable="true">Bu test sadece bilgilendirme ve cihaz konfigürasyonu için uygulanmakta olup, resmi sağlık kuruluşlarında uygulanan işitme testlerinin yerine geçmemektedir.</string>
     <string name="checkbox_memory_retention_text" translatable="true">Program Hafızası</string>
     <string name="checkbox_volume_retention_text" translatable="true">Ses Hafızası</string>
     <string name="textview_click_for_connect_text" translatable="true">Bağlanmak İçin Tıkla</string>
@@ -92,4 +96,9 @@
     <string name="textview_initialize_network_problem_text" translatable="true">Uzak Sunucu Hatası, Lütfen Daha Sonra Tekrar Deneyin</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Bağlı Cihaz İle Uyumlu Dosyalar Bulunamadı</string>
     <string name="alert_dialog_connected_before_text">Daha Önceden Kayıtlı Cihaz/Cihazlar Tespit Edildi. Bağlantıya Bu Cihaz/Cihazlar İle Devam Etmek İster Misiniz?</string>
+
+    <string-array name="feedbackCancelerValues">
+        <item>Dış Ortam</item>
+        <item>Müzik</item>
+    </string-array>
 </resources>

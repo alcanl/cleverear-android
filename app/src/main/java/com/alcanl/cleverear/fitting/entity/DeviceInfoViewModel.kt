@@ -3,13 +3,14 @@ package com.alcanl.cleverear.fitting.entity
 import androidx.lifecycle.ViewModel
 
 data class DeviceInfoViewModel(var isEqualizerEnabled: Boolean, var isFeedBackCancelerEnabled: Boolean,
-                               var isNoiseReductionEnabled: Boolean, var equalizerTrebleValue: Int,
-                               var equalizerMidValue: Int, var equalizerBassValue: Int, var wideRangeBandGainValue: Int,
-                               var isMemoryRetentionEnabled: Boolean, var isVolumeRetentionEnabled: Boolean): ViewModel() {
+                               var equalizerTrebleValue: Int, var equalizerMidValue: Int,
+                               var equalizerBassValue: Int, var wideRangeBandGainValue: Int,
+                               var isMemoryRetentionEnabled: Boolean, var isVolumeRetentionEnabled: Boolean,
+                               var deviceModelNumber: String): ViewModel() {
 
 
-    constructor() : this(false, false, false,
-        0, 0, 0, 0, false, false)
+    constructor() : this(false, false, 0, 0,
+        0, 0, false, false, "")
 
     fun initializeDeviceInfoViewModel(deviceInfoExt: DeviceInfoExt)
     {
@@ -21,5 +22,6 @@ data class DeviceInfoViewModel(var isEqualizerEnabled: Boolean, var isFeedBackCa
         equalizerMidValue = deviceInfoExt.getProductEqualizerMidValue()
         equalizerTrebleValue = deviceInfoExt.getProductEqualizerTrebleValue()
         equalizerBassValue = deviceInfoExt.getProductEqualizerBassValue()
+        deviceModelNumber = deviceInfoExt.getDeviceModelNumber()
     }
 }

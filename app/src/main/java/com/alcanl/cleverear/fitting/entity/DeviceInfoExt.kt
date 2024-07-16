@@ -8,7 +8,6 @@ import com.alcanl.cleverear.fitting.getWideBandGainValue
 import com.alcanl.cleverear.fitting.isEqualizerEnabled
 import com.alcanl.cleverear.fitting.isFeedbackCancelerEnabled
 import com.alcanl.cleverear.fitting.isMemoryRetentionEnabled
-import com.alcanl.cleverear.fitting.isNoiseReductionEnabled
 import com.alcanl.cleverear.fitting.isVolumeRetentionEnabled
 import com.ark.DeviceInfo
 import com.ark.Library
@@ -27,7 +26,6 @@ data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
     fun getDeviceModelNumber() : String = deviceInfo?.serialId?.toString() ?: ""
     fun getDeviceLibraryId() : String = if (deviceInfo == null) "" else Integer.toHexString(deviceInfo.libraryId)
     fun isEqualizerEnabled() = product?.isEqualizerEnabled() ?: false
-    fun isNoiseReductionEnabled() = product?.isNoiseReductionEnabled(hearingAidDTO!!) ?: false
     fun isFeedbackCancelerEnabled() = product?.isFeedbackCancelerEnabled() ?: false
     fun getProductWideBandValue() = product?.getWideBandGainValue() ?: 17
     fun isMemoryRetentionEnabled() = product?.isMemoryRetentionEnabled() ?: false

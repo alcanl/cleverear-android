@@ -24,6 +24,9 @@
     <string name="toast_no_permission">Keine Bluetooth-Erlaubnis</string>
     <string name="toast_no_device_selected">Nein Jedes ausgewählte Gerät</string>
     <string name="textview_no_previous_device_info">kein Hörgerät</string>
+    <string name="groupbox_active_title_text" translatable="true">Aktive Programmeigenschaften</string>
+    <string name="groupbox_common_title_text" translatable="true">Gemeinsame Eigenschaften für alle Programme</string>
+    <string name="groupbox_burn_title_text" translatable="true">SÄnderungen auf dem Gerät speichern</string>
     <string name="toast_no_previous_device_for_selection">Keine vorherigen Geräteinformationen für die Auswahl</string>
     <string name="dialog_unpaired_device_text" translatable="true">Das Gerät muss mit dem Telefon für die Konfiguration verbunden sein</string>
     <string name="notification_disconnect_text" translatable="true">Die Verbindung zum Hörgerät wurde unterbrochen</string>
@@ -60,9 +63,9 @@
     <string name="checkbox_equalizer_text" translatable="true">Equalizer</string>
     <string name="textview_bass_text" translatable="true">Bass</string>
     <string name="textview_treble_text" translatable="true">Dreifach</string>
-    <string name="textview_mid_text" translatable="true">MitteMid</string>
+    <string name="textview_mid_text" translatable="true">Mitte</string>
     <string name="textview_active_memory_text" translatable="true"><u><b>Aktives Programm</b></u></string>
-    <string name="textview_wideband_text" translatable="true">Breitbandverstärkung</string>
+    <string name="textview_wide_band_text" translatable="true">Breitbandverstärkung</string>
     <string name="button_burn_text" translatable="true">Speichern</string>
     <string name="button_burn_to_all_text" translatable="true">Für Alle Speichern</string>
     <string name="textview_device_mac"><u>Gerät Mac</u></string>
@@ -72,8 +75,9 @@
     <string name="textview_firmware_version"><u>Firmware Version</u></string>
     <string name="button_retry_text" translatable="true">Wiederholung</string>
     <string name="button_play_sound_text" translatable="true">Play Sound</string>
+    <string name="spinner_feedback_hint_text" translatable="true">Feedback-Umgebung</string>
     <string name="dialog_textview_unsaved_fitting_text" translatable="true">Es gibt ungespeicherte Anpassungsänderungen. Möchten Sie die Änderungen brennen, bevor Sie fortfahren?</string>
-    <string name="textview_insitu_warning_text" translatable="true">Dieser Test wurde nur zur Information und Gerätekonfiguration entwickelt und ist kein Ersatz für offizielle Hörtests von Gesundheitsorganisationen.</string>
+    <string name="textview_in_situ_warning_text" translatable="true">Dieser Test wurde nur zur Information und Gerätekonfiguration entwickelt und ist kein Ersatz für offizielle Hörtests von Gesundheitsorganisationen.</string>
     <string name="checkbox_memory_retention_text" translatable="true">Gedächtnisleistung</string>
     <string name="checkbox_volume_retention_text" translatable="true">Volumenerhalt</string>
     <string name="button_save_in_situ_text" translatable="true">Save In-Situ Test</string>
@@ -92,4 +96,9 @@
     <string name="textview_initialize_network_problem_text" translatable="true">Externer Serverfehler, bitte versuchen Sie später eine Verbindung herzustellen</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Die kompatible Bibliotheksdatei für das angeschlossene Gerät konnte nicht gefunden werden</string>
     <string name="alert_dialog_connected_before_text">Es wurde eine vorherige gespeicherte Geräteverbindung erkannt. Möchten Sie die Verbindung mit dem vorherigen Gerät/den vorherigen Geräten fortsetzen?</string>
+
+    <string-array name="feedbackCancelerValues">
+        <item>Draußen</item>
+        <item>Musik</item>
+    </string-array>
 </resources>

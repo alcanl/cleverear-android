@@ -84,6 +84,9 @@
     <string name="battery_level_json" translatable="false">BatteryLevel</string>
     <string name="title_aux_label">Stream</string>
     <string name="title_mic_label">Mic</string>
+    <string name="groupbox_active_title_text" translatable="true">Active Program Properties</string>
+    <string name="groupbox_common_title_text" translatable="true">Common Properties For All Programs</string>
+    <string name="groupbox_burn_title_text" translatable="true">Save Changes To The Device</string>
     <string name="textview_device_mac" translatable="true"><u>Device Mac</u></string>
     <string name="textview_device_model" translatable="true"><u>Device Model</u></string>
     <string name="textview_library_id" translatable="true"><u>Library Id</u></string>
@@ -110,8 +113,7 @@
     <string name="textview_initialize_library_not_found_text" translatable="true">Could Not Found The Compatible Library File For The Connected Device</string>
     <string name="alert_dialog_connected_before_text" translatable="true">Detected A Previous Saved Device Connection. Do You Want To Continue Connection With Previous Device/Devices?</string>
     <string name="navbar_home_text" translatable="false">Device</string>
-    <string name="navbar_insitu_text" translatable="false">In Situ</string>
-    <string name="navbar_audiogram_text" translatable="false">Audiogram</string>
+    <string name="navbar_in_situ_text" translatable="false">In Situ</string>
     <string name="navbar_fitting_text" translatable="false">Fitting</string>
     <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>
     <string name="textview_parameter_read_fail_text" translatable="true">Unknown Problem Occurred While Reading Parameters, Please Contact With Your Delegate</string>
@@ -158,13 +160,14 @@
     <string name="textview_treble_text" translatable="true">Treble</string>
     <string name="textview_mid_text" translatable="true">Mid</string>
     <string name="textview_active_memory_text" translatable="true"><u><b>Active Program</b></u></string>
-    <string name="textview_wideband_text" translatable="true">WideBand Gain</string>
+    <string name="textview_wide_band_text" translatable="true">WideBand Gain</string>
     <string name="button_burn_text" translatable="true">Burn</string>
     <string name="button_burn_to_all_text" translatable="true">Burn To All</string>
     <string name="textview_click_for_connect_text" translatable="true">Click For Connect</string>
     <string name="checkbox_memory_retention_text" translatable="true">Memory Retention</string>
     <string name="checkbox_volume_retention_text" translatable="true">Volume Retention</string>
-    <string name="textview_insitu_warning_text" translatable="true">This test has been designed just for information and device configuration and is not a substitute for official health organizations hearing tests.</string>
+    <string name="spinner_feedback_hint_text" translatable="true">Feedback Environment</string>
+    <string name="textview_in_situ_warning_text" translatable="true">This test has been designed just for information and device configuration and is not a substitute for official health organizations hearing tests.</string>
 
     <string-array name="programs">
         <item>Program 1</item>
@@ -175,6 +178,11 @@
         <item>Program 6</item>
         <item>Program 7</item>
         <item>Program 8</item>
+    </string-array>
+
+    <string-array name="feedbackCancelerValues">
+        <item>Outdoor</item>
+        <item>Music</item>
     </string-array>
 
 </resources>

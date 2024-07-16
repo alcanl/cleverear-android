@@ -20,7 +20,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499">
 
+        <rm.com.audiowave.AudioWaveView
+            android:id="@+id/audioWaveView"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            app:animateExpansion="true"
+            app:chunkHeight="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/frameLayoutHeader"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:minChunkHeight="3dp"
+            app:touchable="false"
+            app:waveColor="@color/design_default_color_secondary_variant" />
+
         <TextView
+            android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -35,7 +52,8 @@
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frameLayoutHeader" />
 
         <LinearLayout
             android:id="@id/linearLayout"
@@ -49,7 +67,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView">
 
             <Button
                 android:layout_width="wrap_content"
@@ -83,33 +102,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.105">
+            app:layout_constraintTop_toBottomOf="@+id/audioWaveView">
 
             <TextView
                 android:id="@+id/textViewSoundProperties"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="20dp"
                 android:fontFamily="sans-serif-medium"
                 android:padding="5dp"
                 android:text="@string/dialog_textview_check_text"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
-            <ImageView
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_marginStart="10dp"
-                android:layout_gravity="center | start"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/sharp_hearing_aid_24"
-                tools:ignore="ContentDescription" />
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

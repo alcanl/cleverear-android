@@ -349,7 +349,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/textview_insitu_warning_text"
+            android:text="@string/textview_in_situ_warning_text"
             android:textAlignment="center"
             android:textColor="@color/ap_black"
             android:textSize="8sp"

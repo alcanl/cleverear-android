@@ -14,8 +14,6 @@ const val MEMORY_RETENTION_ENABLE = "X_MemoryRetention_Enable"
 const val EQ_ENABLE = "X_EQ_Enable"
 const val EQ_CHANNEL_GAIN = "X_EQ_ChannelGain_dB[%d]"
 const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
-const val WDRC_NOISE_REDUCTION_ENABLE = "X_WDRC_INR_Enable[%d]"
-const val GAP_DEVICE_NAME = "X_RF_GAPDeviceName%d"
 const val WIDE_BAND_GAIN = "X_LIM_TargetGain_dB"
 
 private fun Product.isSystemParameter(parameterName: String) : Boolean
@@ -91,13 +89,6 @@ fun Product.disableEqualizerForAllMemories(hearingAid: HearingAid)
         disableEqualizer(ParameterSpace.value(it))
     }
 }
-fun Product.readDoubleParameter(parameterName: String) : Double
-{
-    if (isSystemParameter(parameterName))
-        return this.systemMemory.parameters.getById(parameterName).doubleValue
-
-    return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).doubleValue
-}
 
 fun Product.readIntParameter(parameterName: String) : Int
 {
@@ -105,29 +96,6 @@ fun Product.readIntParameter(parameterName: String) : Int
         return this.systemMemory.parameters.getById(parameterName).value
 
     return this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).value
-}
-@SuppressLint("DefaultLocale")
-fun Product.writeDeviceGapName(name: String)
-{
-    if (name.length > 22)
-        throw UnsupportedOperationException("Name must be maximum 22 characters")
-
-    val arr = name.toCharArray()
-    val sb = StringBuilder()
-    var gapNameParameterIndex = 0
-
-    for (i in arr.indices) {
-        val hex = Integer.toHexString(arr[i].code)
-        sb.append(hex)
-
-        if (i % 3 == 2 || i == arr.size - 1) {
-            this.systemMemory.parameters.getById(String.format(GAP_DEVICE_NAME, gapNameParameterIndex))
-                .value = Integer.parseInt(sb.toString())
-
-            ++gapNameParameterIndex
-            sb.clear()
-        }
-    }
 }
 fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
 {
@@ -145,33 +113,33 @@ fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
 fun Product.setEqualizerBassValue(dto: HearingAidDTO, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(0, 17, value)
-        36 -> this.setEqualizerValue(0, 12, value)
-        24 -> this.setEqualizerValue(0, 8, value)
+        49 -> this.setEqualizerValue(0, 9, value)
+        36 -> this.setEqualizerValue(0, 9, value)
+        24 -> this.setEqualizerValue(0, 9, value)
         16 -> this.setEqualizerValue(0, 6, value)
-        12 -> this.setEqualizerValue(0, 4, value)
+        12 -> this.setEqualizerValue(0, 6, value)
     }
 }
 
 fun Product.setEqualizerMidValue(dto: HearingAidDTO, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(17, 34, value)
-        36 -> this.setEqualizerValue(12, 24, value)
-        24 -> this.setEqualizerValue(8, 16, value)
+        49 -> this.setEqualizerValue(9, 19, value)
+        36 -> this.setEqualizerValue(9, 19, value)
+        24 -> this.setEqualizerValue(9, 17, value)
         16 -> this.setEqualizerValue(6, 11, value)
-        12 -> this.setEqualizerValue(4, 8, value)
+        12 -> this.setEqualizerValue(6, 9, value)
     }
 }
 
 fun Product.setEqualizerTrebleValue(dto: HearingAidDTO, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(34, 49, value)
-        36 -> this.setEqualizerValue(24, 36, value)
-        24 -> this.setEqualizerValue(16, 24, value)
+        49 -> this.setEqualizerValue(19, 49, value)
+        36 -> this.setEqualizerValue(19, 36, value)
+        24 -> this.setEqualizerValue(17, 24, value)
         16 -> this.setEqualizerValue(11, 16, value)
-        12 -> this.setEqualizerValue(8, 12, value)
+        12 -> this.setEqualizerValue(9, 12, value)
     }
 }
 
@@ -196,24 +164,6 @@ fun Product.burnChangesToAllMemories(hearingAid: HearingAid)
     this.writeParameters(ParameterSpace.kSystemNvmMemory)
 }
 
-@SuppressLint("DefaultLocale")
-fun Product.enableNoiseReduction(hearingAidDTO: HearingAidDTO)
-{
-    (0..< hearingAidDTO.wdrcChannelCount).forEach {
-        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
-            WDRC_NOISE_REDUCTION_ENABLE, it))
-            .value = 1
-    }
-}
-@SuppressLint("DefaultLocale")
-fun Product.disableNoiseReduction(hearingAidDTO: HearingAidDTO)
-{
-    (0..< hearingAidDTO.wdrcChannelCount).forEach {
-        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
-            WDRC_NOISE_REDUCTION_ENABLE, it))
-            .value = 0
-    }
-}
 fun Product.isEqualizerEnabled() : Boolean
 {
     return this.memories.getItem(currentMemory.value()).parameters.getById(EQ_ENABLE).value == 1
@@ -222,15 +172,6 @@ fun Product.isFeedbackCancelerEnabled() : Boolean
 {
     return this.memories.getItem(currentMemory.value()).parameters.getById(FEEDBACK_CANCELER_ENABLE).value == 1
 }
-@SuppressLint("DefaultLocale")
-fun Product.isNoiseReductionEnabled(hearingAidDTO: HearingAidDTO) : Boolean
-{
-    return (0..< hearingAidDTO.wdrcChannelCount).all {
-        this.memories.getItem(currentMemory.value()).parameters.getById(String.format(
-            WDRC_NOISE_REDUCTION_ENABLE, it)).value == 1
-    }
-}
-
 fun Product.setWideBandGain(value: Int)
 {
     setParameter(WIDE_BAND_GAIN, value)
@@ -266,31 +207,31 @@ fun Product.getWideBandGainValue() : Int
 fun Product.getEqualizerBassValue(hearingAidDTO: HearingAidDTO) : Int
 {
     return when (hearingAidDTO.wdrcChannelCount) {
-        49 -> this.getEqualizerValue(0, 17)
-        36 -> this.getEqualizerValue(0, 12)
-        24 -> this.getEqualizerValue(0, 8)
+        49 -> this.getEqualizerValue(0, 9)
+        36 -> this.getEqualizerValue(0, 9)
+        24 -> this.getEqualizerValue(0, 9)
         16 -> this.getEqualizerValue(0, 6)
-        else -> this.getEqualizerValue(0, 4)
+        else -> this.getEqualizerValue(0, 6)
     }
 }
 fun Product.getEqualizerMidValue(hearingAidDTO: HearingAidDTO) : Int
 {
     return when (hearingAidDTO.wdrcChannelCount) {
-        49 -> this.getEqualizerValue(17, 34)
-        36 -> this.getEqualizerValue(12, 24)
-        24 -> this.getEqualizerValue(8, 16)
+        49 -> this.getEqualizerValue(9, 19)
+        36 -> this.getEqualizerValue(9, 19)
+        24 -> this.getEqualizerValue(9, 17)
         16 -> this.getEqualizerValue(6, 11)
-        else -> this.getEqualizerValue(4, 8)
+        else -> this.getEqualizerValue(6, 9)
     }
 }
 fun Product.getEqualizerTrebleValue(hearingAidDTO: HearingAidDTO) : Int
 {
     return when (hearingAidDTO.wdrcChannelCount) {
-        49 -> this.getEqualizerValue(34, 49)
-        36 -> this.getEqualizerValue(24, 36)
-        24 -> this.getEqualizerValue(16, 24)
+        49 -> this.getEqualizerValue(19, 49)
+        36 -> this.getEqualizerValue(19, 36)
+        24 -> this.getEqualizerValue(17, 24)
         16 -> this.getEqualizerValue(11, 16)
-        else -> this.getEqualizerValue(8, 12)
+        else -> this.getEqualizerValue(9, 12)
     }
 }
 

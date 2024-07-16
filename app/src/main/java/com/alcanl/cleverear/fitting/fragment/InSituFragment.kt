@@ -29,7 +29,7 @@ import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
 import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
-import com.alcanl.cleverear.fitting.event.EventObject
+import com.alcanl.cleverear.fitting.event.FittingEvent
 import com.alcanl.cleverear.fitting.event.listener.FragmentListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_BINDING
@@ -142,7 +142,7 @@ class InSituFragment : Fragment(), FragmentListener {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: EventObject)
+    override fun onEventReceive(event: FittingEvent)
     {
         saveButtonClicked()
     }

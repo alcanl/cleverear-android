@@ -21,14 +21,12 @@ import com.alcanl.cleverear.fitting.burnChangesToMemory
 import com.alcanl.cleverear.fitting.disableEqualizer
 import com.alcanl.cleverear.fitting.disableFeedBackCanceler
 import com.alcanl.cleverear.fitting.disableMemoryRetention
-import com.alcanl.cleverear.fitting.disableNoiseReduction
 import com.alcanl.cleverear.fitting.disableVolumeRetention
 import com.alcanl.cleverear.fitting.enableEqualizer
 import com.alcanl.cleverear.fitting.enableFeedBackCanceler
 import com.alcanl.cleverear.fitting.enableMemoryRetention
-import com.alcanl.cleverear.fitting.enableNoiseReduction
 import com.alcanl.cleverear.fitting.enableVolumeRetention
-import com.alcanl.cleverear.fitting.event.EventObject
+import com.alcanl.cleverear.fitting.event.FittingEvent
 import com.alcanl.cleverear.fitting.event.listener.FragmentListener
 import com.alcanl.cleverear.fitting.setEqualizerBassValue
 import com.alcanl.cleverear.fitting.setEqualizerMidValue
@@ -78,12 +76,12 @@ class FittingFragment : Fragment(), FragmentListener {
         savedInstanceState: Bundle?
     ): View {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_fitting, container, false)
-        initialize()
         return mBinding.root
     }
     override fun onStart()
     {
         EventBus.getDefault().register(this)
+        initialize()
         super.onStart()
     }
     override fun onStop() {
@@ -91,7 +89,7 @@ class FittingFragment : Fragment(), FragmentListener {
         super.onStop()
     }
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: EventObject)
+    override fun onEventReceive(event: FittingEvent)
     {
         burnParametersToAllMemories()
     }
@@ -103,6 +101,7 @@ class FittingFragment : Fragment(), FragmentListener {
         initializeSpinner()
         initializeSelectedMemory()
         initializeEqualizer()
+        initializeFeedbackCancelerSpinnerAdapter()
     }
     private fun initializeSelectedMemory()
     {
@@ -114,7 +113,7 @@ class FittingFragment : Fragment(), FragmentListener {
             deviceInfoExtMap[selectedEarSide]?.isEqualizerEnabled()!!
         }
     }
-    private fun initializeSpinnerAdapter(memoryCount: Int)
+    private fun initializeMemorySpinnerAdapter(memoryCount: Int)
     {
         try {
             mBinding.apply {
@@ -139,6 +138,26 @@ class FittingFragment : Fragment(), FragmentListener {
             Log.e("initializeSpinnerAdapter", ex.message!!)
         }
     }
+    private fun initializeFeedbackCancelerSpinnerAdapter()
+    {
+        try {
+            mBinding.apply {
+                spinnerFeedbackCanceler.setSpinnerAdapter(IconSpinnerAdapter(spinnerFeedbackCanceler))
+                val itemArray = resources.getStringArray(R.array.feedbackCancelerValues)
+                val iconAdapterList = ArrayList<IconSpinnerItem>(itemArray.size)
+
+                itemArray.forEach {
+                    iconAdapterList.add(IconSpinnerItem(text = it))
+                }
+
+                spinnerFeedbackCanceler.setItems(iconAdapterList)
+                spinnerFeedbackCanceler.lifecycleOwner = this@FittingFragment
+
+            }
+        } catch (ex: Throwable) {
+            Log.e("initializeSpinnerAdapter", ex.message!!)
+        }
+    }
     private fun initializeSpinner()
     {
         val memoryCount = with(configuration) {
@@ -147,7 +166,7 @@ class FittingFragment : Fragment(), FragmentListener {
             }
         }
 
-        initializeSpinnerAdapter(memoryCount)
+        initializeMemorySpinnerAdapter(memoryCount)
     }
 
     @Synchronized
@@ -305,22 +324,12 @@ class FittingFragment : Fragment(), FragmentListener {
             }
         }
     }
-    fun noiseReductionCheckedChanged()
-    {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
-        threadPool.execute {
-            fittingConfig.apply {
-                deviceInfoExtMap[selectedEarSide]?.let {
-                    mBinding.checkBoxNoiseReduction.handleFittingCheckedChanged(
-                        { it.product?.disableNoiseReduction(it.hearingAidDTO!!) },
-                        { it.product?.enableNoiseReduction(it.hearingAidDTO!!) })
-                }
-            }
-        }
-    }
+
     fun feedbackCancelerCheckedChanged()
     {
         (activity as RemoteFittingActivity).isFittingChangesMade = true
+        mBinding.spinnerFeedbackCanceler.isEnabled = mBinding.checkBoxFeedbackCanceler.isChecked
+
         threadPool.execute {
             fittingConfig.apply {
                 mBinding.checkBoxFeedbackCanceler.handleFittingCheckedChanged(
@@ -328,6 +337,10 @@ class FittingFragment : Fragment(), FragmentListener {
                     { deviceInfoExtMap[selectedEarSide]?.product?.enableFeedBackCanceler() })
             }
         }
+    }
+    fun spinnerFeedbackCancelerItemSelected(pos: Int)
+    {
+        TODO("Not implemented Yet")
     }
     fun burnButtonsClicked(button: AppCompatButton)
     {
