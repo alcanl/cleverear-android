@@ -2,7 +2,6 @@ package com.alcanl.cleverear
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
@@ -41,23 +40,22 @@ class RemoteFittingActivity : AppCompatActivity() {
     }
     private fun initializeNavController()
     {
-        binding.navigationView.menu.forEach { menuItem ->
-            menuItem.setOnMenuItemClickListener {
-                if (isFittingChangesMade) {
-                    mSelectedFragmentId = it.itemId
-                    mUnsavedFittingDialog.show()
-                    false
-                }
-                else if (isInSituInProgress) {
-                    mSelectedFragmentId = it.itemId
-                    mInSituInProgressDialog.show()
-                    false
-                }
-                else when (it.itemId) {
-                    R.id.navbar_fitting -> { navigateTo(R.id.navbar_fitting); true }
-                    R.id.navbar_home -> { navigateTo(R.id.navbar_home); true }
-                    else -> { navigateTo(R.id.navbar_insitu); true }
-                }
+        binding.navigationView.setOnItemSelectedListener {
+
+            if (isFittingChangesMade) {
+                mSelectedFragmentId = it.itemId
+                mUnsavedFittingDialog.show()
+                false
+            }
+            else if (isInSituInProgress) {
+                mSelectedFragmentId = it.itemId
+                mInSituInProgressDialog.show()
+                false
+            }
+            else when (it.itemId) {
+                R.id.navbar_fitting -> { navigateTo(R.id.navbar_fitting); true }
+                R.id.navbar_home -> { navigateTo(R.id.navbar_home); true }
+                else -> { navigateTo(R.id.navbar_insitu); true }
             }
         }
     }

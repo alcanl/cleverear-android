@@ -5,12 +5,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
-import com.daasuu.bl.BubbleLayout
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -34,14 +32,6 @@ class DeviceListAdapter @Inject constructor(@ApplicationContext context: Context
         }
 
         val textViewAdapter = view?.findViewById<TextView>(R.id.textViewAdapter)
-        val layoutBubble = view?.findViewById<BubbleLayout>(R.id.layoutBubble)
-
-        layoutBubble?.startAnimation(
-            AnimationUtils.loadAnimation(
-                context,
-                R.anim.translate_textview_left_to_right
-            )
-        )
 
         if (mIndex == position && mManufacturerData == MANUFACTURER_CODE_RIGHT) {
             textViewAdapter?.setTextColor(context.getColor(R.color.right_device_slider))

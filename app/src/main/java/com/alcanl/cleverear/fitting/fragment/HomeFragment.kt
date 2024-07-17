@@ -81,6 +81,7 @@ class HomeFragment : Fragment() {
         initialize()
         return mBinding.root
     }
+
     override fun onResume()
     {
         if (fittingConfig.isInitializeCompleted) {
@@ -97,11 +98,13 @@ class HomeFragment : Fragment() {
 
         super.onResume()
     }
+
     private fun initialize()
     {
         mBinding.viewModel = HomeFragmentListenersViewModel(this)
         mHandler = RemoteHandler(this)
     }
+
     private fun handleServiceResponseSuccess(deviceInfo: DeviceInfo, libFile: File, hearingAid: HearingAid,
                                              hearingAidDTO: HearingAidDTO)
     {
@@ -181,7 +184,7 @@ class HomeFragment : Fragment() {
     {
         activity?.runOnUiThread {
             (activity as RemoteFittingActivity).binding.navigationView.menu.forEach {
-                it.isEnabled= false
+                it.isEnabled = false
             }
         }
 

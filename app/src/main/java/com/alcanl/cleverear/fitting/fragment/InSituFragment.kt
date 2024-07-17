@@ -128,6 +128,15 @@ class InSituFragment : Fragment(), FragmentListener {
         }
         super.onPause()
     }
+
+    override fun onDestroy() {
+        try {
+            manufacturing.prepareDeviceForModeling(false)
+        } catch (ex: ArkException) {
+            Log.e("onPause", ex.message!!)
+        }
+        super.onDestroy()
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
