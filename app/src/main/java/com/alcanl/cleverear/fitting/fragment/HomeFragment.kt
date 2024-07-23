@@ -17,7 +17,8 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.RemoteFittingActivity
-import com.alcanl.cleverear.api.dto.HearingAidDTO
+import com.alcanl.cleverear.api.aid.HearingAidDTO
+import com.alcanl.cleverear.api.equalizer.EqualizerValuesDTO
 import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
@@ -106,7 +107,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleServiceResponseSuccess(deviceInfo: DeviceInfo, libFile: File, hearingAid: HearingAid,
-                                             hearingAidDTO: HearingAidDTO)
+                                             hearingAidDTO: HearingAidDTO, equalizerValuesDTO: EqualizerValuesDTO)
     {
         mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
         runBlocking {
@@ -120,7 +121,7 @@ class HomeFragment : Fragment() {
         with(fittingConfig) {
             if (product.ear == 0) {
                 deviceInfoExtMap[EarSide.Left] =
-                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
                 deviceInfoViewModelMap[EarSide.Left]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Left]!!)
                 with(mBinding) {
                     frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
@@ -131,7 +132,7 @@ class HomeFragment : Fragment() {
             }
             else {
                 deviceInfoExtMap[EarSide.Right] =
-                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library)
+                    DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
                 deviceInfoViewModelMap[EarSide.Right]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Right]!!)
                 with(mBinding) {
                     frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
@@ -160,13 +161,14 @@ class HomeFragment : Fragment() {
             val libFile =
                 wirelessFittingInitializer.findLibraryByLibraryId(deviceInfo?.libraryId?.toString()!!)
             val hearingAidDTO = wirelessFittingInitializer.findHearingAidDTO(deviceInfo)
+            val equalizerValuesDTO = wirelessFittingInitializer.findEqualizerValues(hearingAidDTO)
 
             runBlocking {
                 delay(1000)
             }
 
-            if (libFile != null && hearingAidDTO?.modelName?.isNotEmpty()!!)
-                handleServiceResponseSuccess(deviceInfo, libFile, hearingAid, hearingAidDTO)
+            if (libFile != null && hearingAidDTO?.modelName?.isNotEmpty()!! && equalizerValuesDTO?.equalizerValuesName?.isNotEmpty()!!)
+                handleServiceResponseSuccess(deviceInfo, libFile, hearingAid, hearingAidDTO, equalizerValuesDTO)
             else
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_NOT_FOUND)
 

@@ -6,7 +6,7 @@ import java.util.Base64
 import java.util.Objects
 
 @Serializable
-data class ParamInfo(
+data class ParamDTO(
     val paramId : String? = null,
     @SerializedName("paramData") val paramFile: String? = null,
     @SerializedName("libraryName")val libraryId: String? = null
@@ -14,7 +14,7 @@ data class ParamInfo(
 
     override fun equals(other: Any?): Boolean
     {
-        return other is ParamInfo && paramId == other.paramId
+        return other is ParamDTO && paramId == other.paramId
                 && libraryId == other.libraryId
     }
 

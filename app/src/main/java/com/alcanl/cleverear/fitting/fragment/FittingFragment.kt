@@ -84,7 +84,8 @@ class FittingFragment : Fragment(), FragmentListener {
         initialize()
         super.onStart()
     }
-    override fun onStop() {
+    override fun onStop()
+    {
         EventBus.getDefault().unregister(this)
         super.onStop()
     }
@@ -270,7 +271,7 @@ class FittingFragment : Fragment(), FragmentListener {
         {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerBassValue(it.hearingAidDTO!!, value.toInt())
+                    it.product?.setEqualizerBassValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
                 }
             }
         }
@@ -284,7 +285,7 @@ class FittingFragment : Fragment(), FragmentListener {
         {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerMidValue(it.hearingAidDTO!!, value.toInt())
+                    it.product?.setEqualizerMidValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
                 }
             }
         }
@@ -298,7 +299,7 @@ class FittingFragment : Fragment(), FragmentListener {
         {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, value.toInt())
+                    it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
                 }
             }
         }

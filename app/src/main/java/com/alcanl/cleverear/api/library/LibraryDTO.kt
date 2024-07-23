@@ -6,13 +6,13 @@ import java.util.Base64
 import java.util.Objects
 
 @Serializable
-data class LibraryInfo(
+data class LibraryDTO(
     @SerializedName("libraryName") val libraryId : String? = null,
     @SerializedName("libraryData") val libraryFile : String? = null
 ) {
     override fun equals(other: Any?): Boolean
     {
-        return other is LibraryInfo && libraryId == other.libraryId
+        return other is LibraryDTO && libraryId == other.libraryId
                 && libraryFile == other.libraryFile
     }
 

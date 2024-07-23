@@ -2,7 +2,7 @@ package com.alcanl.cleverear.fitting
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.alcanl.cleverear.api.dto.HearingAidDTO
+import com.alcanl.cleverear.api.aid.HearingAidDTO
 import com.alcanl.cleverear.entity.HearingAid
 import com.ark.ArkException
 import com.ark.Parameter
@@ -29,16 +29,17 @@ private fun Product.getEqualizerValue(from: Int, to: Int) : Int
         sum += this.readIntParameter(String.format(EQ_CHANNEL_GAIN, it))
     }
 
-    return sum / (to - from)
+    return sum / (to - from) - 18
 }
 
 @SuppressLint("DefaultLocale")
-private fun Product.setEqualizerValue(from: Int, to: Int, value: Int)
+private fun Product.setEqualizerValue(from: Int, to: Int, value: Int, equalizerValues: List<Int>)
 {
     try {
         (from..< to).forEach {
             this.memories.getItem(currentMemory.value()).parameters.getById(
-                String.format(EQ_CHANNEL_GAIN, it)).value = value
+                String.format(EQ_CHANNEL_GAIN, it)).value = if (value > equalizerValues[it] || value < equalizerValues[it])
+                    equalizerValues[it] - 18 else value - 18
         }
 
     } catch (ex: ArkException) {
@@ -110,36 +111,36 @@ fun Product.readAllParameters(hearingAid: HearingAid) : Boolean
     } catch (_: Throwable) { return false }
 }
 
-fun Product.setEqualizerBassValue(dto: HearingAidDTO, value: Int)
+fun Product.setEqualizerBassValue(dto: HearingAidDTO, equalizerValues: List<Int>, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(0, 9, value)
-        36 -> this.setEqualizerValue(0, 9, value)
-        24 -> this.setEqualizerValue(0, 9, value)
-        16 -> this.setEqualizerValue(0, 6, value)
-        12 -> this.setEqualizerValue(0, 6, value)
+        49 -> this.setEqualizerValue(0, 9, value, equalizerValues)
+        36 -> this.setEqualizerValue(0, 9, value, equalizerValues)
+        24 -> this.setEqualizerValue(0, 9, value, equalizerValues)
+        16 -> this.setEqualizerValue(0, 6, value, equalizerValues)
+        12 -> this.setEqualizerValue(0, 6, value, equalizerValues)
     }
 }
 
-fun Product.setEqualizerMidValue(dto: HearingAidDTO, value: Int)
+fun Product.setEqualizerMidValue(dto: HearingAidDTO, equalizerValues: List<Int>, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(9, 19, value)
-        36 -> this.setEqualizerValue(9, 19, value)
-        24 -> this.setEqualizerValue(9, 17, value)
-        16 -> this.setEqualizerValue(6, 11, value)
-        12 -> this.setEqualizerValue(6, 9, value)
+        49 -> this.setEqualizerValue(9, 19, value, equalizerValues)
+        36 -> this.setEqualizerValue(9, 19, value, equalizerValues)
+        24 -> this.setEqualizerValue(9, 17, value, equalizerValues)
+        16 -> this.setEqualizerValue(6, 11, value, equalizerValues)
+        12 -> this.setEqualizerValue(6, 9, value, equalizerValues)
     }
 }
 
-fun Product.setEqualizerTrebleValue(dto: HearingAidDTO, value: Int)
+fun Product.setEqualizerTrebleValue(dto: HearingAidDTO, equalizerValues: List<Int>, value: Int)
 {
     when (dto.wdrcChannelCount) {
-        49 -> this.setEqualizerValue(19, 49, value)
-        36 -> this.setEqualizerValue(19, 36, value)
-        24 -> this.setEqualizerValue(17, 24, value)
-        16 -> this.setEqualizerValue(11, 16, value)
-        12 -> this.setEqualizerValue(9, 12, value)
+        49 -> this.setEqualizerValue(19, 49, value, equalizerValues)
+        36 -> this.setEqualizerValue(19, 36, value, equalizerValues)
+        24 -> this.setEqualizerValue(17, 24, value, equalizerValues)
+        16 -> this.setEqualizerValue(11, 16, value, equalizerValues)
+        12 -> this.setEqualizerValue(9, 12, value, equalizerValues)
     }
 }
 
