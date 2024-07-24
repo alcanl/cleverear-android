@@ -25,6 +25,7 @@ import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.entity.DeviceInfoExt
+import com.alcanl.cleverear.fitting.entity.DeviceInfoViewModel
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
 import com.alcanl.cleverear.util.EarSide
@@ -122,7 +123,7 @@ class HomeFragment : Fragment() {
             if (product.ear == 0) {
                 deviceInfoExtMap[EarSide.Left] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
-                deviceInfoViewModelMap[EarSide.Left]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Left]!!)
+                deviceInfoViewModelMap[EarSide.Left] = DeviceInfoViewModel(deviceInfoExtMap[EarSide.Left]!!)
                 with(mBinding) {
                     frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
@@ -133,7 +134,7 @@ class HomeFragment : Fragment() {
             else {
                 deviceInfoExtMap[EarSide.Right] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
-                deviceInfoViewModelMap[EarSide.Right]?.initializeDeviceInfoViewModel(deviceInfoExtMap[EarSide.Right]!!)
+                deviceInfoViewModelMap[EarSide.Right] = DeviceInfoViewModel(deviceInfoExtMap[EarSide.Right]!!)
                 with(mBinding) {
                     frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
@@ -177,6 +178,9 @@ class HomeFragment : Fragment() {
             mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_FAIL)
         } catch (ex: ArkException) {
             Log.e("ARK", ex.message!!)
+            mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
+        } catch (ex: Throwable) {
+            Log.e("OTHER", ex.message!!)
             mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
         }
 

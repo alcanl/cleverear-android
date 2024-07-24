@@ -22,9 +22,13 @@ class RemoteFittingActivity : AppCompatActivity() {
         CustomAlertDialogInSituInProgress(this)
     }
     lateinit var binding : ActivityRemoteFittingBinding
-    private var mSelectedFragmentId : Int? = null
-    var isFittingChangesMade = false
-    var isInSituInProgress = false
+
+    @Volatile
+    var mSelectedFragmentId : Int? = null
+    @Volatile
+    var isFittingChangesMade : Boolean = false
+    @Volatile
+    var isInSituInProgress : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {

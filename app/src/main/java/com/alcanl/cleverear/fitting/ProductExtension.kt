@@ -5,7 +5,6 @@ import android.util.Log
 import com.alcanl.cleverear.api.aid.HearingAidDTO
 import com.alcanl.cleverear.entity.HearingAid
 import com.ark.ArkException
-import com.ark.Parameter
 import com.ark.ParameterSpace
 import com.ark.Product
 
@@ -29,7 +28,7 @@ private fun Product.getEqualizerValue(from: Int, to: Int) : Int
         sum += this.readIntParameter(String.format(EQ_CHANNEL_GAIN, it))
     }
 
-    return sum / (to - from) - 18
+    return sum / (to - from) + 18
 }
 
 @SuppressLint("DefaultLocale")
@@ -46,29 +45,13 @@ private fun Product.setEqualizerValue(from: Int, to: Int, value: Int, equalizerV
         Log.e("Product::setFittingValues", ex.message!!)
     }
 }
-private fun setParameter(parameter: Parameter, value: Any)
-{
-    if (value is Int && parameter.isValidIntValue(value))
-        parameter.value = value
-    else if (value is Double && parameter.isValidDoubleValue(value))
-        parameter.doubleValue = value
-    else if (value is Boolean && parameter.isValidBooleanValue(value))
-        parameter.isBooleanValue = value
-    else
-        throw ArkException("Invalid Parameter Name And Value Combination")
 
-}
-fun Product.setParameter(parameterName: String, value: Any)
+fun Product.setParameter(parameterName: String, value: Int)
 {
-    if (isSystemParameter(parameterName)) {
-        setParameter(systemMemory.parameters.getById(parameterName), value)
-    }
-    else {
-        setParameter(
-            this.memories.getItem(currentMemory.value()).parameters.getById(parameterName),
-            value
-        )
-    }
+    if (isSystemParameter(parameterName))
+        this.systemMemory.parameters.getById(parameterName).value = value
+    else
+        this.memories.getItem(currentMemory.value()).parameters.getById(parameterName).value = value
 }
 fun Product.enableEqualizer(memory: ParameterSpace)
 {
@@ -77,18 +60,6 @@ fun Product.enableEqualizer(memory: ParameterSpace)
 fun Product.disableEqualizer(memory: ParameterSpace)
 {
     this.memories.getItem(memory.value()).parameters.getById(EQ_ENABLE).value = 0
-}
-fun Product.enableEqualizerForAllMemories(hearingAid: HearingAid)
-{
-    (0..< hearingAid.numberOfMemories).forEach {
-        enableEqualizer(ParameterSpace.value(it))
-    }
-}
-fun Product.disableEqualizerForAllMemories(hearingAid: HearingAid)
-{
-    (0..< hearingAid.numberOfMemories).forEach {
-        disableEqualizer(ParameterSpace.value(it))
-    }
 }
 
 fun Product.readIntParameter(parameterName: String) : Int

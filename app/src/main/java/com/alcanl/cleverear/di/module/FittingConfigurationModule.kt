@@ -7,14 +7,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import java.util.EnumMap
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object FittingConfigurationModule {
     var selectedEarSide : EarSide = EarSide.Left
-    val deviceInfoViewModelMap: EnumMap<EarSide, DeviceInfoViewModel> = EnumMap(EarSide::class.java)
+    val deviceInfoViewModelMap: MutableMap<EarSide, DeviceInfoViewModel> = mutableMapOf()
     val deviceInfoExtMap: MutableMap<EarSide, DeviceInfoExt> = mutableMapOf()
     var isBinauralConnection = false
     val isInitializeCompleted : Boolean
@@ -30,8 +29,6 @@ object FittingConfigurationModule {
     init {
         deviceInfoExtMap[EarSide.Left] = DeviceInfoExt()
         deviceInfoExtMap[EarSide.Right] = DeviceInfoExt()
-        deviceInfoViewModelMap[EarSide.Left] = DeviceInfoViewModel()
-        deviceInfoViewModelMap[EarSide.Right] = DeviceInfoViewModel()
     }
     @Provides
     @Singleton

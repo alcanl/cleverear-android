@@ -28,6 +28,9 @@ interface IEarTechnicLibraryService {
     fun findHearingAidEqualizerValuesById(@Query(API_QUERY_NUM)modelNumber: Int) : Call<HearingAidDTO>
 
     @GET(API_HEARING_AID_EQUALIZER_VALUES)
+    fun findHearingAidEqualizerValuesByHearingAidModelNumber(@Query(API_QUERY_NUMBER)modelNumber: Int) : Call<EqualizerValuesDTO>
+
+    @GET(API_EQUALIZER_VALUES)
     fun findHearingAidEqualizerValuesById(@Query(API_QUERY_ID)id: Long) : Call<EqualizerValuesDTO>
 
 }

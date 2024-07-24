@@ -9,19 +9,15 @@ data class DeviceInfoViewModel(var isEqualizerEnabled: Boolean, var isFeedBackCa
                                var deviceModelNumber: String): ViewModel() {
 
 
-    constructor() : this(false, false, 0, 0,
-        0, 0, false, false, "")
-
-    fun initializeDeviceInfoViewModel(deviceInfoExt: DeviceInfoExt)
-    {
-        isEqualizerEnabled = deviceInfoExt.isEqualizerEnabled()
-        isFeedBackCancelerEnabled = deviceInfoExt.isFeedbackCancelerEnabled()
-        isMemoryRetentionEnabled = deviceInfoExt.isMemoryRetentionEnabled()
-        isVolumeRetentionEnabled = deviceInfoExt.isVolumeRetentionEnabled()
-        wideRangeBandGainValue = deviceInfoExt.getProductWideBandValue()
-        equalizerMidValue = deviceInfoExt.getProductEqualizerMidValue()
-        equalizerTrebleValue = deviceInfoExt.getProductEqualizerTrebleValue()
-        equalizerBassValue = deviceInfoExt.getProductEqualizerBassValue()
+    constructor(deviceInfoExt: DeviceInfoExt) : this(
+        isEqualizerEnabled = deviceInfoExt.isEqualizerEnabled(),
+        isFeedBackCancelerEnabled = deviceInfoExt.isFeedbackCancelerEnabled(),
+        equalizerTrebleValue = deviceInfoExt.getProductEqualizerTrebleValue(),
+        equalizerMidValue = deviceInfoExt.getProductEqualizerMidValue(),
+        equalizerBassValue = deviceInfoExt.getProductEqualizerBassValue(),
+        wideRangeBandGainValue = deviceInfoExt.getProductWideBandValue(),
+        isMemoryRetentionEnabled = deviceInfoExt.isMemoryRetentionEnabled(),
+        isVolumeRetentionEnabled = deviceInfoExt.isVolumeRetentionEnabled(),
         deviceModelNumber = deviceInfoExt.getDeviceModelNumber()
-    }
+    )
 }

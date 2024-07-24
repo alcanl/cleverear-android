@@ -45,10 +45,7 @@ import com.ark.ParameterSpace
 import com.skydoves.powerspinner.IconSpinnerAdapter
 import com.skydoves.powerspinner.IconSpinnerItem
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -92,7 +89,7 @@ class FittingFragment : Fragment(), FragmentListener {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: FittingEvent)
     {
-        burnParametersToAllMemories()
+        burnButtonsClicked(mBinding.buttonBurnAll)
     }
 
     private fun initialize()
@@ -173,7 +170,6 @@ class FittingFragment : Fragment(), FragmentListener {
     @Synchronized
     private fun wideBandSliderValueChangedCallback(value: Int)
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
         try {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
@@ -185,36 +181,31 @@ class FittingFragment : Fragment(), FragmentListener {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun burnParametersToSelectedMemory()
     {
-        GlobalScope.launch {
-            try {
-                mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
-                fittingConfig.apply {
-                    deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToMemory(mSelectedMemory)
-                }
-                mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
-            } catch (ex: Throwable) {
-                Log.e("burnParametersToSelectedMemory", ex.message!!)
+        try {
+            mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
+            fittingConfig.apply {
+                deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToMemory(mSelectedMemory)
             }
+            mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
+        } catch (ex: Throwable) {
+            Log.e("burnParametersToSelectedMemory", ex.message!!)
         }
     }
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun burnParametersToAllMemories()
+
+    private  fun burnParametersToAllMemories()
     {
-        GlobalScope.launch {
-            try {
-                mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
-                with(fittingConfig) {
-                    deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToAllMemories(
-                        configuration.hearingAidMap[selectedEarSide]!!
-                    )
-                }
-                mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
-            } catch (ex: Throwable) {
-                Log.e("burnParametersToAllMemories", ex.message!!)
+        try {
+            mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
+            with(fittingConfig) {
+                deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToAllMemories(
+                    configuration.hearingAidMap[selectedEarSide]!!
+                )
             }
+            mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
+        } catch (ex: Throwable) {
+            Log.e("burnParametersToAllMemories", ex.message!!)
         }
     }
 
@@ -308,6 +299,7 @@ class FittingFragment : Fragment(), FragmentListener {
     }
     fun wideBandSliderValueChanged(value: Float)
     {
+        (activity as RemoteFittingActivity).isFittingChangesMade = true
         threadPool.execute { wideBandSliderValueChangedCallback(value.toInt()) }
     }
     fun equalizerCheckedChanged()
@@ -345,12 +337,15 @@ class FittingFragment : Fragment(), FragmentListener {
     }
     fun burnButtonsClicked(button: AppCompatButton)
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = false
-
-        if (button.id == mBinding.buttonBurn.id)
-            burnParametersToSelectedMemory()
-        else
-            burnParametersToAllMemories()
+        threadPool.execute {
+            threadPool.submit {
+                if (button.id == mBinding.buttonBurn.id)
+                    burnParametersToSelectedMemory()
+                else
+                    burnParametersToAllMemories()
+            }.get()
+            (activity as RemoteFittingActivity).isFittingChangesMade = false
+        }
     }
     fun earSideButtonClicked(earSide: EarSide)
     {
