@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.fitting.entity
 
+import androidx.lifecycle.ViewModel
 import com.alcanl.cleverear.api.aid.HearingAidDTO
 import com.alcanl.cleverear.api.equalizer.EqualizerValuesDTO
 import com.alcanl.cleverear.fitting.getEqualizerBassValue
@@ -17,7 +18,7 @@ import java.util.Objects
 
 data class DeviceInfoExt(val product: Product?, val deviceInfo: DeviceInfo?,
                          val hearingAidDTO: HearingAidDTO?, val library: Library?,
-                         var isInitFinished: Boolean = false, val equalizerValuesDTO: EqualizerValuesDTO?) {
+                         var isInitFinished: Boolean = false, val equalizerValuesDTO: EqualizerValuesDTO?) : ViewModel(){
 
     constructor() : this(null, null, null, null, equalizerValuesDTO = null)
 

@@ -73,6 +73,7 @@
     <string name="dialog_no" translatable="true">No</string>
     <string name="device_connected_text" translatable="true">Connected to Earnet</string>
     <string name="notification_reconnect_text" translatable="true">Hearing Aid Re-Connected</string>
+    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side, The Connection Of The Device %s Has Lost.\nPlease Wait While Trying To Reconnect.</string>
     <string name="current_memory_json" translatable="false">CurrentMemory</string>
     <string name="volume_level_json" translatable="false">VolumeLevel</string>
     <string name="device_name_json" translatable="false">DeviceName</string>
@@ -125,6 +126,7 @@
     <string name="textview_decibel_text" translatable="false">%d dB</string>
     <string name="button_plus_five_text" translatable="false">+5</string>
     <string name="button_minus_five_text" translatable="false">-5</string>
+    <string name="button_select_program_text" translatable="true">Select Program</string>
     <string name="textview_8k_text" translatable="false">8k</string>
     <string name="textview_6k_text" translatable="false">6k</string>
     <string name="textview_4k_text" translatable="false">4k</string>

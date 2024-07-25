@@ -1,7 +1,6 @@
 package com.alcanl.cleverear.di.module
 
 import com.alcanl.cleverear.fitting.entity.DeviceInfoExt
-import com.alcanl.cleverear.fitting.entity.DeviceInfoViewModel
 import com.alcanl.cleverear.util.EarSide
 import dagger.Module
 import dagger.Provides
@@ -13,7 +12,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FittingConfigurationModule {
     var selectedEarSide : EarSide = EarSide.Left
-    val deviceInfoViewModelMap: MutableMap<EarSide, DeviceInfoViewModel> = mutableMapOf()
     val deviceInfoExtMap: MutableMap<EarSide, DeviceInfoExt> = mutableMapOf()
     var isBinauralConnection = false
     val isInitializeCompleted : Boolean

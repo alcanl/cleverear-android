@@ -23,14 +23,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.SelfFittingActivity
 import com.alcanl.cleverear.databinding.FragmentInSituBinding
 import com.alcanl.cleverear.di.interceptor.DecibelArrayInterceptor
 import com.alcanl.cleverear.di.interceptor.FrequencyArrayInterceptor
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
-import com.alcanl.cleverear.fitting.event.FittingEvent
-import com.alcanl.cleverear.fitting.event.listener.FragmentListener
+import com.alcanl.cleverear.fitting.event.InSituEvent
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_BINDING
 import com.alcanl.cleverear.util.WHAT_INVALIDATE_CHART
@@ -62,12 +62,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import java.lang.ref.WeakReference
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class InSituFragment : Fragment(), FragmentListener {
+class InSituFragment : Fragment(), IEventListener {
     @Inject
     lateinit var fittingConfig : FittingConfigurationModule
     @Inject
@@ -151,9 +152,10 @@ class InSituFragment : Fragment(), FragmentListener {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: FittingEvent)
+    override fun onEventReceive(event: EventObject)
     {
-        saveButtonClicked()
+        if (event is InSituEvent)
+            saveButtonClicked()
     }
 
     private fun initialize()
@@ -313,7 +315,7 @@ class InSituFragment : Fragment(), FragmentListener {
     @OptIn(DelicateCoroutinesApi::class)
     fun playSoundButtonClicked()
     {
-        (activity as RemoteFittingActivity).isInSituInProgress = true
+        (activity as SelfFittingActivity).isInSituInProgress = true
         mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         GlobalScope.launch {
             try {
@@ -365,7 +367,7 @@ class InSituFragment : Fragment(), FragmentListener {
     @OptIn(DelicateCoroutinesApi::class)
     fun saveButtonClicked()
     {
-        (activity as RemoteFittingActivity).isInSituInProgress = false
+        (activity as SelfFittingActivity).isInSituInProgress = false
 
         GlobalScope.launch {
             saveMediaToStorage(mBinding.lineChart.chartBitmap)

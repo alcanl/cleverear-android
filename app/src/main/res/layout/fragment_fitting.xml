@@ -7,6 +7,7 @@
     <data>
         <import type="com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel"/>
         <import type="com.alcanl.cleverear.di.module.FittingConfigurationModule"/>
+        <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <import type="com.alcanl.cleverear.util.EarSide"/>
         <import type="android.widget.ArrayAdapter"/>
         <import type="com.ark.ParameterSpace"/>
@@ -15,6 +16,7 @@
         <import type="androidx.core.content.ContextCompat"/>
         <import type="androidx.appcompat.content.res.AppCompatResources"/>
         <import type="com.alcanl.cleverear.R"/>
+        <variable name="configurationModule" type="ConfigurationModule" />
         <variable name="isEqualizerEnabled" type="boolean" />
         <variable name="config" type="FittingConfigurationModule" />
         <variable name="viewModel" type="FittingFragmentListenersViewModel" />
@@ -67,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom | center"
                     android:backgroundTint="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
-                    android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Left).product != null}"
+                    android:enabled="@{configurationModule.INSTANCE.hearingAidMap.get(EarSide.Left).isConnected()}"
                     android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Left)}"
                     android:text="@string/left_ear_side_text"
                     android:textAllCaps="false"
@@ -94,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom | center"
                     android:backgroundTint="@{config.INSTANCE.selectedEarSide == EarSide.Right ? ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_secondary_variant) : ContextCompat.getColor(context, com.androidplot.R.color.ap_gray)}"
-                    android:enabled="@{config.INSTANCE.deviceInfoExtMap.get(EarSide.Right).product != null}"
+                    android:enabled="@{configurationModule.INSTANCE.hearingAidMap.get(EarSide.Right).isConnected()}"
                     android:onClick="@{()-> viewModel.handleEarSideSelectButton(EarSide.Right)}"
                     android:text="@string/right_ear_side_text"
                     android:textAllCaps="false"
@@ -242,7 +244,7 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="@{config.INSTANCE.deviceInfoViewModelMap.get(config.INSTANCE.selectedEarSide).equalizerTrebleValue}"
+                android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductEqualizerTrebleValue()}"
                 android:valueFrom="0"
                 android:valueTo="36"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
@@ -264,7 +266,7 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="@{config.INSTANCE.deviceInfoViewModelMap.get(config.INSTANCE.selectedEarSide).equalizerBassValue}"
+                android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductEqualizerBassValue()}"
                 android:valueFrom="0"
                 android:valueTo="36"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
@@ -286,7 +288,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/design_default_color_secondary_variant"
-                android:checked="@{config.INSTANCE.deviceInfoViewModelMap.get(config.INSTANCE.selectedEarSide).equalizerEnabled}"
+                android:checked="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).isEqualizerEnabled()}"
                 android:onCheckedChanged="@{() -> viewModel.handleCheckBoxEqualizerCheckedChanged()}"
                 android:text="@string/checkbox_equalizer_text"
                 android:textColor="@color/ap_black"
@@ -301,7 +303,7 @@
                 android:layout_width="166dp"
                 android:layout_height="45dp"
                 android:enabled="@{isEqualizerEnabled}"
-                android:value="@{config.INSTANCE.deviceInfoViewModelMap.get(config.INSTANCE.selectedEarSide).equalizerMidValue}"
+                android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductEqualizerMidValue()}"
                 android:valueFrom="0"
                 android:valueTo="36"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
@@ -372,13 +374,13 @@
             android:textColor="@color/design_default_color_secondary_variant"
             android:textColorHint="@color/design_default_color_secondary_variant"
             android:textSize="14sp"
+            android:onClick="@{()-> viewModel.handleMemorySpinnerClicked()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/appCompatImageViewLogo"
             app:layout_constraintHorizontal_bias="0.24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.025"
-            app:onItemSelected="@{(pos) -> viewModel.handleMemorySpinnerItemSelect(pos)}"
             app:spinner_arrow_animate_duration="700"
             app:spinner_arrow_tint="@color/design_default_color_secondary_variant"
             app:spinner_divider_color="@color/design_default_color_secondary_variant"
@@ -416,7 +418,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="5dp"
-                android:value="@{config.INSTANCE.deviceInfoViewModelMap.get(config.INSTANCE.selectedEarSide).wideRangeBandGainValue}"
+                android:value="@{config.INSTANCE.deviceInfoExtMap.get(config.INSTANCE.selectedEarSide).getProductWideBandValue()}"
                 android:valueFrom="0"
                 android:valueTo="42"
                 app:haloColor="@{config.INSTANCE.selectedEarSide == EarSide.Left ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"

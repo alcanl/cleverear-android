@@ -48,7 +48,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="DiscouragedApi">
         <activity
-            android:name=".RemoteFittingActivity"
+            android:name=".SelfFittingActivity"
             android:exported="true" />
         <activity
             android:name=".AutoConnectActivity"

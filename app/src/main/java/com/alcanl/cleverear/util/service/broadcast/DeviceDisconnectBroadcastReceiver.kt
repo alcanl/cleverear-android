@@ -18,10 +18,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.fitting.event.DisconnectEvent
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
 import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
 
@@ -55,12 +57,18 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
                 Log.d("debug", String.format("The Device %s disconnected", leftDevice))
                 handleLeftDeviceDisconnect()
                 showNotification(context, notification)
+                EventBus.getDefault().post(DisconnectEvent(this,
+                    configuration.hearingAidMap[EarSide.Left]
+                ))
             }
 
             if (device.address == rightDevice) {
                 Log.d("debug", String.format("The Device %s disconnected", rightDevice))
                 handleRightDeviceDisconnect()
                 showNotification(context, notification)
+                EventBus.getDefault().post(DisconnectEvent(this,
+                    configuration.hearingAidMap[EarSide.Right]
+                ))
             }
 
         } catch (_: IllegalStateException) {}

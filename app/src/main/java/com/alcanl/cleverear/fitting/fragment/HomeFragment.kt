@@ -16,7 +16,7 @@ import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.SelfFittingActivity
 import com.alcanl.cleverear.api.aid.HearingAidDTO
 import com.alcanl.cleverear.api.equalizer.EqualizerValuesDTO
 import com.alcanl.cleverear.databinding.FragmentHomeBinding
@@ -25,7 +25,6 @@ import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.WirelessFittingInitializer
 import com.alcanl.cleverear.fitting.entity.DeviceInfoExt
-import com.alcanl.cleverear.fitting.entity.DeviceInfoViewModel
 import com.alcanl.cleverear.fitting.exception.NetworkException
 import com.alcanl.cleverear.fitting.readAllParameters
 import com.alcanl.cleverear.util.EarSide
@@ -123,7 +122,6 @@ class HomeFragment : Fragment() {
             if (product.ear == 0) {
                 deviceInfoExtMap[EarSide.Left] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
-                deviceInfoViewModelMap[EarSide.Left] = DeviceInfoViewModel(deviceInfoExtMap[EarSide.Left]!!)
                 with(mBinding) {
                     frameLayoutLeftEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
@@ -134,7 +132,6 @@ class HomeFragment : Fragment() {
             else {
                 deviceInfoExtMap[EarSide.Right] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
-                deviceInfoViewModelMap[EarSide.Right] = DeviceInfoViewModel(deviceInfoExtMap[EarSide.Right]!!)
                 with(mBinding) {
                     frameLayoutRightEar.startAnimation(AnimationUtils.loadAnimation(requireContext(),
                         R.anim.alpha_blink_anim_fit_image)
@@ -189,7 +186,7 @@ class HomeFragment : Fragment() {
     private fun initializeProduct()
     {
         activity?.runOnUiThread {
-            (activity as RemoteFittingActivity).binding.navigationView.menu.forEach {
+            (activity as SelfFittingActivity).binding.navigationView.menu.forEach {
                 it.isEnabled = false
             }
         }
@@ -236,7 +233,7 @@ class HomeFragment : Fragment() {
                     imageViewHearingAid.startAlphaAnimation(it.requireContext())
                     textViewInitialize.startAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
                     postDelayed({
-                        (it.activity as RemoteFittingActivity).binding.navigationView.menu.forEach {item ->
+                        (it.activity as SelfFittingActivity).binding.navigationView.menu.forEach { item ->
                             item.isEnabled = true
                         }
                         textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))

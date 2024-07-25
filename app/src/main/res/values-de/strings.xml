@@ -11,6 +11,8 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="button_select_program_text" translatable="true">Wählen</string>
+    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side, The Connection Of The Device %s Has Lost.\nBitte warten Sie, während Sie versuchen, die Verbindung wiederherzustellen.</string>
     <string name="dialog_already_connected_message">Sie haben bereits eine Verbindung mit einem Gerät hergestellt. Möchten Sie diese Verbindung beenden?</string>
     <string name="textview_count_device_found_text">Geräte gefunden</string>
     <string name="button_stop_scan_text">\tSuche beenden</string>

@@ -3,11 +3,11 @@ package com.alcanl.cleverear.util.dialog
 import android.app.Dialog
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.SelfFittingActivity
 import com.alcanl.cleverear.databinding.LayoutAlertDialogInSituInProgressBinding
 import com.alcanl.cleverear.viewmodel.InSituInProgressDialogListenersViewModel
 
-class CustomAlertDialogInSituInProgress(activity: RemoteFittingActivity): Dialog(activity, R.style.DialogStyle) {
+class CustomAlertDialogInSituInProgress(activity: SelfFittingActivity): Dialog(activity, R.style.DialogStyle) {
     init {
         window?.setBackgroundDrawableResource(R.drawable.drawable_alert_dialog)
         setCancelable(false)

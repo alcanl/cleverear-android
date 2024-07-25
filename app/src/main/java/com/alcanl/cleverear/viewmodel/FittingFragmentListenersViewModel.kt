@@ -37,9 +37,9 @@ class FittingFragmentListenersViewModel(fragment: FittingFragment) {
     {
         mWeakReference.get()?.equalizerMidSliderValueChanged(value)
     }
-    fun handleMemorySpinnerItemSelect(pos: Int)
+    fun handleMemorySpinnerClicked()
     {
-        mWeakReference.get()?.spinnerItemSelected(pos)
+        mWeakReference.get()?.memorySpinnerClicked()
     }
     fun handleFeedbackCancelerSpinnerItemSelect(pos: Int)
     {

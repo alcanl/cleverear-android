@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.R
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.SelfFittingActivity
 import com.alcanl.cleverear.databinding.FragmentFittingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
@@ -27,7 +27,7 @@ import com.alcanl.cleverear.fitting.enableFeedBackCanceler
 import com.alcanl.cleverear.fitting.enableMemoryRetention
 import com.alcanl.cleverear.fitting.enableVolumeRetention
 import com.alcanl.cleverear.fitting.event.FittingEvent
-import com.alcanl.cleverear.fitting.event.listener.FragmentListener
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.fitting.setEqualizerBassValue
 import com.alcanl.cleverear.fitting.setEqualizerMidValue
 import com.alcanl.cleverear.fitting.setEqualizerTrebleValue
@@ -37,6 +37,7 @@ import com.alcanl.cleverear.util.WHAT_DISABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_ENABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
 import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
+import com.alcanl.cleverear.util.dialog.CustomDialogProgramPicker
 import com.alcanl.cleverear.util.extension.handleFittingCheckedChanged
 import com.alcanl.cleverear.util.extension.setLayoutDisable
 import com.alcanl.cleverear.util.extension.setLayoutEnable
@@ -51,12 +52,13 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.ref.WeakReference
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class FittingFragment : Fragment(), FragmentListener {
+class FittingFragment : Fragment(), IEventListener {
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
     @Inject
@@ -65,14 +67,23 @@ class FittingFragment : Fragment(), FragmentListener {
     lateinit var configuration: ConfigurationModule
 
     private lateinit var mSelectedMemory : ParameterSpace
+
     private lateinit var mBinding: FragmentFittingBinding
+
     private lateinit var mHandler: FittingHandler
+
+    private var mSelectedPickerPosition : Int = 0
+
+    private val mDialogProgramPicker: CustomDialogProgramPicker by lazy {
+        CustomDialogProgramPicker(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_fitting, container, false)
+        mBinding.lifecycleOwner = this
         return mBinding.root
     }
     override fun onStart()
@@ -87,23 +98,23 @@ class FittingFragment : Fragment(), FragmentListener {
         super.onStop()
     }
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    override fun onEventReceive(event: FittingEvent)
+    override fun onEventReceive(event: EventObject)
     {
-        burnButtonsClicked(mBinding.buttonBurnAll)
+        if (event is FittingEvent)
+            burnButtonsClicked(mBinding.buttonBurnAll)
     }
 
     private fun initialize()
     {
         mBinding.viewModel = FittingFragmentListenersViewModel(this)
         mHandler = FittingHandler(this)
-        initializeSpinner()
         initializeSelectedMemory()
         initializeEqualizer()
         initializeFeedbackCancelerSpinnerAdapter()
     }
     private fun initializeSelectedMemory()
     {
-        mSelectedMemory = ParameterSpace.value(mBinding.spinnerMemory.selectedIndex)
+        mSelectedMemory = configuration.hearingAidMap[fittingConfig.selectedEarSide]?.currentMemory!!
     }
     private fun initializeEqualizer()
     {
@@ -111,31 +122,7 @@ class FittingFragment : Fragment(), FragmentListener {
             deviceInfoExtMap[selectedEarSide]?.isEqualizerEnabled()!!
         }
     }
-    private fun initializeMemorySpinnerAdapter(memoryCount: Int)
-    {
-        try {
-            mBinding.apply {
-                spinnerMemory.setSpinnerAdapter(IconSpinnerAdapter(spinnerMemory))
-                val iconAdapterList = ArrayList<IconSpinnerItem>(memoryCount)
-                val itemArray = resources.getStringArray(R.array.programs)
 
-                (0..< memoryCount).forEach {
-                    iconAdapterList.add(IconSpinnerItem(text = itemArray[it]))
-                }
-                spinnerMemory.setItems(iconAdapterList)
-
-                spinnerMemory.selectItemByIndex(
-                    with(fittingConfig) {
-                        deviceInfoExtMap[selectedEarSide]?.product?.currentMemory?.value() ?: 1
-                    })
-
-                spinnerMemory.lifecycleOwner = this@FittingFragment
-
-            }
-        } catch (ex: Throwable) {
-            Log.e("initializeSpinnerAdapter", ex.message!!)
-        }
-    }
     private fun initializeFeedbackCancelerSpinnerAdapter()
     {
         try {
@@ -155,16 +142,6 @@ class FittingFragment : Fragment(), FragmentListener {
         } catch (ex: Throwable) {
             Log.e("initializeSpinnerAdapter", ex.message!!)
         }
-    }
-    private fun initializeSpinner()
-    {
-        val memoryCount = with(configuration) {
-            with(fittingConfig) {
-                hearingAidMap[selectedEarSide]?.numberOfMemories ?: 8
-            }
-        }
-
-        initializeMemorySpinnerAdapter(memoryCount)
     }
 
     @Synchronized
@@ -212,9 +189,12 @@ class FittingFragment : Fragment(), FragmentListener {
     private fun invalidateBindingsCallback()
     {
         mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
-        mBinding.invalidateAll()
         runBlocking {
             delay(1500)
+        }
+        activity?.runOnUiThread { mBinding.invalidateAll() }
+        runBlocking {
+            delay(2000)
         }
         mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
     }
@@ -266,7 +246,7 @@ class FittingFragment : Fragment(), FragmentListener {
                 }
             }
         }
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
     fun equalizerMidSliderValueChanged(value: Float)
@@ -280,7 +260,7 @@ class FittingFragment : Fragment(), FragmentListener {
                 }
             }
         }
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
     fun equalizerTrebleSliderValueChanged(value: Float)
@@ -294,17 +274,17 @@ class FittingFragment : Fragment(), FragmentListener {
                 }
             }
         }
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
     fun wideBandSliderValueChanged(value: Float)
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { wideBandSliderValueChangedCallback(value.toInt()) }
     }
     fun equalizerCheckedChanged()
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
@@ -320,7 +300,7 @@ class FittingFragment : Fragment(), FragmentListener {
 
     fun feedbackCancelerCheckedChanged()
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         mBinding.spinnerFeedbackCanceler.isEnabled = mBinding.checkBoxFeedbackCanceler.isChecked
 
         threadPool.execute {
@@ -344,7 +324,7 @@ class FittingFragment : Fragment(), FragmentListener {
                 else
                     burnParametersToAllMemories()
             }.get()
-            (activity as RemoteFittingActivity).isFittingChangesMade = false
+            (activity as SelfFittingActivity).isFittingChangesMade = false
         }
     }
     fun earSideButtonClicked(earSide: EarSide)
@@ -353,18 +333,14 @@ class FittingFragment : Fragment(), FragmentListener {
         threadPool.execute(this::invalidateBindingsCallback)
 
     }
-    fun spinnerItemSelected(pos: Int)
+    fun numberPickerOnValueChanged(pos: Int)
     {
-        mSelectedMemory = ParameterSpace.value(pos)
-        configuration.hearingAidMap[fittingConfig.selectedEarSide]
-            ?.wirelessControl?.currentMemory = ParameterSpace.value(pos)
-
-        threadPool.execute(this::invalidateBindingsCallback)
-
+        mSelectedPickerPosition = pos
+        mBinding.spinnerMemory.setHint(resources.getStringArray(R.array.programs)[pos])
     }
     fun memoryRetentionCheckedChanged()
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute {
             fittingConfig.apply {
                 mBinding.checkBoxMemoryRetention.handleFittingCheckedChanged(
@@ -376,7 +352,7 @@ class FittingFragment : Fragment(), FragmentListener {
     }
     fun volumeRetentionCheckedChanged()
     {
-        (activity as RemoteFittingActivity).isFittingChangesMade = true
+        (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute {
             fittingConfig.apply {
                 mBinding.checkBoxVolumeRetention.handleFittingCheckedChanged(
@@ -384,5 +360,19 @@ class FittingFragment : Fragment(), FragmentListener {
                     { deviceInfoExtMap[selectedEarSide]?.product?.enableVolumeRetention() })
             }
         }
+    }
+    fun memorySpinnerClicked()
+    {
+        mDialogProgramPicker.show()
+    }
+    fun dialogSelectProgramClicked()
+    {
+        mDialogProgramPicker.dismiss()
+        mSelectedMemory = ParameterSpace.value(mSelectedPickerPosition)
+        configuration.hearingAidMap[fittingConfig.selectedEarSide]
+            ?.wirelessControl?.currentMemory = ParameterSpace.value(mSelectedPickerPosition)
+
+        threadPool.execute(this::invalidateBindingsCallback)
+
     }
 }

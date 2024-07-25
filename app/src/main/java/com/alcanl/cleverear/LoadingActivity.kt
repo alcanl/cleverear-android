@@ -314,7 +314,7 @@ class LoadingActivity : AppCompatActivity() {
         Handler(Looper.myLooper()!!).postDelayed({
             startActivity(if (!configuration.isRemoteFittingConnection) Intent
                 (this@LoadingActivity, ControlActivity::class.java) else Intent(
-                this@LoadingActivity, RemoteFittingActivity::class.java
+                this@LoadingActivity, SelfFittingActivity::class.java
             )); finish() }, 3000)
     }
     private fun finalizeLoadingTimer()

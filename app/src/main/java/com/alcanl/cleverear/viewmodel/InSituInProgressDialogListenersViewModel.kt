@@ -1,9 +1,9 @@
 package com.alcanl.cleverear.viewmodel
 
-import com.alcanl.cleverear.RemoteFittingActivity
+import com.alcanl.cleverear.SelfFittingActivity
 import java.lang.ref.WeakReference
 
-class InSituInProgressDialogListenersViewModel(activity: RemoteFittingActivity) {
+class InSituInProgressDialogListenersViewModel(activity: SelfFittingActivity) {
     private val mWeakReference = WeakReference(activity)
 
     fun handleYesButton()

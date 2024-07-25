@@ -61,7 +61,7 @@ fun ViewGroup.setLayoutDisable()
 fun ViewGroup.setLayoutEnable()
 {
     this.children.iterator().forEachRemaining {
-        if (it is ViewGroup)
+        if (it is ViewGroup && it !is FrameLayout)
             it.setLayoutEnable()
         else
             it.isEnabled = true

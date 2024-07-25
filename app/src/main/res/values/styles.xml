@@ -5,6 +5,9 @@
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 
-
+    <style name="NumberPickerStyle" >
+        <item name="android:textColorPrimary">@color/design_default_color_secondary_variant</item>
+        <item name="android:textColorSecondary">@color/design_default_color_secondary_variant</item>
+    </style>
 
 </resources>
