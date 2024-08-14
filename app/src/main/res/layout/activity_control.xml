@@ -159,7 +159,6 @@
                 android:id="@+id/sliderRight"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
                 android:layout_marginEnd="-30dp"
                 android:enabled="@{config.INSTANCE.doubleDeviceConnection ? true : false}"
                 android:rotation="270"
@@ -258,9 +257,9 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonOne"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -271,12 +270,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonTwo"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="10dp"
@@ -287,12 +286,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonThree"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -303,12 +302,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonFour"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -319,7 +318,7 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
             </TableRow>
 
@@ -328,9 +327,9 @@
                 android:layout_height="72dp"
                 android:padding="10dp">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonFive"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -341,12 +340,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonSix"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -357,12 +356,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonSeven"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -373,12 +372,12 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/buttonEight"
-                    style="?android:attr/buttonBarButtonStyle"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -389,7 +388,7 @@
                     android:textColor="@color/ap_black"
                     android:textSize="24sp"
                     android:visibility="invisible"
-                    app:cornerRadius="50dp"
+                    app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
             </TableRow>
 

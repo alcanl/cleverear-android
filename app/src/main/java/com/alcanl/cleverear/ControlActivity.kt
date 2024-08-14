@@ -43,16 +43,16 @@ class ControlActivity : AppCompatActivity(), IEventListener {
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var configuration : ConfigurationModule
+    @Inject
+    lateinit var listener : ControlActivityEventListener
 
     lateinit var mBinding: ActivityControlBinding
-    private lateinit var mListener : ControlActivityEventListener
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
-        mListener = ControlActivityEventListener(this, eventHandler, threadPool)
-                .also { it.startEventListener() }
-
+        listener.startEventListener()
         EventBus.getDefault().register(this)
     }
     override fun onResume()
@@ -71,24 +71,23 @@ class ControlActivity : AppCompatActivity(), IEventListener {
             configuration.hearingAidMap[configuration.earSide]?.currentMemory?.value() ?: 0
         ) }
 
-        if (!mListener.isListenerOnBoard())
-            mListener =
-                ControlActivityEventListener(this, eventHandler, threadPool).apply { startEventListener() }
+        if (!listener.isListenerOnBoard())
+            listener.startEventListener()
     }
     override fun onStop()
     {
         super.onStop()
 
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
     }
     override fun onDestroy() {
         super.onDestroy()
 
         EventBus.getDefault().unregister(this)
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
     }
     @Subscribe(threadMode = ThreadMode.ASYNC)

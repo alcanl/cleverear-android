@@ -14,37 +14,50 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAdvancedBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.listeners.AdvancedActivityEventListener
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.listeners.event.MemoryEvent
+import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.viewmodel.AdvancedActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
+import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AdvancedActivity : AppCompatActivity(){
+class AdvancedActivity : AppCompatActivity(), IEventListener {
     @Inject
     lateinit var eventHandler: EventHandler
     @Inject
     lateinit var configuration : ConfigurationModule
     @Inject
     lateinit var threadPool: ExecutorService
+    @Inject
+    lateinit var listener: AdvancedActivityEventListener
+
     private lateinit var mBinding : ActivityAdvancedBinding
-    private lateinit var mListener: AdvancedActivityEventListener
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
-        mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
-            .also { it.startEventListener() }
+        listener.startEventListener()
+        EventBus.getDefault().register(this)
     }
     override fun onResume()
     {
@@ -55,23 +68,99 @@ class AdvancedActivity : AppCompatActivity(){
             return
         }
 
-        if (!mListener.isListenerOnBoard())
-            mListener = AdvancedActivityEventListener(this, eventHandler, threadPool, configuration)
-                .apply { startEventListener() }
+        if (!listener.isListenerOnBoard())
+            listener.startEventListener()
     }
     override fun onStop()
     {
         super.onStop()
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
     }
     override fun onDestroy() {
         super.onDestroy()
 
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
+        EventBus.getDefault().unregister(this)
+
+    }
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        when (event) {
+            is VolumeEvent -> onVolumeEventReceived(event)
+            is MemoryEvent -> onMemoryEventReceived(event)
+            is BatteryEvent -> onBatteryEventReceived(event)
+            is ConnectionEvent -> onConnectionEventReceived(event)
+        }
+    }
+    private fun onVolumeEventReceived(event: VolumeEvent)
+    {
+        threadPool.execute {
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.volume = event.volumeData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.volume = event.volumeData
+                    else
+                        hearingAidMap[EarSide.Right]?.volume = event.volumeData
+            }
+
+            runOnUiThread {
+                Toast.makeText(this@AdvancedActivity, String.format(
+                    ContextCompat.getString(this@AdvancedActivity,
+                        R.string.listener_volume_level_text
+                    ) + " %d", event.volumeData), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun onBatteryEventReceived(event: BatteryEvent)
+    {
+        threadPool.execute {
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.batteryLevel = event.batteryData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.batteryLevel = event.batteryData
+                    else
+                        hearingAidMap[EarSide.Right]?.batteryLevel = event.batteryData
+            }
+        }
+    }
+    private fun onMemoryEventReceived(event: MemoryEvent)
+    {
+        threadPool.execute {
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                        hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(event.memoryData)
+                    else
+                        hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(event.memoryData)
+            }
+        }
+        runOnUiThread {
+            Toast.makeText(this@AdvancedActivity, String.format(
+                ContextCompat.getString(this@AdvancedActivity, R.string.text_active_memory)
+                    + (event.memoryData + 1).toString()), Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun onConnectionEventReceived(event: ConnectionEvent)
+    {
+        if (event.connectionData == 1) {
+            runOnUiThread {
+                Toast.makeText(this, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
+                    .show()
+                    finish()
+                    configuration.isConnected = false
+            }
+        }
     }
     private fun initialize()
     {

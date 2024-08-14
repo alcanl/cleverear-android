@@ -169,6 +169,8 @@
     <string name="checkbox_memory_retention_text" translatable="true">Memory Retention</string>
     <string name="checkbox_volume_retention_text" translatable="true">Volume Retention</string>
     <string name="spinner_feedback_hint_text" translatable="true">Feedback Environment</string>
+    <string name="bubble_textview_single_device_text" translatable="true">If you are user of just a single hearing aid, you can continue with…</string>
+    <string name="bubble_textview_double_device_text" translatable="true">If you are user of both ear side of hearing aids, you can continue with…</string>
     <string name="textview_in_situ_warning_text" translatable="true">This test has been designed just for information and device configuration and is not a substitute for official health organizations hearing tests.</string>
 
     <string-array name="programs">

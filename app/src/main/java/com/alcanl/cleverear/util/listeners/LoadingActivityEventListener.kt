@@ -1,34 +1,40 @@
 package com.alcanl.cleverear.util.listeners
 
+import android.content.Context
 import android.util.Log
-import com.alcanl.cleverear.LoadingActivity
-import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.parseJsonConnectionData
 import com.alcanl.cleverear.util.parseJsonSenderMacData
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.ark.Event
 import com.ark.EventHandler
 import com.ark.EventType
+import dagger.hilt.android.qualifiers.ApplicationContext
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONException
 import java.lang.NullPointerException
-import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
+import javax.inject.Inject
 
-class LoadingActivityEventListener(activity: LoadingActivity, private val mEventHandler: EventHandler,
-                                   private val mConfiguration : ConfigurationModule, private val mThreadPool : ExecutorService)
+class LoadingActivityEventListener @Inject constructor (@ApplicationContext context: Context)
 {
-    private val mWeakReference = WeakReference(activity)
+    @Inject
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var threadPool : ExecutorService
+
+    private val mContext = context
     private var mListener : Thread? = null
+
     fun startEventListener() {
 
-        mThreadPool.execute {
+        threadPool.execute {
             try {
                 mListener = Thread.currentThread()
                  while (!mListener?.isInterrupted!!){
                     try {
-                        val event = mEventHandler.event
-                        val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
+                        val event = eventHandler.event
+                        val eventSender = parseJsonSenderMacData(event.data, mContext)
                         when (event.type) {
                             EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
                             else -> {
@@ -51,29 +57,15 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     }
     private fun handleConnectionEvent(event: Event, eventSender: String)
     {
-        val actLoad = mWeakReference.get()!!
         try {
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
-            val connectionState = parseJsonConnectionData(event.data, actLoad)
-            if (connectionState == 3) {
-                if (!mConfiguration.isDoubleDeviceConnection) {
-                    mConfiguration.hearingAidMap[mConfiguration.earSide]?.isConnected = true
-                    mConfiguration.isConnected = true
-                }
-                else {
-                    if (eventSender == mConfiguration.hearingAidMap[EarSide.Left]?.address) {
-                        mConfiguration.hearingAidMap[EarSide.Left]?.isConnected = true
-                    }
-                    else
-                        mConfiguration.hearingAidMap[EarSide.Right]?.isConnected = true
+            val connectionEvent = ConnectionEvent(this)
+            connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
+            connectionEvent.eventSender = eventSender
 
-                    if (mConfiguration.hearingAidMap.all { it.value.isConnected })
-                        mConfiguration.isConnected = true
+            EventBus.getDefault().post(connectionEvent)
 
-                }
-            }
-        } catch (ex: JSONException)
-        {
+        } catch (ex: JSONException) {
             Log.e("parseError", ex.message!!)
         }
     }
@@ -81,7 +73,7 @@ class LoadingActivityEventListener(activity: LoadingActivity, private val mEvent
     fun stopListener()
     {
         mListener?.interrupt()
-        mEventHandler.exit()
+        eventHandler.exit()
     }
     @Synchronized
     fun isListenerOnBoard() : Boolean

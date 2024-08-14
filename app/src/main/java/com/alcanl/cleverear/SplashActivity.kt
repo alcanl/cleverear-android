@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
 import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
@@ -21,14 +22,19 @@ import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogConnectedBefore
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var configuration: ConfigurationModule
@@ -36,11 +42,28 @@ class SplashActivity : AppCompatActivity() {
     lateinit var eventHandler: EventHandler
     @Inject
     lateinit var threadPool: ExecutorService
+    @Inject
+    lateinit var listener: SplashActivityEventListener
 
     private lateinit var mAlertDialog: CustomAlertDialogConnectedBefore
-    private lateinit var mListener: SplashActivityEventListener
     private lateinit var mAddressArray : Array<String>
     private var isAshaConnected = false
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        if (event is BatteryEvent)
+            configuration.apply {
+                if (isDoubleDeviceConnection)
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.batteryLevel = event.batteryData
+                    else
+                        hearingAidMap[EarSide.Right]?.batteryLevel = event.batteryData
+                else
+                    hearingAidMap[earSide]?.batteryLevel = event.batteryData
+            }
+    }
+
     private fun initCountDownTimer()
     {
         object: CountDownTimer(4000, 1000) {
@@ -114,13 +137,13 @@ class SplashActivity : AppCompatActivity() {
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
         checkAndRequestNotificationPermission()
         checkPrefs()
-        mListener = SplashActivityEventListener(eventHandler, threadPool, configuration, this)
         mAlertDialog = CustomAlertDialogConnectedBefore(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
         initialize()
         initCountDownTimer()
         cleanEvents()
@@ -151,9 +174,9 @@ class SplashActivity : AppCompatActivity() {
     private fun cleanEventsCallback()
     {
         try {
-            mListener.startEventListener()
+            listener.startEventListener()
             Thread.sleep(2000)
-            mListener.stopListener()
+            listener.stopListener()
         } catch (_: InterruptedException) {}
     }
     fun alertDialogPositiveButtonClicked()

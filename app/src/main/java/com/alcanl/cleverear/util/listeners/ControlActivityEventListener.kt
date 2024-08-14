@@ -18,25 +18,30 @@ import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.ark.Event
 import com.ark.EventHandler
 import com.ark.EventType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.greenrobot.eventbus.EventBus
 import org.json.JSONException
 import java.lang.NullPointerException
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
-class ControlActivityEventListener @Inject constructor (private val mContext: Context,
-                                                        private val mEventHandler: EventHandler,
-                                                        private val mThreadPool : ExecutorService) {
+class ControlActivityEventListener @Inject constructor (@ApplicationContext context: Context) {
+
+    @Inject
+    lateinit var eventHandler: EventHandler
+    @Inject
+    lateinit var threadPool : ExecutorService
 
     private var mListener: Thread? = null
+    private val mContext = context
 
     fun startEventListener() {
-        mThreadPool.execute {
+        threadPool.execute {
                 try {
                     mListener = Thread.currentThread()
                     while (!mListener?.isInterrupted!!) {
                         try {
-                            val event = mEventHandler.event
+                            val event = eventHandler.event
                             val eventSender = parseJsonSenderMacData(event.data, mContext)
 
                             when (event.type) {
@@ -127,7 +132,7 @@ class ControlActivityEventListener @Inject constructor (private val mContext: Co
     fun stopListener()
     {
         mListener?.interrupt()
-        mEventHandler.exit()
+        eventHandler.exit()
     }
     @Synchronized
     fun isListenerOnBoard() : Boolean

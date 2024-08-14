@@ -10,6 +10,7 @@ import javax.inject.Inject
 class DeviceScanner @Inject constructor(){
     @Inject
     lateinit var productManager: ProductManager
+
     private fun scanDevice(earSide: EarSide) : AsyncResult
     {
         return productManager.beginScanForWirelessDevices(WirelessProgrammerType.kPlatformDefault, "",

@@ -1,24 +1,29 @@
 package com.alcanl.cleverear.util.listeners
 
+import android.content.Context
 import android.util.Log
-import com.alcanl.cleverear.SplashActivity
-import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.parseJsonBatteryStateData
 import com.alcanl.cleverear.util.parseJsonSenderMacData
 import com.ark.EventHandler
 import com.ark.EventType
+import dagger.hilt.android.qualifiers.ApplicationContext
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONException
 import java.lang.NullPointerException
-import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
+import javax.inject.Inject
 
-class SplashActivityEventListener(private val mEventHandler: EventHandler,
-                                  private val mThreadPool: ExecutorService,
-                                  private val mConfiguration: ConfigurationModule,
-                                  activity: SplashActivity) {
-    private val mWeakReference = WeakReference(activity)
+class SplashActivityEventListener @Inject constructor (@ApplicationContext context: Context) {
+
+    @Inject
+    lateinit var mEventHandler: EventHandler
+    @Inject
+    lateinit var mThreadPool: ExecutorService
+
+    private val mContext = context
     private lateinit var mListener: Thread
+
     fun startEventListener()
     {
 
@@ -29,17 +34,10 @@ class SplashActivityEventListener(private val mEventHandler: EventHandler,
                     val event = mEventHandler.event
                     Log.e("eventSplash", event.data)
                     if (event.type == EventType.kBatteryEvent) {
-                        val battery = parseJsonBatteryStateData(event.data, mWeakReference.get()!!)
-                        val sender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
-                        mConfiguration.apply {
-                            if (isDoubleDeviceConnection)
-                                if (sender == hearingAidMap[EarSide.Left]?.address)
-                                    hearingAidMap[EarSide.Left]?.batteryLevel = battery
-                                else
-                                    hearingAidMap[EarSide.Right]?.batteryLevel = battery
-                            else
-                                hearingAidMap[earSide]?.batteryLevel = battery
-                        }
+                        val batteryEvent = BatteryEvent(this)
+                        batteryEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
+                        batteryEvent.batteryData = parseJsonBatteryStateData(event.data, mContext)
+                        EventBus.getDefault().post(batteryEvent)
                     }
                 }
                 Log.d("splash", "SplashListenerStopped")

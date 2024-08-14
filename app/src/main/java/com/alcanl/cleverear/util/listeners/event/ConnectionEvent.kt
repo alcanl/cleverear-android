@@ -9,4 +9,5 @@ class ConnectionEvent(source: Any?) : EventObject(source) {
         UUID.randomUUID()
     }
     var connectionData by Delegates.notNull<Int>()
+    lateinit var eventSender : String
 }

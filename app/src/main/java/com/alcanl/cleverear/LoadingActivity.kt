@@ -23,6 +23,7 @@ import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.ConfigurationModule.earSide
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
 import com.alcanl.cleverear.util.HA_LEFT_NAME
@@ -35,16 +36,21 @@ import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.service.broadcast.BondHearingAidBroadcastReceiver
 import com.alcanl.cleverear.util.listeners.LoadingActivityEventListener
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.inject.Inject
 @AndroidEntryPoint
-class LoadingActivity : AppCompatActivity() {
+class LoadingActivity : AppCompatActivity(), IEventListener {
     @Inject
     lateinit var configuration: ConfigurationModule
     @Inject
@@ -55,15 +61,17 @@ class LoadingActivity : AppCompatActivity() {
     lateinit var productManager: ProductManager
     @Inject
     lateinit var mBondRequestReceiver: BondHearingAidBroadcastReceiver
-    private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
-    private lateinit var mListener: LoadingActivityEventListener
-    private lateinit var mBinding : ActivityLoadingBinding
+    @Inject
+    lateinit var listener: LoadingActivityEventListener
 
+    private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
+    private lateinit var mBinding : ActivityLoadingBinding
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
+        EventBus.getDefault().register(this)
 
         with(configuration) {
             if (isConnectedBefore)
@@ -80,23 +88,23 @@ class LoadingActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!mListener.isListenerOnBoard())
-            mListener = LoadingActivityEventListener(this, eventHandler, configuration, threadPool)
-                .apply { startEventListener() }
+        if (!listener.isListenerOnBoard())
+            listener.startEventListener()
     }
     override fun onStop()
     {
         super.onStop()
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
     }
     override fun onDestroy()
     {
         super.onDestroy()
-        if (mListener.isListenerOnBoard())
-            mListener.stopListener()
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
 
+        EventBus.getDefault().unregister(this)
         unregisterReceiver(mBondRequestReceiver)
 
         handleSharedPrefs()
@@ -111,6 +119,29 @@ class LoadingActivity : AppCompatActivity() {
                 startService()
 
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        if (event is ConnectionEvent)
+            if (event.connectionData == 3)
+                with(configuration) {
+                    if (!isDoubleDeviceConnection) {
+                        hearingAidMap[earSide]?.isConnected = true
+                        isConnected = true
+                    }
+                    else {
+                        if (event.eventSender == hearingAidMap[EarSide.Left]?.address) {
+                            hearingAidMap[EarSide.Left]?.isConnected = true
+                        }
+                        else
+                            hearingAidMap[EarSide.Right]?.isConnected = true
+
+                        if (hearingAidMap.all { it.value.isConnected })
+                            isConnected = true
+                    }
+                }
     }
     private fun startService()
     {
@@ -333,9 +364,7 @@ class LoadingActivity : AppCompatActivity() {
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
-        mListener = LoadingActivityEventListener(this, eventHandler, configuration, threadPool)
-            .apply { startEventListener() }
-
+        listener.startEventListener()
     }
     private fun connectForSingleDevice()
     {

@@ -18,6 +18,8 @@
     <string name="button_stop_scan_text">\tSuche beenden</string>
     <string name="textview_volume_text">Lautstärke</string>
     <string name="textview_program_text">Programme</string>
+    <string name="bubble_textview_single_device_text" translatable="true">Wenn Sie nur ein einziges Hörgerät benutzen, können Sie mit…</string>
+    <string name="bubble_textview_double_device_text" translatable="true">Wenn Sie Hörgeräte für beide Ohren benutzen, können Sie mit dem…</string>
     <string name="textview_left_device_text">Linkes Gerät</string>
     <string name="textview_right_device_text">Rechtes Gerät</string>
     <string name="textview_control_ha">Hörgerät einstellen</string>
