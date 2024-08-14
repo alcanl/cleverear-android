@@ -9,24 +9,34 @@ import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.widget.Button
 import android.widget.TableRow
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.util.listeners.event.VolumeEvent
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.listeners.ControlActivityEventListener
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.alcanl.cleverear.viewmodel.ControlActivityListenersViewModel
 import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 @AndroidEntryPoint
-class ControlActivity : AppCompatActivity() {
+class ControlActivity : AppCompatActivity(), IEventListener {
     @Inject
     lateinit var eventHandler: EventHandler
     @Inject
@@ -40,10 +50,10 @@ class ControlActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-        mListener =
-            ControlActivityEventListener(this, eventHandler, threadPool, configuration).also {
-                it.startEventListener()
-            }
+        mListener = ControlActivityEventListener(this, eventHandler, threadPool)
+                .also { it.startEventListener() }
+
+        EventBus.getDefault().register(this)
     }
     override fun onResume()
     {
@@ -63,9 +73,7 @@ class ControlActivity : AppCompatActivity() {
 
         if (!mListener.isListenerOnBoard())
             mListener =
-                ControlActivityEventListener(this, eventHandler, threadPool, configuration).apply {
-                    startEventListener()
-                }
+                ControlActivityEventListener(this, eventHandler, threadPool).apply { startEventListener() }
     }
     override fun onStop()
     {
@@ -78,9 +86,106 @@ class ControlActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
+        EventBus.getDefault().unregister(this)
         if (mListener.isListenerOnBoard())
             mListener.stopListener()
 
+    }
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        when (event) {
+            is VolumeEvent -> onVolumeEventReceived(event)
+            is MemoryEvent -> onMemoryEventReceived(event)
+            is BatteryEvent -> onBatteryEventReceived(event)
+            is ConnectionEvent -> onConnectionEventReceived(event)
+        }
+
+    }
+    private fun onBatteryEventReceived(event: BatteryEvent)
+    {
+        runOnUiThread {
+            with(configuration) {
+                if (!isDoubleDeviceConnection) {
+                    if (earSide == EarSide.Left)
+                        mBinding.batteryViewLeftDevice.batteryLevel = event.batteryData
+                    else
+                        mBinding.batteryViewRightDevice.batteryLevel = event.batteryData
+
+                    hearingAidMap[earSide]?.batteryLevel = event.batteryData
+                } else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address) {
+                        mBinding.batteryViewLeftDevice.batteryLevel = event.batteryData
+                        hearingAidMap[EarSide.Left]?.batteryLevel = event.batteryData
+                    }
+                    else {
+                        mBinding.batteryViewRightDevice.batteryLevel = event.batteryData
+                        hearingAidMap[EarSide.Right]?.batteryLevel = event.batteryData
+                    }
+            }
+        }
+    }
+    private fun onVolumeEventReceived(event: VolumeEvent)
+    {
+        runOnUiThread {
+            with(configuration) {
+                if (!isDoubleDeviceConnection) {
+                    hearingAidMap[earSide]?.volume = event.volumeData
+                    mBinding.sliderCommon.value = hearingAidMap[earSide]?.volume?.toFloat() ?: 0F
+                }
+                else
+                    if (isDualDeviceConfig) {
+                        hearingAidMap.forEach {  it.value.volume = event.volumeData  }
+                        mBinding.sliderCommon.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
+                    }
+                    else
+                        if (event.eventSender == hearingAidMap[EarSide.Left]?.address) {
+                            hearingAidMap[EarSide.Left]?.volume = event.volumeData
+                            mBinding.sliderLeft.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
+                        }
+                        else {
+                            hearingAidMap[EarSide.Right]?.volume = event.volumeData
+                            mBinding.sliderRight.value = hearingAidMap[EarSide.Right]?.volume!!.toFloat()
+                        }
+            }
+        }
+    }
+    private fun onMemoryEventReceived(event: MemoryEvent)
+    {
+        threadPool.execute {
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                        hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(event.memoryData)
+                    else
+                        hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(event.memoryData)
+            }
+            setSelectedMemoryButtonView(getMemoryEventButton(event.memoryData), event.memoryData)
+        }
+    }
+    private fun onConnectionEventReceived(event: ConnectionEvent)
+    {
+        if (event.connectionData == 1)
+            runOnUiThread {
+                Toast.makeText(this, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                finish()
+                configuration.isConnected = false
+            }
+    }
+    private fun getMemoryEventButton(memoryState: Int) : Button
+    {
+        return when (memoryState) {
+            0 -> mBinding.buttonOne
+            1 -> mBinding.buttonTwo
+            2 -> mBinding.buttonThree
+            3 -> mBinding.buttonFour
+            4 -> mBinding.buttonFive
+            5 -> mBinding.buttonSix
+            6 -> mBinding.buttonSeven
+            else -> mBinding.buttonEight
+        }
     }
     private fun initBatteryViews()
     {
@@ -391,7 +496,7 @@ class ControlActivity : AppCompatActivity() {
             setSelectedMemoryButtonView(button, buttonNumber)
         } catch (_: ArkException) {}
     }
-    fun setSelectedMemoryButtonView(button: Button, num : Int)
+    private fun setSelectedMemoryButtonView(button: Button, num : Int)
     {
         runOnUiThread {
             button.backgroundTintList = AppCompatResources.getColorStateList(

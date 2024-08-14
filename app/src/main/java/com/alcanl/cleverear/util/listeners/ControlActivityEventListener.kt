@@ -1,12 +1,8 @@
 package com.alcanl.cleverear.util.listeners
 
+import android.content.Context
 import android.util.Log
-import android.widget.Button
-import android.widget.Toast
-import com.alcanl.cleverear.ControlActivity
-import com.alcanl.cleverear.R
-import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.util.parseJsonBatteryStateData
 import com.alcanl.cleverear.util.parseJsonConnectionData
 import com.alcanl.cleverear.util.parseJsonMemoryActiveData
@@ -16,21 +12,24 @@ import com.alcanl.cleverear.sdk.events.BatteryStateChangedEvent
 import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.sdk.events.CurrentMemoryCharacteristicChangedEvent
 import com.alcanl.cleverear.sdk.events.VolumeChangeEvent
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.ark.Event
 import com.ark.EventHandler
 import com.ark.EventType
-import com.ark.ParameterSpace
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONException
 import java.lang.NullPointerException
-import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
+import javax.inject.Inject
 
-class ControlActivityEventListener(activity: ControlActivity, private val mEventHandler: EventHandler,
-                                   private val mThreadPool : ExecutorService,
-                                   private val mConfiguration : ConfigurationModule) {
+class ControlActivityEventListener @Inject constructor (private val mContext: Context,
+                                                        private val mEventHandler: EventHandler,
+                                                        private val mThreadPool : ExecutorService) {
 
-    private val mWeakReference = WeakReference(activity)
     private var mListener: Thread? = null
+
     fun startEventListener() {
         mThreadPool.execute {
                 try {
@@ -38,7 +37,7 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
                     while (!mListener?.isInterrupted!!) {
                         try {
                             val event = mEventHandler.event
-                            val eventSender = parseJsonSenderMacData(event.data, mWeakReference.get()!!)
+                            val eventSender = parseJsonSenderMacData(event.data, mContext)
 
                             when (event.type) {
                                 EventType.kConnectionEvent -> handleConnectionEvent(event)
@@ -66,27 +65,15 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleConnectionEvent(event: Event)
     {
-        val actCont = mWeakReference.get()!!
-
         try {
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
-            val connectionState = parseJsonConnectionData(event.data, actCont)
+            val connectionEvent = ConnectionEvent(this)
+            connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
+            EventBus.getDefault().post(connectionEvent)
 
-            if (connectionState == 1) {
-                with(actCont) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this,
-                            R.string.toast_connection_lost_text,
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        finish()
-                        mConfiguration.isConnected = false
-                    }
-                }
+            if (connectionEvent.connectionData == 1)
                 Thread.currentThread().interrupt()
-            }
+
         } catch (ex: JSONException)
         {
             Log.e("parseError", ex.message!!)
@@ -94,34 +81,14 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleBatteryEvent(event: Event, eventSender: String)
     {
-        val actCont = mWeakReference.get()!!
         try {
             Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
-            val batteryState = parseJsonBatteryStateData(event.data, actCont)
+            val batteryEvent = BatteryEvent(this)
+            batteryEvent.batteryData = parseJsonBatteryStateData(event.data, mContext)
+            batteryEvent.eventSender = eventSender
 
-            with(actCont) {
-                runOnUiThread {
-                    with(mConfiguration) {
-                        if (!isDoubleDeviceConnection) {
-                            if (earSide == EarSide.Left)
-                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                            else
-                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
+            EventBus.getDefault().post(batteryEvent)
 
-                            hearingAidMap[earSide]?.batteryLevel = batteryState
-                        }
-                        else
-                            if (eventSender == hearingAidMap[EarSide.Left]?.address) {
-                                mBinding.batteryViewLeftDevice.batteryLevel = batteryState
-                                hearingAidMap[EarSide.Left]?.batteryLevel = batteryState
-                            }
-                            else {
-                                mBinding.batteryViewRightDevice.batteryLevel = batteryState
-                                hearingAidMap[EarSide.Right]?.batteryLevel = batteryState
-                            }
-                    }
-                }
-            }
         } catch (ex: JSONException)
         {
             Log.e("parseError", ex.message!!)
@@ -129,66 +96,30 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     }
     private fun handleMemoryEvent(event: Event, eventSender: String) {
 
-        val actCont = mWeakReference.get()!!
         try {
-            Log.e(
-                CurrentMemoryCharacteristicChangedEvent::class.java.simpleName,
-                event.data
-            )
-            val memoryState = parseJsonMemoryActiveData(event.data, mWeakReference.get()!!)
+            Log.e(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
 
-            mThreadPool.execute {
-                with(mConfiguration) {
-                    if (!isDoubleDeviceConnection)
-                        hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(memoryState)
-                    else
-                        if (eventSender == hearingAidMap[EarSide.Left]?.address!!)
-                            hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(memoryState)
-                        else
-                            hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(memoryState)
-                }
+            val memoryEvent = MemoryEvent(this)
+            memoryEvent.memoryData = parseJsonMemoryActiveData(event.data, mContext)
+            memoryEvent.eventSender = eventSender
 
-                actCont.setSelectedMemoryButtonView(getMemoryEventButton(memoryState), memoryState)
-            }
+            EventBus.getDefault().post(memoryEvent)
 
-        } catch (ex: JSONException)
-        {
+        } catch (ex: JSONException) {
             Log.e("parseError", ex.message!!)
         }
     }
     private fun handleVolumeEvent(event: Event, eventSender: String)
     {
-        val actCont = mWeakReference.get()!!
-
         try {
             Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
-            val volumeState = parseJsonVolumeData(event.data, actCont)
-
-            actCont.runOnUiThread {
-                with(mConfiguration) {
-                    if (!isDoubleDeviceConnection) {
-                        hearingAidMap[earSide]?.volume = volumeState
-                        actCont.mBinding.sliderCommon.value = hearingAidMap[earSide]?.volume?.toFloat() ?: 0F
-                    }
-                    else
-                        if (isDualDeviceConfig) {
-                            hearingAidMap.forEach {  it.value.volume = volumeState  }
-                            actCont.mBinding.sliderCommon.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
-                        }
-                        else
-                            if (eventSender == hearingAidMap[EarSide.Left]?.address) {
-                                hearingAidMap[EarSide.Left]?.volume = volumeState
-                                actCont.mBinding.sliderLeft.value = hearingAidMap[EarSide.Left]?.volume!!.toFloat()
-                            }
-                            else {
-                                hearingAidMap[EarSide.Right]?.volume = volumeState
-                                actCont.mBinding.sliderRight.value = hearingAidMap[EarSide.Right]?.volume!!.toFloat()
-                            }
-                }
-            }
+            val volumeState = parseJsonVolumeData(event.data, mContext)
+            val volumeEvent = VolumeEvent(this)
+            volumeEvent.eventSender = eventSender
+            volumeEvent.volumeData = volumeState
+            EventBus.getDefault().post(volumeEvent)
         }
-        catch (ex: JSONException)
-        {
+        catch (ex: JSONException) {
             Log.e("parseError", ex.message!!)
         }
     }
@@ -197,21 +128,6 @@ class ControlActivityEventListener(activity: ControlActivity, private val mEvent
     {
         mListener?.interrupt()
         mEventHandler.exit()
-    }
-    private fun getMemoryEventButton(memoryState: Int) : Button
-    {
-        val actCont = mWeakReference.get()!!
-
-        return when (memoryState) {
-            0 -> actCont.mBinding.buttonOne
-            1 -> actCont.mBinding.buttonTwo
-            2 -> actCont.mBinding.buttonThree
-            3 -> actCont.mBinding.buttonFour
-            4 -> actCont.mBinding.buttonFive
-            5 -> actCont.mBinding.buttonSix
-            6 -> actCont.mBinding.buttonSeven
-            else -> actCont.mBinding.buttonEight
-        }
     }
     @Synchronized
     fun isListenerOnBoard() : Boolean
