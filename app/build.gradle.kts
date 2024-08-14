@@ -71,6 +71,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
     implementation("com.github.alxrm:audiowave-progressbar:0.9.2")
     implementation("com.github.homayoonahmadi:GroupBoxLayout:1.2.0")
     implementation("org.greenrobot:eventbus:3.3.1")

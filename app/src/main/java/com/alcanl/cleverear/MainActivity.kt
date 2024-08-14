@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.animation.Animation
@@ -34,6 +35,10 @@ import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,6 +51,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMainBinding
     private var mIsBluetoothPermissionsGranted = false
     private var mIsWebViewActive = false
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -59,6 +66,12 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK)
             bluetoothTurnedOn()
     }
+    private val updateAppResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
+        if (result.resultCode != RESULT_OK)
+            Log.d("UPDATE","Update flow failed! Result code: " + result.resultCode)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()
@@ -70,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkBluetoothEnabled()
+        checkForUpdates()
     }
     override fun onResume() {
         super.onResume()
@@ -86,6 +100,14 @@ class MainActivity : AppCompatActivity() {
             android.view.animation.AnimationUtils.loadAnimation
                 (this, R.anim.translate_button_right_to_left)
         )
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        updateAppResultLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()) } }
+
     }
     override fun onDestroy()
     {
@@ -275,6 +297,22 @@ class MainActivity : AppCompatActivity() {
         }
             else
                 configuration.isBluetoothEnabled = true
+    }
+    private fun checkForUpdates()
+    {
+
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    updateAppResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
+            }
+        }
     }
     fun buttonSingleDeviceClick() {
 
