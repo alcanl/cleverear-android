@@ -17,9 +17,12 @@ import com.alcanl.cleverear.fitting.event.DisconnectEvent
 import com.alcanl.cleverear.fitting.event.FittingEvent
 import com.alcanl.cleverear.fitting.event.InSituEvent
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.GERMAN
+import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogDeviceDisconnected
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogFittingUnsaved
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogInSituInProgress
+import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.isConnected
 import com.ark.ArkException
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +34,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
 
 @AndroidEntryPoint
@@ -68,13 +73,11 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
     }
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
     override fun onEventReceive(event: EventObject)
     {
-        if (event is DisconnectEvent) {
+        if (event is DisconnectEvent)
             handleDisconnect(event.hearingAid)
-        }
-
     }
     @OptIn(DelicateCoroutinesApi::class)
     private fun handleDisconnect(hearingAid: HearingAid?)
@@ -91,8 +94,10 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         }
         else {
             mDeviceDisconnectedDialog.binding.textViewMainMessage.text = String.format(
-                mDeviceDisconnectedDialog.binding.textViewMainMessage.text.toString(), hearingAid.side, hearingAid.name
-            )
+                mDeviceDisconnectedDialog.binding.textViewMainMessage.text.toString(),
+                if(getSystemLanguage().lowercase() == TURKISH) hearingAid.side.getTR()
+                else if (getSystemLanguage().lowercase() == GERMAN) hearingAid.side.getGE()
+                else hearingAid.side.getEN(), hearingAid.name)
 
             GlobalScope.launch { handleDisconnectCallback(this, hearingAid) }
         }
@@ -102,6 +107,9 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     {
         scope.async {
             try {
+                runBlocking {
+                    5000
+                }
                 hearingAid.communicationAdaptor?.connect()
                 runBlocking {
                     delay(8000)
@@ -111,13 +119,19 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             }
         }.await()
 
-        val adapter = getSystemService(BluetoothManager::class.java).adapter
-        if (adapter != null && isConnected(adapter.getRemoteDevice(hearingAid.address))) {
-            mDeviceDisconnectedDialog.binding.apply {
-                progressBar.visibility = View.INVISIBLE
+        runOnUiThread {
+            val adapter = getSystemService(BluetoothManager::class.java).adapter
+            if (adapter != null && isConnected(adapter.getRemoteDevice(hearingAid.address))) {
+                mDeviceDisconnectedDialog.binding.apply {
+                    progressBar.visibility = View.INVISIBLE
                     textViewMainMessage.text = getString(R.string.notification_reconnect_text) }
-            Handler(Looper.myLooper()!!).postDelayed({ mDeviceDisconnectedDialog.dismiss() }, 2000) }
-
+                Handler(Looper.myLooper()!!).postDelayed({ mDeviceDisconnectedDialog.dismiss() }, 2000) }
+            else
+                mDeviceDisconnectedDialog.binding.apply {
+                    progressBar.visibility = View.INVISIBLE
+                    buttonOk.visibility = View.VISIBLE
+                }
+        }
     }
     private fun navigateTo(id: Int)
     {

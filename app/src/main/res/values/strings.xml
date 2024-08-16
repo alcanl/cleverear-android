@@ -73,7 +73,7 @@
     <string name="dialog_no" translatable="true">No</string>
     <string name="device_connected_text" translatable="true">Connected to Earnet</string>
     <string name="notification_reconnect_text" translatable="true">Hearing Aid Re-Connected</string>
-    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side, The Connection Of The Device %s Has Lost.\nPlease Wait While Trying To Reconnect.</string>
+    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side\nThe Connection Of The Device\n %s Has Lost.\nPlease Wait While Trying To Reconnect.</string>
     <string name="current_memory_json" translatable="false">CurrentMemory</string>
     <string name="volume_level_json" translatable="false">VolumeLevel</string>
     <string name="device_name_json" translatable="false">DeviceName</string>
