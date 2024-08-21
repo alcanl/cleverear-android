@@ -16,7 +16,8 @@
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -49,6 +50,9 @@
         android:theme="@style/Theme.CleverEar"
         android:usesCleartextTraffic="true"
         tools:ignore="DiscouragedApi">
+        <activity
+            android:name=".MainContainerActivity"
+            android:exported="false" />
         <activity
             android:name=".SelfFittingActivity"
             android:exported="true" />

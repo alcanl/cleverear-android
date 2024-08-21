@@ -92,9 +92,9 @@ class AutoConnectService : Service()
 
                 isServiceOnBoard = false
             }
-
+            Log.i(AutoConnectService::class.simpleName, "onDestroyCalled")
         } catch (ex: Throwable) {
-            Log.e("SERVICE::ON_DESTROY", ex.message!!)
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
     private fun initialize(intent: Intent?)
@@ -163,9 +163,9 @@ class AutoConnectService : Service()
                 mHandler.sendEmptyMessage(WHAT_BACKGROUND_CONNECTED)
             }
         } catch (ex: ExecutionException) {
-            Log.e("SERVICE::SCHEDULED", ex.message!!)
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
         } catch (ex : InterruptedException) {
-            Log.e("SERVICE::THREAD", ex.message!!)
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
     private fun doConnection(hearingAid: HearingAid)
@@ -173,7 +173,7 @@ class AutoConnectService : Service()
         val adapter = getSystemService(BluetoothManager::class.java).adapter
 
         if (!adapter.isEnabled) {
-            Log.e("SERVICE::DO_CONNECTION", "Bluetooth off")
+            Log.e(AutoConnectService::class.simpleName, "Bluetooth off")
             return
         }
 
@@ -227,10 +227,10 @@ class AutoConnectService : Service()
                     else {}
                 }
                 else
-                    Log.d("SERVICE::DEVICE_NOT_FOUND", "There is not any hearing aid in range!")
+                    Log.i(AutoConnectService::class.simpleName, "There is not any hearing aid in range!")
             }
         } catch (ex: Throwable) {
-            Log.e("SERVICE::SCHEDULER", ex.message!!)
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
         finally {
             stopDeviceScan(adapter)

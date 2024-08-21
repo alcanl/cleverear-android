@@ -8,9 +8,11 @@
     <string name="textview_device_detection_device_connected_text">Cihaza Bağlanıldı</string>
     <string name="textview_device_detection_connection_in_process_text">Cihaza Bağlanılıyor</string>
     <string name="textview_device_detection_not_connected_text">Cihaza Bağlanılamadı</string>
-    <string name="dialog_already_connected_message">Şu anda aktif bir bağlantınız bulunmaktadır. Bu bağlantıyı sonlandırmak istiyor musunuz?</string>
+    <string name="dialog_already_connected_message">Aktif bağlantıyı sonlandırmak istediğinizden emin misiniz?</string>
     <string name="textview_count_device_found_text">Cihaz Bulundu</string>
-    <string name="button_stop_scan_text">Taramayı Durdur</string>
+    <string name="button_stop_connection_text">Bağlantıyı Sonlandır</string>
+    <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
+    <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses</string>
     <string name="textview_program_text">Programlar</string>
     <string name="textview_left_device_text">Sol Kulak</string>

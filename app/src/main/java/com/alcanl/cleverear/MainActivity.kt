@@ -342,7 +342,7 @@ class MainActivity : AppCompatActivity() {
                 isDoubleDeviceConnection = true
                 earSide = EarSide.Left
             }
-            Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+            Intent(this, MainContainerActivity::class.java).apply { startActivity(this) }
         }
         else {
             toastNoPermission()

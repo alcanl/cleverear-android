@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@+id/navbar_connection">
+
+    <fragment
+        android:id="@+id/navbar_connection"
+        android:name="com.alcanl.cleverear.fragment.ConnectionFragment"
+        android:label="Connection"
+        tools:layout="@layout/fragment_connection" />
+
+    <fragment
+        android:id="@+id/navbar_control"
+        android:name="com.alcanl.cleverear.fragment.ControlFragment"
+        android:label="Control"
+        tools:layout="@layout/fragment_control" />
+
+    <fragment
+        android:id="@+id/navbar_advanced"
+        android:name="com.alcanl.cleverear.fragment.AdvancedFragment"
+        android:label="Advanced"
+        tools:layout="@layout/fragment_advanced"/>
+
+</navigation>

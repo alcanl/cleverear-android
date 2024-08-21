@@ -106,7 +106,6 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         EventBus.getDefault().unregister(this)
         unregisterReceiver(mBondRequestReceiver)
-
         handleSharedPrefs()
 
         with(configuration) {
@@ -343,10 +342,15 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     {
         mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
         Handler(Looper.myLooper()!!).postDelayed({
-            startActivity(if (!configuration.isRemoteFittingConnection) Intent
-                (this@LoadingActivity, ControlActivity::class.java) else Intent(
-                this@LoadingActivity, SelfFittingActivity::class.java
-            )); finish() }, 3000)
+            if (!configuration.isRemoteFittingConnection)
+                if (configuration.isConnectedBefore)
+                    Intent(this@LoadingActivity, MainContainerActivity::class.java)
+                        .apply { startActivity(this); finish() }
+                else
+                    finish()
+            else
+                Intent(this@LoadingActivity, SelfFittingActivity::class.java
+            ).apply { startActivity(this) };  finish() }, 3000)
     }
     private fun finalizeLoadingTimer()
     {
@@ -354,9 +358,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             finalizeConnectedLoadingTimer()
         else {
             mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
-            Handler(Looper.myLooper()!!).postDelayed(
-                { startActivity(Intent(this, MainActivity::class.java)); finish() },
-                3000)
+            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
         }
     }
     private fun initialize()

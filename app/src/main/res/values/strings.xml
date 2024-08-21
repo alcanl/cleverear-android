@@ -29,13 +29,16 @@
     <string name="toast_no_previous_device_for_selection" translatable="true">No Previous Device Info For Selection</string>
     <string name="textview_mode_text">Mode</string>
     <string name="textview_channel_text">Channel</string>
+    <string name="textview_scan_process_scanning_text" translatable="true">Scanning</string>
+    <string name="textview_scan_process_connected_text" translatable="true">Connected</string>
     <string name="textview_R_text" translatable="false">R</string>
     <string name="textview_L_text" translatable="false">L</string>
     <string name="button_check_tick_content_desc" translatable="false">Set Channel Done</string>
     <string name="edittext_channel_hint" translatable="false">1–255</string>
-    <string name="dialog_already_connected_message" translatable="true">You have already connected with a device. Do you want to end this connection?</string>
+    <string name="button_stop_scan_text" translatable="false">\tStop Scanning</string>
+    <string name="dialog_already_connected_message" translatable="true">Are you sure to end current connection?</string>
     <string name="textview_count_device_found_text" translatable="true">Device Found</string>
-    <string name="button_stop_scan_text" translatable="true">\t\t\tStop Scanning</string>
+    <string name="button_stop_connection_text" translatable="true">\t\t\tStop Connection</string>
     <string name="textview_volume_text" translatable="true">Volume</string>
     <string name="textview_program_text" translatable="true">Programs</string>
     <string name="textview_left_device_text" translatable="true">Left Device</string>
@@ -152,7 +155,7 @@
     <string name="textview_90_text" translatable="false">90</string>
     <string name="textview_100_text" translatable="false">100</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Are You Hearing The Signal?</string>
-    <string name="dialog_textview_check_text" translatable="true" formatted="false">%d Hz Frequency / %d db</string>
+    <string name="dialog_textview_check_text" formatted="false" translatable="true">%d Hz Frequency / %d db</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Results Saved To Gallery</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
     <string name="checkbox_feedback_text" translatable="true">Feedback Canceler</string>

@@ -37,13 +37,13 @@ class EarSideSelectionActivity : AppCompatActivity() {
     fun leftEarButtonClicked()
     {
         configuration.earSide = EarSide.Left
-        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+        Intent(this, MainContainerActivity::class.java).apply { startActivity(this) }
         finish()
     }
     fun rightEarButtonClicked()
     {
         configuration.earSide = EarSide.Right
-        Intent(this, ConnectionActivity::class.java).apply { startActivity(this) }
+        Intent(this, MainContainerActivity::class.java).apply { startActivity(this) }
         finish()
     }
 }

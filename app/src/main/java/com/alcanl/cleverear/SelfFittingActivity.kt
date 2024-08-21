@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
-import com.alcanl.cleverear.databinding.ActivityRemoteFittingBinding
+import com.alcanl.cleverear.databinding.ActivitySelfFittingBinding
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.DisconnectEvent
 import com.alcanl.cleverear.fitting.event.FittingEvent
@@ -45,7 +45,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     private val mDeviceDisconnectedDialog: CustomAlertDialogDeviceDisconnected by lazy {
         CustomAlertDialogDeviceDisconnected(this)
     }
-    lateinit var binding : ActivityRemoteFittingBinding
+    lateinit var binding : ActivitySelfFittingBinding
 
     @Volatile
     var mSelectedFragmentId : Int? = null
@@ -57,7 +57,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_remote_fitting)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_self_fitting)
         initializeNavController()
         EventBus.getDefault().register(this)
 
@@ -121,7 +121,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     }
     private fun navigateTo(id: Int)
     {
-        findNavController(R.id.navHostFragmentActivityRemote).navigate(id)
+        findNavController(R.id.navHostSelfFitting).navigate(id)
     }
     private fun initializeNavController()
     {

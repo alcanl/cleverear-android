@@ -78,7 +78,6 @@ class AutoConnectActivity : AppCompatActivity() {
     {
         configuration.isConnectedBefore = true
         startActivity(Intent(this@AutoConnectActivity, LoadingActivity::class.java))
-        finish()
     }
     private fun remoteFittingButtonClickedCommon()
     {
