@@ -24,7 +24,7 @@
     <string name="bubble_textview_double_device_text" translatable="true">Çift cihaz kullanıcısı iseniz bağlantıya devam etmek için…</string>
     <string name="textview_no_previous_device_info">Kayıtlı Cihaz Yok</string>
     <string name="button_select_program_text" translatable="true">Programı Seç</string>
-    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Kulak, %s Cihaz Bağlantısı Kaybedildi.\nYeniden Bağlanmayı Denerken Lütfen Bekleyin.</string>
+    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Kulak, %s\n Cihaz Bağlantısı Kaybedildi.\nYeniden Bağlanmayı Denerken Lütfen Bekleyin.</string>
     <string name="textview_remote_conf_ha" translatable="true">Uzak Konfigürasyon</string>
     <string name="toast_no_previous_device_for_selection">Kayıtlı Cihaz Bilgisi Bulunmamaktadır</string>
     <string name="textview_control_ha">Cihazı Kontrol Et</string>
