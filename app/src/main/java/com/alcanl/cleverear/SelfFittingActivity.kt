@@ -10,13 +10,16 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.databinding.ActivitySelfFittingBinding
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.DisconnectEvent
 import com.alcanl.cleverear.fitting.event.FittingEvent
 import com.alcanl.cleverear.fitting.event.InSituEvent
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.fitting.fragment.FittingFragment
+import com.alcanl.cleverear.fitting.fragment.HomeFragment
+import com.alcanl.cleverear.fitting.fragment.InSituFragment
 import com.alcanl.cleverear.util.GERMAN
 import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogDeviceDisconnected
@@ -133,10 +136,14 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
                 }
         }
     }
-    private fun navigateTo(id: Int)
+    private fun navigateTo(fragment: Fragment)
     {
-        findNavController(R.id.navHostSelfFitting).navigate(id)
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(binding.navHostSelfFitting.id, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
+
     private fun initializeNavController()
     {
         binding.navigationView.setOnItemSelectedListener {
@@ -152,9 +159,15 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
                 false
             }
             else when (it.itemId) {
-                R.id.navbar_fitting -> { navigateTo(R.id.navbar_fitting); true }
-                R.id.navbar_home -> { navigateTo(R.id.navbar_home); true }
-                else -> { navigateTo(R.id.navbar_insitu); true }
+                R.id.navbar_fitting -> {
+                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    navigateTo(FittingFragment()); true }
+                R.id.navbar_home -> {
+                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    navigateTo(HomeFragment()); true }
+                else -> {
+                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    navigateTo(InSituFragment()); true }
             }
         }
     }
@@ -169,7 +182,11 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         mUnsavedFittingDialog.dismiss()
         binding.navigationView.children.find { it.id == mSelectedFragmentId }
             ?.isSelected = true
-        navigateTo(mSelectedFragmentId!!)
+        navigateTo(when (mSelectedFragmentId!!) {
+            R.id.navbar_home -> HomeFragment()
+            R.id.navbar_insitu -> InSituFragment()
+            else -> FittingFragment()
+        })
     }
     fun inSituInProgressDialogPositiveButtonClicked()
     {
@@ -183,7 +200,11 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         mUnsavedFittingDialog.dismiss()
         binding.navigationView.children.find { it.id == mSelectedFragmentId }
             ?.isSelected = true
-        navigateTo(mSelectedFragmentId!!)
+        navigateTo(when (mSelectedFragmentId!!) {
+            R.id.navbar_home -> HomeFragment()
+            R.id.navbar_insitu -> InSituFragment()
+            else -> FittingFragment()
+        })
     }
     fun disconnectDialogOkButtonClicked()
     {

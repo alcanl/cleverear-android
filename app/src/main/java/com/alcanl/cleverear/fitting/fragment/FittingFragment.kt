@@ -92,6 +92,11 @@ class FittingFragment : Fragment(), IEventListener {
         initialize()
         super.onStart()
     }
+    override fun onResume()
+    {
+        (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        super.onResume()
+    }
     override fun onStop()
     {
         EventBus.getDefault().unregister(this)

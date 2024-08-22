@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
@@ -13,6 +14,15 @@ import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_LEFT_EAR_INITIALIZED
 import com.alcanl.cleverear.util.WHAT_RIGHT_EAR_INITIALIZED
+
+fun FrameLayout.startAlphaBlinkAnimation()
+{
+    val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+    anim.setDuration(400)
+    anim.startOffset = 20
+    anim.setRepeatCount(0)
+    this.startAnimation(anim)
+}
 
 fun FrameLayout.postDelayAnimation(delay: Long, context: Context)
 {

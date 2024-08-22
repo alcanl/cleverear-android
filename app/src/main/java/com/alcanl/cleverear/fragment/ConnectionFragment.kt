@@ -6,14 +6,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.LoadingActivity
+import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -24,9 +25,10 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
+import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
+import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.util.scan.DeviceScanner
-import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
@@ -35,6 +37,7 @@ import com.ark.EventType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ConnectionFragment : Fragment() {
@@ -69,6 +72,7 @@ class ConnectionFragment : Fragment() {
         initBinding()
         if (!configuration.isConnected)
             buttonDetectDeviceClicked()
+
     }
 
     override fun onCreateView(
@@ -84,7 +88,7 @@ class ConnectionFragment : Fragment() {
     override fun onStop()
     {
         if (isScanContinue)
-            stopScanButtonClicked()
+            stopScanProcess()
 
         super.onStop()
     }
@@ -94,6 +98,7 @@ class ConnectionFragment : Fragment() {
         super.onResume()
 
         with(mBinding) {
+            imageButtonDetect.isEnabled = !configuration.isConnected
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             textViewDeviceState.text = getString(if (configuration.isConnected)  R.string.device_connected_text else R.string.textview_device_detection_not_found_text)
@@ -104,7 +109,7 @@ class ConnectionFragment : Fragment() {
     private fun finalizeConnectionConfiguration()
     {
         if (isScanContinue)
-            stopScanButtonClicked()
+            stopScanProcess()
 
         mIsDeviceFound = true
         startActivity(Intent(activity, LoadingActivity::class.java))
@@ -119,6 +124,7 @@ class ConnectionFragment : Fragment() {
         }
         mBinding.adapter = deviceListAdapter
     }
+
     private fun isHearingAid(manufacturerCode: String): Boolean {
         var manufacturerCodeSub = ""
 
@@ -132,6 +138,7 @@ class ConnectionFragment : Fragment() {
         else
             manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
     }
+
     private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
     {
         if (configuration.hearingAidMap.containsKey(earSide))
@@ -142,10 +149,12 @@ class ConnectionFragment : Fragment() {
             device.name, device.rssi, device.manufacturerData, earSide
         )
     }
+
     private fun recognizeEarSide(manufacturerData: String): EarSide
     {
         return if (manufacturerData.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
     }
+
     private fun scanDevicesWithBluetooth()
     {
         try {
@@ -160,6 +169,7 @@ class ConnectionFragment : Fragment() {
             }
         }
     }
+
     @SuppressLint("SuspiciousIndentation")
     private fun scanThreadCallBack()
     {
@@ -182,6 +192,7 @@ class ConnectionFragment : Fragment() {
         }
         Log.e("scan", "Scan ended")
     }
+
     @SuppressLint("DefaultLocale")
     private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
     {
@@ -203,11 +214,13 @@ class ConnectionFragment : Fragment() {
             )
         }
     }
+
     private fun searchHearingAidInList(pos: Int): DiscoveredDeviceInfo?
     {
         val device = mBinding.adapter!!.getItem(pos)
         return mBleDeviceSet.find { it.toString() == device }
     }
+
     private fun selectDoubleItem(pos: Int)
     {
         val selectedDevice = searchHearingAidInList(pos)
@@ -224,6 +237,7 @@ class ConnectionFragment : Fragment() {
         else
             showConnectionProblemToastMessage()
     }
+
     private fun selectSingleItem(pos: Int)
     {
         val selectedDevice = searchHearingAidInList(pos)
@@ -248,18 +262,27 @@ class ConnectionFragment : Fragment() {
                 .show()
         }
     }
+
     fun buttonBackClicked()
     {
         if (isScanContinue)
-            stopScanButtonClicked()
+            stopScanProcess()
 
         if (configuration.isConnected)
             mAlertDialog.show()
         else
             activity?.finish()
     }
+
     fun buttonDetectDeviceClicked()
     {
+        mBinding.frameLayoutStartScan.startAlphaBlinkAnimation()
+
+        if (isScanContinue) {
+            stopScanProcess()
+            return
+        }
+
         if (!configuration.isConnected) {
             mBleDeviceSet.clear()
             mDeviceCount = 0
@@ -268,12 +291,12 @@ class ConnectionFragment : Fragment() {
             with(mBinding) {
                 progressBar.visibility = View.VISIBLE
                 textViewScanProcess.text = getString(R.string.textview_scan_process_scanning_text)
-                imageButtonDetect.isEnabled = false
             }
             scanDevices()
             isScanContinue = true
         }
     }
+
     fun alertDialogPositiveButtonClicked()
     {
         mAlertDialog.dismiss()
@@ -282,7 +305,7 @@ class ConnectionFragment : Fragment() {
         mBinding.imageViewStopConnection.visibility = View.INVISIBLE
 
         if (configuration.isServiceOnBoard) {
-            requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
+            (activity as MainContainerActivity).stopService()
             configuration.isServiceOnBoard = false
         }
 
@@ -300,10 +323,12 @@ class ConnectionFragment : Fragment() {
                     textViewScanProcess.text = getString(R.string.textview_detect_device_text)
                     textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
                     frameLayoutStopConnection.visibility = View.GONE
+                    imageButtonDetect.isEnabled = true
                 }
             }, 6000
         )
     }
+
     fun alertDialogNegativeButtonClicked()
     {
         mAlertDialog.dismiss()
@@ -323,13 +348,14 @@ class ConnectionFragment : Fragment() {
 
         selectSingleItem(pos)
     }
+
     private fun scanDevices()
     {
         mBinding.textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
         threadPool.execute { scanThreadCallBack() }
     }
 
-    private fun stopScanButtonClicked()
+    private fun stopScanProcess()
     {
         try {
             @Synchronized
@@ -337,14 +363,13 @@ class ConnectionFragment : Fragment() {
                 scanOnBoard.interrupt()
                 eventHandler.exit()
             }
+
             stop()
             isScanContinue = false
             deviceScanner.endScanProcess(mAsyncResult)
+            mBinding.textViewScanProcess.text = getString(R.string.textview_detect_device_text)
+            mBinding.progressBar.visibility = View.GONE
 
-            with(mBinding) {
-                imageButtonDetect.isEnabled = true
-                progressBar.visibility = View.GONE
-            }
         } catch (ex: ArkException) {
             Log.e("err", ex.message!!)
         } catch (_: Throwable) {

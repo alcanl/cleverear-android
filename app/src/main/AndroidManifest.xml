@@ -52,7 +52,7 @@
         tools:ignore="DiscouragedApi">
         <activity
             android:name=".MainContainerActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".SelfFittingActivity"
             android:exported="true" />
@@ -63,18 +63,8 @@
             android:name=".LoadingActivity"
             android:exported="true" />
         <activity
-            android:name=".AdvancedActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ControlActivity"
-            android:exported="true" />
-        <activity
             android:name=".EarSideSelectionActivity"
             android:exported="true" />
-        <activity
-            android:name=".ConnectionActivity"
-            android:exported="true"
-            android:theme="@style/Theme.CleverEar" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />

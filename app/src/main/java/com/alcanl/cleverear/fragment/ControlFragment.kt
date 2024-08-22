@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentControlBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -19,7 +20,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.listeners.ControlActivityEventListener
+import com.alcanl.cleverear.util.listeners.ControlFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
@@ -45,7 +46,7 @@ class ControlFragment : Fragment(), IEventListener {
     @Inject
     lateinit var configuration : ConfigurationModule
     @Inject
-    lateinit var listener : ControlActivityEventListener
+    lateinit var listener : ControlFragmentEventListener
 
     lateinit var mBinding: FragmentControlBinding
 
@@ -69,6 +70,12 @@ class ControlFragment : Fragment(), IEventListener {
     override fun onResume()
     {
         super.onResume()
+        (activity as MainContainerActivity).apply {
+            runOnUiThread {
+                this.binding.frameLayoutLoading.visibility = View.GONE
+            }
+        }
+
         if (!configuration.isConnected) {
             activity?.finish()
             return

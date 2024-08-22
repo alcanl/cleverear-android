@@ -1,19 +1,18 @@
 package com.alcanl.cleverear.viewmodel
 
-import android.view.View
-import com.alcanl.cleverear.ConnectionActivity
+import com.alcanl.cleverear.fragment.ConnectionFragment
 import java.lang.ref.WeakReference
 
-class ActiveConnectionDialogListenersViewModel(activity: ConnectionActivity){
-    private val mWeakReference = WeakReference(activity)
+class ActiveConnectionDialogListenersViewModel(fragment: ConnectionFragment){
+    private val mWeakReference = WeakReference(fragment)
 
     fun handlePositiveButton()
     {
         mWeakReference.get()!!.alertDialogPositiveButtonClicked()
     }
-    fun handleNegativeButton(view: View)
+    fun handleNegativeButton()
     {
-        mWeakReference.get()!!.alertDialogNegativeButtonClicked(view)
+        mWeakReference.get()!!.alertDialogNegativeButtonClicked()
     }
 
 }

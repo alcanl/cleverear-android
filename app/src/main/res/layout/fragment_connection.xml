@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="62dp"
+                    android:layout_marginTop="70dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/textview_detect_device_text"
                     android:textColor="@color/ap_black"

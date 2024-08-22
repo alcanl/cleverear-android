@@ -23,7 +23,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.listeners.AdvancedActivityEventListener
+import com.alcanl.cleverear.util.listeners.AdvancedFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
@@ -50,7 +50,7 @@ class AdvancedFragment : Fragment(), IEventListener {
     @Inject
     lateinit var threadPool: ExecutorService
     @Inject
-    lateinit var listener: AdvancedActivityEventListener
+    lateinit var listener: AdvancedFragmentEventListener
 
     private lateinit var mBinding : FragmentAdvancedBinding
 

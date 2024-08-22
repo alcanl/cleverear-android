@@ -85,6 +85,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume()
     {
+        (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
         if (fittingConfig.isInitializeCompleted) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE

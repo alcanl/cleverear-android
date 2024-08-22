@@ -23,7 +23,7 @@
             app:menu="@menu/bottom_nav_menu"
             tools:ignore="VisualLintBottomNav" />
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/navHostMainContainer"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
@@ -34,7 +34,45 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navGraph="@navigation/main_navigation"
-            tools:ignore="FragmentTagUsage" />
+             />
+
+        <FrameLayout
+            android:id="@+id/frameLayoutLoading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/background"
+            android:translationZ="270dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/navigationViewContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
+
+            <ImageView
+                android:id="@+id/imageViewLogo"
+                android:layout_gravity="end"
+                android:layout_width="87dp"
+                android:layout_height="90dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="9dp"
+                android:contentDescription="@string/main_logo_description_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/eartechnic_logo" />
+
+            <ProgressBar
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/design_default_color_secondary_variant"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

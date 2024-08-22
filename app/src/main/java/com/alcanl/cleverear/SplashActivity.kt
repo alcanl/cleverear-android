@@ -79,7 +79,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 handleConnectedBefore()
 
                 if (configuration.isConnected) {
-                    Intent(this@SplashActivity, ControlActivity::class.java).apply { startActivity(this); finish() }
+                    Intent(this@SplashActivity, MainContainerActivity::class.java).apply { startActivity(this); finish() }
                     return
                 }
                 else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
