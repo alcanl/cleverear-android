@@ -11,10 +11,11 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="toast_no_permission_splash_activity" translatable="true">Um fortzufahren, akzeptieren Sie bitte die Genehmigungsanfragen</string>
     <string name="textview_scan_process_scanning_text" translatable="true">Scannen</string>
     <string name="textview_scan_process_connected_text" translatable="true">Verbunden</string>
     <string name="button_select_program_text" translatable="true">Wählen</string>
-    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side, The Connection Of The Device %s Has Lost.\nBitte warten Sie, während Sie versuchen, die Verbindung wiederherzustellen.</string>
+    <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ohrseite, Der Anschluss des Geräts %s Has Lost.\nBitte warten Sie, während Sie versuchen, die Verbindung wiederherzustellen.</string>
     <string name="dialog_already_connected_message">Möchten Sie die aktuelle Verbindung wirklich beenden?</string>
     <string name="textview_count_device_found_text">Geräte gefunden</string>
     <string name="button_stop_connection_text">\tVerbindung beenden</string>
@@ -80,21 +81,21 @@
     <string name="textview_firmware_id"><u>Firmware Id</u></string>
     <string name="textview_firmware_version"><u>Firmware Version</u></string>
     <string name="button_retry_text" translatable="true">Wiederholung</string>
-    <string name="button_play_sound_text" translatable="true">Play Sound</string>
+    <string name="button_play_sound_text" translatable="true">Ton abspielen</string>
     <string name="spinner_feedback_hint_text" translatable="true">Feedback-Umgebung</string>
     <string name="dialog_textview_unsaved_fitting_text" translatable="true">Es gibt ungespeicherte Anpassungsänderungen. Möchten Sie die Änderungen brennen, bevor Sie fortfahren?</string>
     <string name="textview_in_situ_warning_text" translatable="true">Dieser Test wurde nur zur Information und Gerätekonfiguration entwickelt und ist kein Ersatz für offizielle Hörtests von Gesundheitsorganisationen.</string>
     <string name="checkbox_memory_retention_text" translatable="true">Gedächtnisleistung</string>
     <string name="checkbox_volume_retention_text" translatable="true">Volumenerhalt</string>
-    <string name="button_save_in_situ_text" translatable="true">Save In-Situ Test</string>
+    <string name="button_save_in_situ_text" translatable="true">In-Situ-Test speichern</string>
     <string name="textview_click_for_connect_text" translatable="true">Klicken für Verbindung</string>
     <string name="dialog_textview_hear_sound_text" translatable="true">Hörst Du Das Signal?</string>
     <string name="toast_test_result_saved_text" translatable="true">Testergebnisse in der Galerie gespeichert</string>
     <string name="dialog_textview_check_text" translatable="true" formatted="false">%d Hz Frequenz / %d db</string>
     <string name="textview_device_initialized_text" translatable="true">Device %s Successfully Initialized</string>
-    <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
-    <string name="textview_parameter_read_success_text" translatable="true">The Parameters Has Successfully Read From The Device</string>
-    <string name="textview_parameter_read_fail_text" translatable="true">Unknown Problem Occurred While Reading Parameters, Please Contact With Your Delegate</string>
+    <string name="textview_parameter_read_process_text" translatable="true">Bitte warten Sie, während Sie beschriftete Parameter aus dem Gerät lesen</string>
+    <string name="textview_parameter_read_success_text" translatable="true">Die Parameter wurden erfolgreich vom Gerät gelesen</string>
+    <string name="textview_parameter_read_fail_text" translatable="true">Beim Lesen der Parameter ist ein unbekanntes Problem aufgetreten, bitte wenden Sie sich an Ihren Delegierten</string>
     <string name="textview_initializing_text" translatable="true">Bitte warten Sie während der Initialisierung des Geräts</string>
     <string name="textview_initialize_library_found_text" translatable="true">Erfolgreich die kompatible Bibliothek gefunden, Beginn der Initialisierung des Geräts</string>
     <string name="textview_initialize_success_text" translatable="true">Erfolgreiche Initialisierung des Geräts für die Anpassung</string>

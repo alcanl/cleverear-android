@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -44,10 +45,63 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     lateinit var threadPool: ExecutorService
     @Inject
     lateinit var listener: SplashActivityEventListener
-
-    private lateinit var mAlertDialog: CustomAlertDialogConnectedBefore
-    private lateinit var mAddressArray : Array<String>
     private var isAshaConnected = false
+    private lateinit var mAddressArray : Array<String>
+
+    private val mPostNotificationPermission by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+        else true
+        }
+
+    private val mForeGroundServicePermission by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
+            ) == PackageManager.PERMISSION_GRANTED
+        else true
+    }
+
+    private val mAlertDialog: CustomAlertDialogConnectedBefore by lazy {
+        CustomAlertDialogConnectedBefore(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        EventBus.getDefault().register(this)
+        initialize()
+
+        if (mForeGroundServicePermission && mPostNotificationPermission) {
+            initCountDownTimer()
+            cleanEvents()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 22)
+            if (grantResults.isNotEmpty())
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission)
+                    initCountDownTimer()
+                else
+                    Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+
+        if (requestCode == 23)
+            if (grantResults.isNotEmpty())
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission)
+                    initCountDownTimer()
+                else
+                    Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
@@ -62,6 +116,23 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 else
                     hearingAidMap[earSide]?.batteryLevel = event.batteryData
             }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun checkAndRequestNotificationPermission()
+    {
+        if (!mPostNotificationPermission)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                22
+            )
+        if (!mForeGroundServicePermission)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE),
+                23)
+
     }
 
     private fun initCountDownTimer()
@@ -98,7 +169,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                     ).apply { startActivity(this) }
                     finish()
                 }
-
             }
         }.start()
     }
@@ -137,32 +207,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
         checkAndRequestNotificationPermission()
         checkPrefs()
-        mAlertDialog = CustomAlertDialogConnectedBefore(this)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
-        EventBus.getDefault().register(this)
-        initialize()
-        initCountDownTimer()
-        cleanEvents()
-
-    }
-
-    private fun checkAndRequestNotificationPermission()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    0
-                )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE) != PackageManager.PERMISSION_GRANTED)
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE), 0)
-
     }
 
     private fun cleanEvents()
