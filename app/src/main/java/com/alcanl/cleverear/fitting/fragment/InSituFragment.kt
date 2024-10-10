@@ -433,4 +433,18 @@ class InSituFragment : Fragment(), IEventListener {
         }
 
     }
+    fun dialogEndTestButtonClicked()
+    {
+        try {
+            (activity as SelfFittingActivity).isInSituInProgress = false
+            manufacturing.prepareDeviceForModeling(false)
+            mFrequencyIndex = 0
+            mDecibelIndex = 2
+            mDialog.dismiss()
+            mHandler.sendEmptyMessage(WHAT_INVALIDATE_CHART)
+
+        } catch (ex: Throwable) {
+            Log.e(this.javaClass.name, "End Test Error")
+        }
+    }
 }

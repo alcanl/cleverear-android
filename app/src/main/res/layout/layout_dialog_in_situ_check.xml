@@ -12,13 +12,29 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="230dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499">
+
+        <Button
+            android:id="@+id/buttonEndTest"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:backgroundTint="@color/right_device_slider"
+            android:onClick="@{()-> viewModel.handleEndTestButton()}"
+            android:text="@string/button_end_in_situ_text"
+            android:textColor="@color/off_white"
+            android:textSize="14sp"
+            app:cornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            tools:ignore="ButtonStyle,TextContrastCheck,TouchTargetSizeCheck" />
 
         <rm.com.audiowave.AudioWaveView
             android:id="@+id/audioWaveView"
@@ -67,7 +83,7 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:padding="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/buttonEndTest"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"

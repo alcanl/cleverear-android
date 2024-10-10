@@ -14,4 +14,8 @@ class InSituSoundCheckDialogListenersViewModel(fragment: InSituFragment) {
     {
         mWeakReference.get()?.dialogNegativeButtonClicked()
     }
+    fun handleEndTestButton()
+    {
+        mWeakReference.get()?.dialogEndTestButtonClicked()
+    }
 }
