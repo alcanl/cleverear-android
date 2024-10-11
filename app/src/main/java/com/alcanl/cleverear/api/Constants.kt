@@ -1,6 +1,6 @@
 package com.alcanl.cleverear.api
 
-const val API_BASE_URL = "http://192.168.2.78:50531/api/ear-technic/"
+const val API_BASE_URL = "http://localhost:50531/api/ear-technic/"
 const val API_LIB_INFO_GET_BY_HA_URL = "library/model/info"
 const val API_LIB_INFO_GET_BY_LIB_ID_URL = "library"
 const val API_PARAM_DEFAULT_DATA_GET_BY_HA_NAME = "param/model/data"

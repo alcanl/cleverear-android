@@ -67,8 +67,14 @@ class AutoConnectService : Service()
     private lateinit var mConnectorThread: Future<*>
     private lateinit var mHandler: AutoConnectHandler
     private lateinit var mConnectedNotification: Notification
+
+    override fun onCreate() {
+        super.onCreate()
+        Log.i(AutoConnectService::class.simpleName, "onCreate")
+    }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
+        Log.i(AutoConnectService::class.simpleName, "onStartCommand")
         initialize(intent)
         return START_STICKY
     }
@@ -126,6 +132,13 @@ class AutoConnectService : Service()
     private fun scheduledThreadCallback(intent: Intent?)
     {
         try {
+            if (configuration.stopServiceFlag) {
+                configuration.stopServiceFlag = false
+                scheduledExecutor.shutdownNow()
+                stopSelf()
+                return
+            }
+
             with(configuration) {
                 if (!isDoubleDeviceConnection) {
                     if (isConnected) {

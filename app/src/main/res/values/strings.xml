@@ -114,7 +114,7 @@
     <string name="textview_initialize_library_found_text" translatable="true">Successfully Found The Compatible Library, Beginning The Initialize Device</string>
     <string name="textview_initialize_success_text" translatable="true">The Device Is Ready For Fitting</string>
     <string name="textview_initialize_unknown_problem_text" translatable="true">Unknown Problem Occurred While Initializing The Device</string>
-    <string name="textview_initialize_network_problem_text" translatable="true">External Server Error, Please Try To Connect Later</string>
+    <string name="textview_initialize_network_problem_text" translatable="true">External Server Error\nPlease Try To Connect Later</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Could Not Found The Compatible Library File For The Connected Device</string>
     <string name="alert_dialog_connected_before_text" translatable="true">Detected A Previous Saved Device Connection. Do You Want To Continue Connection With Previous Device/Devices?</string>
     <string name="navbar_home_text" translatable="false">Device</string>
