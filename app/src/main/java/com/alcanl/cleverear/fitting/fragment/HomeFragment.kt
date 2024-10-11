@@ -57,6 +57,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
+
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     @Inject
