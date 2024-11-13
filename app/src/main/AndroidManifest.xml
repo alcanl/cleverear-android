@@ -51,6 +51,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="DiscouragedApi">
         <activity
+            android:name=".BeaconActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainContainerActivity"
             android:exported="true" />
         <activity

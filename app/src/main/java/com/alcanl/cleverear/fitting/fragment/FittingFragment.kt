@@ -341,7 +341,7 @@ class FittingFragment : Fragment(), IEventListener {
     fun numberPickerOnValueChanged(pos: Int)
     {
         mSelectedPickerPosition = pos
-        mBinding.spinnerMemory.setHint(resources.getStringArray(R.array.programs)[pos])
+        mBinding.spinnerMemory.hint = resources.getStringArray(R.array.programs)[pos]
     }
     fun memoryRetentionCheckedChanged()
     {
