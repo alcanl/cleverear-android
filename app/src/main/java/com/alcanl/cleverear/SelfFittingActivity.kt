@@ -44,15 +44,17 @@ import java.util.EventObject
 @AndroidEntryPoint
 class SelfFittingActivity : AppCompatActivity(), IEventListener {
 
-    private val mUnsavedFittingDialog : CustomAlertDialogFittingUnsaved by lazy {
-        CustomAlertDialogFittingUnsaved(this)
-    }
-    private val mInSituInProgressDialog: CustomAlertDialogInSituInProgress by lazy {
-        CustomAlertDialogInSituInProgress(this)
-    }
-    private val mDeviceDisconnectedDialog: CustomAlertDialogDeviceDisconnected by lazy {
-        CustomAlertDialogDeviceDisconnected(this)
-    }
+    private val mUnsavedFittingDialog : CustomAlertDialogFittingUnsaved
+        get() = CustomAlertDialogFittingUnsaved(this)
+
+
+    private val mInSituInProgressDialog: CustomAlertDialogInSituInProgress
+        get() = CustomAlertDialogInSituInProgress(this)
+
+
+    private val mDeviceDisconnectedDialog: CustomAlertDialogDeviceDisconnected
+        get() = CustomAlertDialogDeviceDisconnected(this)
+
     lateinit var binding : ActivitySelfFittingBinding
 
     @Volatile

@@ -65,6 +65,6 @@ class MainContainerActivity : AppCompatActivity() {
 
     fun stopService()
     {
-        stopService(Intent(this, AutoConnectService::class.java))
+        configuration.stopServiceFlag = true
     }
 }

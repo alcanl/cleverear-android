@@ -22,6 +22,8 @@ object ConfigurationModule {
     var isServiceOnBoard = false
     var isBluetoothEnabled = false
     var isRemoteFittingConnection = false
+    @Volatile
+    var stopServiceFlag = false
     var earSide : EarSide = EarSide.Right
     val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)
 
