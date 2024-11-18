@@ -1,17 +1,23 @@
 package com.alcanl.cleverear
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanRecord
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityBeaconBinding
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
@@ -34,6 +40,23 @@ class BeaconActivity : AppCompatActivity() {
 
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
+    private val mLocationFinePermission by lazy {
+        ContextCompat.checkSelfPermission(
+            this,
+            ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private val mLocationBackgroundPermission by lazy {
+
+        if (Build.VERSION.SDK_INT >= 29)
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        else true
+    }
+
     private val test : ScanCallback by lazy {
         object : ScanCallback() {
 
@@ -55,7 +78,39 @@ class BeaconActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         initialize()
+        checkLocationPermission()
         discoverEddyStoneBeacons()
+    }
+
+    private fun checkLocationPermission()
+    {
+        if (!mLocationFinePermission)
+            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION), 60)
+
+        if (!mLocationBackgroundPermission && Build.VERSION.SDK_INT >= 29)
+            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_BACKGROUND_LOCATION), 61)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 60)
+            if (grantResults.isNotEmpty())
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mLocationFinePermission)
+                    if (!mLocationBackgroundPermission && Build.VERSION.SDK_INT >= 29)
+                        ActivityCompat.requestPermissions(this, arrayOf(ACCESS_BACKGROUND_LOCATION), 62)
+                else
+                    Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+
+        if (requestCode == 61)
+            if (grantResults.isNotEmpty())
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mLocationBackgroundPermission)
+                  if (!mLocationFinePermission)
+                      ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION), 63)
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun initialize()
@@ -69,11 +124,16 @@ class BeaconActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun discoverEddyStoneBeacons()
     {
-        mBluetoothLeScanner.startScan(test)
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
+            .setReportDelay(0L)
+            .build()
+        mBluetoothLeScanner.startScan(emptyList(), settings, test)
         //Handler(Looper.myLooper()!!).postDelayed({ mBluetoothLeScanner.stopScan(test) }, 20000L)
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun detectEddystoneTLM(scanData: ByteArray?) {
         if (scanData != null && scanData.isNotEmpty()) {
             //scanData.forEach { i -> Log.d("Scan Data", i.toHexString()) }
