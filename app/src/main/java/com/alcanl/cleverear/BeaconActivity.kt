@@ -3,7 +3,6 @@ package com.alcanl.cleverear
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
@@ -24,17 +23,12 @@ import com.neovisionaries.bluetooth.ble.advertising.EddystoneUID
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneURL
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Arrays
 
 
 @AndroidEntryPoint
 class BeaconActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityBeaconBinding
-
-    private lateinit var mBluetoothManager: BluetoothManager
-
-    private lateinit var mBluetoothAdapter: BluetoothAdapter
 
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
@@ -49,28 +43,27 @@ class BeaconActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 29)
             ContextCompat.checkSelfPermission(
                 this,
-                ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         else true
     }
 
-    private val test : ScanCallback by lazy {
+    private val test: ScanCallback by lazy {
         object : ScanCallback() {
 
             @SuppressLint("MissingPermission")
             override fun onScanResult(callbackType: Int, result: ScanResult) {
-                Log.d(BeaconActivity::class.simpleName, result.device.address)
+                //Log.d(BeaconActivity::class.simpleName, result.device.address)
 
                 if (result.scanRecord != null) {
-                    result.scanRecord!!.bytes.forEach { i -> Log.d("Advertise Data", i.toString()) }
-                    parseScanDataWithNewLibTest(result.scanRecord!!.bytes)
-                    detectEddystoneTLM(result.scanRecord?.bytes)
+                    //result.scanRecord!!.bytes.forEach { i -> Log.d("Advertise Data", i.toString()) }
+                    parseScanDataWithNewLibTest(result.scanRecord!!.bytes, result.device.address)
                 }
             }
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()
         if (!mLocationCoarsePermission || !mLocationFinePermission)
@@ -79,10 +72,13 @@ class BeaconActivity : AppCompatActivity() {
             discoverEddyStoneBeacons()
     }
 
-    private fun requestLocationPermission()
-    {
+    private fun requestLocationPermission() {
         if (Build.VERSION.SDK_INT >= 29)
-            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), 60)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),
+                60
+            )
         else
             ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION), 61)
     }
@@ -96,27 +92,22 @@ class BeaconActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)
                     discoverEddyStoneBeacons()
-        }
-
-        else if (requestCode == 61)
+        } else if (requestCode == 61)
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mLocationFinePermission)
-                  discoverEddyStoneBeacons()
+                    discoverEddyStoneBeacons()
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun initialize()
-    {
+    private fun initialize() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_beacon)
-        mBluetoothManager = getSystemService(BluetoothManager::class.java)
-        mBluetoothAdapter = mBluetoothManager.adapter
-        mBluetoothLeScanner = mBluetoothAdapter.bluetoothLeScanner
+        mBluetoothLeScanner =
+            getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
 
     @SuppressLint("MissingPermission")
-    private fun discoverEddyStoneBeacons()
-    {
+    private fun discoverEddyStoneBeacons() {
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -127,126 +118,94 @@ class BeaconActivity : AppCompatActivity() {
         //Handler(Looper.myLooper()!!).postDelayed({ mBluetoothLeScanner.stopScan(test) }, 20000L)
     }
 
-    private fun detectEddystoneTLM(scanData: ByteArray?) {
-        if (scanData != null && scanData.isNotEmpty()) {
-            //scanData.forEach { i -> Log.d("Scan Data", i.toHexString()) }
-            if (scanData[0] == 0x16.toByte() && scanData[1] == 0xFE.toByte() && scanData[2] == 0x20.toByte()) {
-                val telemetryData = Arrays.copyOfRange(scanData, 3, scanData.size)
-                parseTelemetryData(telemetryData)
-            }
-        }
 
-    }
+    private fun parseScanDataWithNewLibTest(scanRecord: ByteArray, address: String) {
+        val structures = ADPayloadParser.getInstance().parse(scanRecord)
 
-    private fun parseTelemetryData(telemetryData: ByteArray) {
+        for (structure in structures) {
+            when (structure) {
+                is EddystoneUID -> {
+                    // Eddystone UID
+                    val es = structure
+                    Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
+                    // (1) Calibrated Tx power at 0 m.
+                    val power = es.txPower
+                    Log.d(BeaconActivity::class.simpleName, power.toString())
 
-        if (telemetryData.size >= 14) {
+                    // (2) 10-byte Namespace ID
+                    val namespaceId = es.namespaceId
+                    Log.d(BeaconActivity::class.simpleName, namespaceId.toString())
+                    val namespaceIdAsString = es.namespaceIdAsString
+                    Log.d(BeaconActivity::class.simpleName, namespaceIdAsString)
 
-            val batteryLevel = (telemetryData[0].toInt() and 0xFF)
-            val temperature = ((telemetryData[1].toInt() shl 8) or (telemetryData[2].toInt() and 0xFF)).toShort()
-            val timeCounter = (telemetryData[3].toInt() shl 24) or ((telemetryData[4].toInt() and 0xFF) shl 16) or
-                        ((telemetryData[5].toInt() and 0xFF) shl 8) or (telemetryData[6].toInt() and 0xFF)
+                    // (3) 6-byte Instance ID
+                    val instanceId = es.instanceId
+                    Log.d(BeaconActivity::class.simpleName, instanceId.toString())
+                    val instanceIdAsString = es.instanceIdAsString
+                    Log.d(BeaconActivity::class.simpleName, instanceIdAsString)
 
-            val version = telemetryData[7]
+                    // (4) 16-byte Beacon ID
+                    val beaconId = es.beaconId
+                    Log.d(BeaconActivity::class.simpleName, beaconId.toString())
+                    val beaconIdAsString = es.beaconIdAsString
+                    Log.d(BeaconActivity::class.simpleName, beaconIdAsString)
+                }
 
-            Log.d("EddystoneTLM", "Battery Level: $batteryLevel%")
-            Log.d("EddystoneTLM", "Temperature: $temperature°C")
-            Log.d("EddystoneTLM", "Time Counter: $timeCounter seconds")
-            Log.d("EddystoneTLM", "Version: $version")
-        } else {
-            Log.d("EddystoneTLM", "Invalid TLM data length")
-        }
-    }
+                is EddystoneURL -> {
+                    // Eddystone URL
+                    Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
 
-}
+                    // (1) Calibrated Tx power at 0 m.
+                    val power = structure.txPower
+                    Log.d(BeaconActivity::class.simpleName, power.toString())
+                    // (2) URL
+                    val url = structure.url
+                    Log.d(BeaconActivity::class.simpleName, url.toString())
+                }
 
-private fun parseScanDataWithNewLibTest(scanRecord: ByteArray)
-{
-    val structures = ADPayloadParser.getInstance().parse(scanRecord)
+                is EddystoneTLM -> {
+                    // Eddystone TLM
+                    Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
+                    // (1) TLM Version
+                    val version = structure.tlmVersion
+                    Log.d(BeaconActivity::class.simpleName, version.toString())
 
-    for (structure in structures) {
-        when (structure) {
-            is EddystoneUID -> {
-                // Eddystone UID
-                val es = structure
-                Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
-                // (1) Calibrated Tx power at 0 m.
-                val power = es.txPower
-                Log.d(BeaconActivity::class.simpleName, power.toString())
+                    // (2) Battery Voltage
+                    val voltage = structure.batteryVoltage
+                    Log.d(BeaconActivity::class.simpleName, voltage.toString())
 
-                // (2) 10-byte Namespace ID
-                val namespaceId = es.namespaceId
-                Log.d(BeaconActivity::class.simpleName, namespaceId.toString())
-                val namespaceIdAsString = es.namespaceIdAsString
-                Log.d(BeaconActivity::class.simpleName, namespaceIdAsString)
+                    // (3) Beacon Temperature
+                    val temperature = structure.beaconTemperature
+                    Log.d(BeaconActivity::class.simpleName, temperature.toString())
 
-                // (3) 6-byte Instance ID
-                val instanceId = es.instanceId
-                Log.d(BeaconActivity::class.simpleName, instanceId.toString())
-                val instanceIdAsString = es.instanceIdAsString
-                Log.d(BeaconActivity::class.simpleName, instanceIdAsString)
+                    // (4) Advertisement count since power-on or reboot.
+                    val count = structure.advertisementCount
+                    Log.d(BeaconActivity::class.simpleName, count.toString())
 
-                // (4) 16-byte Beacon ID
-                val beaconId = es.beaconId
-                Log.d(BeaconActivity::class.simpleName, beaconId.toString())
-                val beaconIdAsString = es.beaconIdAsString
-                Log.d(BeaconActivity::class.simpleName, beaconIdAsString)
-            }
+                    // (5) Elapsed time in milliseconds since power-on or reboot.
+                    val elapsed = structure.elapsedTime
+                    Log.d(BeaconActivity::class.simpleName, elapsed.toString())
+                }
 
-            is EddystoneURL -> {
-                // Eddystone URL
-                Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
+                is IBeacon -> {
+                    // iBeacon
+                    Log.d(BeaconActivity::class.simpleName, address)
 
-                // (1) Calibrated Tx power at 0 m.
-                val power = structure.txPower
-                Log.d(BeaconActivity::class.simpleName, power.toString())
-                // (2) URL
-                val url = structure.url
-                Log.d(BeaconActivity::class.simpleName, url.toString())
-            }
+                    // (1) Proximity UUID
+                    val uuid = structure.uuid
+                    Log.d("UUID", uuid.toString())
+                    // (2) Major number
+                    val major = structure.major
+                    Log.d("Major", major.toString())
 
-            is EddystoneTLM -> {
-                // Eddystone TLM
-                Log.d(BeaconActivity::class.simpleName, "EddystoneUID")
-                // (1) TLM Version
-                val version = structure.tlmVersion
-                Log.d(BeaconActivity::class.simpleName, version.toString())
+                    // (3) Minor number
+                    val minor = structure.minor
+                    Log.d("Minor", minor.toString())
 
-                // (2) Battery Voltage
-                val voltage = structure.batteryVoltage
-                Log.d(BeaconActivity::class.simpleName, voltage.toString())
-
-                // (3) Beacon Temperature
-                val temperature = structure.beaconTemperature
-                Log.d(BeaconActivity::class.simpleName, temperature.toString())
-
-                // (4) Advertisement count since power-on or reboot.
-                val count = structure.advertisementCount
-                Log.d(BeaconActivity::class.simpleName, count.toString())
-
-                // (5) Elapsed time in milliseconds since power-on or reboot.
-                val elapsed = structure.elapsedTime
-                Log.d(BeaconActivity::class.simpleName, elapsed.toString())
-            }
-
-            is IBeacon -> {
-                // iBeacon
-                val iBeacon = structure
-
-                // (1) Proximity UUID
-                val uuid = iBeacon.uuid
-                Log.d("UUID", uuid.toString())
-                // (2) Major number
-                val major = iBeacon.major
-                Log.d("Major", major.toString())
-
-                // (3) Minor number
-                val minor = iBeacon.minor
-                Log.d("Minor", minor.toString())
-
-                // (4) Tx Power
-                val power = iBeacon.power
-                Log.d("Power", power.toString())
+                    // (4) Tx Power
+                    val power = structure.power
+                    Log.d("Power", power.toString())
+                }
             }
         }
     }
