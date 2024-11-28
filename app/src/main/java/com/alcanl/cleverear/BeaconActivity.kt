@@ -11,8 +11,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -107,11 +105,11 @@ class BeaconActivity : AppCompatActivity() {
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
-            .setReportDelay(3000L)
+            .setReportDelay(0)
             .build()
 
         mBluetoothLeScanner.startScan(emptyList(), settings, mScanCallback)
-        Handler(Looper.myLooper()!!).postDelayed({ mBluetoothLeScanner.stopScan(mScanCallback) }, 20000L)
+        //Handler(Looper.myLooper()!!).postDelayed({ mBluetoothLeScanner.stopScan(mScanCallback) }, 20000L)
     }
 
     private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String)
@@ -123,6 +121,15 @@ class BeaconActivity : AppCompatActivity() {
             if (it is EddystoneTLM) {
                 Log.d(BeaconActivity::class.simpleName, "EddystoneUIDTLM")
                 Log.d(BeaconActivity::class.simpleName, address)
+                it.data.forEach { byte ->
+                    Log.d("raw data", byte.toString())
+                }
+                //6 - 15 kapalı
+                //ikincisi left shift + or
+                //34 35 sıcaklık
+                //36 37 step
+                //38 free fall bool
+                //39 bool defa 0
 
                 val version = it.tlmVersion
                 Log.d(BeaconActivity::class.simpleName, version.toString())
