@@ -23,4 +23,10 @@
         android:label="Advanced"
         tools:layout="@layout/fragment_advanced"/>
 
+    <fragment
+        android:id="@+id/navbar_beacon"
+        android:name="com.alcanl.cleverear.fragment.BeaconFragment"
+        android:label="Measurement"
+        tools:layout="@layout/fragment_beacon"/>
+
 </navigation>

@@ -14,6 +14,7 @@
     <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
     <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses</string>
+    <string name="navbar_beacon_text" translatable="true">Ölçümler</string>
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>
     <string name="toast_no_permission_splash_activity" translatable="true">Devam Edebilmek İçin Zorunlu İzin Taleplerini Kabul Edilmesi Gerekmektedir</string>
     <string name="textview_program_text">Programlar</string>

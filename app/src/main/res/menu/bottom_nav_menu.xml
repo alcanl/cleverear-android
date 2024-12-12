@@ -20,4 +20,11 @@
         android:title="@string/navbar_advanced_text"
         android:icon="@drawable/advanced"
         android:id="@+id/navbar_advanced"/>
+
+    <item
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/navbar_beacon_text"
+        android:icon="@drawable/baseline_scale_24"
+        android:id="@+id/navbar_beacon"/>
 </menu>

@@ -1,0 +1,107 @@
+package com.alcanl.cleverear.fragment
+
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothManager
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import com.alcanl.cleverear.R
+import com.alcanl.cleverear.databinding.FragmentBeaconBinding
+import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
+import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class BeaconFragment : Fragment() {
+
+    private lateinit var mBinding: FragmentBeaconBinding
+
+    private lateinit var mBluetoothLeScanner: BluetoothLeScanner
+
+    private val mScanCallback: ScanCallback by lazy {
+        object : ScanCallback() {
+
+            @SuppressLint("MissingPermission")
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+
+                if (result.scanRecord != null)
+                    determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
+        super.onCreate(savedInstanceState)
+        initialize()
+        discoverEddyStoneBeacons()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_beacon, container, false)
+        mBinding.lifecycleOwner = this
+        return mBinding.root
+    }
+
+    private fun initialize() {
+
+        mBluetoothLeScanner = requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun discoverEddyStoneBeacons() {
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
+            .setReportDelay(0)
+            .build()
+
+        mBluetoothLeScanner.startScan(emptyList(), settings, mScanCallback)
+    }
+
+    private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String) {
+        val structures = ADPayloadParser.getInstance().parse(scanRecord)
+
+        structures.forEach {
+
+            if (it is EddystoneTLM) {
+                Log.d(BeaconFragment::class.simpleName, "EddystoneUIDTLM")
+                Log.d(BeaconFragment::class.simpleName, address)
+                it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
+                //6 - 15 kapalı
+                //ikincisi left shift + or
+                //34 35 sıcaklık
+                //36 37 step
+                //38 free fall bool
+                //39 bool defa 0
+
+                val version = it.tlmVersion
+                Log.d(BeaconFragment::class.simpleName, version.toString())
+
+                val voltage = it.batteryVoltage
+                Log.d(BeaconFragment::class.simpleName, voltage.toString())
+
+                val temperature = it.beaconTemperature
+                Log.d(BeaconFragment::class.simpleName, temperature.toString())
+
+                val count = it.advertisementCount
+                Log.d(BeaconFragment::class.simpleName, count.toString())
+
+                val elapsed = it.elapsedTime
+                Log.d(BeaconFragment::class.simpleName, elapsed.toString())
+            }
+        }
+    }
+}

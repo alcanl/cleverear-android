@@ -369,12 +369,4 @@ class MainActivity : AppCompatActivity() {
                 .also { it.setAnimationListener(infoButtonAnimation()) })
         }
     }
-
-    fun buttonBeaconClicked()
-    {
-        Intent(this, BeaconActivity::class.java).apply {
-            startActivity(this)
-            finish()
-        }
-    }
 }

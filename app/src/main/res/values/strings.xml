@@ -68,6 +68,7 @@
     <string name="navbar_connection_text" translatable="true">Connection</string>
     <string name="navbar_control_text" translatable="true">Control</string>
     <string name="navbar_advanced_text" translatable="true">Advanced</string>
+    <string name="navbar_beacon_text" translatable="true">Measurements</string>
     <string name="left_ear_side_text" translatable="true">Left Ear</string>
     <string name="right_ear_side_text" translatable="true">Right Ear</string>
     <string name="toast_bluetooth_not_found_text" translatable="true">Your Device Does Not Support Bluetooth Connection</string>

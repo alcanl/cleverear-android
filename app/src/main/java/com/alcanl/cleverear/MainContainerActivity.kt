@@ -1,19 +1,27 @@
 package com.alcanl.cleverear
 
-import android.content.Intent
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.alcanl.cleverear.databinding.ActivityMainContainerBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fragment.AdvancedFragment
+import com.alcanl.cleverear.fragment.BeaconFragment
 import com.alcanl.cleverear.fragment.ConnectionFragment
 import com.alcanl.cleverear.fragment.ControlFragment
-import com.alcanl.cleverear.util.service.AutoConnectService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
+const val ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE = 60
+const val ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE = 61
 
 @AndroidEntryPoint
 class MainContainerActivity : AppCompatActivity() {
@@ -22,11 +30,45 @@ class MainContainerActivity : AppCompatActivity() {
     lateinit var configuration: ConfigurationModule
     lateinit var binding : ActivityMainContainerBinding
 
+    private val mLocationFinePermission by lazy {
+        ContextCompat.checkSelfPermission(
+            this,
+            ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private val mLocationCoarsePermission by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            ContextCompat.checkSelfPermission(
+                this,
+                ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        else true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_container)
         initializeNavController()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE &&
+            grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+            grantResults[1] == PackageManager.PERMISSION_GRANTED
+        )
+            navigateTo(BeaconFragment())
+        else if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE &&
+            grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+        )
+            navigateTo(BeaconFragment())
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun navigateTo(fragment: Fragment)
@@ -53,6 +95,19 @@ class MainContainerActivity : AppCompatActivity() {
                         navigateTo(ControlFragment()); true
                     }
                 }
+                R.id.navbar_beacon -> {
+                    if (!configuration.isConnected)
+                        false
+                    else
+                        if (hasPermissionsForBeaconFragment()) {
+                            navigateTo(BeaconFragment())
+                            true
+                        }
+                        else {
+                            requestLocationPermission()
+                            false
+                        }
+                }
                 else -> {
                     if (!configuration.isConnected)
                         false
@@ -61,6 +116,30 @@ class MainContainerActivity : AppCompatActivity() {
                 }}
             }
         }
+    }
+
+    private fun requestLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),
+                ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE
+            )
+        else
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(ACCESS_FINE_LOCATION),
+                ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
+            )
+    }
+
+    private fun hasPermissionsForBeaconFragment() : Boolean
+    {
+        if (!mLocationCoarsePermission || !mLocationFinePermission) {
+            requestLocationPermission()
+            return false
+        }
+        return true
     }
 
     fun stopService()

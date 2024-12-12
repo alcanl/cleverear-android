@@ -49,9 +49,7 @@
         android:theme="@style/Theme.CleverEar"
         android:usesCleartextTraffic="true"
         tools:ignore="DiscouragedApi">
-        <activity
-            android:name=".BeaconActivity"
-            android:exported="true" />
+
         <activity
             android:name=".MainContainerActivity"
             android:exported="true" />

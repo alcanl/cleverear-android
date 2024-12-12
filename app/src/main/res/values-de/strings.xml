@@ -11,6 +11,7 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="navbar_beacon_text" translatable="true">Messungen</string>
     <string name="toast_no_permission_splash_activity" translatable="true">Um fortzufahren, akzeptieren Sie bitte die Genehmigungsanfragen</string>
     <string name="textview_scan_process_scanning_text" translatable="true">Scannen</string>
     <string name="textview_scan_process_connected_text" translatable="true">Verbunden</string>
