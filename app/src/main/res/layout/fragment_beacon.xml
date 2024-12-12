@@ -3,17 +3,13 @@
 <layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".BeaconActivity"/>
 
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:shimmer_animation_duration="2000" >
+        app:shimmer_animation_duration="2000"
+        tools:context=".BeaconActivity">
 
         <LinearLayout
             android:layout_width="match_parent"

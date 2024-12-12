@@ -13,21 +13,35 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ConfigurationModule {
+
     @Volatile
     var isConnected = false
+
     @Volatile
     var canBondDeviceReConnect = false
-    var isDoubleDeviceConnection = false
-    var isDualDeviceConfig = false
-    var isConnectedBefore = false
-    var isServiceOnBoard = false
-    var isBluetoothEnabled = false
-    var isRemoteFittingConnection = false
+
     @Volatile
     var stopServiceFlag = false
+
+    var isDoubleDeviceConnection = false
+
+    var isDualDeviceConfig = false
+
+    var isConnectedBefore = false
+
+    var isServiceOnBoard = false
+
+    var isBluetoothEnabled = false
+
+    var isRemoteFittingConnection = false
+
     var earSide : EarSide = EarSide.Right
+
     val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)
-    val eddyStoneMap : EnumMap<EarSide, EddystoneHearingAid> = EnumMap(EarSide::class.java)
+
+    val eddyStoneMap : EnumMap<EarSide, EddystoneHearingAid> by lazy {
+        EnumMap(EarSide::class.java)
+    }
 
     @Singleton
     @Provides
