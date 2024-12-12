@@ -43,6 +43,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AdvancedFragment : Fragment(), IEventListener {
+
     @Inject
     lateinit var eventHandler: EventHandler
     @Inject

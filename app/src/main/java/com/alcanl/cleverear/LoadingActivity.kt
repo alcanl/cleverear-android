@@ -49,8 +49,10 @@ import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import javax.inject.Inject
+
 @AndroidEntryPoint
 class LoadingActivity : AppCompatActivity(), IEventListener {
+
     @Inject
     lateinit var configuration: ConfigurationModule
     @Inject

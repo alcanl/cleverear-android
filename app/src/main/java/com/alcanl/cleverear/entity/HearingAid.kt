@@ -2,6 +2,7 @@ package com.alcanl.cleverear.entity
 
 import android.bluetooth.BluetoothDevice
 import android.util.Log
+import com.alcanl.cleverear.util.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
 import com.alcanl.cleverear.util.EarSide
 import com.ark.ArkException
 import com.ark.CommunicationAdaptor
@@ -22,7 +23,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                       var streamAddressRaw : Int = 1101286, var streamChannelList : Int = 1,
                       var memories: ParameterMemoryList? = null, var parameters: ParameterList? = null,
                       val systemMemory: ParameterMemory? = null, @Volatile var isConnected : Boolean = false,
-                      @Volatile var isDeviceInRange: Boolean = false)
+                      @Volatile var isDeviceInRange: Boolean = false, var isEddystoneTLM : Boolean = false)
 {
 
     fun getPropertiesFromSDK(productManager: ProductManager, eventHandler: EventHandler)
@@ -51,6 +52,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                 this@HearingAid.streamChannelList = streamChannelList
                 this@HearingAid.streamAddressRaw = streamAddress
                 this@HearingAid.streamAddress = streamAddressRaw shr 16
+                isEddystoneTLM = wirelessControl?.modelNumber == EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
             }
         }
         catch (e : ArkException) {

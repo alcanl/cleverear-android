@@ -17,11 +17,12 @@ import com.alcanl.cleverear.fragment.AdvancedFragment
 import com.alcanl.cleverear.fragment.BeaconFragment
 import com.alcanl.cleverear.fragment.ConnectionFragment
 import com.alcanl.cleverear.fragment.ControlFragment
+import com.alcanl.cleverear.util.ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE
+import com.alcanl.cleverear.util.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-const val ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE = 60
-const val ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE = 61
+
 
 @AndroidEntryPoint
 class MainContainerActivity : AppCompatActivity() {

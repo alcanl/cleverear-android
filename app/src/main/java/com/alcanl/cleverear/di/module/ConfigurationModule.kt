@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.di.module
 
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import dagger.Module
@@ -26,6 +27,7 @@ object ConfigurationModule {
     var stopServiceFlag = false
     var earSide : EarSide = EarSide.Right
     val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)
+    val eddyStoneMap : EnumMap<EarSide, EddystoneHearingAid> = EnumMap(EarSide::class.java)
 
     @Singleton
     @Provides

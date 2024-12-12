@@ -15,15 +15,19 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
+import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BeaconFragment : Fragment() {
 
-    private lateinit var mBinding: FragmentBeaconBinding
+    @Inject
+    lateinit var configuration : ConfigurationModule
 
+    private lateinit var mBinding: FragmentBeaconBinding
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
     private val mScanCallback: ScanCallback by lazy {
@@ -42,7 +46,6 @@ class BeaconFragment : Fragment() {
     {
         super.onCreate(savedInstanceState)
         initialize()
-        discoverEddyStoneBeacons()
     }
 
     override fun onCreateView(
@@ -54,8 +57,26 @@ class BeaconFragment : Fragment() {
         return mBinding.root
     }
 
-    private fun initialize() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
+        super.onViewCreated(view, savedInstanceState)
+        mBinding.shimmerLayout.startShimmerAnimation()
 
+        if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
+            handleNotSupportedHearingAid()
+        else
+            handleEddystoneTLM()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        mBluetoothLeScanner.stopScan(mScanCallback)
+    }
+
+    private fun initialize()
+    {
         mBluetoothLeScanner = requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
 
@@ -65,12 +86,13 @@ class BeaconFragment : Fragment() {
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
-            .setReportDelay(0)
+            .setReportDelay(2)
             .build()
 
         mBluetoothLeScanner.startScan(emptyList(), settings, mScanCallback)
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String) {
         val structures = ADPayloadParser.getInstance().parse(scanRecord)
 
@@ -79,29 +101,56 @@ class BeaconFragment : Fragment() {
             if (it is EddystoneTLM) {
                 Log.d(BeaconFragment::class.simpleName, "EddystoneUIDTLM")
                 Log.d(BeaconFragment::class.simpleName, address)
-                it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
-                //6 - 15 kapalı
-                //ikincisi left shift + or
-                //34 35 sıcaklık
-                //36 37 step
-                //38 free fall bool
-                //39 bool defa 0
 
-                val version = it.tlmVersion
-                Log.d(BeaconFragment::class.simpleName, version.toString())
+                if (configuration.hearingAidMap.none { ha -> ha.value.address == address })
+                    return
 
-                val voltage = it.batteryVoltage
-                Log.d(BeaconFragment::class.simpleName, voltage.toString())
+                configuration.eddyStoneMap.forEach { (_, eddystoneTLM) ->
 
-                val temperature = it.beaconTemperature
-                Log.d(BeaconFragment::class.simpleName, temperature.toString())
+                    it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
+                    //6 - 15 kapalı
+                    //ikincisi left shift + or
+                    //34 35 sıcaklık
+                    //36 37 step
+                    //38 free fall bool
+                    //39 bool defa 0
+                    eddystoneTLM.tlmVersion = it.tlmVersion
+                    eddystoneTLM.temperature = it.beaconTemperature.toDouble()
+                    eddystoneTLM.batteryVoltage = it.batteryVoltage
+                    eddystoneTLM.advertisementCount = it.advertisementCount
+                    eddystoneTLM.elapsedTime = it.elapsedTime
+                    eddystoneTLM.isFallen = it.data[38].toHexString().toBoolean()
+                    eddystoneTLM.isDefault = it.data[39].toHexString().toBoolean()
+                    eddystoneTLM.setStepCount(it.data[36], it.data[37])
+                    eddystoneTLM.setTemperatureData(it.data[34], it.data[35])
 
-                val count = it.advertisementCount
-                Log.d(BeaconFragment::class.simpleName, count.toString())
+                    val version = it.tlmVersion
+                    Log.d(BeaconFragment::class.simpleName, version.toString())
 
-                val elapsed = it.elapsedTime
-                Log.d(BeaconFragment::class.simpleName, elapsed.toString())
+                    val voltage = it.batteryVoltage
+                    Log.d(BeaconFragment::class.simpleName, voltage.toString())
+
+                    val temperature = it.beaconTemperature
+                    Log.d(BeaconFragment::class.simpleName, temperature.toString())
+
+                    val count = it.advertisementCount
+                    Log.d(BeaconFragment::class.simpleName, count.toString())
+
+                    val elapsed = it.elapsedTime
+                    Log.d(BeaconFragment::class.simpleName, elapsed.toString())
+
+                }
             }
         }
+    }
+    private fun handleNotSupportedHearingAid()
+    {
+
+    }
+
+    private fun handleEddystoneTLM()
+    {
+        discoverEddyStoneBeacons()
+
     }
 }
