@@ -7,37 +7,33 @@
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
         app:shimmer_animation_duration="2000"
         tools:context=".BeaconActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:orientation="vertical" >
 
-            <LinearLayout
-                android:layout_marginTop="5dp"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/circle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="end"
+                    android:layout_marginStart="100dp"
+                    android:contentDescription="@string/main_logo_description_text"
+                    android:src="@drawable/eartechnic_logo" />
 
-                <TextView
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:text="test"
-                    android:gravity="center"
-                    android:background="#D3D3D3"
-                    android:textSize="26sp" />
-            </LinearLayout>
+
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_marginTop="10dp"
