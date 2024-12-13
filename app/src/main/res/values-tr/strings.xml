@@ -14,6 +14,15 @@
     <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
     <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses</string>
+    <string name="textview_eddystone_description_text" translatable="true">Anlık Cihaz Ölçüm Verileri</string>
+    <string name="textview_tlm_version_text" translatable="true">TLM Versiyon :</string>
+    <string name="textview_tlm_battery_voltage_text" translatable="true">TLM Pil Voltajı :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">TLM Sıcaklık :</string>
+    <string name="textview_tlm_advertisement_count_text" translatable="true">Yayın Sayısı :</string>
+    <string name="textview_tlm_elapsed_time_text" translatable="true">Gecikme Zamanı :</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Adım Sayısı :</string>
+    <string name="button_enable_tracking_text" translatable="true">Takibi Aktif Et</string>
+    <string name="button_disable_tracking_text" translatable="true">Takibi Devre Dışı Bırak</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nBağlı hiçbir cihaz modeli bu özelliği desteklememektedir</string>
     <string name="navbar_beacon_text" translatable="true">Ölçümler</string>
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>

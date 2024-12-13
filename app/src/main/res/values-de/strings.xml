@@ -11,6 +11,15 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="textview_eddystone_description_text" translatable="true">Echtzeit-Gerätemessdaten</string>
+    <string name="textview_tlm_version_text" translatable="true">TLM-Version :</string>
+    <string name="textview_tlm_battery_voltage_text" translatable="true">Batteriespannung :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">Temperatur :</string>
+    <string name="textview_tlm_advertisement_count_text" translatable="true">Werbung Zähler :</string>
+    <string name="textview_tlm_elapsed_time_text" translatable="true">Verstrichene Zeit :</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Schrittzähler :</string>
+    <string name="button_enable_tracking_text" translatable="true">Verfolgung aktivieren</string>
+    <string name="button_disable_tracking_text" translatable="true">Verfolgung deaktivieren</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">Es tut uns leid\nKein verbundenes Gerätemodell unterstützt die Messverfolgungsfunktion</string>
     <string name="navbar_beacon_text" translatable="true">Messungen</string>
     <string name="toast_no_permission_splash_activity" translatable="true">Um fortzufahren, akzeptieren Sie bitte die Genehmigungsanfragen</string>

@@ -111,6 +111,15 @@
     <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
     <string name="dialog_info_title" translatable="true">Info</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_tlm_version_text" translatable="true">TLM Version :</string>
+    <string name="textview_tlm_battery_voltage_text" translatable="true">TLM Battery Voltage :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">Temperature :</string>
+    <string name="textview_tlm_advertisement_count_text" translatable="true">Advertisement Count :</string>
+    <string name="textview_tlm_elapsed_time_text" translatable="true">Elapsed Time :</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Step Count :</string>
+    <string name="button_enable_tracking_text" translatable="true">Enable Tracking</string>
+    <string name="button_disable_tracking_text" translatable="true">Disable Tracking</string>
+    <string name="textview_eddystone_description_text" translatable="true">Real-Time\nDevice Measurement Data</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">We are sorry\nNo connected device model supports the measurement tracking feature</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_initializing_text" translatable="true">Please Wait While Initializing The Device</string>
