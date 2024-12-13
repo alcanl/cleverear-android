@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,10 +58,25 @@ class BeaconFragment : Fragment() {
         return mBinding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    @SuppressLint("MissingPermission")
+    override fun onDestroy()
     {
-        super.onViewCreated(view, savedInstanceState)
-        mBinding.shimmerLayout.startShimmerAnimation()
+        super.onDestroy()
+        mBluetoothLeScanner.stopScan(mScanCallback)
+        if (mBinding.shimmerLayout.isShimmerVisible)
+            mBinding.shimmerLayout.stopShimmer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (mBinding.shimmerLayout.isShimmerVisible)
+            mBinding.shimmerLayout.stopShimmer()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!mBinding.shimmerLayout.isShimmerVisible)
+            mBinding.shimmerLayout.startShimmer()
 
         if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
             handleNotSupportedHearingAid()
@@ -68,15 +84,9 @@ class BeaconFragment : Fragment() {
             handleEddystoneTLM()
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onDestroy()
-    {
-        super.onDestroy()
-        mBluetoothLeScanner.stopScan(mScanCallback)
-    }
-
     private fun initialize()
     {
+        mBinding.viewModel = BeaconFragmentListenersViewModel(this)
         mBluetoothLeScanner = requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
 
@@ -90,6 +100,7 @@ class BeaconFragment : Fragment() {
             .build()
 
         mBluetoothLeScanner.startScan(emptyList(), settings, mScanCallback)
+        configuration.isEddyStoneScanInProgress = true
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -145,12 +156,17 @@ class BeaconFragment : Fragment() {
     }
     private fun handleNotSupportedHearingAid()
     {
-
+        mBinding.frameLayoutNotSupported.visibility = View.VISIBLE
+        mBinding.shimmerLayout.stopShimmer()
     }
 
     private fun handleEddystoneTLM()
     {
         discoverEddyStoneBeacons()
+    }
 
+    fun enableEddystoneTracking()
+    {
+        configuration.isEddystoneTrackingActive = true
     }
 }

@@ -4,7 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <io.supercharge.shimmerlayout.ShimmerLayout
+    <data>
+        <import type="com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel"/>
+        <variable name="viewModel" type="BeaconFragmentListenersViewModel" />
+    </data>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,64 +29,445 @@
                 android:layout_gravity="end"
                 android:orientation="horizontal" >
 
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="90dp"
                     android:layout_height="90dp"
                     android:layout_gravity="end"
                     android:layout_marginStart="100dp"
                     android:contentDescription="@string/main_logo_description_text"
-                    android:src="@drawable/eartechnic_logo" />
+                    android:src="@drawable/eartechnic_logo"
+                    tools:ignore="ImageContrastCheck" />
 
 
             </FrameLayout>
 
-            <LinearLayout
-                android:layout_marginTop="10dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:layout_height="match_parent">
 
-                <ImageView
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/circle"
-                    android:layout_width="wrap_content"
+                <FrameLayout
+                    android:id="@+id/frameLayoutNotSupported"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:text="test"
-                    android:gravity="center"
-                    android:background="#D3D3D3"
-                    android:textSize="26sp" />
-            </LinearLayout>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/textViewEddystoneNotSupported"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="65dp"
+                        android:text="@string/textview_eddystone_not_supported_text"
+                        android:textAlignment="center"
+                        android:textColor="@color/design_default_color_secondary_variant"
+                        tools:ignore="TextContrastCheck" />
 
-            <LinearLayout
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="@string/textview_in_situ_warning_text"
+                        app:srcCompat="@drawable/icon_warning"
+                        tools:ignore="ImageContrastCheck" />
+                </FrameLayout>
 
-                <ImageView
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/circle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:layout_marginEnd="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:text="test"
-                    android:gravity="center"
-                    android:background="#D3D3D3"
-                    android:textSize="26sp" />
-            </LinearLayout>
+                    <ir.programmerplus.groupbox.GroupBoxLayout
+                        android:id="@+id/groupBoxLayoutLeftDevice"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layoutDirection="ltr"
+                        android:padding="8dp"
+                        app:borderColor="#A8A3A3"
+                        app:borderCornerRadius="8dp"
+                        app:borderStrokeWidth="2.2dp"
+                        app:labelText="@string/textview_left_device_text"
+                        app:labelTextColor="@color/ap_black"
+                        app:labelTextSize="10dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="TLM Version :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMVersion"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="TLM Battery Voltage :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMBatteryVoltage"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Temperature :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMTemperature"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Advertisement Count :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMAdvertisementCount"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Elapsed Time :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMElapsedTime"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Step Count :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewTLMStepCount"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_marginTop="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:layout_marginEnd="20dp"
+                                android:backgroundTint="@color/design_default_color_secondary_variant"
+                                android:text="Enable Tracking"
+                                android:textColor="@color/white"
+                                tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
+                        </FrameLayout>
+
+                    </ir.programmerplus.groupbox.GroupBoxLayout>
+
+                    <ir.programmerplus.groupbox.GroupBoxLayout
+                        android:id="@+id/groupBoxLayoutRightDevice"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layoutDirection="ltr"
+                        android:padding="8dp"
+                        app:borderColor="#A8A3A3"
+                        app:borderCornerRadius="8dp"
+                        app:borderStrokeWidth="2.2dp"
+                        app:labelText="@string/textview_left_device_text"
+                        app:labelTextColor="@color/ap_black"
+                        app:labelTextSize="10dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="TLM Version :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMVersion"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="TLM Battery Voltage :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMBatteryVoltage"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Temperature :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMTemperature"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Advertisement Count :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMAdvertisementCount"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Elapsed Time :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMElapsedTime"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Step Count :"
+                                android:textAlignment="center"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                tools:ignore="TextContrastCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/textViewRightDeviceTLMStepCount"
+                                android:textAlignment="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textColor="@color/design_default_color_secondary_variant"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_marginTop="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:layout_marginEnd="20dp"
+                                android:backgroundTint="@color/design_default_color_secondary_variant"
+                                android:text="Enable Tracking"
+                                android:textColor="@color/white"
+                                tools:ignore="TextContrastCheck" />
+                        </FrameLayout>
+
+                    </ir.programmerplus.groupbox.GroupBoxLayout>
+
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
-    </io.supercharge.shimmerlayout.ShimmerLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
 </layout>

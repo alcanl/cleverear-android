@@ -33,6 +33,10 @@ object ConfigurationModule {
 
     var isBluetoothEnabled = false
 
+    var isEddyStoneScanInProgress = false
+
+    var isEddystoneTrackingActive = false
+
     var isRemoteFittingConnection = false
 
     var earSide : EarSide = EarSide.Right

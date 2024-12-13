@@ -111,6 +111,7 @@
     <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
     <string name="dialog_info_title" translatable="true">Info</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="textview_eddystone_not_supported_text" translatable="true">We are sorry\nNo connected device model supports the measurement tracking feature</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
     <string name="textview_initializing_text" translatable="true">Please Wait While Initializing The Device</string>
     <string name="textview_initialize_library_found_text" translatable="true">Successfully Found The Compatible Library, Beginning The Initialize Device</string>
