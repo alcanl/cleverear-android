@@ -59,8 +59,10 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
 
     @Volatile
     var mSelectedFragmentId : Int? = null
+
     @Volatile
     var isFittingChangesMade : Boolean = false
+
     @Volatile
     var isInSituInProgress : Boolean = false
 

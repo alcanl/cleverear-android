@@ -19,11 +19,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AutoConnectActivity : AppCompatActivity() {
+
     @Inject
     lateinit var configuration : ConfigurationModule
+
     private var isLeftSelected = false
+
     private var isRightSelected = false
+
     private lateinit var mBinding : ActivityAutoConnectBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()

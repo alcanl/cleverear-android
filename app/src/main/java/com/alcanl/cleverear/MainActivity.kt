@@ -44,14 +44,20 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var enableBluetoothBroadCast : BluetoothStateBroadcastReceiver
-    private lateinit var mBinding: ActivityMainBinding
+
     private var mIsBluetoothPermissionsGranted = false
+
     private var mIsWebViewActive = false
+
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+
+    private lateinit var mBinding: ActivityMainBinding
 
     private val gpsActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()

@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 import com.alcanl.cleverear.R
 import com.ark.ArkException
 import com.onsemi.androidble.BleUtil
@@ -15,8 +16,10 @@ class CleverEarApp : Application() {
         super.onCreate()
 
         try {
-            BleUtil.BleManager_Init(this)
-        } catch (_: ArkException) {}
+            BleUtil.BleManager_Init(applicationContext)
+        } catch (ex: ArkException) {
+            Log.e(CleverEarApp::class.simpleName, "Error while initializing the BLE library")
+        }
 
         val channel = NotificationChannel(
             getString(R.string.service_notification_start_channel_id),

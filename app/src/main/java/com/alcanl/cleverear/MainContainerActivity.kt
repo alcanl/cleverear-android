@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,12 +24,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
-
 @AndroidEntryPoint
 class MainContainerActivity : AppCompatActivity() {
 
     @Inject
     lateinit var configuration: ConfigurationModule
+
     lateinit var binding : ActivityMainContainerBinding
 
     private val mLocationFinePermission by lazy {
@@ -51,6 +52,10 @@ class MainContainerActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_container)
+
+        if (!hasPermissionsForBluetoothLocation())
+            requestLocationPermission()
+
         initializeNavController()
     }
 
@@ -63,11 +68,17 @@ class MainContainerActivity : AppCompatActivity() {
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
             grantResults[1] == PackageManager.PERMISSION_GRANTED
         )
-            navigateTo(BeaconFragment())
+            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
+
         else if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE &&
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         )
-            navigateTo(BeaconFragment())
+            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
+
+        else {
+            Toast.makeText(this, R.string.toast_no_permission_splash_activity, Toast.LENGTH_LONG).show()
+            finish()
+        }
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
@@ -75,8 +86,10 @@ class MainContainerActivity : AppCompatActivity() {
     private fun navigateTo(fragment: Fragment)
     {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
+
         if (fragment !is ControlFragment)
             fragmentTransaction.setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
+
         fragmentTransaction.replace(binding.navHostMainContainer.id, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
@@ -99,22 +112,15 @@ class MainContainerActivity : AppCompatActivity() {
                 R.id.navbar_beacon -> {
                     if (!configuration.isConnected)
                         false
-                    else
-                        if (hasPermissionsForBeaconFragment()) {
-                            navigateTo(BeaconFragment())
-                            true
-                        }
-                        else {
-                            requestLocationPermission()
-                            false
-                        }
+                    else {
+                        navigateTo(BeaconFragment()); true }
                 }
                 else -> {
                     if (!configuration.isConnected)
                         false
                     else {
-                        navigateTo(AdvancedFragment()); true
-                }}
+                        navigateTo(AdvancedFragment()); true }
+                }
             }
         }
     }
@@ -134,13 +140,9 @@ class MainContainerActivity : AppCompatActivity() {
             )
     }
 
-    private fun hasPermissionsForBeaconFragment() : Boolean
+    private fun hasPermissionsForBluetoothLocation() : Boolean
     {
-        if (!mLocationCoarsePermission || !mLocationFinePermission) {
-            requestLocationPermission()
-            return false
-        }
-        return true
+        return mLocationCoarsePermission && mLocationFinePermission
     }
 
     fun stopService()

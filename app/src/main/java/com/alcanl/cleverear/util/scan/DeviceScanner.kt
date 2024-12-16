@@ -8,6 +8,7 @@ import com.ark.WirelessProgrammerType
 import javax.inject.Inject
 
 class DeviceScanner @Inject constructor(){
+
     @Inject
     lateinit var productManager: ProductManager
 

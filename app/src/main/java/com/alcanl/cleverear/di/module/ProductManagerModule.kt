@@ -12,13 +12,17 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ProductManagerModule {
+
     private val mProductManager = ProductManager.getInstance()
+
     @Provides
     @Singleton
     fun createProductManager() : ProductManager = mProductManager
+
     @Provides
     @Singleton
     fun createEventHandler() : EventHandler = mProductManager.eventHandler
+
     @Provides
     @Singleton
     fun createManufacturing() : Manufacturing = mProductManager.manufacturing

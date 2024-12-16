@@ -55,14 +55,19 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var productManager: ProductManager
+
     @Inject
     lateinit var mBondRequestReceiver: BondHearingAidBroadcastReceiver
+
     @Inject
     lateinit var listener: LoadingActivityEventListener
 

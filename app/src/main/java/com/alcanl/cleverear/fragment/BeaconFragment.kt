@@ -29,6 +29,7 @@ class BeaconFragment : Fragment() {
     lateinit var configuration : ConfigurationModule
 
     private lateinit var mBinding: FragmentBeaconBinding
+
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
     private val mScanCallback: ScanCallback by lazy {
@@ -43,9 +44,8 @@ class BeaconFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initialize()
     }
 
