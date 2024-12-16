@@ -14,9 +14,20 @@ import com.alcanl.cleverear.databinding.FragmentHomeBinding
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_LEFT_EAR_INITIALIZED
 import com.alcanl.cleverear.util.WHAT_RIGHT_EAR_INITIALIZED
+import ir.programmerplus.groupbox.GroupBoxLayout
 
 fun FrameLayout.startAlphaBlinkAnimation()
 {
+    val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+    anim.setDuration(400)
+    anim.startOffset = 20
+    anim.setRepeatCount(0)
+    this.startAnimation(anim)
+}
+
+fun GroupBoxLayout.startAlphaBlinkAnimation()
+{
+    this.visibility = View.VISIBLE
     val anim: Animation = AlphaAnimation(0.0f, 1.0f)
     anim.setDuration(400)
     anim.startOffset = 20

@@ -114,6 +114,7 @@ class ConnectionFragment : Fragment() {
             imageButtonDetect.isEnabled = !configuration.isConnected
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
+            groupBoxLayoutDeviceList.visibility = View.INVISIBLE
             textViewDeviceState.text = getString(if (configuration.isConnected)  R.string.device_connected_text else R.string.textview_device_detection_not_found_text)
             textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
@@ -214,6 +215,9 @@ class ConnectionFragment : Fragment() {
     {
         with(mBinding) {
 
+            if (adapter!!.isEmpty)
+                groupBoxLayoutDeviceList.startAlphaBlinkAnimation()
+
             adapter!!.add(device.toString())
 
             if (configuration.isDoubleDeviceConnection && recognizeEarSide(device.manufacturerData) == EarSide.Right)
@@ -305,6 +309,7 @@ class ConnectionFragment : Fragment() {
             mIsDeviceFound = false
             scanDevicesWithBluetooth()
             with(mBinding) {
+                groupBoxLayoutDeviceList.visibility = View.INVISIBLE
                 progressBar.visibility = View.VISIBLE
                 textViewScanProcess.text = getString(R.string.textview_scan_process_scanning_text)
             }

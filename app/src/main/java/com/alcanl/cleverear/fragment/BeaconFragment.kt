@@ -63,20 +63,32 @@ class BeaconFragment : Fragment() {
     {
         super.onDestroy()
         mBluetoothLeScanner.stopScan(mScanCallback)
-        if (mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.stopShimmer()
+
+        mBinding.shimmerLayout.apply {
+            if (isShimmerVisible) {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        if (mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.stopShimmer()
+        mBinding.shimmerLayout.apply {
+            if (isShimmerVisible) {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.startShimmer()
+
+        mBinding.shimmerLayout.apply {
+            if (!isShimmerVisible)
+                startShimmer()
+        }
 
         if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
             handleNotSupportedHearingAid()
@@ -156,9 +168,14 @@ class BeaconFragment : Fragment() {
     }
     private fun handleNotSupportedHearingAid()
     {
-        mBinding.frameLayoutNotSupported.visibility = View.VISIBLE
-        mBinding.shimmerLayout.visibility = View.GONE
-        mBinding.shimmerLayout.stopShimmer()
+        with(mBinding) {
+            frameLayoutNotSupported.visibility = View.VISIBLE
+            linearLayoutMain.visibility = View.INVISIBLE
+            shimmerLayout.apply {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     private fun handleEddystoneTLM()

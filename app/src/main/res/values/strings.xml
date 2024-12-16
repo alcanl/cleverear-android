@@ -92,6 +92,7 @@
     <string name="title_aux_label">Stream</string>
     <string name="title_mic_label">Mic</string>
     <string name="groupbox_active_title_text" translatable="true">Active Program Properties</string>
+    <string name="groupbox_select_device_text" translatable="true">Select Device To Connect</string>
     <string name="groupbox_common_title_text" translatable="true">Common Properties For All Programs</string>
     <string name="groupbox_burn_title_text" translatable="true">Save Changes To The Device</string>
     <string name="textview_device_mac" translatable="true"><u>Device Mac</u></string>
