@@ -2,3 +2,4 @@
 /release
 build.gradle.kts
 /app/build.gradle.kts
+./src/main/res/raw/ear_keystore.p12
