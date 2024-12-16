@@ -157,6 +157,7 @@ class BeaconFragment : Fragment() {
     private fun handleNotSupportedHearingAid()
     {
         mBinding.frameLayoutNotSupported.visibility = View.VISIBLE
+        mBinding.shimmerLayout.visibility = View.GONE
         mBinding.shimmerLayout.stopShimmer()
     }
 

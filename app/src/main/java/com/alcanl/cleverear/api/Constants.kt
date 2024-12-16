@@ -1,8 +1,10 @@
 package com.alcanl.cleverear.api
 
-const val API_KEY_HEADER = "apiAuthKey"
-const val API_KEY = "wc\$Fl8B^avs4pv1Jb^Su^h7\"*SO+}}d^og3iZ1[nL{uwoDc<p83P*L)0tp!]dnhp:NSMU.De1Z/<9@yL\$hjWC[<Ju\$WRQajf'JD\"[BUe!Bmj0ZDgdVrqmH[2>N{h\${'\$'}\$t,"
-const val API_BASE_URL = "http://localhost:50531/api/ear-technic/"
+import com.alcanl.cleverear.BuildConfig
+
+const val API_KEY = BuildConfig.API_KEY
+const val API_KEY_HEADER = BuildConfig.API_KEY_HEADER
+const val API_BASE_URL = BuildConfig.API_BASE_URL
 const val API_LIB_INFO_GET_BY_HA_URL = "library/model/info"
 const val API_LIB_INFO_GET_BY_LIB_ID_URL = "library"
 const val API_PARAM_DEFAULT_DATA_GET_BY_HA_NAME = "param/model/data"
