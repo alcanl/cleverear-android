@@ -34,35 +34,43 @@ object RetrofitModule {
             .baseUrl(API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .client(OkHttpClient.Builder()
-                .sslSocketFactory(sslSocketFactory, getX509TrustManager())
+                .sslSocketFactory(sslSocketFactory, getX509TrustManager(context))
                 .hostnameVerifier { _, _ -> true }
                 .build())
             .build()
     }
 
-    private fun getX509TrustManager(): X509TrustManager
+    private fun getX509TrustManager(context: Context): X509TrustManager
     {
-        val trustManagers = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-            .apply { init(null as KeyStore?) }
-            .trustManagers
+        val keyStore = KeyStore.getInstance("PKCS12").apply {
+            val certificateInputStream = context.resources.openRawResource(R.raw.ear_keystore)
+            load(certificateInputStream, "ear**123".toCharArray())
+            certificateInputStream.close()
+        }
 
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        trustManagerFactory.init(keyStore)
+
+        val trustManagers = trustManagerFactory.trustManagers
         return trustManagers.filterIsInstance<X509TrustManager>().first()
     }
 
-
     private fun getCustomSSLSocketFactory(context: Context): SSLSocketFactory
     {
-        val keyStore = KeyStore.getInstance("PKCS12")
-        val certificateInputStream = context.resources.openRawResource(R.raw.ear_keystore)
-
-        keyStore.load(certificateInputStream, "ear**123".toCharArray())
-        certificateInputStream.close()
+        val keyStore = KeyStore.getInstance("PKCS12").apply {
+            val certStream = context.resources.openRawResource(R.raw.ear_keystore)
+            load(certStream, "ear**123".toCharArray())
+            certStream.close()
+        }
 
         val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
         keyManagerFactory.init(keyStore, "ear**123".toCharArray())
 
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        trustManagerFactory.init(keyStore)
+
         val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(keyManagerFactory.keyManagers, null, null)
+        sslContext.init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, null)
         return sslContext.socketFactory
     }
 

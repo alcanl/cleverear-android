@@ -28,7 +28,8 @@ private fun Product.getEqualizerValue(from: Int, to: Int) : Int
         sum += this.readIntParameter(String.format(EQ_CHANNEL_GAIN, it))
     }
 
-    return sum / (to - from) + 18
+    val result = sum / (to - from) + 18
+    return if (result > 36) result - 18 else result
 }
 
 @SuppressLint("DefaultLocale")
