@@ -67,10 +67,10 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     @Volatile
     var isInSituInProgress : Boolean = false
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
+    {
         finish()
         return super.onKeyDown(keyCode, event)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?)

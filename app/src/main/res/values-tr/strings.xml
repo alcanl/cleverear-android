@@ -69,6 +69,7 @@
     <string name="dialog_no">Hayır</string>
     <string name="text_active_memory" translatable="true">Aktif Program </string>
     <string name="device_connected_text">Earnet ile Bağlanıldı</string>
+    <string name="device_already_connected_text" translatable="true">Bağlı</string>
     <string name="textview_mode_text">Mod   </string>
     <string name="textview_channel_text">Kanal</string>
     <string name="title_aux_label">Stream</string>

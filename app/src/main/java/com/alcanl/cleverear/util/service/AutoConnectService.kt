@@ -68,10 +68,7 @@ class AutoConnectService : Service()
     private lateinit var mHandler: AutoConnectHandler
     private lateinit var mConnectedNotification: Notification
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.i(AutoConnectService::class.simpleName, "onCreate")
-    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         Log.i(AutoConnectService::class.simpleName, "onStartCommand")

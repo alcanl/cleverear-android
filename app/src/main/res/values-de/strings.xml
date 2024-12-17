@@ -11,6 +11,7 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="device_already_connected_text" translatable="true">Verbunden</string>
     <string name="groupbox_select_device_text" translatable="true">Gerät zum Verbinden auswählen</string>
     <string name="textview_eddystone_description_text" translatable="true">Echtzeit-Gerätemessdaten</string>
     <string name="textview_tlm_version_text" translatable="true">TLM-Version :</string>

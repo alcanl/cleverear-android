@@ -58,6 +58,36 @@
                 android:layout_height="match_parent"
                 android:layout_weight="5">
 
+                <com.daasuu.bl.BubbleLayout
+                    android:id="@+id/bubbleLayoutLeftEar"
+                    android:layout_width="111dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:padding="8dp"
+                    android:visibility="invisible"
+                    app:bl_arrowDirection="bottom_right"
+                    app:bl_arrowHeight="8dp"
+                    app:bl_arrowPosition="16dp"
+                    app:bl_arrowWidth="8dp"
+                    app:bl_cornersRadius="6dp"
+                    app:bl_strokeWidth="1dp"
+                    tools:ignore="TextSizeCheck">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginEnd="4dp"
+                        android:text="@string/device_already_connected_text"
+                        android:textAlignment="center"
+                        android:textColor="@color/left_device_slider"
+                        android:textSize="14sp"
+                        tools:ignore="SmallSp,TextContrastCheck" />
+
+                </com.daasuu.bl.BubbleLayout>
+
                 <ImageButton
                     android:id="@+id/imageButtonLeft"
                     android:layout_width="119dp"
@@ -90,6 +120,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="5">
+
+                <com.daasuu.bl.BubbleLayout
+                    android:id="@+id/bubbleLayoutRightEar"
+                    android:layout_width="111dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_gravity="end"
+                    android:padding="8dp"
+                    android:visibility="invisible"
+                    app:bl_arrowDirection="bottom"
+                    app:bl_arrowHeight="8dp"
+                    app:bl_arrowPosition="16dp"
+                    app:bl_arrowWidth="8dp"
+                    app:bl_cornersRadius="6dp"
+                    app:bl_strokeWidth="1dp"
+                    tools:ignore="TextSizeCheck">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginEnd="4dp"
+                        android:text="@string/device_already_connected_text"
+                        android:textAlignment="center"
+                        android:textColor="@color/right_device_slider"
+                        android:textSize="14sp"
+                        tools:ignore="SmallSp,TextContrastCheck" />
+
+                </com.daasuu.bl.BubbleLayout>
 
                 <ImageButton
                     android:id="@+id/imageButtonRight"

@@ -78,6 +78,7 @@
     <string name="dialog_yes" translatable="true">Yes</string>
     <string name="dialog_no" translatable="true">No</string>
     <string name="device_connected_text" translatable="true">Connected to Earnet</string>
+    <string name="device_already_connected_text" translatable="true">Connected</string>
     <string name="notification_reconnect_text" translatable="true">Hearing Aid Re-Connected</string>
     <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side\nThe Connection Of The Device\n %s Has Lost.\nPlease Wait While Trying To Reconnect.</string>
     <string name="current_memory_json" translatable="false">CurrentMemory</string>
