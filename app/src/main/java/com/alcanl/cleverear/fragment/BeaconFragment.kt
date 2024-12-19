@@ -7,7 +7,6 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
@@ -117,56 +117,28 @@ class BeaconFragment : Fragment() {
         configuration.isEddyStoneScanInProgress = true
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String)
     {
-        val structures = ADPayloadParser.getInstance().parse(scanRecord)
+        ADPayloadParser.getInstance().parse(scanRecord).forEach {
 
-        structures.forEach {
+            if (it is EddystoneTLM)
+                with(configuration) {
+                    if (hearingAidMap.none { ha -> ha.value.address == address })
+                        return
 
-            if (it is EddystoneTLM) {
-                Log.d(BeaconFragment::class.simpleName, "EddystoneUIDTLM")
-                Log.d(BeaconFragment::class.simpleName, address)
-
-                if (configuration.hearingAidMap.none { ha -> ha.value.address == address })
-                    return
-
-                configuration.eddyStoneMap.forEach { (earSide, eddystoneTLM) ->
-
-                    it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
-                    //6 - 15 kapalı
-                    //ikincisi left shift + or
-                    //34 35 sıcaklık
-                    //36 37 step
-                    //38 free fall bool
-                    //39 bool defa 0
-                    eddystoneTLM.tlmVersion = it.tlmVersion
-                    eddystoneTLM.temperature = it.beaconTemperature.toDouble()
-                    eddystoneTLM.batteryVoltage = it.batteryVoltage
-                    eddystoneTLM.advertisementCount = it.advertisementCount
-                    eddystoneTLM.elapsedTime = it.elapsedTime
-                    eddystoneTLM.isFallen = it.data[38].toHexString().toBoolean()
-                    eddystoneTLM.isDefault = it.data[39].toHexString().toBoolean()
-                    eddystoneTLM.setStepCount(it.data[36], it.data[37])
-                    eddystoneTLM.setTemperatureData(it.data[34], it.data[35])
-
-                    val version = it.tlmVersion
-                    Log.d(BeaconFragment::class.simpleName, version.toString())
-
-                    val voltage = it.batteryVoltage
-                    Log.d(BeaconFragment::class.simpleName, voltage.toString())
-
-                    val temperature = it.beaconTemperature
-                    Log.d(BeaconFragment::class.simpleName, temperature.toString())
-
-                    val count = it.advertisementCount
-                    Log.d(BeaconFragment::class.simpleName, count.toString())
-
-                    val elapsed = it.elapsedTime
-                    Log.d(BeaconFragment::class.simpleName, elapsed.toString())
-
+                    if (isDoubleDeviceConnection) {
+                        if (address == hearingAidMap[EarSide.Left]?.address)
+                            eddyStoneMap[EarSide.Left] = EddystoneHearingAid()
+                                .also { eddyStoneLeft -> eddyStoneLeft.setEddystoneProperties(it) }
+                        else if (address == hearingAidMap[EarSide.Right]?.address)
+                            eddyStoneMap[EarSide.Right] = EddystoneHearingAid()
+                                .also { eddyStoneRight -> eddyStoneRight.setEddystoneProperties(it) }
+                    }
+                    else {
+                        eddyStoneMap[earSide] = EddystoneHearingAid()
+                            .also { eddystone -> eddystone.setEddystoneProperties(it) }
+                    }
                 }
-            }
         }
     }
     private fun handleNotSupportedHearingAid()
