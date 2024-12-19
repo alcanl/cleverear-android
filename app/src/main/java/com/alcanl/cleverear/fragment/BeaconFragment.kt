@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
@@ -103,7 +104,8 @@ class BeaconFragment : Fragment() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun discoverEddyStoneBeacons() {
+    private fun discoverEddyStoneBeacons()
+    {
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -116,7 +118,8 @@ class BeaconFragment : Fragment() {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String) {
+    private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String)
+    {
         val structures = ADPayloadParser.getInstance().parse(scanRecord)
 
         structures.forEach {
@@ -128,7 +131,7 @@ class BeaconFragment : Fragment() {
                 if (configuration.hearingAidMap.none { ha -> ha.value.address == address })
                     return
 
-                configuration.eddyStoneMap.forEach { (_, eddystoneTLM) ->
+                configuration.eddyStoneMap.forEach { (earSide, eddystoneTLM) ->
 
                     it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
                     //6 - 15 kapalı
@@ -183,8 +186,10 @@ class BeaconFragment : Fragment() {
         discoverEddyStoneBeacons()
     }
 
-    fun enableEddystoneTracking()
+    fun enableEddystoneTracking(earSide: EarSide)
     {
-        configuration.isEddystoneTrackingActive = true
+        configuration.eddyStoneMap[earSide]?.apply {
+            isTrackingActive = !isTrackingActive
+        }
     }
 }

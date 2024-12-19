@@ -36,6 +36,7 @@ import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -49,18 +50,25 @@ class AutoConnectService : Service()
 {
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var scheduledExecutor: ScheduledExecutorService
+
     @Inject
     lateinit var productManager: ProductManager
+
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var mDisconnectReceiver : DeviceDisconnectBroadcastReceiver
+
     @Inject
     lateinit var mDeviceFoundReceiver : DeviceFoundBroadcastReceiver
+
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
 
@@ -82,6 +90,9 @@ class AutoConnectService : Service()
     override fun onDestroy() {
         super.onDestroy()
         try {
+            if (EventBus.getDefault().isRegistered(this))
+                EventBus.getDefault().unregister(this)
+
             unregisterReceiver(mDisconnectReceiver)
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
@@ -102,6 +113,9 @@ class AutoConnectService : Service()
     }
     private fun initialize(intent: Intent?)
     {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
+
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
@@ -109,7 +123,9 @@ class AutoConnectService : Service()
         mHandler = AutoConnectHandler(this)
         configuration.isServiceOnBoard = true
         checkDeviceConnectionState(intent)
+        checkDeviceEddystoneValues()
     }
+
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
         private val mWeakReference = WeakReference(service)
 
@@ -122,10 +138,27 @@ class AutoConnectService : Service()
             super.handleMessage(msg)
         }
     }
+
     private fun checkDeviceConnectionState(intent: Intent?)
     {
         scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
     }
+
+    private fun checkDeviceEddystoneValues()
+    {
+        if (configuration.isConnected)
+            configuration.hearingAidMap
+                .filter { it.value.isEddystoneTLM }
+                .forEach { (earSide, hearingAid) ->
+                    scheduledExecutor.scheduleWithFixedDelay({
+                        scheduledEddystoneThreadCallback(earSide, hearingAid) }, 0, 10, TimeUnit.MINUTES) }
+    }
+
+    private fun scheduledEddystoneThreadCallback(earSide: EarSide, hearingAid: HearingAid)
+    {
+
+    }
+
     private fun scheduledThreadCallback(intent: Intent?)
     {
         try {
@@ -178,6 +211,7 @@ class AutoConnectService : Service()
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
+
     private fun doConnection(hearingAid: HearingAid)
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
