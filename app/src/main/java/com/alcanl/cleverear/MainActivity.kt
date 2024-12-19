@@ -9,8 +9,9 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.animation.Animation
@@ -68,8 +69,10 @@ class MainActivity : AppCompatActivity() {
     }
     private val updateAppResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-        if (result.resultCode != RESULT_OK)
-            Log.d("UPDATE","Update flow failed! Result code: " + result.resultCode)
+        if (result.resultCode != RESULT_OK) {
+            Toast.makeText(this, R.string.toast_update_need_text, Toast.LENGTH_LONG).show()
+            Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -23,6 +23,7 @@
     <string name="textview_device_detection_not_connected_text" translatable="true">Could not Connected To Device</string>
     <string name="textview_control_ha" translatable="true">Control Hearing Aid</string>
     <string name="textview_remote_conf_ha" translatable="true">Remote Fitting</string>
+    <string name="toast_update_need_text" translatable="true">A new version is available in the store, you have to update the app for continue</string>
     <string name="toast_no_permission" translatable="true">No Bluetooth Permission</string>
     <string name="toast_no_permission_splash_activity" translatable="true">For To Continue, Please Accept The Permission Requests</string>
     <string name="button_end_in_situ_text" translatable="true">End Test</string>

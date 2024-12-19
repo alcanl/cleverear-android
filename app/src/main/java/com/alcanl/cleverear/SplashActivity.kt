@@ -39,13 +39,18 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var listener: SplashActivityEventListener
+
     private var isAshaConnected = false
+
     private lateinit var mAddressArray : Array<String>
 
     private val mPostNotificationPermission by lazy {

@@ -8,6 +8,7 @@
     <string name="textview_device_detection_device_connected_text">Verbunden mit Gerät</string>
     <string name="textview_device_detection_connection_in_process_text">Verbinden mit dem Gerät</string>
     <string name="textview_device_detection_not_connected_text">Konnte nicht mit dem Gerät verbunden werden</string>
+    <string name="toast_update_need_text" translatable="true">Eine neue Version ist im Store verfügbar. Sie müssen die App aktualisieren, um fortzufahren.</string>
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
