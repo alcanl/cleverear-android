@@ -44,24 +44,37 @@ class ConnectionFragment : Fragment() {
 
     @Inject
     lateinit var deviceScanner: DeviceScanner
+
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var deviceListAdapter: DeviceListAdapter
+
     @Volatile
     private var mDeviceCount = 0
+
     @Volatile
     private var mBleDeviceSet = HashSet<DiscoveredDeviceInfo>()
+
     private var mIsDeviceFound = false
+
     private var isScanContinue = false
+
     private lateinit var scanOnBoard : Thread
+
     private lateinit var mAsyncResult: AsyncResult
+
     private lateinit var mSelectedHearingAid: HearingAid
+
     private lateinit var mBinding: FragmentConnectionBinding
+
     private val mAlertDialog: CustomAlertDialogActiveConnection by lazy {
         CustomAlertDialogActiveConnection(this)
     }
@@ -101,6 +114,7 @@ class ConnectionFragment : Fragment() {
             imageButtonDetect.isEnabled = !configuration.isConnected
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
+            groupBoxLayoutDeviceList.visibility = View.INVISIBLE
             textViewDeviceState.text = getString(if (configuration.isConnected)  R.string.device_connected_text else R.string.textview_device_detection_not_found_text)
             textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
@@ -163,14 +177,13 @@ class ConnectionFragment : Fragment() {
                 else deviceScanner.scanForLeftDevice()
 
         } catch (ex: ArkException) {
-            Log.e("", ex.message!!)
+            Log.e(ConnectionFragment::class.simpleName, ex.message!!)
             activity?.runOnUiThread {
                 Toast.makeText(activity, R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    @SuppressLint("SuspiciousIndentation")
     private fun scanThreadCallBack()
     {
         scanOnBoard = Thread.currentThread()
@@ -180,23 +193,30 @@ class ConnectionFragment : Fragment() {
             mBinding.adapter!!.notifyDataSetChanged() }
 
         while (!scanOnBoard.isInterrupted) {
-            val event = eventHandler.event
-            if (event.type == EventType.kScanEvent) {
-                Log.e(ScanEvent::class.java.simpleName, event.data)
-                val device = parseJsonScanData(event.data, requireContext())
-                if (isHearingAid(device.manufacturerData)) {
-                    mBleDeviceSet.add(device)
-                    activity?.runOnUiThread { addHearingAidToListCallback(device) }
+            try {
+                val event = eventHandler.event
+                if (event.type == EventType.kScanEvent) {
+                    Log.e(ScanEvent::class.java.simpleName, event.data)
+                    val device = parseJsonScanData(event.data, requireContext())
+                    if (isHearingAid(device.manufacturerData)) {
+                        mBleDeviceSet.add(device)
+                        activity?.runOnUiThread { addHearingAidToListCallback(device) }
+                    }
                 }
+            } catch (ex: Throwable) {
+                Log.e("Error in scan thread", ex.message!!)
             }
         }
-        Log.e("scan", "Scan ended")
+        Log.e("Scan", "Scan ended")
     }
 
     @SuppressLint("DefaultLocale")
     private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
     {
         with(mBinding) {
+
+            if (adapter!!.isEmpty)
+                groupBoxLayoutDeviceList.startAlphaBlinkAnimation()
 
             adapter!!.add(device.toString())
 
@@ -289,6 +309,7 @@ class ConnectionFragment : Fragment() {
             mIsDeviceFound = false
             scanDevicesWithBluetooth()
             with(mBinding) {
+                groupBoxLayoutDeviceList.visibility = View.INVISIBLE
                 progressBar.visibility = View.VISIBLE
                 textViewScanProcess.text = getString(R.string.textview_scan_process_scanning_text)
             }

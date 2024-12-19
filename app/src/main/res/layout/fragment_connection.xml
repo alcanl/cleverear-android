@@ -86,20 +86,36 @@
                     android:textSize="20sp" />
             </FrameLayout>
 
-            <ListView
-                android:id="@+id/listView"
-                android:layout_width="240dp"
-                android:layout_height="110dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp"
-                android:adapter="@{adapter}"
-                android:foregroundGravity="center"
-                android:onItemClick="@{(p, v, pos, i)-> viewModel.handleListViewItemSelected(pos)}"
-                android:textAlignment="center"
+            <ir.programmerplus.groupbox.GroupBoxLayout
+                android:id="@+id/groupBoxLayoutDeviceList"
+                android:layout_width="match_parent"
+                android:layout_height="165dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                android:visibility="invisible"
+                app:borderColor="#A8A3A3"
+                app:borderCornerRadius="8dp"
+                app:borderStrokeWidth="2.2dp"
+                app:labelText="@string/groupbox_select_device_text"
+                app:labelTextColor="@color/ap_black"
+                app:labelTextSize="10dp"
                 app:layout_constraintBottom_toTopOf="@+id/textViewDeviceState"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/frameLayoutEndConnection" />
+                app:layout_constraintTop_toBottomOf="@+id/frameLayoutEndConnection"
+                app:layout_constraintVertical_bias="0.497">
+
+                <ListView
+                    android:id="@+id/listView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:adapter="@{adapter}"
+                    android:foregroundGravity="center"
+                    android:onItemClick="@{(p, v, pos, i)-> viewModel.handleListViewItemSelected(pos)}"
+                    android:textAlignment="center" />
+            </ir.programmerplus.groupbox.GroupBoxLayout>
 
             <TextView
                 android:id="@+id/textViewDeviceState"
@@ -117,13 +133,13 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/listView" />
+                />
 
             <FrameLayout
                 android:id="@+id/frameLayoutEndConnection"
                 android:layout_width="289dp"
                 android:layout_height="83dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="35dp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

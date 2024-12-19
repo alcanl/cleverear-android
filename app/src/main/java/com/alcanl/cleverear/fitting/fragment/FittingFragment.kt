@@ -59,10 +59,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class FittingFragment : Fragment(), IEventListener {
+
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
+
     @Inject
     lateinit var threadPool : ExecutorService
+
     @Inject
     lateinit var configuration: ConfigurationModule
 

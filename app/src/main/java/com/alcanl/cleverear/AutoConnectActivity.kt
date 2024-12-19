@@ -3,6 +3,7 @@ package com.alcanl.cleverear
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.view.animation.Animation
 import android.widget.ImageButton
 import android.widget.Toast
@@ -19,15 +20,46 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AutoConnectActivity : AppCompatActivity() {
+
     @Inject
     lateinit var configuration : ConfigurationModule
+
     private var isLeftSelected = false
+
     private var isRightSelected = false
+
     private lateinit var mBinding : ActivityAutoConnectBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()
     }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        with(configuration) {
+
+            mBinding.apply {
+
+                imageButtonLeft.isEnabled = if (hearingAidMap[EarSide.Left] != null) !hearingAidMap[EarSide.Left]?.isConnected!!
+                                            else getLeftEarModelNumber().isNotBlank()
+
+                imageButtonRight.isEnabled = if (hearingAidMap[EarSide.Right] != null) !hearingAidMap[EarSide.Right]?.isConnected!!
+                                            else getRightEarModelNumber().isNotBlank()
+
+                bubbleLayoutLeftEar.visibility = if (hearingAidMap[EarSide.Left] == null) View.INVISIBLE
+                                                else if (!hearingAidMap[EarSide.Left]?.isConnected!!) View.INVISIBLE else View.VISIBLE
+
+                bubbleLayoutRightEar.visibility = if (hearingAidMap[EarSide.Right] == null) View.INVISIBLE
+                                                else if (!hearingAidMap[EarSide.Right]?.isConnected!!) View.INVISIBLE else View.VISIBLE
+
+                imageButtonControl.isEnabled = !configuration.isConnected
+            }
+        }
+    }
+
     private fun initialize()
     {
         initBinding()

@@ -29,6 +29,7 @@ class BeaconFragment : Fragment() {
     lateinit var configuration : ConfigurationModule
 
     private lateinit var mBinding: FragmentBeaconBinding
+
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
     private val mScanCallback: ScanCallback by lazy {
@@ -43,9 +44,8 @@ class BeaconFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initialize()
     }
 
@@ -63,20 +63,32 @@ class BeaconFragment : Fragment() {
     {
         super.onDestroy()
         mBluetoothLeScanner.stopScan(mScanCallback)
-        if (mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.stopShimmer()
+
+        mBinding.shimmerLayout.apply {
+            if (isShimmerVisible) {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        if (mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.stopShimmer()
+        mBinding.shimmerLayout.apply {
+            if (isShimmerVisible) {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!mBinding.shimmerLayout.isShimmerVisible)
-            mBinding.shimmerLayout.startShimmer()
+
+        mBinding.shimmerLayout.apply {
+            if (!isShimmerVisible)
+                startShimmer()
+        }
 
         if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
             handleNotSupportedHearingAid()
@@ -156,8 +168,14 @@ class BeaconFragment : Fragment() {
     }
     private fun handleNotSupportedHearingAid()
     {
-        mBinding.frameLayoutNotSupported.visibility = View.VISIBLE
-        mBinding.shimmerLayout.stopShimmer()
+        with(mBinding) {
+            frameLayoutNotSupported.visibility = View.VISIBLE
+            linearLayoutMain.visibility = View.INVISIBLE
+            shimmerLayout.apply {
+                stopShimmer()
+                hideShimmer()
+            }
+        }
     }
 
     private fun handleEddystoneTLM()

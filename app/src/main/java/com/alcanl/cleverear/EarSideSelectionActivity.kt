@@ -10,11 +10,15 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.viewmodel.EarSideSelectionActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 @AndroidEntryPoint
 class EarSideSelectionActivity : AppCompatActivity() {
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     private lateinit var mBinding : ActivityEarSideSelectionBinding
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)

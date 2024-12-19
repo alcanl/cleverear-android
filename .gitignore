@@ -15,4 +15,6 @@
 local.properties
 /build.gradle.kts
 build.gradle.kts
+.p12
+/app/src/main/res/raw/ear_keystore.p12
 
