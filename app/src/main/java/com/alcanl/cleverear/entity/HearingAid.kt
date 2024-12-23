@@ -59,6 +59,12 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             Log.e("Read Config Error", e.message!!)
         }
     }
+
+    fun getModelNumber() : String
+    {
+        return wirelessControl?.modelNumber ?: ""
+    }
+
     fun endConnectionSession()
     {
         try {
@@ -66,6 +72,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             isConnected = false
         } catch (_: ArkException) {}
     }
+
     override fun equals(other: Any?): Boolean
     {
         return other is HearingAid && address == other.address && name == other.name && rssi == other.rssi

@@ -5,6 +5,7 @@ import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider
 
 object SliderListener {
+
     @JvmStatic
     @BindingAdapter(value = ["onValueChangeListener"])
     fun setOnValueChangeListener(slider: Slider, listener: OnValueChangeListener)

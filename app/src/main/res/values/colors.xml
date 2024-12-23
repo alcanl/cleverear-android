@@ -11,5 +11,7 @@
     <color name="right_device_slider">#900D09</color>
     <color name="left_device_slider">#FF01579B</color>
     <color name="colorGrayText">#C3C4C8</color>
+    <color name="secondary_variant">#018786</color>
 </resources>
+
 

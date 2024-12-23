@@ -30,7 +30,8 @@ class AutoConnectActivity : AppCompatActivity() {
 
     private lateinit var mBinding : ActivityAutoConnectBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         initialize()
     }

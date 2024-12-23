@@ -87,12 +87,14 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     override fun onEventReceive(event: EventObject)
     {
         if (event is DisconnectEvent)
             handleDisconnect(event.hearingAid)
     }
+
     @OptIn(DelicateCoroutinesApi::class)
     private fun handleDisconnect(hearingAid: HearingAid?)
     {
@@ -117,6 +119,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         }
 
     }
+
     private suspend fun handleDisconnectCallback(scope: CoroutineScope, hearingAid: HearingAid)
     {
         scope.async {
@@ -147,6 +150,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
                 }
         }
     }
+
     private fun navigateTo(fragment: Fragment)
     {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -182,11 +186,13 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             }
         }
     }
+
     fun unsavedFittingDialogPositiveButtonClicked()
     {
         EventBus.getDefault().post(FittingEvent(this))
         mUnsavedFittingDialog.dismiss()
     }
+
     fun unsavedFittingDialogNegativeButtonClicked()
     {
         isFittingChangesMade = false
@@ -199,12 +205,14 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             else -> FittingFragment()
         })
     }
+
     fun inSituInProgressDialogPositiveButtonClicked()
     {
         EventBus.getDefault().post(InSituEvent(this))
         mUnsavedFittingDialog.dismiss()
 
     }
+
     fun inSituInProgressDialogNegativeButtonClicked()
     {
         isInSituInProgress = false
@@ -217,6 +225,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             else -> FittingFragment()
         })
     }
+
     fun disconnectDialogOkButtonClicked()
     {
         mDeviceDisconnectedDialog.dismiss()
@@ -226,5 +235,4 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         }
         finish()
     }
-
 }
