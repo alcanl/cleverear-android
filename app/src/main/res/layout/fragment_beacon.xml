@@ -12,6 +12,7 @@
         <import type="com.alcanl.cleverear.util.GlobalKt"/>
         <import type="android.content.Context"/>
         <import type="androidx.core.content.ContextCompat"/>
+        <import type="android.view.View"/>
         <variable name="viewModel" type="BeaconFragmentListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />
     </data>
@@ -289,13 +290,12 @@
                         <FrameLayout
                             android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:layout_height="match_parent">
 
                             <androidx.appcompat.widget.AppCompatButton
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="end"
+                                android:layout_gravity="end |center_vertical"
                                 android:layout_marginEnd="20dp"
                                 android:backgroundTint="@{config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.secondary_variant : R.color.default_button_color : R.color.default_button_color}"
                                 android:enabled="@{config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? true : false : false}"
@@ -304,6 +304,18 @@
                                 android:textColor="@color/white"
                                 android:textSize="11sp"
                                 tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck,SpeakableTextPresentCheck" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="220dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/textview_eddystone_tracking_description_text"
+                                android:textAlignment="center"
+                                android:textColor="@color/ap_black"
+                                android:textSize="9sp"
+                                android:visibility="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null  ? View.VISIBLE : View.INVISIBLE}"
+                                tools:ignore="RtlCompat,SmallSp,TextSizeCheck,TextContrastCheck" />
                         </FrameLayout>
 
                     </ir.programmerplus.groupbox.GroupBoxLayout>
@@ -312,9 +324,7 @@
                         android:id="@+id/groupBoxLayoutRightDevice"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginTop="15dp"
-                        android:layout_marginEnd="15dp"
+                        android:layout_margin="15dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:layoutDirection="ltr"
@@ -493,10 +503,22 @@
                             android:layout_height="match_parent"
                             android:orientation="horizontal">
 
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="220dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/textview_eddystone_tracking_description_text"
+                                android:textAlignment="center"
+                                android:textColor="@color/ap_black"
+                                android:textSize="9sp"
+                                android:visibility="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null  ? View.VISIBLE : View.INVISIBLE}"
+                                tools:ignore="RtlCompat,SmallSp,TextSizeCheck,TextContrastCheck" />
+
                             <androidx.appcompat.widget.AppCompatButton
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="end"
+                                android:layout_gravity="end | center_vertical"
                                 android:layout_marginEnd="20dp"
                                 android:backgroundTint="@{config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.secondary_variant : R.color.default_button_color : R.color.default_button_color}"
                                 android:enabled="@{config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? true : false : false}"

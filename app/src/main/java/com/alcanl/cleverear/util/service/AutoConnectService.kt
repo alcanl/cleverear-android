@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
@@ -149,12 +150,13 @@ class AutoConnectService : Service()
         if (configuration.isConnected)
             configuration.hearingAidMap
                 .filter { it.value.isEddystoneTLM }
-                .forEach { (earSide, hearingAid) ->
-                    scheduledExecutor.scheduleWithFixedDelay({
-                        scheduledEddystoneThreadCallback(earSide, hearingAid) }, 0, 10, TimeUnit.MINUTES) }
+                .filter { configuration.eddyStoneMap[it.key]?.isTrackingActive!! }
+                .map { configuration.eddyStoneMap[it.key]!! }
+                .forEach { hearingAid -> scheduledExecutor.scheduleWithFixedDelay({
+                        scheduledEddystoneThreadCallback(hearingAid) }, 0, 1, TimeUnit.MINUTES) }
     }
 
-    private fun scheduledEddystoneThreadCallback(earSide: EarSide, hearingAid: HearingAid)
+    private fun scheduledEddystoneThreadCallback(hearingAid: EddystoneHearingAid)
     {
 
     }

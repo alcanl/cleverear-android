@@ -34,6 +34,7 @@ class BeaconFragment : Fragment() {
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
     private val mScanCallback: ScanCallback by lazy {
+
         object : ScanCallback() {
 
             @SuppressLint("MissingPermission")
@@ -45,15 +46,14 @@ class BeaconFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
         initialize()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+    {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_beacon, container, false)
         mBinding.lifecycleOwner = this
         return mBinding.root
@@ -73,7 +73,8 @@ class BeaconFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
+    override fun onPause()
+    {
         super.onPause()
         mBinding.shimmerLayout.apply {
             if (isShimmerVisible) {
@@ -83,7 +84,8 @@ class BeaconFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
 
         mBinding.shimmerLayout.apply {
@@ -141,6 +143,7 @@ class BeaconFragment : Fragment() {
                 }
         }
     }
+
     private fun handleNotSupportedHearingAid()
     {
         with(mBinding) {

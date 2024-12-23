@@ -12,6 +12,7 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="textview_eddystone_tracking_description_text" translatable="true">Mit der Aktivierung beginnt die App, die Gerätemeldungen im Hintergrundmodus zu verfolgen und benachrichtigt den Benutzer über kritische Daten.\nZum Beispiel hohe Temperatur, gefallenes Gerät oder große Kommunikationsentfernung</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">Keine Verbindung</string>
     <string name="textview_eddystone_not_supporting_text" translatable="true">Nicht unterstützt</string>
     <string name="device_already_connected_text" translatable="true">Verbunden</string>

@@ -124,6 +124,7 @@
     <string name="textview_tlm_step_count_text" translatable="true">Step Count :</string>
     <string name="button_enable_tracking_text" translatable="true">Enable Tracking</string>
     <string name="button_disable_tracking_text" translatable="true">Disable Tracking</string>
+    <string name="textview_eddystone_tracking_description_text" translatable="true">With activation, the app starts tracking the device notifications in background mode and notifies the user about critical data.\nSuch as high temperature, fallen device or long distance for communication etc.</string>
     <string name="textview_eddystone_description_text" translatable="true">Real-Time\nDevice Measurement Data</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">We are sorry\nNo connected device model supports the measurement tracking feature</string>
     <string name="textview_parameter_read_process_text" translatable="true">Please Wait While Reading Inscribed Parameters From The Device</string>
