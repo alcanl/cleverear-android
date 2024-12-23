@@ -131,14 +131,14 @@ class BeaconFragment : Fragment() {
                     if (isDoubleDeviceConnection) {
                         if (address == hearingAidMap[EarSide.Left]?.address)
                             eddyStoneMap[EarSide.Left] = EddystoneHearingAid()
-                                .also { eddyStoneLeft -> eddyStoneLeft.setEddystoneProperties(it) }
+                                .also { eddyStoneLeft -> eddyStoneLeft.setEddystoneProperties(it, address) }
                         else if (address == hearingAidMap[EarSide.Right]?.address)
                             eddyStoneMap[EarSide.Right] = EddystoneHearingAid()
-                                .also { eddyStoneRight -> eddyStoneRight.setEddystoneProperties(it) }
+                                .also { eddyStoneRight -> eddyStoneRight.setEddystoneProperties(it, address) }
                     }
                     else {
                         eddyStoneMap[earSide] = EddystoneHearingAid()
-                            .also { eddystone -> eddystone.setEddystoneProperties(it) }
+                            .also { eddystone -> eddystone.setEddystoneProperties(it, address) }
                     }
                 }
         }

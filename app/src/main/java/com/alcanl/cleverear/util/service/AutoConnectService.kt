@@ -12,6 +12,8 @@ import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
 import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
 import android.bluetooth.BluetoothDevice.ACTION_FOUND
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -19,6 +21,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Message
+import android.telephony.SmsManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -27,17 +30,21 @@ import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
+import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
-import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
-import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
+import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.EventHandler
 import com.ark.ProductManager
+import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
-import org.greenrobot.eventbus.EventBus
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -91,9 +98,6 @@ class AutoConnectService : Service()
     override fun onDestroy() {
         super.onDestroy()
         try {
-            if (EventBus.getDefault().isRegistered(this))
-                EventBus.getDefault().unregister(this)
-
             unregisterReceiver(mDisconnectReceiver)
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
@@ -114,9 +118,6 @@ class AutoConnectService : Service()
     }
     private fun initialize(intent: Intent?)
     {
-        if (!EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this)
-
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
@@ -152,13 +153,47 @@ class AutoConnectService : Service()
                 .filter { it.value.isEddystoneTLM }
                 .filter { configuration.eddyStoneMap[it.key]?.isTrackingActive!! }
                 .map { configuration.eddyStoneMap[it.key]!! }
-                .forEach { hearingAid -> scheduledExecutor.scheduleWithFixedDelay({
-                        scheduledEddystoneThreadCallback(hearingAid) }, 0, 1, TimeUnit.MINUTES) }
+                .forEach { eddystoneHearingAid -> scheduledExecutor.scheduleWithFixedDelay({ scheduledEddystoneThreadCallback(eddystoneHearingAid) },
+                    0, 1, TimeUnit.MINUTES) }
     }
 
+    @SuppressLint("MissingPermission")
     private fun scheduledEddystoneThreadCallback(hearingAid: EddystoneHearingAid)
     {
+        val bleScanner = getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
+        val scanCallback = object : ScanCallback() {
 
+            override fun onScanResult(callbackType: Int, result: ScanResult?)
+            {
+                if (result?.device?.address == hearingAid.macAddress)
+                    hearingAid.reSetEddyStoneProperties(EddystoneTLM(17, 0x16, result.scanRecord?.bytes))
+            }
+        }
+
+        bleScanner.startScan(scanCallback)
+
+        runBlocking {
+            delay(5000)
+        }
+
+        bleScanner.stopScan(scanCallback)
+
+        if (hearingAid.isTrackingActive && hearingAid.isFallen)
+            sendDeviceFellSMS()
+
+    }
+
+    private fun sendDeviceFellSMS()
+    {
+        try {
+            val smsText = getString(R.string.service_notification_channel_id)
+            val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
+            val smsManager = getSystemService(SmsManager::class.java)
+            smsManager.sendTextMessage(phoneNumber, null, smsText, null, null)
+
+        } catch (ex: Throwable) {
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
+        }
     }
 
     private fun scheduledThreadCallback(intent: Intent?)

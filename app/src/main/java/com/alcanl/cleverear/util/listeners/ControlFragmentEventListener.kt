@@ -29,10 +29,12 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
 
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool : ExecutorService
 
     private var mListener: Thread? = null
+
     private val mContext = context
 
     fun startEventListener() {

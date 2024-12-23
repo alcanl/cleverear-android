@@ -8,10 +8,11 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int,
                                var temperature : Double, var advertisementCount : Long,
                                var elapsedTime : Long, var stepCount : Long,
                                var isFallen : Boolean, var distance : Long,
-                               var isDefault : Boolean, var isTrackingActive : Boolean) {
+                               var isDefault : Boolean, var isTrackingActive : Boolean,
+                               var macAddress: String) {
 
     constructor() : this(0, 0, 0.0, 0L, 0L,
-                        0L, false, 0L, false, false)
+                        0L, false, 0L, false, false, "")
 
     private fun setStepCount(stepCountFirstData: Byte, stepCountSecondData: Byte)
     {
@@ -23,9 +24,15 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int,
 
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM)
+    fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM)
     {
+        setEddystoneProperties(eddystoneTLM, macAddress)
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String)
+    {
+        macAddress = mac
         tlmVersion = eddystoneTLM.tlmVersion
         temperature = eddystoneTLM.beaconTemperature.toDouble()
         batteryVoltage = eddystoneTLM.batteryVoltage
