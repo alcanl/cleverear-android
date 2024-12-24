@@ -267,6 +267,8 @@ class AutoConnectService : Service()
                         communicationAdaptor?.connect()
                         Thread.sleep(10000)
                         readDeviceConfiguration()
+                        if (isEddystoneTLM)
+                            configuration.eddyStoneMap[this.side] = EddystoneHearingAid()
                     }
                 } catch (_: InterruptedException) {}
                 configuration.setConnections()
@@ -304,6 +306,8 @@ class AutoConnectService : Service()
                         hearingAid.apply {
                             isDeviceInRange = false
                             readDeviceConfiguration()
+                            if (isEddystoneTLM)
+                                eddyStoneMap[this.side] = EddystoneHearingAid()
                         }
                     else {}
                 }

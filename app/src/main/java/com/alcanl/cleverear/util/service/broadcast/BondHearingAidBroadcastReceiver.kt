@@ -8,6 +8,7 @@ import android.content.Intent
 import android.util.Log
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.util.EarSide
 import javax.inject.Inject
 import kotlin.system.exitProcess
@@ -44,16 +45,22 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
                 hearingAidMap[earSide]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
+                    if (isEddystoneTLM)
+                        eddyStoneMap[earSide] = EddystoneHearingAid()
                 }
             else if (earSide == EarSide.Left)
                 hearingAidMap[EarSide.Left]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
+                    if (isEddystoneTLM)
+                        eddyStoneMap[EarSide.Left] = EddystoneHearingAid()
                 }
             else
                 hearingAidMap[EarSide.Right]?.apply {
                     bondStatus = BluetoothDevice.BOND_BONDED
                     readDeviceConfiguration()
+                    if (isEddystoneTLM)
+                        eddyStoneMap[EarSide.Right] = EddystoneHearingAid()
                 }
 
         }

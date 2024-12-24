@@ -7,24 +7,32 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
-import com.alcanl.cleverear.entity.EddystoneHearingAid
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class BeaconFragment : Fragment() {
+class BeaconFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var configuration : ConfigurationModule
@@ -40,10 +48,26 @@ class BeaconFragment : Fragment() {
             @SuppressLint("MissingPermission")
             override fun onScanResult(callbackType: Int, result: ScanResult) {
 
-                if (result.scanRecord != null)
+                if (result.scanRecord != null) {
+                    activity?.runOnUiThread { mBinding.shimmerLayout.showShimmer(true) }
                     determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
+                }
             }
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        if (event is ConnectionEvent && event.connectionData == 1)
+            activity?.let {
+                it.runOnUiThread {
+                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
+                        .show()
+                    it.finish()
+                    configuration.isConnected = false
+                }
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
@@ -64,6 +88,7 @@ class BeaconFragment : Fragment() {
     {
         super.onDestroy()
         mBluetoothLeScanner.stopScan(mScanCallback)
+        EventBus.getDefault().unregister(this)
 
         mBinding.shimmerLayout.apply {
             if (isShimmerVisible) {
@@ -71,6 +96,12 @@ class BeaconFragment : Fragment() {
                 hideShimmer()
             }
         }
+    }
+
+    override fun onStart()
+    {
+        super.onStart()
+        EventBus.getDefault().register(this)
     }
 
     override fun onPause()
@@ -130,16 +161,19 @@ class BeaconFragment : Fragment() {
 
                     if (isDoubleDeviceConnection) {
                         if (address == hearingAidMap[EarSide.Left]?.address)
-                            eddyStoneMap[EarSide.Left] = EddystoneHearingAid()
-                                .also { eddyStoneLeft -> eddyStoneLeft.setEddystoneProperties(it, address) }
+                            eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address)
+
                         else if (address == hearingAidMap[EarSide.Right]?.address)
-                            eddyStoneMap[EarSide.Right] = EddystoneHearingAid()
-                                .also { eddyStoneRight -> eddyStoneRight.setEddystoneProperties(it, address) }
+                            eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address)
                     }
-                    else {
-                        eddyStoneMap[earSide] = EddystoneHearingAid()
-                            .also { eddystone -> eddystone.setEddystoneProperties(it, address) }
-                    }
+                    else
+                        eddyStoneMap[earSide]?.setEddystoneProperties(it, address)
+
+                    Handler(Looper.myLooper()!!).postDelayed({
+                        mBinding.invalidateAll()
+                        if (mBinding.shimmerLayout.isShimmerVisible)
+                            mBinding.shimmerLayout.hideShimmer()
+                        }, 2000)
                 }
         }
     }

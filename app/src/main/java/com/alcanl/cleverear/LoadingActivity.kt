@@ -22,6 +22,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.ConfigurationModule.earSide
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
@@ -395,8 +396,11 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
                 adapter.getRemoteDevice(hearingAid.address).createBond()
 
-            else if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED)
+            else if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_BONDED) {
                 hearingAid.readDeviceConfiguration()
+                if (hearingAid.isEddystoneTLM)
+                    configuration.eddyStoneMap[hearingAid.side] = EddystoneHearingAid()
+            }
 
         }
         catch (ex: ArkException) {

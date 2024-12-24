@@ -20,6 +20,7 @@ import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.sdk.events.ScanEvent
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
@@ -27,6 +28,7 @@ import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
+import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.util.scan.DeviceScanner
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
@@ -35,12 +37,16 @@ import com.ark.AsyncResult
 import com.ark.EventHandler
 import com.ark.EventType
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
+import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ConnectionFragment : Fragment() {
+class ConnectionFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var deviceScanner: DeviceScanner
@@ -79,13 +85,33 @@ class ConnectionFragment : Fragment() {
         CustomAlertDialogActiveConnection(this)
     }
 
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    override fun onEventReceive(event: EventObject)
+    {
+        if (event is ConnectionEvent && event.connectionData == 1)
+            activity?.let {
+                it.runOnUiThread {
+                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
+                        .show()
+                    it.finish()
+                    configuration.isConnected = false
+                }
+            }
+    }
+
     override fun onStart()
     {
         super.onStart()
         initBinding()
+        EventBus.getDefault().register(this)
         if (!configuration.isConnected)
             buttonDetectDeviceClicked()
+    }
 
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
     }
 
     override fun onCreateView(
