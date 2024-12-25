@@ -2,7 +2,6 @@ package com.alcanl.cleverear.fragment
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -56,11 +55,13 @@ class BeaconFragment : Fragment(), IEventListener {
 
     lateinit var binding: FragmentBeaconBinding
 
-    private lateinit var mBluetoothLeScanner: BluetoothLeScanner
+    private lateinit var mHandler: BeaconHandler
 
     private var mScheduledFuture: ScheduledFuture<*>? = null
 
-    private val mHandler by lazy { BeaconHandler(this) }
+    private val mBluetoothLeScanner by lazy {
+        requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
+    }
 
     private val mScanCallback: ScanCallback by lazy {
         object : ScanCallback() {
@@ -68,7 +69,6 @@ class BeaconFragment : Fragment(), IEventListener {
             @SuppressLint("MissingPermission")
             override fun onScanResult(callbackType: Int, result: ScanResult) {
 
-                Log.d("Scan", result.device.address)
                 if (result.scanRecord != null)
                     determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
             }
@@ -125,6 +125,9 @@ class BeaconFragment : Fragment(), IEventListener {
 
         if (mScheduledFuture != null && !mScheduledFuture!!.isCancelled)
             mScheduledFuture?.cancel(true)
+
+        if (configuration.eddyStoneMap.none { it.value.isTrackingActive })
+            mBluetoothLeScanner.stopScan(mScanCallback)
     }
 
     override fun onStart()
@@ -149,6 +152,11 @@ class BeaconFragment : Fragment(), IEventListener {
     {
         super.onResume()
 
+        binding.shimmerLayout.apply {
+            stopShimmer()
+            hideShimmer()
+        }
+
         if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
             handleNotSupportedHearingAid()
         else
@@ -158,7 +166,7 @@ class BeaconFragment : Fragment(), IEventListener {
     private fun initialize()
     {
         binding.viewModel = BeaconFragmentListenersViewModel(this)
-        mBluetoothLeScanner = requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
+        mHandler = BeaconHandler(this)
     }
 
     @SuppressLint("MissingPermission")
@@ -184,21 +192,14 @@ class BeaconFragment : Fragment(), IEventListener {
                     if (hearingAidMap.none { ha -> ha.value.address == address })
                         return
 
-                    if (isDoubleDeviceConnection) {
-                        if (address == hearingAidMap[EarSide.Left]?.address)
-                            eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address)
-
-                        else if (address == hearingAidMap[EarSide.Right]?.address)
-                            eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address)
-                    }
+                    if (isDoubleDeviceConnection)
+                        when (address) {
+                            hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address)
+                            hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address)
+                            else -> {}
+                        }
                     else
                         eddyStoneMap[earSide]?.setEddystoneProperties(it, address)
-
-                    Handler(Looper.myLooper()!!).postDelayed({
-                        binding.invalidateAll()
-                        if (binding.shimmerLayout.isShimmerVisible)
-                            binding.shimmerLayout.hideShimmer()
-                        }, 2000)
                 }
         }
     }
@@ -208,10 +209,6 @@ class BeaconFragment : Fragment(), IEventListener {
         with(binding) {
             frameLayoutNotSupported.visibility = View.VISIBLE
             linearLayoutMain.visibility = View.INVISIBLE
-            shimmerLayout.apply {
-                stopShimmer()
-                hideShimmer()
-            }
         }
     }
 
@@ -220,14 +217,20 @@ class BeaconFragment : Fragment(), IEventListener {
         discoverEddyStoneBeacons()
 
         mScheduledFuture = scheduledThreadPool.scheduleWithFixedDelay({
-            mHandler.apply {
-                sendEmptyMessage(WHAT_START_SHIMMER)
-                runBlocking {
-                    delay(2000)
+
+            try {
+                mHandler.apply {
+                    sendEmptyMessage(WHAT_START_SHIMMER)
+                    runBlocking {
+                        delay(2000)
+                    }
+                    sendEmptyMessage(WHAT_STOP_SHIMMER)
                 }
-                sendEmptyMessage(WHAT_STOP_SHIMMER)
+
+            } catch (ex: Exception) {
+                Log.e(BeaconFragment::class.simpleName, ex.message!!)
             }
-        }, 0, 6, TimeUnit.SECONDS)
+        }, 0, 4, TimeUnit.SECONDS)
     }
 
     private class BeaconHandler(fragment: BeaconFragment) : Handler(Looper.myLooper()!!) {
@@ -236,13 +239,11 @@ class BeaconFragment : Fragment(), IEventListener {
 
         private fun startShimmer()
         {
-            Log.d("Shimmer", "start shimmer")
             mWeakReference.get()?.binding?.shimmerLayout?.showShimmer(true)
         }
 
         private fun stopShimmer()
         {
-            Log.d("Shimmer", "stop shimmer")
             mWeakReference.get()?.binding?.shimmerLayout?.hideShimmer()
             mWeakReference.get()?.binding?.shimmerLayout?.stopShimmer()
         }
@@ -259,7 +260,13 @@ class BeaconFragment : Fragment(), IEventListener {
     fun enableEddystoneTracking(earSide: EarSide)
     {
         configuration.eddyStoneMap[earSide]?.apply {
+
             isTrackingActive = !isTrackingActive
+
+            if (earSide == EarSide.Left)
+                binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+            else
+                binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
         }
     }
 }

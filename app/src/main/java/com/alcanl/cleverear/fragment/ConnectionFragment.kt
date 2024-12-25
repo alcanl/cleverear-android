@@ -103,7 +103,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                         hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
                             .values.first().isConnected = false
                     }
-                    resetFragment()
+                    buttonDetectDeviceClicked()
                 }
             }
     }
@@ -113,6 +113,7 @@ class ConnectionFragment : Fragment(), IEventListener {
         super.onStart()
         initBinding()
         EventBus.getDefault().register(this)
+
         if (!configuration.isConnected)
             buttonDetectDeviceClicked()
     }
@@ -211,11 +212,6 @@ class ConnectionFragment : Fragment(), IEventListener {
     private fun recognizeEarSide(manufacturerData: String): EarSide
     {
         return if (manufacturerData.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
-    }
-
-    private fun resetFragment()
-    {
-
     }
 
     private fun scanDevicesWithBluetooth()
