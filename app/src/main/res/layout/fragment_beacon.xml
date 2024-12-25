@@ -145,7 +145,7 @@
                                 tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMVersion"
+                                android:id="@+id/textViewLeftDeviceTLMVersion"
                                 android:textAlignment="center"
                                 android:textSize="18sp"
                                 android:layout_width="match_parent"
@@ -173,7 +173,7 @@
                                 tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMBatteryVoltage"
+                                android:id="@+id/textViewLeftDeviceTLMBatteryVoltage"
                                 android:textAlignment="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -199,7 +199,7 @@
                                 android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMTemperature"
+                                android:id="@+id/textViewLeftDeviceTLMTemperature"
                                 android:textAlignment="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -225,7 +225,7 @@
                                 android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMAdvertisementCount"
+                                android:id="@+id/textViewLeftDeviceTLMAdvertisementCount"
                                 android:textAlignment="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -251,7 +251,7 @@
                                 android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMElapsedTime"
+                                android:id="@+id/textViewLeftDeviceTLMElapsedTime"
                                 android:textAlignment="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -277,7 +277,7 @@
                                 android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewTLMStepCount"
+                                android:id="@+id/textViewLeftDeviceTLMStepCount"
                                 android:textAlignment="center"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"

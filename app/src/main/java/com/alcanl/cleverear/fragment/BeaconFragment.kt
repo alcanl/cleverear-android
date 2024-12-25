@@ -19,6 +19,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
@@ -29,7 +30,10 @@ import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -70,7 +74,9 @@ class BeaconFragment : Fragment(), IEventListener {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
 
                 if (result.scanRecord != null)
-                    determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
+                    }
             }
         }
     }
@@ -237,6 +243,29 @@ class BeaconFragment : Fragment(), IEventListener {
 
         private val mWeakReference = WeakReference(fragment)
 
+        @SuppressLint("SetTextI18n")
+        private fun fillTextViewsForDeviceCallback(earSide: EarSide, hearingAid: EddystoneHearingAid)
+        {
+            mWeakReference.get()?.binding?.let {
+                if (earSide == EarSide.Left) {
+                    it.textViewLeftDeviceTLMVersion.text = hearingAid.tlmVersion.toString()
+                    it.textViewLeftDeviceTLMAdvertisementCount.text = hearingAid.advertisementCount.toString()
+                    it.textViewLeftDeviceTLMTemperature.text = hearingAid.temperature.toString()
+                    it.textViewLeftDeviceTLMStepCount.text = hearingAid.stepCount.toString()
+                    it.textViewLeftDeviceTLMBatteryVoltage.text = hearingAid.batteryVoltage.toString()
+                    it.textViewLeftDeviceTLMElapsedTime.text = hearingAid.elapsedTime.toString()
+                }
+                else {
+                    it.textViewRightDeviceTLMVersion.text = hearingAid.tlmVersion.toString()
+                    it.textViewRightDeviceTLMAdvertisementCount.text = hearingAid.advertisementCount.toString()
+                    it.textViewRightDeviceTLMTemperature.text = hearingAid.temperature.toString()
+                    it.textViewRightDeviceTLMStepCount.text = hearingAid.stepCount.toString()
+                    it.textViewRightDeviceTLMBatteryVoltage.text = hearingAid.batteryVoltage.toString()
+                    it.textViewRightDeviceTLMElapsedTime.text = hearingAid.elapsedTime.toString()
+                }
+            }
+        }
+
         private fun startShimmer()
         {
             mWeakReference.get()?.binding?.shimmerLayout?.showShimmer(true)
@@ -244,8 +273,11 @@ class BeaconFragment : Fragment(), IEventListener {
 
         private fun stopShimmer()
         {
-            mWeakReference.get()?.binding?.shimmerLayout?.hideShimmer()
-            mWeakReference.get()?.binding?.shimmerLayout?.stopShimmer()
+            mWeakReference.get()?.binding?.let {
+                it.shimmerLayout.hideShimmer()
+                it.shimmerLayout.stopShimmer()
+            }
+            mWeakReference.get()?.configuration?.eddyStoneMap?.forEach(this::fillTextViewsForDeviceCallback)
         }
 
         override fun handleMessage(msg: Message)
