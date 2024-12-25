@@ -143,12 +143,12 @@ class AutoConnectService : Service()
 
     private fun checkDeviceConnectionState(intent: Intent?)
     {
-        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 1, TimeUnit.MINUTES)
+        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 90, TimeUnit.SECONDS)
     }
 
     private fun checkDeviceEddystoneValues()
     {
-        if (configuration.isConnected)
+        if (configuration.isConnected && !configuration.isMainActivityOnScreen)
             configuration.hearingAidMap
                 .filter { it.value.isEddystoneTLM }
                 .filter { configuration.eddyStoneMap[it.key]?.isTrackingActive!! }

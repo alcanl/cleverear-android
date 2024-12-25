@@ -37,6 +37,8 @@ object ConfigurationModule {
 
     var isRemoteFittingConnection = false
 
+    var isMainActivityOnScreen = false
+
     var earSide : EarSide = EarSide.Right
 
     val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)

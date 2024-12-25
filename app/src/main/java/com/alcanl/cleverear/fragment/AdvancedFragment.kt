@@ -171,7 +171,11 @@ class AdvancedFragment : Fragment(), IEventListener {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
                     .show()
                 activity?.finish()
-                configuration.isConnected = false
+                configuration.apply {
+                    isConnected = false
+                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                        .values.first().isConnected = false
+                }
             }
         }
     }

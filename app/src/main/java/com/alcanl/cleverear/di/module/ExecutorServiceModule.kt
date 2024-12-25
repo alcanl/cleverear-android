@@ -9,6 +9,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import javax.inject.Singleton
 
+const val SCHEDULED_THREAD_POOL_SIZE = 5
+
 @Module
 @InstallIn(SingletonComponent::class)
 object ExecutorServiceModule {
@@ -17,6 +19,6 @@ object ExecutorServiceModule {
     fun createExecutorService() : ExecutorService = Executors.newCachedThreadPool()
 
     @Provides
-    fun createScheduledThreadPool() : ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
+    fun createScheduledThreadPool() : ScheduledExecutorService = Executors.newScheduledThreadPool(SCHEDULED_THREAD_POOL_SIZE)
 
 }

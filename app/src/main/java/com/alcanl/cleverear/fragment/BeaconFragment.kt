@@ -9,6 +9,8 @@ import android.bluetooth.le.ScanSettings
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,15 +22,24 @@ import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.WHAT_START_SHIMMER
+import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
+import com.alcanl.cleverear.util.listeners.BeaconFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.lang.ref.WeakReference
 import java.util.EventObject
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,21 +48,29 @@ class BeaconFragment : Fragment(), IEventListener {
     @Inject
     lateinit var configuration : ConfigurationModule
 
-    private lateinit var mBinding: FragmentBeaconBinding
+    @Inject
+    lateinit var scheduledThreadPool: ScheduledExecutorService
+
+    @Inject
+    lateinit var listener : BeaconFragmentEventListener
+
+    lateinit var binding: FragmentBeaconBinding
 
     private lateinit var mBluetoothLeScanner: BluetoothLeScanner
 
-    private val mScanCallback: ScanCallback by lazy {
+    private var mScheduledFuture: ScheduledFuture<*>? = null
 
+    private val mHandler by lazy { BeaconHandler(this) }
+
+    private val mScanCallback: ScanCallback by lazy {
         object : ScanCallback() {
 
             @SuppressLint("MissingPermission")
             override fun onScanResult(callbackType: Int, result: ScanResult) {
 
-                if (result.scanRecord != null) {
-                    activity?.runOnUiThread { mBinding.shimmerLayout.showShimmer(true) }
+                Log.d("Scan", result.device.address)
+                if (result.scanRecord != null)
                     determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
-                }
             }
         }
     }
@@ -65,7 +84,11 @@ class BeaconFragment : Fragment(), IEventListener {
                     Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
                         .show()
                     it.finish()
-                    configuration.isConnected = false
+                    configuration.apply {
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
                 }
             }
     }
@@ -78,9 +101,9 @@ class BeaconFragment : Fragment(), IEventListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
     {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_beacon, container, false)
-        mBinding.lifecycleOwner = this
-        return mBinding.root
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_beacon, container, false)
+        binding.lifecycleOwner = this
+        return binding.root
     }
 
     @SuppressLint("MissingPermission")
@@ -90,24 +113,31 @@ class BeaconFragment : Fragment(), IEventListener {
         mBluetoothLeScanner.stopScan(mScanCallback)
         EventBus.getDefault().unregister(this)
 
-        mBinding.shimmerLayout.apply {
+        binding.shimmerLayout.apply {
             if (isShimmerVisible) {
                 stopShimmer()
                 hideShimmer()
             }
         }
+
+        if (listener.isListenerOnBoard())
+            listener.stopListener()
+
+        if (mScheduledFuture != null && !mScheduledFuture!!.isCancelled)
+            mScheduledFuture?.cancel(true)
     }
 
     override fun onStart()
     {
         super.onStart()
         EventBus.getDefault().register(this)
+        listener.startEventListener()
     }
 
     override fun onPause()
     {
         super.onPause()
-        mBinding.shimmerLayout.apply {
+        binding.shimmerLayout.apply {
             if (isShimmerVisible) {
                 stopShimmer()
                 hideShimmer()
@@ -119,11 +149,6 @@ class BeaconFragment : Fragment(), IEventListener {
     {
         super.onResume()
 
-        mBinding.shimmerLayout.apply {
-            if (!isShimmerVisible)
-                startShimmer()
-        }
-
         if (configuration.hearingAidMap.none { it.value.isEddystoneTLM })
             handleNotSupportedHearingAid()
         else
@@ -132,7 +157,7 @@ class BeaconFragment : Fragment(), IEventListener {
 
     private fun initialize()
     {
-        mBinding.viewModel = BeaconFragmentListenersViewModel(this)
+        binding.viewModel = BeaconFragmentListenersViewModel(this)
         mBluetoothLeScanner = requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
 
@@ -143,7 +168,7 @@ class BeaconFragment : Fragment(), IEventListener {
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
-            .setReportDelay(2)
+            .setReportDelay(0)
             .build()
 
         mBluetoothLeScanner.startScan(emptyList(), settings, mScanCallback)
@@ -170,9 +195,9 @@ class BeaconFragment : Fragment(), IEventListener {
                         eddyStoneMap[earSide]?.setEddystoneProperties(it, address)
 
                     Handler(Looper.myLooper()!!).postDelayed({
-                        mBinding.invalidateAll()
-                        if (mBinding.shimmerLayout.isShimmerVisible)
-                            mBinding.shimmerLayout.hideShimmer()
+                        binding.invalidateAll()
+                        if (binding.shimmerLayout.isShimmerVisible)
+                            binding.shimmerLayout.hideShimmer()
                         }, 2000)
                 }
         }
@@ -180,7 +205,7 @@ class BeaconFragment : Fragment(), IEventListener {
 
     private fun handleNotSupportedHearingAid()
     {
-        with(mBinding) {
+        with(binding) {
             frameLayoutNotSupported.visibility = View.VISIBLE
             linearLayoutMain.visibility = View.INVISIBLE
             shimmerLayout.apply {
@@ -193,6 +218,42 @@ class BeaconFragment : Fragment(), IEventListener {
     private fun handleEddystoneTLM()
     {
         discoverEddyStoneBeacons()
+
+        mScheduledFuture = scheduledThreadPool.scheduleWithFixedDelay({
+            mHandler.apply {
+                sendEmptyMessage(WHAT_START_SHIMMER)
+                runBlocking {
+                    delay(2000)
+                }
+                sendEmptyMessage(WHAT_STOP_SHIMMER)
+            }
+        }, 0, 6, TimeUnit.SECONDS)
+    }
+
+    private class BeaconHandler(fragment: BeaconFragment) : Handler(Looper.myLooper()!!) {
+
+        private val mWeakReference = WeakReference(fragment)
+
+        private fun startShimmer()
+        {
+            Log.d("Shimmer", "start shimmer")
+            mWeakReference.get()?.binding?.shimmerLayout?.showShimmer(true)
+        }
+
+        private fun stopShimmer()
+        {
+            Log.d("Shimmer", "stop shimmer")
+            mWeakReference.get()?.binding?.shimmerLayout?.hideShimmer()
+            mWeakReference.get()?.binding?.shimmerLayout?.stopShimmer()
+        }
+
+        override fun handleMessage(msg: Message)
+        {
+            when (msg.what) {
+                31 -> startShimmer()
+                32 -> stopShimmer()
+            }
+        }
     }
 
     fun enableEddystoneTracking(earSide: EarSide)

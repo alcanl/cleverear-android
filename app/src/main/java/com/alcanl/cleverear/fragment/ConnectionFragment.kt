@@ -28,6 +28,7 @@ import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
+import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.util.scan.DeviceScanner
@@ -63,6 +64,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     @Inject
     lateinit var deviceListAdapter: DeviceListAdapter
 
+    @Inject
+    lateinit var connectionFragmentEventListener: ConnectionFragmentEventListener
+
     @Volatile
     private var mDeviceCount = 0
 
@@ -94,7 +98,12 @@ class ConnectionFragment : Fragment(), IEventListener {
                     Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
                         .show()
                     it.finish()
-                    configuration.isConnected = false
+                    configuration.apply {
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
+                    resetFragment()
                 }
             }
     }
@@ -112,6 +121,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         super.onDestroy()
         EventBus.getDefault().unregister(this)
+
+        if (connectionFragmentEventListener.isListenerOnBoard())
+            connectionFragmentEventListener.stopListener()
     }
 
     override fun onCreateView(
@@ -129,12 +141,18 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (isScanContinue)
             stopScanProcess()
 
+        if (connectionFragmentEventListener.isListenerOnBoard())
+            connectionFragmentEventListener.stopListener()
+
         super.onStop()
     }
 
     override fun onResume()
     {
         super.onResume()
+
+        if (configuration.isConnected)
+            connectionFragmentEventListener.startEventListener()
 
         with(mBinding) {
             imageButtonDetect.isEnabled = !configuration.isConnected
@@ -193,6 +211,11 @@ class ConnectionFragment : Fragment(), IEventListener {
     private fun recognizeEarSide(manufacturerData: String): EarSide
     {
         return if (manufacturerData.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
+    }
+
+    private fun resetFragment()
+    {
+
     }
 
     private fun scanDevicesWithBluetooth()

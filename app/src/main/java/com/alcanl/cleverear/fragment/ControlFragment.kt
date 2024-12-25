@@ -39,12 +39,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ControlFragment : Fragment(), IEventListener {
+
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var configuration : ConfigurationModule
+
     @Inject
     lateinit var listener : ControlFragmentEventListener
 
@@ -191,7 +195,11 @@ class ControlFragment : Fragment(), IEventListener {
                 it.runOnUiThread {
                     Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
                     it.finish()
-                    configuration.isConnected = false
+                    configuration.apply {
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
                 }
             }
     }
