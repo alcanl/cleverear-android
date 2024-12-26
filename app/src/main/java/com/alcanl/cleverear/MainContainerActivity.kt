@@ -1,5 +1,6 @@
 package com.alcanl.cleverear
 
+import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
@@ -20,6 +21,8 @@ import com.alcanl.cleverear.fragment.ConnectionFragment
 import com.alcanl.cleverear.fragment.ControlFragment
 import com.alcanl.cleverear.util.ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
+import com.alcanl.cleverear.util.SMS_PERMISSION_REQUEST_CODE
+import com.alcanl.cleverear.util.dialog.CustomDialogSmsInformation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -31,6 +34,10 @@ class MainContainerActivity : AppCompatActivity() {
     lateinit var configuration: ConfigurationModule
 
     lateinit var binding : ActivityMainContainerBinding
+
+    private val mDialogSmsInformation: CustomDialogSmsInformation by lazy {
+        CustomDialogSmsInformation(this)
+    }
 
     private val mLocationFinePermission by lazy {
         ContextCompat.checkSelfPermission(
@@ -46,6 +53,13 @@ class MainContainerActivity : AppCompatActivity() {
                 ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         else true
+    }
+
+    val mSendSmsPermission by lazy {
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.SEND_SMS
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -74,6 +88,11 @@ class MainContainerActivity : AppCompatActivity() {
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         )
             supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
+
+        else if (requestCode == SMS_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, BeaconFragment()).commit()
+            mDialogSmsInformation.show()
+        }
 
         else {
             Toast.makeText(this, R.string.toast_no_permission_splash_activity, Toast.LENGTH_LONG).show()
@@ -125,7 +144,8 @@ class MainContainerActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestLocationPermission() {
+    private fun requestLocationPermission()
+    {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             ActivityCompat.requestPermissions(
                 this,
@@ -143,6 +163,15 @@ class MainContainerActivity : AppCompatActivity() {
     private fun hasPermissionsForBluetoothLocation() : Boolean
     {
         return mLocationCoarsePermission && mLocationFinePermission
+    }
+
+    fun requestSmsPermission()
+    {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.SEND_SMS),
+            SMS_PERMISSION_REQUEST_CODE
+        )
     }
 
     fun stopService()

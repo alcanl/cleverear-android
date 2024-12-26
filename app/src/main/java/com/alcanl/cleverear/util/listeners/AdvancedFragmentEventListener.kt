@@ -75,6 +75,7 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
         try {
             Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionEvent = ConnectionEvent(this)
+            connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
             connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
 
             EventBus.getDefault().post(connectionEvent)

@@ -22,6 +22,8 @@
     <string name="textview_device_detection_connection_in_process_text" translatable="true">Connecting To Device</string>
     <string name="textview_device_detection_not_connected_text" translatable="true">Could not Connected To Device</string>
     <string name="textview_control_ha" translatable="true">Control Hearing Aid</string>
+    <string name="fallen_device_sms_body" translatable="true">The CleverEar application has detected a situation involving the fall of a hearing aid with serial number %s, being used by one of your close contacts.
+This message has been automatically sent by the CleverEar system for informational purposes. If you believe this is incorrect information, please disregard this message.</string>
     <string name="textview_remote_conf_ha" translatable="true">Remote Fitting</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">No Connection</string>
     <string name="textview_eddystone_not_supporting_text" translatable="true">Not Supporting</string>

@@ -28,7 +28,6 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
 
     fun startEventListener()
     {
-
         threadPool.execute {
             try {
                 mListener = Thread.currentThread()

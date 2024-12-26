@@ -178,15 +178,18 @@ class AutoConnectService : Service()
 
         bleScanner.stopScan(scanCallback)
 
-        if (hearingAid.isTrackingActive && hearingAid.isFallen)
-            sendDeviceFellSMS()
+        if (hearingAid.isTrackingActive && hearingAid.isFallen) {
+            val serialNumber = configuration.hearingAidMap
+                .entries.first { it.value.address == hearingAid.macAddress }.value.name
 
+            sendDeviceFellSMS(serialNumber)
+        }
     }
 
-    private fun sendDeviceFellSMS()
+    private fun sendDeviceFellSMS(serialNumber: String)
     {
         try {
-            val smsText = getString(R.string.service_notification_channel_id)
+            val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
             val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
             val smsManager = getSystemService(SmsManager::class.java)
             smsManager.sendTextMessage(phoneNumber, null, smsText, null, null)

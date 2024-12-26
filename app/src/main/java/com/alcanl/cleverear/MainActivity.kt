@@ -67,12 +67,14 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK)
             gpsTurnedOn()
     }
+
     private val bluetoothActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK)
             bluetoothTurnedOn()
     }
+
     private val updateAppResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
         if (result.resultCode != RESULT_OK) {
@@ -94,7 +96,8 @@ class MainActivity : AppCompatActivity() {
         checkBluetoothEnabled()
         checkForUpdates()
     }
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
         checkBluetoothPermission()
         configuration.isMainActivityOnScreen = true

@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -291,6 +292,11 @@ class BeaconFragment : Fragment(), IEventListener {
 
     fun enableEddystoneTracking(earSide: EarSide)
     {
+        if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
+            (requireActivity() as MainContainerActivity).requestSmsPermission()
+            return
+        }
+
         configuration.eddyStoneMap[earSide]?.apply {
 
             isTrackingActive = !isTrackingActive

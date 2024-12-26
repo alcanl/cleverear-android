@@ -29,6 +29,7 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
 
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Suppress("DEPRECATION")
     override fun onReceive(context: Context?, intent: Intent?)
     {

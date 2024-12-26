@@ -53,7 +53,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
                 this@HearingAid.streamChannelList = streamChannelList
                 this@HearingAid.streamAddressRaw = streamAddress
                 this@HearingAid.streamAddress = streamAddressRaw shr 16
-                isEddystoneTLM = wirelessControl?.modelNumber == EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
+                this@HearingAid.isEddystoneTLM = wirelessControl?.modelNumber == EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
             }
         }
         catch (e : ArkException) {
