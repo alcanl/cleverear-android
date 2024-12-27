@@ -8,18 +8,18 @@ class ConnectionFragmentListenersViewModel(fragment: ConnectionFragment) {
 
     fun handleDetectDeviceButton()
     {
-        mWeakReference.get()?.buttonDetectDeviceClicked()
+        mWeakReference.get()?.onDetectDeviceButtonClicked()
     }
     fun handleBackButton()
     {
-        mWeakReference.get()?.buttonBackClicked()
+        mWeakReference.get()?.onBackButtonClicked()
     }
     fun handleListViewItemSelected(pos: Int)
     {
-        mWeakReference.get()?.hearingAidItemClicked(pos)
+        mWeakReference.get()?.onHearingAidItemClicked(pos)
     }
     fun handleStopConnectionButton()
     {
-        mWeakReference.get()?.stopConnectionButtonClicked()
+        mWeakReference.get()?.onStopConnectionButtonClicked()
     }
 }

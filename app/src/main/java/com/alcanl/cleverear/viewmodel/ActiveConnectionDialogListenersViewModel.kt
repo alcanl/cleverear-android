@@ -8,11 +8,11 @@ class ActiveConnectionDialogListenersViewModel(fragment: ConnectionFragment){
 
     fun handlePositiveButton()
     {
-        mWeakReference.get()!!.alertDialogPositiveButtonClicked()
+        mWeakReference.get()!!.onAlertDialogPositiveButtonClicked()
     }
     fun handleNegativeButton()
     {
-        mWeakReference.get()!!.alertDialogNegativeButtonClicked()
+        mWeakReference.get()!!.onAlertDialogNegativeButtonClicked()
     }
 
 }

@@ -2,8 +2,15 @@ package com.alcanl.cleverear.util.listeners
 
 import android.content.Context
 import android.util.Log
+import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.sdk.events.ScanEvent
+import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
+import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
 import com.alcanl.cleverear.util.parseJsonConnectionData
+import com.alcanl.cleverear.util.parseJsonScanData
 import com.alcanl.cleverear.util.parseJsonSenderMacData
 import com.ark.EventHandler
 import com.ark.EventType
@@ -22,9 +29,28 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
     @Inject
     lateinit var threadPool: ExecutorService
 
+    @Inject
+    lateinit var configuration: ConfigurationModule
+
     private val mContext = context
 
     private var mListener: Thread? = null
+
+    @Synchronized
+    private fun isHearingAid(manufacturerCode: String): Boolean
+    {
+        var manufacturerCodeSub = ""
+
+        try {
+            manufacturerCodeSub = manufacturerCode.substring(0, 6)
+        } catch (_: StringIndexOutOfBoundsException) {}
+
+        return if (!configuration.isDoubleDeviceConnection)
+            if (configuration.earSide == EarSide.Left) manufacturerCodeSub == MANUFACTURER_CODE_LEFT
+            else manufacturerCodeSub == MANUFACTURER_CODE_RIGHT
+        else
+            manufacturerCodeSub == MANUFACTURER_CODE_RIGHT || manufacturerCodeSub == MANUFACTURER_CODE_LEFT
+    }
 
     fun startEventListener()
     {
@@ -33,22 +59,34 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
                 mListener = Thread.currentThread()
                 while (!mListener?.isInterrupted!!) {
                     val event = mEventHandler.event
-                    if (event.type == EventType.kConnectionEvent) {
-                        val connectionEvent = ConnectionEvent(this)
-                        connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
-                        connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
-                        EventBus.getDefault().post(connectionEvent)
+                    when (event.type) {
+                        EventType.kConnectionEvent -> {
+                            val connectionEvent = ConnectionEvent(this)
+                            connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
+                            connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
+                            EventBus.getDefault().post(connectionEvent)
+                        }
+
+                        EventType.kScanEvent -> {
+                            Log.i(ScanEvent::class.java.simpleName, event.data)
+                            val device = parseJsonScanData(event.data, mContext)
+                            if (isHearingAid(device.manufacturerData)) {
+                                val deviceFoundEvent = DeviceFoundEvent(this)
+                                deviceFoundEvent.hearingAid = device
+                                EventBus.getDefault().post(deviceFoundEvent)
+                            }
+                        }
+                    else -> Log.i(ConnectionFragmentEventListener::class.simpleName, event.data)
                     }
-                    else
-                        Log.d(ConnectionFragmentEventListener::class.simpleName, event.data)
+
                 }
 
             } catch (ex: NullPointerException) {
-                Log.e("null", ex.message!!)
+                Log.e(ConnectionFragmentEventListener::class.simpleName, ex.message!!)
             } catch (ex: InterruptedException) {
-                Log.e("thread", ex.message!!)
+                Log.e(ConnectionFragmentEventListener::class.simpleName, ex.message!!)
             } catch (ex: JSONException) {
-                Log.e("json", ex.message!!)
+                Log.e(ConnectionFragmentEventListener::class.simpleName, ex.message!!)
             }
         }
     }
