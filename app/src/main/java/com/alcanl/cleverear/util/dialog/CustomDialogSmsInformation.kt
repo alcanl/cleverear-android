@@ -28,6 +28,10 @@ class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(acti
 
     fun saveSmsContactInformationToPref()
     {
+        val numberNationalCode = mBinding.editTextContactNumberNationalCode.text?.toString()
+            ?.ifBlank { "90" }?.toInt()
+        val number = mBinding.editTextContactNumber.text?.toString()
+            ?.ifBlank { "90" }?.toInt()
         val prefs = mWeakReference.get()?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
     }
 }

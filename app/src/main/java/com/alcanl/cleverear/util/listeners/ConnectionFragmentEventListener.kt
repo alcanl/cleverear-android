@@ -78,7 +78,6 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
                         }
                     else -> Log.i(ConnectionFragmentEventListener::class.simpleName, event.data)
                     }
-
                 }
 
             } catch (ex: NullPointerException) {

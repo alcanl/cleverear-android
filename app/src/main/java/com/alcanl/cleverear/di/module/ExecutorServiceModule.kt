@@ -14,6 +14,7 @@ const val SCHEDULED_THREAD_POOL_SIZE = 5
 @Module
 @InstallIn(SingletonComponent::class)
 object ExecutorServiceModule {
+
     @Provides
     @Singleton
     fun createExecutorService() : ExecutorService = Executors.newCachedThreadPool()

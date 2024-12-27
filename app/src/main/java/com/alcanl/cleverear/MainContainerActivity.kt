@@ -178,4 +178,14 @@ class MainContainerActivity : AppCompatActivity() {
     {
         configuration.stopServiceFlag = true
     }
+
+    fun onDialogSaveContactButtonClicked()
+    {
+
+    }
+
+    fun onDialogCancelButtonClicked()
+    {
+
+    }
 }
