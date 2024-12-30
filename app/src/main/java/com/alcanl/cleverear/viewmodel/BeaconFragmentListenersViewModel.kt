@@ -9,6 +9,6 @@ class BeaconFragmentListenersViewModel(fragment: BeaconFragment) {
 
     fun handleActiveEddystoneTrackingButton(earSide: EarSide)
     {
-        mWeakReference.get()?.enableEddystoneTracking(earSide)
+        mWeakReference.get()?.onEddystoneTrackingButtonClicked(earSide)
     }
 }

@@ -187,4 +187,9 @@ class MainContainerActivity : AppCompatActivity() {
 
         mDialogSmsInformation.dismiss()
     }
+
+    fun showSMSInformationDialog()
+    {
+        mDialogSmsInformation.show()
+    }
 }

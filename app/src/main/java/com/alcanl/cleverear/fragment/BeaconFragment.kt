@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,7 +23,9 @@ import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
 import com.alcanl.cleverear.util.listeners.BeaconFragmentEventListener
@@ -221,6 +224,14 @@ class BeaconFragment : Fragment(), IEventListener {
 
     private fun handleEddystoneTLM()
     {
+        configuration.eddyStoneMap.forEach { (earSide, eddystoneHearingAid) ->
+            if (eddystoneHearingAid.isTrackingActive)
+                if (earSide == EarSide.Left)
+                    binding.buttonTrackLeftDevice.text = getString(R.string.button_disable_tracking_text)
+                else
+                    binding.buttonTrackRightDevice.text = getString(R.string.button_disable_tracking_text)
+        }
+
         discoverEddyStoneBeacons()
 
         mScheduledFuture = scheduledThreadPool.scheduleWithFixedDelay({
@@ -290,21 +301,27 @@ class BeaconFragment : Fragment(), IEventListener {
         }
     }
 
-    fun enableEddystoneTracking(earSide: EarSide)
+    fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
         if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
             (requireActivity() as MainContainerActivity).requestSmsPermission()
             return
         }
 
-        configuration.eddyStoneMap[earSide]?.apply {
-
-            isTrackingActive = !isTrackingActive
-
-            if (earSide == EarSide.Left)
-                binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
-            else
-                binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+        if (requireActivity().getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+            .getString(EMERGENCY_NUMBER, "")?.isBlank()!!) {
+            (requireActivity() as MainContainerActivity).showSMSInformationDialog()
+            return
         }
+        else
+            configuration.eddyStoneMap[earSide]?.apply {
+
+                isTrackingActive = !isTrackingActive
+
+                if (earSide == EarSide.Left)
+                    binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+                else
+                    binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+            }
     }
 }
