@@ -22,6 +22,7 @@ import com.alcanl.cleverear.fragment.ConnectionFragment
 import com.alcanl.cleverear.fragment.ControlFragment
 import com.alcanl.cleverear.util.ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
+import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.SMS_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.dialog.CustomDialogSmsInformation
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,6 +36,8 @@ class MainContainerActivity : AppCompatActivity() {
     lateinit var configuration: ConfigurationModule
 
     lateinit var binding : ActivityMainContainerBinding
+
+    private lateinit var mSelectedTrackingEddystoneEarSide: EarSide
 
     private val mDialogSmsInformation: CustomDialogSmsInformation by lazy {
         CustomDialogSmsInformation(this)
@@ -166,8 +169,10 @@ class MainContainerActivity : AppCompatActivity() {
         return mLocationCoarsePermission && mLocationFinePermission
     }
 
-    fun requestSmsPermission()
+    fun requestSmsPermission(earSide: EarSide)
     {
+        mSelectedTrackingEddystoneEarSide = earSide
+
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.SEND_SMS),
@@ -182,14 +187,17 @@ class MainContainerActivity : AppCompatActivity() {
 
     fun onSMSContactDialogButtonClicked(button: AppCompatButton)
     {
-        if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id)
+        if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id) {
             mDialogSmsInformation.saveSmsContactInformationToPref()
+            configuration.eddyStoneMap[mSelectedTrackingEddystoneEarSide]?.isTrackingActive = true
+        }
 
         mDialogSmsInformation.dismiss()
     }
 
-    fun showSMSInformationDialog()
+    fun showSMSInformationDialog(earSide: EarSide)
     {
+        mSelectedTrackingEddystoneEarSide = earSide
         mDialogSmsInformation.show()
     }
 }

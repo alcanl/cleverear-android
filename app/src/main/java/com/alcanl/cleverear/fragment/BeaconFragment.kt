@@ -120,7 +120,6 @@ class BeaconFragment : Fragment(), IEventListener {
     override fun onDestroy()
     {
         super.onDestroy()
-        mBluetoothLeScanner.stopScan(mScanCallback)
         EventBus.getDefault().unregister(this)
 
         binding.shimmerLayout.apply {
@@ -225,6 +224,7 @@ class BeaconFragment : Fragment(), IEventListener {
     private fun handleEddystoneTLM()
     {
         configuration.eddyStoneMap.forEach { (earSide, eddystoneHearingAid) ->
+
             if (eddystoneHearingAid.isTrackingActive)
                 if (earSide == EarSide.Left)
                     binding.buttonTrackLeftDevice.text = getString(R.string.button_disable_tracking_text)
@@ -233,7 +233,6 @@ class BeaconFragment : Fragment(), IEventListener {
         }
 
         discoverEddyStoneBeacons()
-
         mScheduledFuture = scheduledThreadPool.scheduleWithFixedDelay({
 
             try {
@@ -304,13 +303,13 @@ class BeaconFragment : Fragment(), IEventListener {
     fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
         if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
-            (requireActivity() as MainContainerActivity).requestSmsPermission()
+            (requireActivity() as MainContainerActivity).requestSmsPermission(earSide)
             return
         }
 
         if (requireActivity().getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
             .getString(EMERGENCY_NUMBER, "")?.isBlank()!!) {
-            (requireActivity() as MainContainerActivity).showSMSInformationDialog()
+            (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide)
             return
         }
         else
