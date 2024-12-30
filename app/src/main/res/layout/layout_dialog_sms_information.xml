@@ -28,17 +28,18 @@
             android:layout_height="65dp"
             android:layout_marginStart="35dp"
             android:layout_marginTop="15dp"
-            android:hint="+90"
+            android:hint="@string/edittext_contact_number_national_code_hint"
             app:layout_constraintEnd_toStartOf="@+id/textInputLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewHeader">
 
-            <!--this is the actual edit text which takes the input-->
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextContactNumberNationalCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="number"
+                android:maxLength="3"
+                tools:ignore="TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -49,19 +50,19 @@
             android:layout_height="65dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="35dp"
-            android:hint="Contact Number"
+            android:hint="@string/edittext_contact_number_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textFieldContactNumberNationalCode"
             app:layout_constraintTop_toBottomOf="@+id/textViewHeader">
 
-            <!--this is the actual edit text which takes the input-->
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextContactNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:maxLength="10"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                tools:ignore="TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -72,13 +73,14 @@
             android:layout_marginStart="25dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="25dp"
-            android:text="İşitme cihazı ile ilgili acil durumlarda SMS ile bilgilendirilecek kontakt numarasını girerek\n CleverEar İşitme Cihazı Akıllı Takibini\n aktifleştirebilirsiniz."
+            android:text="@string/dialog_save_contact_number_textview_text"
             android:textAlignment="center"
             android:textColor="@color/design_default_color_secondary_variant"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="VisualLintLongText,TextContrastCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonSaveContact"
@@ -86,12 +88,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/design_default_color_secondary_variant"
-            android:text="Save Contact"
+            android:onClick="@{(view) -> viewModel.handleDialogButtons(view)}"
+            android:text="@string/button_save_contact_number_text"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.332"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            tools:ignore="TextContrastCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonCancel"
@@ -99,7 +103,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/right_device_slider"
-            android:text="Cancel"
+            android:onClick="@{(view) -> viewModel.handleDialogButtons(view)}"
+            android:text="@string/button_cancel_text"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

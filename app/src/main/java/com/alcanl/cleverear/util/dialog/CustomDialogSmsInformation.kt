@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.LayoutDialogSmsInformationBinding
+import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.viewmodel.SmsInformationDialogListenersViewModel
 import java.lang.ref.WeakReference
@@ -14,24 +15,29 @@ import java.lang.ref.WeakReference
 class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(activity, R.style.DialogStyle) {
 
     private val mWeakReference = WeakReference(activity)
-    private var mBinding: LayoutDialogSmsInformationBinding
+    var binding: LayoutDialogSmsInformationBinding
 
     init {
         window?.setBackgroundDrawableResource(R.drawable.drawable_alert_dialog)
         setCancelable(false)
-        mBinding = DataBindingUtil.inflate(layoutInflater,
+        binding = DataBindingUtil.inflate(layoutInflater,
             R.layout.layout_dialog_sms_information,null, false)
-        mBinding.viewModel = SmsInformationDialogListenersViewModel(activity)
+        binding.viewModel = SmsInformationDialogListenersViewModel(activity)
 
-        setContentView(mBinding.root)
+        setContentView(binding.root)
     }
 
     fun saveSmsContactInformationToPref()
     {
-        val numberNationalCode = mBinding.editTextContactNumberNationalCode.text?.toString()
-            ?.ifBlank { "90" }?.toInt()
-        val number = mBinding.editTextContactNumber.text?.toString()
-            ?.ifBlank { "90" }?.toInt()
-        val prefs = mWeakReference.get()?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+        val phoneNumber = (binding.editTextContactNumberNationalCode.text?.toString()
+            ?.ifBlank {
+                with (mWeakReference.get()!!) {
+                    val code = this.getString(R.string.edittext_contact_number_national_code_hint)
+                    code.substring(1, code.length)
+                } + binding.editTextContactNumber.text?.toString() })
+
+        val editor = mWeakReference.get()?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)?.edit()
+        editor?.putString(EMERGENCY_NUMBER, phoneNumber!!)
+        editor?.apply()
     }
 }

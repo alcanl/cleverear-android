@@ -14,6 +14,11 @@
     <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
     <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses</string>
+    <string name="edittext_contact_number_hint" translatable="true">Telefon Numarası</string>
+    <string name="edittext_contact_number_national_code_hint" translatable="true">+90</string>
+    <string name="dialog_save_contact_number_textview_text" translatable="true">İşitme cihazı ile ilgili acil durumlarda SMS ile bilgilendirilecek kişinin telefon numarasını kaydederek\n CleverEar İşitme Cihazı Akıllı Takibini\n aktifleştirebilirsiniz.</string>
+    <string name="button_cancel_text" translatable="true">İptal</string>
+    <string name="button_save_contact_number_text" translatable="true">Numarayı Kaydet</string>
     <string name="fallen_device_sms_body" translatable="true">CleverEar uygulaması bir yakınınız tarafından kullanılmakta olan %s seri numaralı işitme cihazının yüksekten düşmesine ait bir durum algıladı.\nBu mesaj bilgilendirme amacıyla sistem CleverEar tarafından otomatik olarak gönderilmiştir. Eğer yanlış bir bilgilendirme olduğunu düşünüyorsanız lütfen dikkate almayın.</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">Bağlantı Yok</string>
     <string name="textview_eddystone_not_supporting_text" translatable="true">Desteklenmeyen Cihaz</string>

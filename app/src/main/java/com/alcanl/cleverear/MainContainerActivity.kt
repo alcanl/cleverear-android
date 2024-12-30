@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -179,13 +180,11 @@ class MainContainerActivity : AppCompatActivity() {
         configuration.stopServiceFlag = true
     }
 
-    fun onDialogSaveContactButtonClicked()
+    fun onSMSContactDialogButtonClicked(button: AppCompatButton)
     {
+        if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id)
+            mDialogSmsInformation.saveSmsContactInformationToPref()
 
-    }
-
-    fun onDialogCancelButtonClicked()
-    {
-
+        mDialogSmsInformation.dismiss()
     }
 }

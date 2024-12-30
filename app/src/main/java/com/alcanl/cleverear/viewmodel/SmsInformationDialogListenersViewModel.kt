@@ -1,19 +1,15 @@
 package com.alcanl.cleverear.viewmodel
 
+import android.view.View
+import androidx.appcompat.widget.AppCompatButton
 import com.alcanl.cleverear.MainContainerActivity
 import java.lang.ref.WeakReference
 
 class SmsInformationDialogListenersViewModel(activity: MainContainerActivity) {
     private val mWeakReference = WeakReference(activity)
 
-    fun handleButtonSaveContact()
+    fun handleDialogButtons(view : View)
     {
-        mWeakReference.get()?.onDialogSaveContactButtonClicked()
+        mWeakReference.get()?.onSMSContactDialogButtonClicked(view as AppCompatButton)
     }
-
-    fun handleButtonCancel()
-    {
-        mWeakReference.get()?.onDialogCancelButtonClicked()
-    }
-
 }
