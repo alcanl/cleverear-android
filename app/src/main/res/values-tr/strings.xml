@@ -43,6 +43,7 @@
     <string name="switch_dual_device_text">Binaural Kullanım</string>
     <string name="toast_no_permission">Bluetooth İzinleri Bulunamadı</string>
     <string name="toast_no_device_selected">Seçili Cihaz Bulunamadı</string>
+    <string name="dialog_contact_save_success_text">Kontakt Numarası Kaydedildi</string>
     <string name="bubble_textview_single_device_text" translatable="true">Sadece tek bir cihaz kullanıcısı iseniz bağlantıya devam etmek için…</string>
     <string name="bubble_textview_double_device_text" translatable="true">Çift cihaz kullanıcısı iseniz bağlantıya devam etmek için…</string>
     <string name="textview_no_previous_device_info">Kayıtlı Cihaz Yok</string>

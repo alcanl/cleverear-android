@@ -304,12 +304,14 @@ class BeaconFragment : Fragment(), IEventListener {
     fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
         if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
-            (requireActivity() as MainContainerActivity).requestSmsPermission(earSide)
+            (requireActivity() as MainContainerActivity).requestSmsPermission(earSide,
+                if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)
             return
         }
 
         if (requireActivity().getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")?.isBlank()!!)
-            (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide)
+            (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide,
+                if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)
         else
             configuration.eddyStoneMap[earSide]?.apply {
                 isTrackingActive = !isTrackingActive

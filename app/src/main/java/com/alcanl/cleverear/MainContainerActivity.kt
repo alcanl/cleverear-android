@@ -6,6 +6,8 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,11 +39,11 @@ class MainContainerActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityMainContainerBinding
 
+    private lateinit var mTrackingButton: AppCompatButton
+
     private lateinit var mSelectedTrackingEddystoneEarSide: EarSide
 
-    private val mDialogSmsInformation: CustomDialogSmsInformation by lazy {
-        CustomDialogSmsInformation(this)
-    }
+    private lateinit var mDialogSmsInformation: CustomDialogSmsInformation
 
     private val mLocationFinePermission by lazy {
         ContextCompat.checkSelfPermission(
@@ -95,6 +97,7 @@ class MainContainerActivity : AppCompatActivity() {
 
         else if (requestCode == SMS_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, BeaconFragment()).commit()
+            mDialogSmsInformation = CustomDialogSmsInformation(this)
             mDialogSmsInformation.show()
         }
 
@@ -169,9 +172,10 @@ class MainContainerActivity : AppCompatActivity() {
         return mLocationCoarsePermission && mLocationFinePermission
     }
 
-    fun requestSmsPermission(earSide: EarSide)
+    fun requestSmsPermission(earSide: EarSide, button: AppCompatButton)
     {
         mSelectedTrackingEddystoneEarSide = earSide
+        mTrackingButton = button
 
         ActivityCompat.requestPermissions(
             this,
@@ -190,15 +194,31 @@ class MainContainerActivity : AppCompatActivity() {
         if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id) {
             mDialogSmsInformation.saveSmsContactInformationToPref()
             configuration.eddyStoneMap[mSelectedTrackingEddystoneEarSide]?.isTrackingActive = true
-            button.text = getString(R.string.button_disable_tracking_text)
+            mTrackingButton.text = getString(R.string.button_disable_tracking_text)
+
+            mDialogSmsInformation.binding.apply {
+                frameLayoutOk.visibility = View.VISIBLE
+                buttonOk.visibility = View.INVISIBLE
+                textViewContactSave.visibility = View.INVISIBLE
+                progressBar.visibility = View.VISIBLE
+
+                Handler(Looper.myLooper()!!).postDelayed({
+                    progressBar.visibility = View.INVISIBLE
+                    textViewContactSave.visibility = View.VISIBLE
+                    buttonOk.visibility = View.VISIBLE
+                }, 1000)
+            }
+            return
         }
 
         mDialogSmsInformation.dismiss()
     }
 
-    fun showSMSInformationDialog(earSide: EarSide)
+    fun showSMSInformationDialog(earSide: EarSide, button: AppCompatButton)
     {
         mSelectedTrackingEddystoneEarSide = earSide
+        mTrackingButton = button
+        mDialogSmsInformation = CustomDialogSmsInformation(this)
         mDialogSmsInformation.show()
     }
 }
