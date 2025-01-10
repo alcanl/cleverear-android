@@ -334,7 +334,7 @@
                         app:borderColor="#A8A3A3"
                         app:borderCornerRadius="8dp"
                         app:borderStrokeWidth="2.2dp"
-                        app:labelText="@string/textview_left_device_text"
+                        app:labelText="@string/textview_right_device_text"
                         app:labelTextColor="@color/ap_black"
                         app:labelTextSize="10dp"
                         app:layout_constraintEnd_toEndOf="parent"

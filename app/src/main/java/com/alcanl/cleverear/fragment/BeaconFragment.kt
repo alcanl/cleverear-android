@@ -28,6 +28,7 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
+import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.util.listeners.BeaconFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
@@ -259,20 +260,20 @@ class BeaconFragment : Fragment(), IEventListener {
         {
             mWeakReference.get()?.binding?.let {
                 if (earSide == EarSide.Left) {
-                    it.textViewLeftDeviceTLMVersion.text = hearingAid.tlmVersion.toString()
-                    it.textViewLeftDeviceTLMAdvertisementCount.text = hearingAid.advertisementCount.toString()
-                    it.textViewLeftDeviceTLMTemperature.text = hearingAid.temperature.toString()
-                    it.textViewLeftDeviceTLMStepCount.text = hearingAid.stepCount.toString()
-                    it.textViewLeftDeviceTLMBatteryVoltage.text = hearingAid.batteryVoltage.toString()
-                    it.textViewLeftDeviceTLMElapsedTime.text = hearingAid.elapsedTime.toString()
+                    it.textViewLeftDeviceTLMVersion.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
+                    it.textViewLeftDeviceTLMAdvertisementCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
+                    it.textViewLeftDeviceTLMTemperature.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.textViewLeftDeviceTLMStepCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.textViewLeftDeviceTLMBatteryVoltage.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
+                    it.textViewLeftDeviceTLMElapsedTime.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
                 else {
-                    it.textViewRightDeviceTLMVersion.text = hearingAid.tlmVersion.toString()
-                    it.textViewRightDeviceTLMAdvertisementCount.text = hearingAid.advertisementCount.toString()
-                    it.textViewRightDeviceTLMTemperature.text = hearingAid.temperature.toString()
-                    it.textViewRightDeviceTLMStepCount.text = hearingAid.stepCount.toString()
-                    it.textViewRightDeviceTLMBatteryVoltage.text = hearingAid.batteryVoltage.toString()
-                    it.textViewRightDeviceTLMElapsedTime.text = hearingAid.elapsedTime.toString()
+                    it.textViewRightDeviceTLMVersion.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
+                    it.textViewRightDeviceTLMAdvertisementCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
+                    it.textViewRightDeviceTLMTemperature.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.textViewRightDeviceTLMStepCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.textViewRightDeviceTLMBatteryVoltage.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
+                    it.textViewRightDeviceTLMElapsedTime.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
             }
         }
@@ -307,14 +308,10 @@ class BeaconFragment : Fragment(), IEventListener {
             return
         }
 
-        if (requireActivity().getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-            .getString(EMERGENCY_NUMBER, "")?.isBlank()!!) {
+        if (requireActivity().getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")?.isBlank()!!)
             (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide)
-            return
-        }
         else
             configuration.eddyStoneMap[earSide]?.apply {
-
                 isTrackingActive = !isTrackingActive
 
                 if (earSide == EarSide.Left)

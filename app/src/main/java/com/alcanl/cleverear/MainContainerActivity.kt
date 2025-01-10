@@ -190,6 +190,7 @@ class MainContainerActivity : AppCompatActivity() {
         if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id) {
             mDialogSmsInformation.saveSmsContactInformationToPref()
             configuration.eddyStoneMap[mSelectedTrackingEddystoneEarSide]?.isTrackingActive = true
+            button.text = getString(R.string.button_disable_tracking_text)
         }
 
         mDialogSmsInformation.dismiss()
