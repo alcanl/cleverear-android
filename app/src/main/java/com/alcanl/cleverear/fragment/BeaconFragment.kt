@@ -37,17 +37,15 @@ import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.ref.WeakReference
 import java.util.EventObject
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -57,16 +55,13 @@ class BeaconFragment : Fragment(), IEventListener {
     lateinit var configuration : ConfigurationModule
 
     @Inject
-    lateinit var scheduledThreadPool: ScheduledExecutorService
-
-    @Inject
     lateinit var listener : BeaconFragmentEventListener
 
     lateinit var binding: FragmentBeaconBinding
 
     private lateinit var mHandler: BeaconHandler
 
-    private var mScheduledFuture: ScheduledFuture<*>? = null
+    private var mJob: Job? = null
 
     private val mBluetoothLeScanner by lazy {
         requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
@@ -133,8 +128,8 @@ class BeaconFragment : Fragment(), IEventListener {
         if (listener.isListenerOnBoard())
             listener.stopListener()
 
-        if (mScheduledFuture != null && !mScheduledFuture!!.isCancelled)
-            mScheduledFuture?.cancel(true)
+        if (mJob != null && !mJob!!.isCancelled)
+            mJob?.cancel()
 
         if (configuration.eddyStoneMap.none { it.value.isTrackingActive })
             mBluetoothLeScanner.stopScan(mScanCallback)
@@ -234,24 +229,26 @@ class BeaconFragment : Fragment(), IEventListener {
         }
 
         discoverEddyStoneBeacons()
-        mScheduledFuture = scheduledThreadPool.scheduleWithFixedDelay({
 
-            try {
-                mHandler.apply {
-                    sendEmptyMessage(WHAT_START_SHIMMER)
-                    runBlocking {
+        mJob = CoroutineScope(Dispatchers.IO).launch {
+            while (isActive) {
+                try {
+                    mHandler.apply {
+                        sendEmptyMessage(WHAT_START_SHIMMER)
                         delay(2000)
+                        sendEmptyMessage(WHAT_STOP_SHIMMER)
                     }
-                    sendEmptyMessage(WHAT_STOP_SHIMMER)
-                }
 
-            } catch (ex: Exception) {
-                Log.e(BeaconFragment::class.simpleName, ex.message!!)
+                    delay(4000)
+
+                } catch (ex: Exception) {
+                    Log.e(BeaconFragment::class.simpleName, ex.message!!)
+                }
             }
-        }, 0, 4, TimeUnit.SECONDS)
+        }
     }
 
-    private class BeaconHandler(fragment: BeaconFragment) : Handler(Looper.myLooper()!!) {
+    class BeaconHandler(fragment: BeaconFragment) : Handler(Looper.myLooper()!!) {
 
         private val mWeakReference = WeakReference(fragment)
 
@@ -301,6 +298,18 @@ class BeaconFragment : Fragment(), IEventListener {
         }
     }
 
+    fun handleEddystoneButtonUI(earSide: EarSide)
+    {
+        configuration.eddyStoneMap[earSide]?.apply {
+            isTrackingActive = !isTrackingActive
+
+            if (earSide == EarSide.Left)
+                binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+            else
+                binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+        }
+    }
+
     fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
         if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
@@ -313,13 +322,6 @@ class BeaconFragment : Fragment(), IEventListener {
             (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide,
                 if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)
         else
-            configuration.eddyStoneMap[earSide]?.apply {
-                isTrackingActive = !isTrackingActive
-
-                if (earSide == EarSide.Left)
-                    binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
-                else
-                    binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
-            }
+            handleEddystoneButtonUI(earSide)
     }
 }
