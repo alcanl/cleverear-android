@@ -298,18 +298,6 @@ class BeaconFragment : Fragment(), IEventListener {
         }
     }
 
-    fun handleEddystoneButtonUI(earSide: EarSide)
-    {
-        configuration.eddyStoneMap[earSide]?.apply {
-            isTrackingActive = !isTrackingActive
-
-            if (earSide == EarSide.Left)
-                binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
-            else
-                binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
-        }
-    }
-
     fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
         if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
@@ -322,6 +310,13 @@ class BeaconFragment : Fragment(), IEventListener {
             (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide,
                 if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)
         else
-            handleEddystoneButtonUI(earSide)
+            configuration.eddyStoneMap[earSide]?.apply {
+                isTrackingActive = !isTrackingActive
+
+                if (earSide == EarSide.Left)
+                    binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+                else
+                    binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+            }
     }
 }
