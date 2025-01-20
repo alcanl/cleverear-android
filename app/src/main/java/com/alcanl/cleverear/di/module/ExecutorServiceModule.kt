@@ -20,6 +20,7 @@ object ExecutorServiceModule {
     fun createExecutorService() : ExecutorService = Executors.newCachedThreadPool()
 
     @Provides
+    @Singleton
     fun createScheduledThreadPool() : ScheduledExecutorService = Executors.newScheduledThreadPool(SCHEDULED_THREAD_POOL_SIZE)
 
 }
