@@ -73,6 +73,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     lateinit var listener: LoadingActivityEventListener
 
     private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
+
     private lateinit var mBinding : ActivityLoadingBinding
 
     override fun onCreate(savedInstanceState: Bundle?)

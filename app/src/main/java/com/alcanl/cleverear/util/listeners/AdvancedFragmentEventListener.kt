@@ -33,6 +33,7 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
     lateinit var threadPool: ExecutorService
 
     private var mListener: Thread? = null
+
     private val mContext = context
 
     fun startEventListener()

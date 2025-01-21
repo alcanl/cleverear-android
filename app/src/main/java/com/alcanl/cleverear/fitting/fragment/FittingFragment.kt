@@ -180,12 +180,13 @@ class FittingFragment : Fragment(), IEventListener {
                 deviceInfoExtMap[selectedEarSide]?.product?.burnChangesToMemory(mSelectedMemory)
             }
             mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
+
         } catch (ex: Throwable) {
             Log.e("burnParametersToSelectedMemory", ex.message!!)
         }
     }
 
-    private  fun burnParametersToAllMemories()
+    private fun burnParametersToAllMemories()
     {
         try {
             mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
@@ -195,6 +196,7 @@ class FittingFragment : Fragment(), IEventListener {
                 )
             }
             mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
+
         } catch (ex: Throwable) {
             Log.e("burnParametersToAllMemories", ex.message!!)
         }
