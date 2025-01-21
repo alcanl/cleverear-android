@@ -13,6 +13,7 @@ import android.widget.ListView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
@@ -35,6 +36,8 @@ import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -80,22 +83,20 @@ class ConnectionFragment : Fragment(), IEventListener {
     override fun onEventReceive(event: EventObject)
     {
         if (event is ConnectionEvent && event.connectionData == 1)
-            activity?.let {
-                it.runOnUiThread {
-                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
-                        .show()
-                    it.finish()
-                    configuration.apply {
-                        isConnected = false
-                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                            .values.first().isConnected = false
-                    }
-                    onDetectDeviceButtonClicked()
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+                configuration.apply {
+                    isConnected = false
+                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                        .values.first().isConnected = false
                 }
+                onDetectDeviceButtonClicked()
             }
+
         else if (event is DeviceFoundEvent) {
             mBleDeviceSet.add(event.hearingAid)
-            activity?.runOnUiThread { addHearingAidToListCallback(event.hearingAid) }
+            lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
         }
     }
 
@@ -200,8 +201,8 @@ class ConnectionFragment : Fragment(), IEventListener {
 
         } catch (ex: ArkException) {
             Log.e(ConnectionFragment::class.simpleName, ex.message!!)
-            activity?.runOnUiThread {
-                Toast.makeText(activity, R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(requireContext(), R.string.toast_connection_problem_text, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -269,8 +270,8 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     private fun showConnectionProblemToastMessage()
     {
-        activity?.runOnUiThread {
-            Toast.makeText(activity, R.string.toast_connection_problem_text, Toast.LENGTH_LONG)
+        lifecycleScope.launch(Dispatchers.Main) {
+            Toast.makeText(requireContext(), R.string.toast_connection_problem_text, Toast.LENGTH_LONG)
                 .show()
         }
     }
@@ -303,10 +304,11 @@ class ConnectionFragment : Fragment(), IEventListener {
             mBinding.progressBar.visibility = View.GONE
 
         } catch (ex: ArkException) {
-            Log.e("err", ex.message!!)
+            Log.e(ConnectionFragment::class.simpleName, ex.message!!)
+
         } catch (_: Throwable) {
-            activity?.runOnUiThread {
-                Toast.makeText(activity,
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(requireContext(),
                     R.string.toast_unknown_problem_text,
                     Toast.LENGTH_LONG).show()
             }

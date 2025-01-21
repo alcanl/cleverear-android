@@ -56,7 +56,6 @@ import java.util.EventObject
 import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class FittingFragment : Fragment(), IEventListener {
 
