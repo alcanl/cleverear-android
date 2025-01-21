@@ -89,22 +89,26 @@ class FittingFragment : Fragment(), IEventListener {
         mBinding.lifecycleOwner = this
         return mBinding.root
     }
+
     override fun onStart()
     {
         EventBus.getDefault().register(this)
         initialize()
         super.onStart()
     }
+
     override fun onResume()
     {
         (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
         super.onResume()
     }
+
     override fun onStop()
     {
         EventBus.getDefault().unregister(this)
         super.onStop()
     }
+
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
@@ -120,10 +124,12 @@ class FittingFragment : Fragment(), IEventListener {
         initializeEqualizer()
         initializeFeedbackCancelerSpinnerAdapter()
     }
+
     private fun initializeSelectedMemory()
     {
         mSelectedMemory = configuration.hearingAidMap[fittingConfig.selectedEarSide]?.currentMemory!!
     }
+
     private fun initializeEqualizer()
     {
         mBinding.isEqualizerEnabled = with(fittingConfig) {
@@ -257,6 +263,7 @@ class FittingFragment : Fragment(), IEventListener {
         (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
+
     fun equalizerMidSliderValueChanged(value: Float)
     {
         @Synchronized
@@ -271,6 +278,7 @@ class FittingFragment : Fragment(), IEventListener {
         (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
+
     fun equalizerTrebleSliderValueChanged(value: Float)
     {
         @Synchronized
@@ -285,11 +293,13 @@ class FittingFragment : Fragment(), IEventListener {
         (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { handleSynchronized() }
     }
+
     fun wideBandSliderValueChanged(value: Float)
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
         threadPool.execute { wideBandSliderValueChangedCallback(value.toInt()) }
     }
+
     fun equalizerCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
@@ -319,10 +329,12 @@ class FittingFragment : Fragment(), IEventListener {
             }
         }
     }
+
     fun spinnerFeedbackCancelerItemSelected(pos: Int)
     {
         TODO("Not implemented Yet")
     }
+
     fun burnButtonsClicked(button: AppCompatButton)
     {
         threadPool.execute {
@@ -335,17 +347,20 @@ class FittingFragment : Fragment(), IEventListener {
             (activity as SelfFittingActivity).isFittingChangesMade = false
         }
     }
+
     fun earSideButtonClicked(earSide: EarSide)
     {
         fittingConfig.selectedEarSide = earSide
         threadPool.execute(this::invalidateBindingsCallback)
 
     }
+
     fun numberPickerOnValueChanged(pos: Int)
     {
         mSelectedPickerPosition = pos
         mBinding.spinnerMemory.hint = resources.getStringArray(R.array.programs)[pos]
     }
+
     fun memoryRetentionCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
@@ -358,6 +373,7 @@ class FittingFragment : Fragment(), IEventListener {
             }
         }
     }
+
     fun volumeRetentionCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
@@ -369,10 +385,12 @@ class FittingFragment : Fragment(), IEventListener {
             }
         }
     }
+
     fun memorySpinnerClicked()
     {
         mDialogProgramPicker.show()
     }
+
     fun dialogSelectProgramClicked()
     {
         mDialogProgramPicker.dismiss()

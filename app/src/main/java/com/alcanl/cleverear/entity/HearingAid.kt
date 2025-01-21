@@ -40,6 +40,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             Log.e("SDKAdaptors", ex.message!!)
         }
     }
+
     fun readDeviceConfiguration()
     {
         try {

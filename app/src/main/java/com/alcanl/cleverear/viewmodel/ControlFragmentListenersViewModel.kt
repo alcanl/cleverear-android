@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference
 
 class ControlFragmentListenersViewModel(fragment: ControlFragment) {
     private var mWeakReference = WeakReference(fragment)
+
     fun handleMemoryButtonClick(buttonNumber: Int, view: View)
     {
         mWeakReference.get()?.memoryButtonClicked(buttonNumber, view as Button)

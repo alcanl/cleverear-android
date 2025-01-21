@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentControlBinding
@@ -30,11 +31,12 @@ import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,9 +44,6 @@ class ControlFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var eventHandler: EventHandler
-
-    @Inject
-    lateinit var threadPool: ExecutorService
 
     @Inject
     lateinit var configuration : ConfigurationModule
@@ -68,15 +67,14 @@ class ControlFragment : Fragment(), IEventListener {
     {
         super.onStart()
         initialize()
-        listener.startEventListener()
         EventBus.getDefault().register(this)
     }
     override fun onResume()
     {
         super.onResume()
         (activity as MainContainerActivity).apply {
-            runOnUiThread {
-                this.binding.frameLayoutLoading.visibility = View.GONE
+            lifecycleScope.launch(Dispatchers.Main) {
+                this@apply.binding.frameLayoutLoading.visibility = View.GONE
             }
         }
 
@@ -85,14 +83,13 @@ class ControlFragment : Fragment(), IEventListener {
             return
         }
 
-        activity?.let {
-            it.runOnUiThread { initSliders() }
-            it.runOnUiThread { initTextViews() }
-            it.runOnUiThread { initActiveMemory(if (configuration.isDoubleDeviceConnection)
-                configuration.hearingAidMap[EarSide.Left]?.currentMemory?.value()!!
-            else
-                configuration.hearingAidMap[configuration.earSide]?.currentMemory?.value() ?: 0
-            ) }
+        lifecycleScope.launch(Dispatchers.Main) { initSliders() }
+        lifecycleScope.launch(Dispatchers.Main) { initTextViews() }
+        lifecycleScope.launch(Dispatchers.Main) { initActiveMemory(if (configuration.isDoubleDeviceConnection)
+            configuration.hearingAidMap[EarSide.Left]?.currentMemory?.value() ?: 0
+        else
+            configuration.hearingAidMap[configuration.earSide]?.currentMemory?.value() ?: 0)
+
         }
 
         if (!listener.isListenerOnBoard())
@@ -127,7 +124,8 @@ class ControlFragment : Fragment(), IEventListener {
     }
     private fun onBatteryEventReceived(event: BatteryEvent)
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection) {
                     if (earSide == EarSide.Left)
@@ -150,7 +148,8 @@ class ControlFragment : Fragment(), IEventListener {
     }
     private fun onVolumeEventReceived(event: VolumeEvent)
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection) {
                     hearingAidMap[earSide]?.volume = event.volumeData
@@ -175,7 +174,8 @@ class ControlFragment : Fragment(), IEventListener {
     }
     private fun onMemoryEventReceived(event: MemoryEvent)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
@@ -274,7 +274,7 @@ class ControlFragment : Fragment(), IEventListener {
     }
     private fun initMemoryButtons()
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
             initMemoryButtons(if (!configuration.isDoubleDeviceConnection) configuration.hearingAidMap[configuration.earSide]!!
             else configuration.hearingAidMap[EarSide.Left]!!)
         }
@@ -494,7 +494,8 @@ class ControlFragment : Fragment(), IEventListener {
     }
     private fun setSelectedMemoryButtonView(button: Button, num : Int)
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
+
             button.backgroundTintList = AppCompatResources.getColorStateList(
                 requireContext(),
                 com.google.android.material.R.color.design_default_color_secondary_variant
@@ -521,17 +522,18 @@ class ControlFragment : Fragment(), IEventListener {
     }
     fun sliderLeftEarOnValueChanged(value: Float)
     {
-        threadPool.execute { sliderLeftEarOnValueChangedCallback(value) }
+        lifecycleScope.launch(Dispatchers.Default) { sliderLeftEarOnValueChangedCallback(value) }
     }
 
     fun sliderRightEarOnValueChanged(value: Float)
     {
-        threadPool.execute { sliderRightEarOnValueChangedCallback(value) }
+        lifecycleScope.launch(Dispatchers.Default) { sliderRightEarOnValueChangedCallback(value) }
     }
     fun switchOnCheckedChanged()
     {
         if (!configuration.isDualDeviceConfig) {
-            activity?.runOnUiThread {
+
+            lifecycleScope.launch(Dispatchers.Main) {
                 mBinding.sliderLeft.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         requireContext(),
@@ -549,7 +551,8 @@ class ControlFragment : Fragment(), IEventListener {
             configuration.isDualDeviceConfig = true
         }
         else {
-            activity?.runOnUiThread {
+            lifecycleScope.launch(Dispatchers.Main) {
+
                 mBinding.sliderLeft.startAnimation(
                     android.view.animation.AnimationUtils.loadAnimation(
                         requireContext(),
