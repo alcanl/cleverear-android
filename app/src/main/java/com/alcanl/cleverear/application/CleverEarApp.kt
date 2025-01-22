@@ -28,7 +28,6 @@ class CleverEarApp : Application() {
         )
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         notificationManager.createNotificationChannel(channel)
     }
 }

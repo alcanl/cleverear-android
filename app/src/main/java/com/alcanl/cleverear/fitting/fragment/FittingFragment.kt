@@ -153,7 +153,7 @@ class FittingFragment : Fragment(), IEventListener {
 
             }
         } catch (ex: Throwable) {
-            Log.e("initializeSpinnerAdapter", ex.message!!)
+            Log.e(FittingFragment::class.simpleName, ex.message!!)
         }
     }
 
@@ -167,7 +167,7 @@ class FittingFragment : Fragment(), IEventListener {
                 }
             }
         } catch (ex: Throwable) {
-            Log.e("wideBandSliderValueChanged", ex.message!!)
+            Log.e(FittingFragment::class.simpleName, ex.message!!)
         }
     }
 
@@ -181,7 +181,7 @@ class FittingFragment : Fragment(), IEventListener {
             mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
 
         } catch (ex: Throwable) {
-            Log.e("burnParametersToSelectedMemory", ex.message!!)
+            Log.e(FittingFragment::class.simpleName, ex.message!!)
         }
     }
 
@@ -197,7 +197,7 @@ class FittingFragment : Fragment(), IEventListener {
             mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
 
         } catch (ex: Throwable) {
-            Log.e("burnParametersToAllMemories", ex.message!!)
+            Log.e(FittingFragment::class.simpleName, ex.message!!)
         }
     }
 
