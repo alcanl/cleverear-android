@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivitySelfFittingBinding
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.DisconnectEvent
@@ -31,12 +32,10 @@ import com.alcanl.cleverear.util.isConnected
 import com.ark.ArkException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -95,7 +94,6 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             handleDisconnect(event.hearingAid)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun handleDisconnect(hearingAid: HearingAid?)
     {
         mDeviceDisconnectedDialog.show()
@@ -115,7 +113,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
                 else if (getSystemLanguage().lowercase() == GERMAN) hearingAid.side.getGE()
                 else hearingAid.side.getEN(), hearingAid.name)
 
-            GlobalScope.launch { handleDisconnectCallback(this, hearingAid) }
+            lifecycleScope.launch(Dispatchers.Default) { handleDisconnectCallback(this, hearingAid) }
         }
 
     }
@@ -124,19 +122,17 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     {
         scope.async {
             try {
-                runBlocking {
-                    5000
-                }
+                delay(5000)
                 hearingAid.communicationAdaptor?.connect()
-                runBlocking {
-                    delay(8000)
-                }
+                delay(8000)
+
             } catch (ex: ArkException) {
-                Log.e("handleDisconnectCallback", ex.message!!)
+                Log.e(SelfFittingActivity::class.simpleName, ex.message!!)
             }
         }.await()
 
-        runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
+
             val adapter = getSystemService(BluetoothManager::class.java).adapter
             if (adapter != null && isConnected(adapter.getRemoteDevice(hearingAid.address))) {
                 mDeviceDisconnectedDialog.binding.apply {

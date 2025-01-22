@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
@@ -26,11 +27,13 @@ import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.ark.EventHandler
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,9 +45,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var eventHandler: EventHandler
-
-    @Inject
-    lateinit var threadPool: ExecutorService
 
     @Inject
     lateinit var listener: SplashActivityEventListener
@@ -216,16 +216,16 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     private fun cleanEvents()
     {
-        threadPool.execute { cleanEventsCallback() }
+        lifecycleScope.launch(Dispatchers.Default) { cleanEventsCallback() }
     }
 
-    @Synchronized
-    private fun cleanEventsCallback()
+    private suspend fun cleanEventsCallback()
     {
         try {
             listener.startEventListener()
-            Thread.sleep(2000)
+            delay(2000)
             listener.stopListener()
+
         } catch (_: InterruptedException) {}
     }
     fun alertDialogPositiveButtonClicked()

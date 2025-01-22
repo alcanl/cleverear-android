@@ -405,13 +405,13 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         }
         catch (ex: ArkException) {
-            Log.e("connect", ex.message!!)
+            Log.e(LoadingActivity::class.simpleName, ex.message!!)
             runOnUiThread {
                 Toast.makeText(this, R.string.toast_problem_occurred_text, Toast.LENGTH_LONG).show()
             }
         }
         catch (ex: InterruptedException) {
-            Log.e("connectThread", ex.message!!)
+            Log.e(LoadingActivity::class.simpleName, ex.message!!)
         }
     }
     @SuppressLint("MissingPermission")

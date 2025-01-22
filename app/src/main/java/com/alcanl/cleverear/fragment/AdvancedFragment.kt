@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentAdvancedBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -34,11 +35,14 @@ import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,10 +50,10 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var configuration : ConfigurationModule
-    @Inject
-    lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var listener: AdvancedFragmentEventListener
 
@@ -110,9 +114,11 @@ class AdvancedFragment : Fragment(), IEventListener {
                 is ConnectionEvent -> onConnectionEventReceived(event)
             }
     }
+
     private fun onVolumeEventReceived(event: VolumeEvent)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.volume = event.volumeData
@@ -123,7 +129,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                         hearingAidMap[EarSide.Right]?.volume = event.volumeData
             }
 
-            activity?.runOnUiThread {
+            launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), String.format(
                     ContextCompat.getString(requireContext(),
                         R.string.listener_volume_level_text
@@ -131,9 +137,11 @@ class AdvancedFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun onBatteryEventReceived(event: BatteryEvent)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.batteryLevel = event.batteryData
@@ -145,9 +153,11 @@ class AdvancedFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun onMemoryEventReceived(event: MemoryEvent)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
+
             with(configuration) {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
@@ -158,16 +168,17 @@ class AdvancedFragment : Fragment(), IEventListener {
                         hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(event.memoryData)
             }
         }
-        activity?.runOnUiThread {
+
+        lifecycleScope.launch(Dispatchers.Main) {
             Toast.makeText(requireContext(), String.format(
-                ContextCompat.getString(requireContext(), R.string.text_active_memory)
-                        + (event.memoryData + 1).toString()), Toast.LENGTH_SHORT).show()
+                ContextCompat.getString(requireContext(), R.string.text_active_memory)  + (event.memoryData + 1).toString()), Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1) {
-            activity?.runOnUiThread {
+            lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
                     .show()
                 activity?.finish()
@@ -179,6 +190,7 @@ class AdvancedFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun initialize()
     {
         initBinding()
@@ -186,6 +198,7 @@ class AdvancedFragment : Fragment(), IEventListener {
         initSliders()
         initTextViews()
     }
+
     private fun initSliders()
     {
         with(configuration) {
@@ -214,6 +227,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                 }
         }
     }
+
     private fun initCommonSliderForSingleDevice(slider: Slider)
     {
         slider.apply {
@@ -223,6 +237,7 @@ class AdvancedFragment : Fragment(), IEventListener {
             thumbTintList = initCommonSliderTheme()
         }
     }
+
     private fun initCommonSliderTheme() : ColorStateList
     {
         return if (configuration.earSide == EarSide.Left)
@@ -236,30 +251,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                 R.color.right_device_slider
             )
     }
-    fun switchOnCheckedChanged()
-    {
-        with(configuration) {
-            activity?.runOnUiThread {
-                isDualDeviceConfig = if (!isDualDeviceConfig) {
-                    with(mBinding) {
-                        sliderFirstAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_left_to_right_left)
-                        sliderFirstAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_left_to_right_left)
-                        sliderFirstAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_right_to_left_right)
-                        sliderFirstAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_right_to_left_right)
-                    }
-                    true
-                } else {
-                    with(mBinding) {
-                        sliderSecondAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_right_to_left_left)
-                        sliderSecondAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_right_to_left_left)
-                        sliderSecondAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_left_to_right_right)
-                        sliderSecondAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_left_to_right_right)
-                        false
-                    }
-                }
-            }
-        }
-    }
+
     private fun sliderFirstAnimationCallback(slider: Slider, anim: Int)
     {
         with(slider) {
@@ -270,6 +262,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                 ).also { it.setAnimationListener(setSlidersFirstAnimation(slider)) })
         }
     }
+
     private fun sliderSecondAnimationCallback(slider: Slider, anim: Int)
     {
         with(slider) {
@@ -280,13 +273,13 @@ class AdvancedFragment : Fragment(), IEventListener {
                 ).also { it.setAnimationListener(setSlidersSecondAnimation(slider)) })
         }
     }
+
     private fun setSlidersFirstAnimation(slider: Slider) : AnimationListener
     {
         return object : AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
                 slider.visibility = View.INVISIBLE
             }
-
             override fun onAnimationEnd(animation: Animation?) {
 
                 startCommonSlidersAnimation(mBinding.sliderAuxCommon)
@@ -298,13 +291,11 @@ class AdvancedFragment : Fragment(), IEventListener {
                     textViewMicL.visibility = View.INVISIBLE
                     textViewMicR.visibility = View.INVISIBLE
                 }
-
             }
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
+            override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
+
     private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
     {
         return object : AnimationListener {
@@ -323,41 +314,39 @@ class AdvancedFragment : Fragment(), IEventListener {
                     textViewMicR.visibility = View.VISIBLE
                 }
             }
-
             override fun onAnimationEnd(animation: Animation?) {
                 slider.apply {
                     visibility = View.VISIBLE
                     isEnabled = true
                 }
             }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-
-            }
+            override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
-    private fun startCommonSlidersAnimation(slider: Slider)
-    {
+
+    private fun startCommonSlidersAnimation(slider: Slider) {
         slider.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation(
                 requireContext(), R.anim.alpha_blink_anim
-            ).also {it.setAnimationListener(
+            ).also {
+                it.setAnimationListener(
 
-                object: AnimationListener {
-                    override fun onAnimationStart(animation: Animation?) {
+                    object : AnimationListener {
+                        override fun onAnimationStart(animation: Animation?) {
+                        }
+
+                        override fun onAnimationEnd(animation: Animation?) {
+                            slider.visibility = View.VISIBLE
+                            slider.isEnabled = true
+                        }
+
+                        override fun onAnimationRepeat(animation: Animation?) {
+                        }
                     }
-
-                    override fun onAnimationEnd(animation: Animation?) {
-                        slider.visibility = View.VISIBLE
-                        slider.isEnabled = true
-                    }
-
-                    override fun onAnimationRepeat(animation: Animation?) {
-                    }
-                }
-            ) })
-
+                )
+            })
     }
+
     private fun initBinding()
     {
         mBinding.viewModel = AdvancedFragmentListenersViewModel(this)
@@ -383,14 +372,17 @@ class AdvancedFragment : Fragment(), IEventListener {
                     setStreamAddressButtonClickedCallback(result, channel, hearingAidMap[earSide]!!)
         }
     }
+
     private fun initSwitch()
     {
         if (configuration.isDoubleDeviceConnection)
             mBinding.switchDual.visibility = View.VISIBLE
     }
+
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
+
             try {
                 with(hearingAid) {
                     streamAddressRaw = result
@@ -400,9 +392,10 @@ class AdvancedFragment : Fragment(), IEventListener {
             } catch (_: ArkException) {}
         }
     }
+
     private fun modeButtonClickedCallback(view: View, hearingAid: HearingAid)
     {
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
             try {
                 hearingAid.apply {
                     streamChannelList = when (view) {
@@ -450,42 +443,49 @@ class AdvancedFragment : Fragment(), IEventListener {
 
         }
     }
+
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
     {
-        threadPool.execute { micSliderValueChangedCallback(value, earSide) }
+        lifecycleScope.launch(Dispatchers.IO) { micSliderValueChangedCallback(value, earSide) }
     }
-    @Synchronized
-    private fun micSliderValueChangedCallback(value: Float, earSide: EarSide)
+
+    private suspend fun micSliderValueChangedCallback(value: Float, earSide: EarSide)
     {
-        try {
-            with(configuration) {
-                if (isConnected) {
-                    hearingAidMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
-                    hearingAidMap[earSide]?.micAttenuation = value.toInt()
+        Mutex().withLock {
+            try {
+                with(configuration) {
+                    if (isConnected) {
+                        hearingAidMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
+                        hearingAidMap[earSide]?.micAttenuation = value.toInt()
+                    }
                 }
+            } catch (ex: ArkException) {
+                Log.e(AdvancedFragment::class.simpleName, ex.message!!)
             }
-        } catch (ex: ArkException) {
-            Log.e("mic", ex.message!!)
         }
     }
+
     private fun auxSliderValueChanged(value: Float, earSide: EarSide)
     {
-        threadPool.execute { auxSliderValueChangedCallback(value, earSide) }
+        lifecycleScope.launch(Dispatchers.IO) { auxSliderValueChangedCallback(value, earSide) }
     }
-    @Synchronized
-    private fun auxSliderValueChangedCallback(value: Float, earSide: EarSide)
+
+    private suspend fun auxSliderValueChangedCallback(value: Float, earSide: EarSide)
     {
-        try {
-            with(configuration) {
-                if (isConnected) {
-                    hearingAidMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
-                    hearingAidMap[earSide]?.auxAttenuation = value.toInt()
+        Mutex().withLock {
+            try {
+                with(configuration) {
+                    if (isConnected) {
+                        hearingAidMap[earSide]?.wirelessControl?.auxAttenuation = value.toInt()
+                        hearingAidMap[earSide]?.auxAttenuation = value.toInt()
+                    }
                 }
+            } catch (ex: ArkException) {
+                Log.e(AdvancedFragment::class.simpleName, ex.message!!)
             }
-        } catch (ex: ArkException) {
-            Log.e("aux", ex.message!!)
         }
     }
+
     private fun setSelectedModeButtonView(button: Button)
     {
         activity?.runOnUiThread {
@@ -501,6 +501,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                 it is Button && it != button }.forEach { setRestModeButtonsDefaultView(it as Button) }
         }
     }
+
     private fun setRestModeButtonsDefaultView(button: Button)
     {
         button.backgroundTintList = AppCompatResources.getColorStateList(
@@ -508,6 +509,7 @@ class AdvancedFragment : Fragment(), IEventListener {
         button.foregroundTintList = AppCompatResources.getColorStateList(
             requireContext(), R.color.black)
     }
+
     fun modeButtonClicked(view: View)
     {
         with(configuration) {
@@ -521,6 +523,7 @@ class AdvancedFragment : Fragment(), IEventListener {
             }
         }
     }
+
     fun micDualSliderValueChanged(value: Float)
     {
         with(configuration) {
@@ -537,6 +540,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
         }
     }
+
     fun auxDualSliderValueChanged(value: Float)
     {
         with(configuration) {
@@ -553,22 +557,27 @@ class AdvancedFragment : Fragment(), IEventListener {
 
         }
     }
+
     fun micLeftSliderValueChanged(value: Float)
     {
         micSliderValueChanged(value, EarSide.Left)
     }
+
     fun micRightSliderValueChanged(value: Float)
     {
         micSliderValueChanged(value, EarSide.Right)
     }
+
     fun auxLeftSliderValueChanged(value: Float)
     {
         auxSliderValueChanged(value, EarSide.Left)
     }
+
     fun auxRightSliderValueChanged(value: Float)
     {
         auxSliderValueChanged(value, EarSide.Right)
     }
+
     fun setStreamAddressButtonClicked(view: View)
     {
         activity?.runOnUiThread { (view as ImageButton).startAnimation( android.view.animation.AnimationUtils.loadAnimation(
@@ -590,6 +599,31 @@ class AdvancedFragment : Fragment(), IEventListener {
                 override fun onAnimationRepeat(animation: Animation?) {}
             }
         ) })
+        }
+    }
+
+    fun switchOnCheckedChanged()
+    {
+        with(configuration) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                isDualDeviceConfig = if (!isDualDeviceConfig) {
+                    with(mBinding) {
+                        sliderFirstAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_left_to_right_left)
+                        sliderFirstAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_left_to_right_left)
+                        sliderFirstAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_right_to_left_right)
+                        sliderFirstAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_right_to_left_right)
+                    }
+                    true
+                } else {
+                    with(mBinding) {
+                        sliderSecondAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_right_to_left_left)
+                        sliderSecondAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_right_to_left_left)
+                        sliderSecondAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_left_to_right_right)
+                        sliderSecondAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_left_to_right_right)
+                        false
+                    }
+                }
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.view.forEach
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.SelfFittingActivity
@@ -47,31 +48,31 @@ import com.ark.ArkException
 import com.ark.DeviceInfo
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.lang.ref.WeakReference
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
+
     @Inject
     lateinit var wirelessFittingInitializer: WirelessFittingInitializer
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var productManager: ProductManager
-    @Inject
-    lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var fittingConfig : FittingConfigurationModule
 
     private lateinit var mHandler: RemoteHandler
+
     private lateinit var mBinding: FragmentHomeBinding
 
     override fun onCreateView(
@@ -108,13 +109,12 @@ class HomeFragment : Fragment() {
         mHandler = RemoteHandler(this)
     }
 
-    private fun handleServiceResponseSuccess(deviceInfo: DeviceInfo, libFile: File, hearingAid: HearingAid,
+    private suspend fun handleServiceResponseSuccess(deviceInfo: DeviceInfo, libFile: File, hearingAid: HearingAid,
                                              hearingAidDTO: HearingAidDTO, equalizerValuesDTO: EqualizerValuesDTO)
     {
         mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_SUCCESS)
-        runBlocking {
-            delay(2000)
-        }
+        delay(2000)
+
         val library = productManager.loadLibraryFromFile(libFile.absolutePath)
         val product = wirelessFittingInitializer.createProduct(deviceInfo.productId, library)
 
@@ -143,10 +143,8 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        runBlocking {
-            delay(2500)
-        }
 
+        delay(2500)
         mHandler.sendEmptyMessage(WHAT_READ_PARAMETERS_PROCESS)
 
         if (product.readAllParameters(hearingAid))
@@ -163,9 +161,7 @@ class HomeFragment : Fragment() {
             val hearingAidDTO = wirelessFittingInitializer.findHearingAidDTO(deviceInfo)
             val equalizerValuesDTO = wirelessFittingInitializer.findEqualizerValues(hearingAidDTO)
 
-            runBlocking {
-                delay(1000)
-            }
+            delay(1000)
 
             if (libFile != null && hearingAidDTO?.modelName?.isNotEmpty()!! && equalizerValuesDTO?.equalizerValuesName?.isNotEmpty()!!)
                 handleServiceResponseSuccess(deviceInfo, libFile, hearingAid, hearingAidDTO, equalizerValuesDTO)
@@ -173,27 +169,26 @@ class HomeFragment : Fragment() {
                 mHandler.sendEmptyMessage(WHAT_LIBRARY_NOT_FOUND)
 
         } catch (ex: NetworkException) {
-            Log.e("NETWORK", ex.message!!)
+            Log.e(HomeFragment::class.simpleName, ex.message!!)
             mHandler.sendEmptyMessage(WHAT_LIBRARY_SEARCH_FAIL)
         } catch (ex: ArkException) {
-            Log.e("ARK", ex.message!!)
+            Log.e(HomeFragment::class.simpleName, ex.message!!)
             mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
         } catch (ex: Throwable) {
-            Log.e("OTHER", ex.message!!)
+            Log.e(HomeFragment::class.simpleName, ex.message!!)
             mHandler.sendEmptyMessage(WHAT_PRODUCT_CREATE_FAIL)
         }
-
     }
-    @OptIn(DelicateCoroutinesApi::class)
+
     private fun initializeProduct()
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
             (activity as SelfFittingActivity).binding.navigationView.menu.forEach {
                 it.isEnabled = false
             }
         }
 
-        GlobalScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             if (configuration.isDoubleDeviceConnection) {
                 fittingConfig.isBinauralConnection = true
                 async { initializeProductCallback(configuration.hearingAidMap[EarSide.Left]!!) }.await()
@@ -201,7 +196,7 @@ class HomeFragment : Fragment() {
             }
             else {
                 fittingConfig.selectedEarSide = configuration.earSide
-                GlobalScope.launch { initializeProductCallback(configuration.hearingAidMap[configuration.earSide]!!) }
+                lifecycleScope.launch(Dispatchers.IO) { initializeProductCallback(configuration.hearingAidMap[configuration.earSide]!!) }
             }
         }
     }
@@ -301,9 +296,9 @@ class HomeFragment : Fragment() {
         mBinding.hideFrames()
         fittingConfig.selectedEarSide = earSide
 
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.Default) {
             try {
-                activity?.runOnUiThread { mBinding.hideFrames() }
+                launch(Dispatchers.Main) { mBinding.hideFrames() }
                 mBinding.invalidateAll()
                 mHandler.sendEmptyMessage(WHAT_CHANGE_FRAME_LAYOUTS)
             } catch (_ : Throwable) { mHandler.sendEmptyMessage(WHAT_CONNECTION_LOST) }

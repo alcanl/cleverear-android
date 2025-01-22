@@ -43,7 +43,7 @@ private fun Product.setEqualizerValue(from: Int, to: Int, value: Int, equalizerV
         }
 
     } catch (ex: ArkException) {
-        Log.e("Product::setFittingValues", ex.message!!)
+        Log.e(Product::class.simpleName, ex.message!!)
     }
 }
 

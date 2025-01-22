@@ -41,17 +41,88 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WirelessFittingInitializer @Inject constructor(@ApplicationContext context: Context) {
+
     private val mContext = context
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
+
     @Inject
     lateinit var threadPool: ExecutorService
+
     @Inject
     lateinit var earTechnicService: IEarTechnicLibraryService
-    private fun writeDataToFilesDirCallback(byteArray: ByteArray, fileName: String) : File?
 
+    private fun saveHearingAidDTOPref(pref: SharedPreferences, hearingAidDTO: HearingAidDTO?)
+    {
+        if (hearingAidDTO == null)
+            return
+
+        val editor = pref.edit()
+        editor.putString(String.format(PREF_DEVICE_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelName)
+        editor.putString(String.format(PREF_LIBRARY_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), Integer.toHexString(hearingAidDTO.libraryId.toInt()))
+        editor.putString(String.format(PREF_ACTIVE_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.activeParamId)
+        editor.putString(String.format(PREF_DEFAULT_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.defaultParamId)
+        editor.putInt(String.format(PREF_WDRC_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.wdrcChannelCount)
+        editor.putInt(String.format(PREF_FREQUENCY_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.frequencyChannelCount)
+        editor.putInt(String.format(PREF_MODEL_NUMBER, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelNumber)
+        editor.putLong(String.format(PREF_EQUALIZER_VALUES_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.equalizerValuesId)
+        editor.apply()
+    }
+
+    private fun getHearingAidDTOFromPrefs(pref: SharedPreferences) : HearingAidDTO
+    {
+        return HearingAidDTO(pref.getString(String.format(PREF_DEVICE_SERIAL,
+            configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!,
+            pref.getInt(String.format(PREF_MODEL_NUMBER, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0),
+            pref.getString(String.format(PREF_LIBRARY_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
+                "")!!, pref.getString(String.format(
+                PREF_DEFAULT_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
+                "")!!,
+            pref.getString(String.format(PREF_ACTIVE_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
+                "")!!, pref.getInt(String.format(
+                PREF_WDRC_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
+                0),
+            pref.getInt(String.format(PREF_FREQUENCY_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
+                0), pref.getLong(String.format(
+                PREF_EQUALIZER_VALUES_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0)
+        )
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun saveEqualizerDTOPref(pref: SharedPreferences, equalizerValuesDTO: EqualizerValuesDTO?) {
+        if (equalizerValuesDTO == null)
+            return
+
+        val editor = pref.edit()
+        editor.putLong(String.format(PREF_EQUALIZER_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.id)
+        editor.putString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.equalizerValuesName)
+        equalizerValuesDTO.valueList.forEachIndexed { index, i ->
+            editor.putInt(String.format(PREF_EQUALIZER_VALUES, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(), index), i)
+        }
+        editor.apply()
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun getEqualizerDTOPref(pref: SharedPreferences, count: Int) : EqualizerValuesDTO {
+
+        val valuesList = mutableListOf<Int>()
+
+        (0..< count).forEach {
+            valuesList.add(pref.getInt(String.format(PREF_EQUALIZER_VALUES, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(), it), 0))
+        }
+
+        return EqualizerValuesDTO(
+            pref.getLong(String.format(PREF_EQUALIZER_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0),
+            valuesList,
+            pref.getString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!
+        )
+    }
+
+    private fun writeDataToFilesDirCallback(byteArray: ByteArray, fileName: String) : File?
     {
         try {
             val file = File(mContext.filesDir, fileName)
@@ -68,6 +139,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return null
         }
     }
+
     private suspend fun getHearingAidDTOFromService(modelNumber: Int) : HearingAidDTO?
     {
         val call = earTechnicService.findHearingAidEqualizerValuesById(modelNumber)
@@ -80,6 +152,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             throw NetworkException(ex)
         }
     }
+
     private suspend fun getEqualizerValuesDTOFromService(id: Long) : EqualizerValuesDTO?
     {
         val call = earTechnicService.findHearingAidEqualizerValuesById(id)
@@ -92,6 +165,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             throw NetworkException(ex)
         }
     }
+
     private suspend fun getDefaultParamFromService(modelNumber: Int) : File?
     {
         val call = earTechnicService.findDefaultParamByHearingAid(modelNumber)
@@ -111,6 +185,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
 
         return paramFile
     }
+
     private suspend fun getLibraryFromService(libId: String) : File?
     {
         val call = earTechnicService.findLibraryByLibraryId(libId)
@@ -131,10 +206,12 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
 
         return libFile
     }
+
     private fun writeDataToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
     {
         return threadPool.submit(Callable { writeDataToFilesDirCallback(byteArray, fileName) })
     }
+
     fun createProduct(productId : Int, library: Library): Product = library.products.getById(productId).createProduct()
 
     suspend fun findLibraryByLibraryId(libraryId: String) : File?
@@ -146,15 +223,17 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return if (libFile.exists()) libFile else getLibraryFromService(libraryId)
 
         } catch (ex: NumberFormatException) {
-            Log.e("NumberFormat", ex.message!!)
+            Log.e(WirelessFittingInitializer::class.simpleName, ex.message!!)
             return null
         }
     }
+
     suspend fun findDefaultParamByHearingAid(modelNumber: Int) : File?
     {
         val paramFile = File(mContext.filesDir, "default_$modelNumber.param")
         return if (paramFile.exists()) paramFile else getDefaultParamFromService(modelNumber)
     }
+
     suspend fun findHearingAidDTO(deviceInfo: DeviceInfo) : HearingAidDTO?
     {
         try {
@@ -169,10 +248,11 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return getHearingAidDTOFromPrefs(pref)
 
         } catch (ex: Throwable) {
-            Log.e("WirelessFittingInitializer::findHearingAidDTO", ex.message!!)
+            Log.e(WirelessFittingInitializer::class.simpleName, ex.message!!)
             return null
         }
     }
+
     suspend fun findEqualizerValues(hearingAidDTO: HearingAidDTO?) : EqualizerValuesDTO?
     {
         try {
@@ -188,71 +268,8 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             return getEqualizerDTOPref(pref, hearingAidDTO?.wdrcChannelCount!!)
 
         } catch (ex: Throwable) {
-            Log.e("WirelessFittingInitializer::findHearingAidDTO", ex.message!!)
+            Log.e(WirelessFittingInitializer::class.simpleName, ex.message!!)
             return null
         }
-    }
-
-    private fun saveHearingAidDTOPref(pref: SharedPreferences, hearingAidDTO: HearingAidDTO?)
-    {
-        if (hearingAidDTO == null)
-            return
-
-        val editor = pref.edit()
-        editor.putString(String.format(PREF_DEVICE_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelName)
-        editor.putString(String.format(PREF_LIBRARY_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), Integer.toHexString(hearingAidDTO.libraryId.toInt()))
-        editor.putString(String.format(PREF_ACTIVE_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.activeParamId)
-        editor.putString(String.format(PREF_DEFAULT_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.defaultParamId)
-        editor.putInt(String.format(PREF_WDRC_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.wdrcChannelCount)
-        editor.putInt(String.format(PREF_FREQUENCY_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.frequencyChannelCount)
-        editor.putInt(String.format(PREF_MODEL_NUMBER, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelNumber)
-        editor.putLong(String.format(PREF_EQUALIZER_VALUES_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.equalizerValuesId)
-        editor.apply()
-    }
-    private fun getHearingAidDTOFromPrefs(pref: SharedPreferences) : HearingAidDTO
-    {
-        return HearingAidDTO(pref.getString(String.format(PREF_DEVICE_SERIAL,
-            configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!,
-            pref.getInt(String.format(PREF_MODEL_NUMBER, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0),
-            pref.getString(String.format(PREF_LIBRARY_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
-                "")!!, pref.getString(String.format(
-                PREF_DEFAULT_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
-                "")!!,
-            pref.getString(String.format(PREF_ACTIVE_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
-                "")!!, pref.getInt(String.format(
-                PREF_WDRC_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
-                0),
-            pref.getInt(String.format(PREF_FREQUENCY_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()),
-                0), pref.getLong(String.format(
-                PREF_EQUALIZER_VALUES_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0)
-        )
-    }
-    @SuppressLint("DefaultLocale")
-    private fun saveEqualizerDTOPref(pref: SharedPreferences, equalizerValuesDTO: EqualizerValuesDTO?) {
-        if (equalizerValuesDTO == null)
-            return
-
-        val editor = pref.edit()
-        editor.putLong(String.format(PREF_EQUALIZER_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.id)
-        editor.putString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.equalizerValuesName)
-        equalizerValuesDTO.valueList.forEachIndexed { index, i ->
-            editor.putInt(String.format(PREF_EQUALIZER_VALUES, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(), index), i)
-        }
-        editor.apply()
-    }
-    @SuppressLint("DefaultLocale")
-    private fun getEqualizerDTOPref(pref: SharedPreferences, count: Int) : EqualizerValuesDTO {
-
-        val valuesList = mutableListOf<Int>()
-
-        (0..< count).forEach {
-            valuesList.add(pref.getInt(String.format(PREF_EQUALIZER_VALUES, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(), it), 0))
-        }
-
-        return EqualizerValuesDTO(
-            pref.getLong(String.format(PREF_EQUALIZER_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), 0),
-            valuesList,
-            pref.getString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!
-        )
     }
 }
