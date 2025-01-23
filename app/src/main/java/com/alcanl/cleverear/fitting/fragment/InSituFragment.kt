@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.collection.IntIntPair
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.SelfFittingActivity
@@ -50,8 +51,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,42 +63,49 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 import java.lang.ref.WeakReference
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class InSituFragment : Fragment(), IEventListener {
+
     @Inject
     lateinit var fittingConfig : FittingConfigurationModule
+
     @Inject
     lateinit var configuration : ConfigurationModule
+
     @Inject
     lateinit var manufacturing: Manufacturing
-    @Inject
-    lateinit var threadPool : ExecutorService
+
     @Inject
     @FrequencyArrayInterceptor
     lateinit var frequencyArray: Array<Int>
+
     @Inject
     @DecibelArrayInterceptor
     lateinit var decibelArray: Array<Int>
+
     @Inject
     lateinit var lineDataSet: LineDataSet
+
     @Inject
     lateinit var dataList: ArrayList<Entry>
+
     @Inject
     lateinit var lineData: LineData
+
     @Inject
     lateinit var inSituResultMap: MutableMap<Float, Float>
-    private val mDialog: CustomDialogInSituSoundCheck by lazy {
-        CustomDialogInSituSoundCheck(this)
-    }
+
     private lateinit var mBinding : FragmentInSituBinding
     private lateinit var mHandler : InSituHandler
     private var mFrequencyIndex = 0
     private var mDecibelIndex = 2
 
+    private val mDialog: CustomDialogInSituSoundCheck by lazy {
+        CustomDialogInSituSoundCheck(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,7 +138,7 @@ class InSituFragment : Fragment(), IEventListener {
         try {
             manufacturing.prepareDeviceForModeling(false)
         } catch (ex: ArkException) {
-            Log.e("onPause", ex.message!!)
+            Log.e(InSituFragment::class.simpleName, ex.message!!)
         }
         super.onPause()
     }
@@ -140,7 +147,7 @@ class InSituFragment : Fragment(), IEventListener {
         try {
             manufacturing.prepareDeviceForModeling(false)
         } catch (ex: ArkException) {
-            Log.e("onPause", ex.message!!)
+            Log.e(InSituFragment::class.simpleName, ex.message!!)
         }
         super.onDestroy()
     }
@@ -169,7 +176,7 @@ class InSituFragment : Fragment(), IEventListener {
         mBinding.viewModel = InSituFragmentListenersViewModel(this)
         mBinding.config = fittingConfig
         mHandler = InSituHandler(this)
-        threadPool.execute { initializeDeviceForInSituTest() }
+        lifecycleScope.launch(Dispatchers.IO) { initializeDeviceForInSituTest() }
     }
     private fun initializeDeviceForInSituTest() {
         try {
@@ -303,27 +310,25 @@ class InSituFragment : Fragment(), IEventListener {
         try {
             manufacturing.prepareDeviceForModeling(false)
         } catch (ex: ArkException) {
-            Log.e("earSideButtonClicked", ex.message!!)
+            Log.e(InSituFragment::class.simpleName, ex.message!!)
         }
 
         fittingConfig.selectedEarSide = earSide
 
-        threadPool.apply {
-            execute {
-                submit { initializeDeviceForInSituTest() }.get()
-                mHandler.apply {
-                    sendEmptyMessage(WHAT_INVALIDATE_BINDING)
-                    sendEmptyMessage(WHAT_INVALIDATE_CHART)
-                }
+        lifecycleScope.launch(Dispatchers.IO) { async { initializeDeviceForInSituTest() }.await()
+
+            mHandler.apply {
+                sendEmptyMessage(WHAT_INVALIDATE_BINDING)
+                sendEmptyMessage(WHAT_INVALIDATE_CHART)
             }
         }
     }
-    @OptIn(DelicateCoroutinesApi::class)
+
     fun playSoundButtonClicked()
     {
         (activity as SelfFittingActivity).isInSituInProgress = true
         mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
-        GlobalScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 async {
                     try {
@@ -370,21 +375,23 @@ class InSituFragment : Fragment(), IEventListener {
             changeText(mBinding.textViewFrequency ,frequencyArray[--mFrequencyIndex])
         }
     }
-    @OptIn(DelicateCoroutinesApi::class)
+
     fun saveButtonClicked()
     {
         (activity as SelfFittingActivity).isInSituInProgress = false
 
-        GlobalScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             saveMediaToStorage(mBinding.lineChart.chartBitmap)
         }
 
         Toast.makeText(requireContext(), R.string.toast_test_result_saved_text, Toast.LENGTH_LONG).show()
     }
+
     fun autoFitButtonClicked()
     {
         TODO("Not Implemented Yet!")
     }
+
     fun dialogPositiveButtonClicked()
     {
         try {
@@ -395,8 +402,7 @@ class InSituFragment : Fragment(), IEventListener {
                 mDialog.dismiss()
                 return
             }
-            inSituResultMap[frequencyArray[mFrequencyIndex++].toFloat()] =
-                decibelArray[mDecibelIndex].toFloat()
+            inSituResultMap[frequencyArray[mFrequencyIndex++].toFloat()] = decibelArray[mDecibelIndex].toFloat()
             mDecibelIndex = 2
             changeText(mBinding.textViewFrequency, frequencyArray[mFrequencyIndex])
             changeText(mBinding.textViewDecibel, decibelArray[mDecibelIndex])
@@ -409,7 +415,7 @@ class InSituFragment : Fragment(), IEventListener {
             mHandler.postDelayed(this::playSoundButtonClicked, 1000)
 
         } catch (ex: Throwable) {
-            Log.e("dialogPositiveButtonClicked", ex.message!!)
+            Log.e(InSituFragment::class.simpleName, ex.message!!)
         }
 
     }
@@ -444,7 +450,7 @@ class InSituFragment : Fragment(), IEventListener {
             mHandler.sendEmptyMessage(WHAT_INVALIDATE_CHART)
 
         } catch (ex: Throwable) {
-            Log.e(this.javaClass.name, "End Test Error")
+            Log.e(InSituFragment::class.simpleName, ex.message!!)
         }
     }
 }

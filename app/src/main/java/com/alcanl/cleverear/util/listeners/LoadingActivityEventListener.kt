@@ -20,14 +20,16 @@ class LoadingActivityEventListener @Inject constructor (@ApplicationContext cont
 {
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool : ExecutorService
 
     private val mContext = context
+
     private var mListener : Thread? = null
 
-    fun startEventListener() {
-
+    fun startEventListener()
+    {
         threadPool.execute {
             try {
                 mListener = Thread.currentThread()
@@ -37,28 +39,27 @@ class LoadingActivityEventListener @Inject constructor (@ApplicationContext cont
                         val eventSender = parseJsonSenderMacData(event.data, mContext)
                         when (event.type) {
                             EventType.kConnectionEvent -> handleConnectionEvent(event, eventSender)
-                            else -> {
-                                Log.e("eventLoading", event.data)
-                            }
+                            else -> Log.i(LoadingActivityEventListener::class.simpleName, event.data)
                         }
                     } catch (ex: JSONException) {
-                        Log.e("parseError", ex.message!!)
+                        Log.e(LoadingActivityEventListener::class.simpleName, ex.message!!)
                     }
                 }
-                Log.d("loading", "LoadingListenerStopped")
+                Log.d(LoadingActivityEventListener::class.simpleName, "Loading Listener Stopped")
 
             } catch (ex: NullPointerException) {
-                Log.e("nullTest", ex.message!!)
+                Log.e(LoadingActivityEventListener::class.simpleName, ex.message!!)
             }
             catch(ex : InterruptedException) {
-                Log.e("thread", ex.message!!)
+                Log.e(LoadingActivityEventListener::class.simpleName, ex.message!!)
             }
         }
     }
+
     private fun handleConnectionEvent(event: Event, eventSender: String)
     {
         try {
-            Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
+            Log.i(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionEvent = ConnectionEvent(this)
             connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
             connectionEvent.eventSender = eventSender
@@ -66,15 +67,17 @@ class LoadingActivityEventListener @Inject constructor (@ApplicationContext cont
             EventBus.getDefault().post(connectionEvent)
 
         } catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(LoadingActivityEventListener::class.simpleName, ex.message!!)
         }
     }
+
     @Synchronized
     fun stopListener()
     {
         mListener?.interrupt()
         eventHandler.exit()
     }
+
     @Synchronized
     fun isListenerOnBoard() : Boolean
     {
@@ -82,6 +85,5 @@ class LoadingActivityEventListener @Inject constructor (@ApplicationContext cont
             return false
 
         return mListener?.isAlive!!
-
     }
 }

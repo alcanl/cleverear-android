@@ -206,7 +206,6 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     {
         EventBus.getDefault().post(InSituEvent(this))
         mUnsavedFittingDialog.dismiss()
-
     }
 
     fun inSituInProgressDialogNegativeButtonClicked()
