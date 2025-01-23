@@ -191,15 +191,14 @@ class ControlFragment : Fragment(), IEventListener {
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1)
-            activity?.let {
-                it.runOnUiThread {
-                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
-                    it.finish()
-                    configuration.apply {
-                        isConnected = false
-                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                            .values.first().isConnected = false
-                    }
+            lifecycleScope.launch(Dispatchers.Main) {
+
+                Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+                configuration.apply {
+                    isConnected = false
+                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                        .values.first().isConnected = false
                 }
             }
     }

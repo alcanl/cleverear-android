@@ -488,7 +488,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     private fun setSelectedModeButtonView(button: Button)
     {
-        activity?.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
             button.backgroundTintList = AppCompatResources.getColorStateList(
                 requireContext(),
                 com.google.android.material.R.color.design_default_color_secondary_variant
@@ -580,7 +580,8 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     fun setStreamAddressButtonClicked(view: View)
     {
-        activity?.runOnUiThread { (view as ImageButton).startAnimation( android.view.animation.AnimationUtils.loadAnimation(
+        lifecycleScope.launch(Dispatchers.Main) {
+            (view as ImageButton).startAnimation( android.view.animation.AnimationUtils.loadAnimation(
             requireContext(), R.anim.alpha_blink_anim
         ).also {it.setAnimationListener(
 

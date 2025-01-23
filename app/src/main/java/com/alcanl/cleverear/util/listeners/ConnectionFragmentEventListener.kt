@@ -24,7 +24,7 @@ import javax.inject.Inject
 class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext context: Context) {
 
     @Inject
-    lateinit var mEventHandler: EventHandler
+    lateinit var eventHandler: EventHandler
 
     @Inject
     lateinit var threadPool: ExecutorService
@@ -58,9 +58,10 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
             try {
                 mListener = Thread.currentThread()
                 while (!mListener?.isInterrupted!!) {
-                    val event = mEventHandler.event
+                    val event = eventHandler.event
                     when (event.type) {
                         EventType.kConnectionEvent -> {
+                            Log.i(ConnectionEvent::class.java.simpleName, event.data)
                             val connectionEvent = ConnectionEvent(this)
                             connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
                             connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
@@ -76,7 +77,7 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
                                 EventBus.getDefault().post(deviceFoundEvent)
                             }
                         }
-                    else -> Log.i(ConnectionFragmentEventListener::class.simpleName, event.data)
+                        else -> Log.i(ConnectionFragmentEventListener::class.simpleName, event.data)
                     }
                 }
 
@@ -93,7 +94,7 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
     fun stopListener()
     {
         mListener?.interrupt()
-        mEventHandler.exit()
+        eventHandler.exit()
     }
 
     fun isListenerOnBoard() : Boolean

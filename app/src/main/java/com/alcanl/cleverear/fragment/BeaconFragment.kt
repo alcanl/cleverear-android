@@ -16,7 +16,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
@@ -30,8 +32,12 @@ import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.util.listeners.BeaconFragmentEventListener
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.listeners.event.MemoryEvent
+import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
+import com.ark.ParameterSpace
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +80,7 @@ class BeaconFragment : Fragment(), IEventListener {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
 
                 if (result.scanRecord != null)
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         determineEddystoneBeacons(result.scanRecord!!.bytes, result.device.address)
                     }
             }
@@ -84,17 +90,86 @@ class BeaconFragment : Fragment(), IEventListener {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
+        if (isVisible)
+            when (event) {
+                is VolumeEvent -> onVolumeEventReceived(event)
+                is MemoryEvent -> onMemoryEventReceived(event)
+                is BatteryEvent -> onBatteryEventReceived(event)
+                is ConnectionEvent -> onConnectionEventReceived(event)
+            }
+    }
+
+    private fun onVolumeEventReceived(event: VolumeEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.volume = event.volumeData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.volume = event.volumeData
+                    else
+                        hearingAidMap[EarSide.Right]?.volume = event.volumeData
+            }
+
+            launch(Dispatchers.Main) {
+                Toast.makeText(requireContext(), String.format(
+                    ContextCompat.getString(requireContext(),
+                        R.string.listener_volume_level_text
+                    ) + " %d", event.volumeData), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun onBatteryEventReceived(event: BatteryEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.batteryLevel = event.batteryData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.batteryLevel = event.batteryData
+                    else
+                        hearingAidMap[EarSide.Right]?.batteryLevel = event.batteryData
+            }
+        }
+    }
+
+    private fun onMemoryEventReceived(event: MemoryEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            with(configuration) {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                        hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(event.memoryData)
+                    else
+                        hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(event.memoryData)
+            }
+        }
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            Toast.makeText(requireContext(), String.format(
+                ContextCompat.getString(requireContext(), R.string.text_active_memory)  + (event.memoryData + 1).toString()), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onConnectionEventReceived(event: EventObject)
+    {
         if (event is ConnectionEvent && event.connectionData == 1)
-            activity?.let {
-                it.runOnUiThread {
-                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT)
-                        .show()
-                    it.finish()
-                    configuration.apply {
-                        isConnected = false
-                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                            .values.first().isConnected = false
-                    }
+            lifecycleScope.launch(Dispatchers.Main) {
+
+                Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+                configuration.apply {
+                    isConnected = false
+                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                        .values.first().isConnected = false
                 }
             }
     }
