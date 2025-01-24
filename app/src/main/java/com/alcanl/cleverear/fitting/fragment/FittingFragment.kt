@@ -69,6 +69,9 @@ class FittingFragment : Fragment(), IEventListener {
     @Inject
     lateinit var configuration: ConfigurationModule
 
+    @Inject
+    lateinit var mutex: Mutex
+
     private lateinit var mSelectedMemory : ParameterSpace
 
     private lateinit var mBinding: FragmentFittingBinding
@@ -160,7 +163,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     private suspend fun wideBandSliderValueChangedCallback(value: Int)
     {
-        Mutex().withLock {
+        mutex.withLock {
             try {
                 fittingConfig.apply {
                     deviceInfoExtMap[selectedEarSide]?.let {
@@ -252,7 +255,7 @@ class FittingFragment : Fragment(), IEventListener {
     {
         suspend fun handleSynchronized()
         {
-            Mutex().withLock {
+            mutex.withLock {
                 fittingConfig.apply {
                     deviceInfoExtMap[selectedEarSide]?.let {
                         it.product?.setEqualizerBassValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
@@ -268,7 +271,7 @@ class FittingFragment : Fragment(), IEventListener {
     {
         suspend fun handleSynchronized()
         {
-            Mutex().withLock {
+            mutex.withLock {
                 fittingConfig.apply {
                     deviceInfoExtMap[selectedEarSide]?.let {
                         it.product?.setEqualizerMidValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
@@ -284,7 +287,7 @@ class FittingFragment : Fragment(), IEventListener {
     {
         suspend fun handleSynchronized()
         {
-            Mutex().withLock {
+            mutex.withLock {
                 fittingConfig.apply {
                     deviceInfoExtMap[selectedEarSide]?.let {
                         it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())

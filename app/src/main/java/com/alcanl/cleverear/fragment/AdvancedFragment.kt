@@ -7,8 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
@@ -24,6 +22,9 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.extension.startSetStreamChannelAnimation
+import com.alcanl.cleverear.util.extension.startAuxMicSlidersFirstAnimation
+import com.alcanl.cleverear.util.extension.startAuxMicSlidersSecondAnimation
 import com.alcanl.cleverear.util.listeners.AdvancedFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
@@ -53,6 +54,9 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var configuration : ConfigurationModule
+
+    @Inject
+    lateinit var mutex: Mutex
 
     @Inject
     lateinit var listener: AdvancedFragmentEventListener
@@ -252,101 +256,6 @@ class AdvancedFragment : Fragment(), IEventListener {
             )
     }
 
-    private fun sliderFirstAnimationCallback(slider: Slider, anim: Int)
-    {
-        with(slider) {
-            startAnimation(
-                android.view.animation.AnimationUtils.loadAnimation(
-                    requireContext(),
-                    anim
-                ).also { it.setAnimationListener(setSlidersFirstAnimation(slider)) })
-        }
-    }
-
-    private fun sliderSecondAnimationCallback(slider: Slider, anim: Int)
-    {
-        with(slider) {
-            startAnimation(
-                android.view.animation.AnimationUtils.loadAnimation(
-                    requireContext(),
-                    anim
-                ).also { it.setAnimationListener(setSlidersSecondAnimation(slider)) })
-        }
-    }
-
-    private fun setSlidersFirstAnimation(slider: Slider) : AnimationListener
-    {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                slider.visibility = View.INVISIBLE
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-
-                startCommonSlidersAnimation(mBinding.sliderAuxCommon)
-                startCommonSlidersAnimation(mBinding.sliderMicCommon)
-
-                with(mBinding) {
-                    textViewAuxL.visibility = View.INVISIBLE
-                    textViewAuxR.visibility= View.INVISIBLE
-                    textViewMicL.visibility = View.INVISIBLE
-                    textViewMicR.visibility = View.INVISIBLE
-                }
-            }
-            override fun onAnimationRepeat(animation: Animation?) {}
-        }
-    }
-
-    private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
-    {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-                with(mBinding) {
-                    sliderAuxCommon.apply {
-                        visibility = View.INVISIBLE; isEnabled = false
-                    }
-                    sliderMicCommon.apply {
-                        visibility = View.INVISIBLE; isEnabled = false
-                    }
-
-                    textViewAuxL.visibility = View.VISIBLE
-                    textViewAuxR.visibility= View.VISIBLE
-                    textViewMicL.visibility = View.VISIBLE
-                    textViewMicR.visibility = View.VISIBLE
-                }
-            }
-            override fun onAnimationEnd(animation: Animation?) {
-                slider.apply {
-                    visibility = View.VISIBLE
-                    isEnabled = true
-                }
-            }
-            override fun onAnimationRepeat(animation: Animation?) {}
-        }
-    }
-
-    private fun startCommonSlidersAnimation(slider: Slider) {
-        slider.startAnimation(
-            android.view.animation.AnimationUtils.loadAnimation(
-                requireContext(), R.anim.alpha_blink_anim
-            ).also {
-                it.setAnimationListener(
-
-                    object : AnimationListener {
-                        override fun onAnimationStart(animation: Animation?) {
-                        }
-
-                        override fun onAnimationEnd(animation: Animation?) {
-                            slider.visibility = View.VISIBLE
-                            slider.isEnabled = true
-                        }
-
-                        override fun onAnimationRepeat(animation: Animation?) {
-                        }
-                    }
-                )
-            })
-    }
-
     private fun initBinding()
     {
         mBinding.viewModel = AdvancedFragmentListenersViewModel(this)
@@ -366,8 +275,7 @@ class AdvancedFragment : Fragment(), IEventListener {
         with(configuration) {
             if (isConnected)
                 if (isDoubleDeviceConnection)
-                    hearingAidMap.forEach {
-                        setStreamAddressButtonClickedCallback(result,channel, it.value) }
+                    hearingAidMap.forEach { setStreamAddressButtonClickedCallback(result,channel, it.value) }
                 else
                     setStreamAddressButtonClickedCallback(result, channel, hearingAidMap[earSide]!!)
         }
@@ -451,7 +359,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     private suspend fun micSliderValueChangedCallback(value: Float, earSide: EarSide)
     {
-        Mutex().withLock {
+        mutex.withLock {
             try {
                 with(configuration) {
                     if (isConnected) {
@@ -472,7 +380,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     private suspend fun auxSliderValueChangedCallback(value: Float, earSide: EarSide)
     {
-        Mutex().withLock {
+        mutex.withLock {
             try {
                 with(configuration) {
                     if (isConnected) {
@@ -578,28 +486,16 @@ class AdvancedFragment : Fragment(), IEventListener {
         auxSliderValueChanged(value, EarSide.Right)
     }
 
-    fun setStreamAddressButtonClicked(view: View)
+    fun setStreamAddressButtonClicked(imageButton: ImageButton)
     {
         lifecycleScope.launch(Dispatchers.Main) {
-            (view as ImageButton).startAnimation( android.view.animation.AnimationUtils.loadAnimation(
-            requireContext(), R.anim.alpha_blink_anim
-        ).also {it.setAnimationListener(
 
-            object: AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {
-                    val channel: Int
-
-                    try {
-                        channel = mBinding.editTextChannel.text.toString().toInt()
-                        setStreamAddressButtonClicked(channel)
-                    } catch (_: NumberFormatException) {
-                        Toast.makeText(requireContext(), R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
-                    }
-                }
-                override fun onAnimationEnd(animation: Animation?) {}
-                override fun onAnimationRepeat(animation: Animation?) {}
+            try {
+                val channel = mBinding.editTextChannel.text.toString().toInt()
+                imageButton.startSetStreamChannelAnimation(requireContext()) { setStreamAddressButtonClicked(channel) }
+            } catch (_: NumberFormatException) {
+                Toast.makeText(requireContext(), R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
             }
-        ) })
         }
     }
 
@@ -607,23 +503,23 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         with(configuration) {
             lifecycleScope.launch(Dispatchers.Main) {
-                isDualDeviceConfig = if (!isDualDeviceConfig) {
-                    with(mBinding) {
-                        sliderFirstAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_left_to_right_left)
-                        sliderFirstAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_left_to_right_left)
-                        sliderFirstAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_right_to_left_right)
-                        sliderFirstAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_right_to_left_right)
-                    }
-                    true
-                } else {
-                    with(mBinding) {
-                        sliderSecondAnimationCallback(sliderAuxLeft, R.anim.translate_slider_adv_right_to_left_left)
-                        sliderSecondAnimationCallback(sliderMicLeft, R.anim.translate_slider_adv_right_to_left_left)
-                        sliderSecondAnimationCallback(sliderAuxRight, R.anim.translate_slider_adv_left_to_right_right)
-                        sliderSecondAnimationCallback(sliderMicRight, R.anim.translate_slider_adv_left_to_right_right)
-                        false
-                    }
-                }
+                isDualDeviceConfig =
+                    if (!isDualDeviceConfig)
+                        with(mBinding) {
+                            sliderAuxLeft.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_left)
+                            sliderMicLeft.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_left)
+                            sliderAuxRight.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_right)
+                            sliderMicRight.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_right)
+                            true
+                        }
+                     else
+                        with(mBinding) {
+                            sliderAuxLeft.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_left)
+                            sliderMicLeft.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_left)
+                            sliderAuxRight.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_right)
+                            sliderMicRight.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_right)
+                            false
+                        }
             }
         }
     }

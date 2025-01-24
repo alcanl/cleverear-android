@@ -29,7 +29,6 @@ import com.alcanl.cleverear.util.dialog.CustomAlertDialogFittingUnsaved
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogInSituInProgress
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.isConnected
-import com.ark.ArkException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,10 +46,8 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     private val mUnsavedFittingDialog : CustomAlertDialogFittingUnsaved
         get() = CustomAlertDialogFittingUnsaved(this)
 
-
     private val mInSituInProgressDialog: CustomAlertDialogInSituInProgress
         get() = CustomAlertDialogInSituInProgress(this)
-
 
     private val mDeviceDisconnectedDialog: CustomAlertDialogDeviceDisconnected
         get() = CustomAlertDialogDeviceDisconnected(this)
@@ -87,51 +84,51 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         EventBus.getDefault().unregister(this)
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
         if (event is DisconnectEvent)
-            handleDisconnect(event.hearingAid)
+           handleDisconnect(event.hearingAid)
     }
 
     private fun handleDisconnect(hearingAid: HearingAid?)
     {
-        mDeviceDisconnectedDialog.show()
+        lifecycleScope.launch(Dispatchers.Main) {
 
-        if (hearingAid == null) {
-            mDeviceDisconnectedDialog.binding.apply {
-                progressBar.visibility = View.INVISIBLE
-                buttonOk.visibility = View.VISIBLE
-                textViewMainMessage.text = getString(R.string.toast_unknown_problem_text)
+            mDeviceDisconnectedDialog.show()
+
+            if (hearingAid == null)
+                mDeviceDisconnectedDialog.binding.apply {
+                    progressBar.visibility = View.INVISIBLE
+                    buttonOk.visibility = View.VISIBLE
+                    textViewMainMessage.text = getString(R.string.toast_unknown_problem_text)
+                }
+            else {
+                mDeviceDisconnectedDialog.binding.textViewMainMessage.text = String.format(
+                    getString(R.string.dialog_textview_device_disconnected_text),
+                    if(getSystemLanguage().lowercase() == TURKISH) hearingAid.side.getTR()
+                    else if (getSystemLanguage().lowercase() == GERMAN) hearingAid.side.getGE()
+                    else hearingAid.side.getEN(), hearingAid.name)
+
+                launch(Dispatchers.IO) { handleDisconnectCallback(this, hearingAid) }
             }
-
         }
-        else {
-            mDeviceDisconnectedDialog.binding.textViewMainMessage.text = String.format(
-                mDeviceDisconnectedDialog.binding.textViewMainMessage.text.toString(),
-                if(getSystemLanguage().lowercase() == TURKISH) hearingAid.side.getTR()
-                else if (getSystemLanguage().lowercase() == GERMAN) hearingAid.side.getGE()
-                else hearingAid.side.getEN(), hearingAid.name)
-
-            lifecycleScope.launch(Dispatchers.Default) { handleDisconnectCallback(this, hearingAid) }
-        }
-
     }
 
     private suspend fun handleDisconnectCallback(scope: CoroutineScope, hearingAid: HearingAid)
     {
         scope.async {
             try {
-                delay(5000)
+                delay(8000)
                 hearingAid.communicationAdaptor?.connect()
                 delay(8000)
 
-            } catch (ex: ArkException) {
+            } catch (ex: Exception) {
                 Log.e(SelfFittingActivity::class.simpleName, ex.message!!)
             }
         }.await()
 
-        lifecycleScope.launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.Main) {
 
             val adapter = getSystemService(BluetoothManager::class.java).adapter
             if (adapter != null && isConnected(adapter.getRemoteDevice(hearingAid.address))) {
@@ -224,10 +221,7 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
     fun disconnectDialogOkButtonClicked()
     {
         mDeviceDisconnectedDialog.dismiss()
-
-        Intent(this, MainActivity::class.java).apply {
-            startActivity(this)
-        }
+        Intent(this, MainActivity::class.java).apply { startActivity(this) }
         finish()
     }
 }
