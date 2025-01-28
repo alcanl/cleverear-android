@@ -17,10 +17,10 @@ import javax.inject.Inject
 class SplashActivityEventListener @Inject constructor (@ApplicationContext context: Context) {
 
     @Inject
-    lateinit var mEventHandler: EventHandler
+    lateinit var eventHandler: EventHandler
 
     @Inject
-    lateinit var mThreadPool: ExecutorService
+    lateinit var threadPool: ExecutorService
 
     private val mContext = context
 
@@ -28,12 +28,11 @@ class SplashActivityEventListener @Inject constructor (@ApplicationContext conte
 
     fun startEventListener()
     {
-
-        mThreadPool.execute {
+        threadPool.execute {
             try {
                 mListener = Thread.currentThread()
                 while (!mListener.isInterrupted) {
-                    val event = mEventHandler.event
+                    val event = eventHandler.event
                     if (event.type == EventType.kBatteryEvent) {
                         val batteryEvent = BatteryEvent(this)
                         batteryEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
@@ -41,22 +40,23 @@ class SplashActivityEventListener @Inject constructor (@ApplicationContext conte
                         EventBus.getDefault().post(batteryEvent)
                     }
                     else
-                        Log.d(SplashActivityEventListener::class.simpleName, event.data)
+                        Log.i(SplashActivityEventListener::class.simpleName, event.data)
                 }
                 Log.d(SplashActivityEventListener::class.simpleName, "Splash Listener Stopped")
             } catch (ex: NullPointerException) {
-                Log.e("null", ex.message!!)
+                Log.e(SplashActivityEventListener::class.simpleName, ex.message!!)
             } catch (ex: InterruptedException) {
-                Log.e("thread", ex.message!!)
+                Log.e(SplashActivityEventListener::class.simpleName, ex.message!!)
             } catch (ex: JSONException) {
-                Log.e("json", ex.message!!)
+                Log.e(SplashActivityEventListener::class.simpleName, ex.message!!)
             }
         }
     }
+
     @Synchronized
     fun stopListener()
     {
         mListener.interrupt()
-        mEventHandler.exit()
+        eventHandler.exit()
     }
 }

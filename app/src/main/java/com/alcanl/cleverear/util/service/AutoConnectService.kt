@@ -87,7 +87,7 @@ class AutoConnectService : Service()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
-        Log.i(AutoConnectService::class.simpleName, "onStartCommand")
+        Log.i(AutoConnectService::class.simpleName, "Service On Board")
         initialize(intent)
         return START_STICKY
     }
@@ -111,7 +111,7 @@ class AutoConnectService : Service()
 
                 isServiceOnBoard = false
             }
-            Log.i(AutoConnectService::class.simpleName, "onDestroyCalled")
+            Log.i(AutoConnectService::class.simpleName, "Service Stopped")
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
@@ -257,7 +257,7 @@ class AutoConnectService : Service()
         val adapter = getSystemService(BluetoothManager::class.java).adapter
 
         if (!adapter.isEnabled) {
-            Log.e(AutoConnectService::class.simpleName, "Bluetooth off")
+            Log.d(AutoConnectService::class.simpleName, "Bluetooth Off")
             return
         }
 
@@ -315,7 +315,7 @@ class AutoConnectService : Service()
                     else {}
                 }
                 else
-                    Log.i(AutoConnectService::class.simpleName, "There is not any hearing aid in range!")
+                    Log.d(AutoConnectService::class.simpleName, "There is not any hearing aid in range!")
             }
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)

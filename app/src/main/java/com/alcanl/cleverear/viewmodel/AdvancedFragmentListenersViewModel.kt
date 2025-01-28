@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.viewmodel
 
 import android.view.View
+import android.widget.ImageButton
 import com.alcanl.cleverear.fragment.AdvancedFragment
 import java.lang.ref.WeakReference
 
@@ -37,7 +38,7 @@ class AdvancedFragmentListenersViewModel(fragment: AdvancedFragment) {
     }
     fun handleSetChannelButtonClick(view: View)
     {
-        mWeakReference.get()?.setStreamAddressButtonClicked(view)
+        mWeakReference.get()?.setStreamAddressButtonClicked(view as ImageButton)
     }
     fun handleSwitchCheckedChange()
     {

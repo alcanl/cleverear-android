@@ -51,29 +51,26 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
                                 EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                                 EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                                 EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                                else -> handleGenericEvent(event)
+                                else -> Log.i(ControlFragmentEventListener::class.simpleName, event.data)
                             }
                         } catch (ex: JSONException) {
-                            Log.e("parseError", ex.message!!)
+                            Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
                         }
                     }
-                    Log.d("control", "ControlListenerStopped")
+                    Log.d(ControlFragmentEventListener::class.simpleName, "Control Listener Stopped")
 
                 } catch (ex: NullPointerException) {
-                        Log.e("null", ex.message!!)
-                    } catch (ex: InterruptedException) {
-                        Log.e("thread", ex.message!!)
-                    }
+                    Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
+                } catch (ex: InterruptedException) {
+                    Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
+                }
             }
     }
-    private fun handleGenericEvent(event: Event)
-    {
-        Log.e("eventControl", event.data)
-    }
+
     private fun handleConnectionEvent(event: Event)
     {
         try {
-            Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
+            Log.i(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionEvent = ConnectionEvent(this)
             connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
             connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
@@ -82,30 +79,30 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
             if (connectionEvent.connectionData == 1)
                 Thread.currentThread().interrupt()
 
-        } catch (ex: JSONException)
-        {
-            Log.e("parseError", ex.message!!)
+        } catch (ex: JSONException) {
+            Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleBatteryEvent(event: Event, eventSender: String)
     {
         try {
-            Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
+            Log.i(BatteryStateChangedEvent::class.java.simpleName, event.data)
             val batteryEvent = BatteryEvent(this)
             batteryEvent.batteryData = parseJsonBatteryStateData(event.data, mContext)
             batteryEvent.eventSender = eventSender
 
             EventBus.getDefault().post(batteryEvent)
 
-        } catch (ex: JSONException)
-        {
-            Log.e("parseError", ex.message!!)
+        } catch (ex: JSONException) {
+            Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleMemoryEvent(event: Event, eventSender: String) {
 
         try {
-            Log.e(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
+            Log.i(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
 
             val memoryEvent = MemoryEvent(this)
             memoryEvent.memoryData = parseJsonMemoryActiveData(event.data, mContext)
@@ -114,13 +111,14 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
             EventBus.getDefault().post(memoryEvent)
 
         } catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleVolumeEvent(event: Event, eventSender: String)
     {
         try {
-            Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
+            Log.i(VolumeChangeEvent::class.java.simpleName, event.data)
             val volumeState = parseJsonVolumeData(event.data, mContext)
             val volumeEvent = VolumeEvent(this)
             volumeEvent.eventSender = eventSender
@@ -128,15 +126,17 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
             EventBus.getDefault().post(volumeEvent)
         }
         catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(ControlFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     @Synchronized
     fun stopListener()
     {
         mListener?.interrupt()
         eventHandler.exit()
     }
+
     @Synchronized
     fun isListenerOnBoard() : Boolean
     {
@@ -144,6 +144,5 @@ class ControlFragmentEventListener @Inject constructor (@ApplicationContext cont
             return false
 
         return mListener?.isAlive!!
-
     }
 }

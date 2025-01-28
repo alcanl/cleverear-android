@@ -71,7 +71,7 @@
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textViewMode"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,TextSizeCheck" />
 
                 <Button
                     android:id="@+id/buttonModeOne"

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.SelfFittingActivity
 import com.alcanl.cleverear.databinding.FragmentFittingBinding
@@ -46,14 +47,17 @@ import com.ark.ParameterSpace
 import com.skydoves.powerspinner.IconSpinnerAdapter
 import com.skydoves.powerspinner.IconSpinnerItem
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.ref.WeakReference
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -63,10 +67,10 @@ class FittingFragment : Fragment(), IEventListener {
     lateinit var fittingConfig: FittingConfigurationModule
 
     @Inject
-    lateinit var threadPool : ExecutorService
+    lateinit var configuration: ConfigurationModule
 
     @Inject
-    lateinit var configuration: ConfigurationModule
+    lateinit var mutex: Mutex
 
     private lateinit var mSelectedMemory : ParameterSpace
 
@@ -157,17 +161,18 @@ class FittingFragment : Fragment(), IEventListener {
         }
     }
 
-    @Synchronized
-    private fun wideBandSliderValueChangedCallback(value: Int)
+    private suspend fun wideBandSliderValueChangedCallback(value: Int)
     {
-        try {
-            fittingConfig.apply {
-                deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setWideBandGain(value)
+        mutex.withLock {
+            try {
+                fittingConfig.apply {
+                    deviceInfoExtMap[selectedEarSide]?.let {
+                        it.product?.setWideBandGain(value)
+                    }
                 }
+            } catch (ex: Throwable) {
+                Log.e(FittingFragment::class.simpleName, ex.message!!)
             }
-        } catch (ex: Throwable) {
-            Log.e(FittingFragment::class.simpleName, ex.message!!)
         }
     }
 
@@ -201,16 +206,12 @@ class FittingFragment : Fragment(), IEventListener {
         }
     }
 
-    private fun invalidateBindingsCallback()
+    private suspend fun invalidateBindingsCallback()
     {
         mHandler.sendEmptyMessage(WHAT_SHOW_LOADING_FRAME)
-        runBlocking {
-            delay(1500)
-        }
-        activity?.runOnUiThread { mBinding.invalidateAll() }
-        runBlocking {
-            delay(2000)
-        }
+        delay(1500)
+        lifecycleScope.launch(Dispatchers.Main) { mBinding.invalidateAll() }
+        delay(2000)
         mHandler.sendEmptyMessage(WHAT_HIDE_LOADING_FRAME)
     }
 
@@ -252,59 +253,62 @@ class FittingFragment : Fragment(), IEventListener {
 
     fun equalizerBassSliderValueChanged(value: Float)
     {
-        @Synchronized
-        fun handleSynchronized()
+        suspend fun handleSynchronized()
         {
-            fittingConfig.apply {
-                deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerBassValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+            mutex.withLock {
+                fittingConfig.apply {
+                    deviceInfoExtMap[selectedEarSide]?.let {
+                        it.product?.setEqualizerBassValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+                    }
                 }
             }
         }
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute { handleSynchronized() }
+        lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
     fun equalizerMidSliderValueChanged(value: Float)
     {
-        @Synchronized
-        fun handleSynchronized()
+        suspend fun handleSynchronized()
         {
-            fittingConfig.apply {
-                deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerMidValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+            mutex.withLock {
+                fittingConfig.apply {
+                    deviceInfoExtMap[selectedEarSide]?.let {
+                        it.product?.setEqualizerMidValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+                    }
                 }
             }
         }
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute { handleSynchronized() }
+        lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
     fun equalizerTrebleSliderValueChanged(value: Float)
     {
-        @Synchronized
-        fun handleSynchronized()
+        suspend fun handleSynchronized()
         {
-            fittingConfig.apply {
-                deviceInfoExtMap[selectedEarSide]?.let {
-                    it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+            mutex.withLock {
+                fittingConfig.apply {
+                    deviceInfoExtMap[selectedEarSide]?.let {
+                        it.product?.setEqualizerTrebleValue(it.hearingAidDTO!!, it.equalizerValuesDTO?.valueList!!, value.toInt())
+                    }
                 }
             }
         }
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute { handleSynchronized() }
+        lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
     fun wideBandSliderValueChanged(value: Float)
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute { wideBandSliderValueChangedCallback(value.toInt()) }
+        lifecycleScope.launch(Dispatchers.IO) { wideBandSliderValueChangedCallback(value.toInt()) }
     }
 
     fun equalizerCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
                     mBinding.checkBoxEqualizer.handleFittingCheckedChanged(
@@ -322,7 +326,7 @@ class FittingFragment : Fragment(), IEventListener {
         (activity as SelfFittingActivity).isFittingChangesMade = true
         mBinding.spinnerFeedbackCanceler.isEnabled = mBinding.checkBoxFeedbackCanceler.isChecked
 
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 mBinding.checkBoxFeedbackCanceler.handleFittingCheckedChanged(
                     { deviceInfoExtMap[selectedEarSide]?.product?.disableFeedBackCanceler() },
@@ -338,13 +342,14 @@ class FittingFragment : Fragment(), IEventListener {
 
     fun burnButtonsClicked(button: AppCompatButton)
     {
-        threadPool.execute {
-            threadPool.submit {
+        lifecycleScope.launch(Dispatchers.IO) {
+            async {
                 if (button.id == mBinding.buttonBurn.id)
                     burnParametersToSelectedMemory()
                 else
                     burnParametersToAllMemories()
-            }.get()
+            }.await()
+
             (activity as SelfFittingActivity).isFittingChangesMade = false
         }
     }
@@ -352,7 +357,7 @@ class FittingFragment : Fragment(), IEventListener {
     fun earSideButtonClicked(earSide: EarSide)
     {
         fittingConfig.selectedEarSide = earSide
-        threadPool.execute(this::invalidateBindingsCallback)
+        lifecycleScope.launch(Dispatchers.Default) { invalidateBindingsCallback() }
 
     }
 
@@ -365,12 +370,11 @@ class FittingFragment : Fragment(), IEventListener {
     fun memoryRetentionCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 mBinding.checkBoxMemoryRetention.handleFittingCheckedChanged(
                     { deviceInfoExtMap[selectedEarSide]?.product?.disableMemoryRetention() },
                     { deviceInfoExtMap[selectedEarSide]?.product?.enableMemoryRetention() })
-
             }
         }
     }
@@ -378,7 +382,7 @@ class FittingFragment : Fragment(), IEventListener {
     fun volumeRetentionCheckedChanged()
     {
         (activity as SelfFittingActivity).isFittingChangesMade = true
-        threadPool.execute {
+        lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 mBinding.checkBoxVolumeRetention.handleFittingCheckedChanged(
                     { deviceInfoExtMap[selectedEarSide]?.product?.disableVolumeRetention() },
@@ -399,7 +403,6 @@ class FittingFragment : Fragment(), IEventListener {
         configuration.hearingAidMap[fittingConfig.selectedEarSide]
             ?.wirelessControl?.currentMemory = ParameterSpace.value(mSelectedPickerPosition)
 
-        threadPool.execute(this::invalidateBindingsCallback)
-
+        lifecycleScope.launch(Dispatchers.Default) { invalidateBindingsCallback() }
     }
 }

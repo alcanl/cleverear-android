@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
 import android.widget.Button
 import android.widget.TableRow
 import android.widget.Toast
@@ -21,6 +19,8 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.extension.startVolumeSliderFirstAnimation
+import com.alcanl.cleverear.util.extension.startVolumeSliderSecondAnimation
 import com.alcanl.cleverear.util.listeners.ControlFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
@@ -33,6 +33,8 @@ import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -50,6 +52,9 @@ class ControlFragment : Fragment(), IEventListener {
 
     @Inject
     lateinit var listener : ControlFragmentEventListener
+
+    @Inject
+    lateinit var mutex: Mutex
 
     lateinit var mBinding: FragmentControlBinding
 
@@ -191,15 +196,14 @@ class ControlFragment : Fragment(), IEventListener {
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1)
-            activity?.let {
-                it.runOnUiThread {
-                    Toast.makeText(it, R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
-                    it.finish()
-                    configuration.apply {
-                        isConnected = false
-                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                            .values.first().isConnected = false
-                    }
+            lifecycleScope.launch(Dispatchers.Main) {
+
+                Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+                configuration.apply {
+                    isConnected = false
+                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                        .values.first().isConnected = false
                 }
             }
     }
@@ -272,6 +276,17 @@ class ControlFragment : Fragment(), IEventListener {
         initSwitch()
 
     }
+
+    private fun initTextViews()
+    {
+        if (configuration.isDualDeviceConfig) {
+            mBinding.apply {
+                textViewLeftSeekBar.visibility = View.INVISIBLE
+                textViewRightSeekBar.visibility = View.INVISIBLE
+            }
+        }
+    }
+
     private fun initMemoryButtons()
     {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -279,6 +294,7 @@ class ControlFragment : Fragment(), IEventListener {
             else configuration.hearingAidMap[EarSide.Left]!!)
         }
     }
+
     private fun initMemoryButtons(hearingAid: HearingAid)
     {
         checkEnabledMemoryCount(hearingAid).also {
@@ -368,79 +384,27 @@ class ControlFragment : Fragment(), IEventListener {
         }
         }
     }
-    private fun setSlidersFirstAnimation(slider: Slider) : AnimationListener
+
+    private suspend fun sliderLeftEarOnValueChangedCallback(value: Float)
     {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?)
-            {
-                slider.isEnabled = false
-            }
-
-            override fun onAnimationEnd(animation: Animation?)
-            {
-
-                slider.visibility = View.INVISIBLE
-                mBinding.textViewLeftSeekBar.visibility = View.INVISIBLE
-                mBinding.textViewRightSeekBar.visibility = View.INVISIBLE
-
-                if (mBinding.sliderCommon.visibility != View.VISIBLE) {
-                    mBinding.sliderCommon.startAnimation(
-                        android.view.animation.AnimationUtils.loadAnimation(
-                            requireContext(), R.anim.alpha_blink_anim
-                        ).also {it.setAnimationListener(object : AnimationListener {
-                            override fun onAnimationStart(animation: Animation?) {
-                                mBinding.sliderCommon.visibility = View.VISIBLE
-                                mBinding.sliderCommon.isEnabled = true
+        mutex.withLock {
+            try {
+                configuration.apply {
+                    if (isConnected) {
+                        if (!isDoubleDeviceConnection)
+                            hearingAidMap[earSide]?.apply {
+                                wirelessControl?.volume = value.toInt()
+                                volume = value.toInt()
                             }
-                            override fun onAnimationEnd(animation: Animation?) {}
-                            override fun onAnimationRepeat(animation: Animation?) {}
-                        })
-
-                        })
+                        else
+                            hearingAidMap[EarSide.Left]?.apply {
+                                wirelessControl?.volume = value.toInt()
+                                volume = value.toInt()
+                            }
+                    }
                 }
-            }
-            override fun onAnimationRepeat(animation: Animation?) {}
+            } catch (_: ArkException) {}
         }
-    }
-    private fun setSlidersSecondAnimation(slider: Slider) : AnimationListener
-    {
-        return object : AnimationListener {
-            override fun onAnimationStart(animation: Animation?)
-            {
-                mBinding.sliderCommon.visibility = View.GONE
-                mBinding.sliderCommon.isEnabled = false
-            }
-
-            override fun onAnimationEnd(animation: Animation?)
-            {
-                slider.visibility = View.VISIBLE
-                slider.isEnabled = true
-                mBinding.textViewRightSeekBar.visibility = View.VISIBLE
-                mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {}
-        }
-    }
-    @Synchronized
-    private fun sliderLeftEarOnValueChangedCallback(value: Float)
-    {
-        try {
-            configuration.apply {
-                if (isConnected) {
-                    if (!isDoubleDeviceConnection)
-                        hearingAidMap[earSide]?.apply {
-                            wirelessControl?.volume = value.toInt()
-                            volume = value.toInt()
-                        }
-                    else
-                        hearingAidMap[EarSide.Left]?.apply {
-                            wirelessControl?.volume = value.toInt()
-                            volume = value.toInt()
-                        }
-                }
-            }
-        } catch (_: ArkException) {}
     }
     private fun initActiveMemory(num: Int)
     {
@@ -458,25 +422,27 @@ class ControlFragment : Fragment(), IEventListener {
         }
         setSelectedMemoryButtonView(button, num)
     }
-    @Synchronized
-    private fun sliderRightEarOnValueChangedCallback(value: Float)
+
+    private suspend fun sliderRightEarOnValueChangedCallback(value: Float)
     {
-        try {
-            configuration.apply {
-                if (isConnected) {
-                    if (!isDoubleDeviceConnection)
-                        hearingAidMap[earSide]?.apply {
-                            wirelessControl?.volume = value.toInt()
-                            volume = value.toInt()
-                        }
-                    else
-                        hearingAidMap[EarSide.Right]?.apply {
-                            wirelessControl?.volume = value.toInt()
-                            volume = value.toInt()
-                        }
+        mutex.withLock {
+            try {
+                configuration.apply {
+                    if (isConnected) {
+                        if (!isDoubleDeviceConnection)
+                            hearingAidMap[earSide]?.apply {
+                                wirelessControl?.volume = value.toInt()
+                                volume = value.toInt()
+                            }
+                        else
+                            hearingAidMap[EarSide.Right]?.apply {
+                                wirelessControl?.volume = value.toInt()
+                                volume = value.toInt()
+                            }
+                    }
                 }
-            }
-        } catch (_: ArkException) {}
+            } catch (_: ArkException) {}
+        }
     }
     fun memoryButtonClicked(buttonNumber: Int, button: Button)
     {
@@ -534,49 +500,22 @@ class ControlFragment : Fragment(), IEventListener {
         if (!configuration.isDualDeviceConfig) {
 
             lifecycleScope.launch(Dispatchers.Main) {
-                mBinding.sliderLeft.startAnimation(
-                    android.view.animation.AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.translate_left_to_right_left_slider
-                    ).also { it.setAnimationListener(setSlidersFirstAnimation(mBinding.sliderLeft)) }
-                )
-                mBinding.sliderRight.startAnimation(
-                    android.view.animation.AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.translate_right_to_left_right_slider
-                    ).also { it.setAnimationListener(setSlidersFirstAnimation(mBinding.sliderRight)) }
-                )
-
+                mBinding.apply {
+                    sliderLeft.startVolumeSliderFirstAnimation(requireContext(), this, R.anim.translate_left_to_right_left_slider)
+                    sliderRight.startVolumeSliderFirstAnimation(requireContext(), this, R.anim.translate_right_to_left_right_slider)
+                }
             }
             configuration.isDualDeviceConfig = true
         }
         else {
             lifecycleScope.launch(Dispatchers.Main) {
 
-                mBinding.sliderLeft.startAnimation(
-                    android.view.animation.AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.translate_right_to_left_left_slider
-                    ).also { it.setAnimationListener(setSlidersSecondAnimation(mBinding.sliderLeft)) }
-                )
-                mBinding.sliderRight.startAnimation(
-                    android.view.animation.AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.translate_left_to_right_right_slider
-                    ).also { it.setAnimationListener(setSlidersSecondAnimation(mBinding.sliderRight)) }
-                )
-
+                mBinding.apply {
+                    sliderLeft.startVolumeSliderSecondAnimation(requireContext(), this, R.anim.translate_right_to_left_left_slider)
+                    sliderRight.startVolumeSliderSecondAnimation(requireContext(), this, R.anim.translate_left_to_right_right_slider)
+                }
             }
             configuration.isDualDeviceConfig = false
-        }
-    }
-    private fun initTextViews()
-    {
-        if (configuration.isDualDeviceConfig) {
-            mBinding.apply {
-                textViewLeftSeekBar.visibility = View.INVISIBLE
-                textViewRightSeekBar.visibility = View.INVISIBLE
-            }
         }
     }
 }

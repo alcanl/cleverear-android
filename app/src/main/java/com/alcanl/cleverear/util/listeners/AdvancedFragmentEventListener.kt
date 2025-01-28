@@ -29,6 +29,7 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
 
     @Inject
     lateinit var eventHandler: EventHandler
+
     @Inject
     lateinit var threadPool: ExecutorService
 
@@ -51,30 +52,27 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
                             EventType.kBatteryEvent -> handleBatteryEvent(event, eventSender)
                             EventType.kMemoryEvent -> handleMemoryEvent(event, eventSender)
                             EventType.kVolumeEvent -> handleVolumeEvent(event, eventSender)
-                            else -> handleGenericEvent(event)
+                            else -> Log.i(AdvancedFragmentEventListener::class.simpleName, event.data)
                         }
                     } catch (ex: JSONException) {
-                        Log.e("parseError", ex.message!!)
+                        Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
                     }
                 }
 
-                Log.d("advanced", "AdvancedListenerStopped")
+                Log.d(AdvancedFragmentEventListener::class.simpleName, "Advanced Listener Stopped")
 
             } catch (ex: NullPointerException) {
-                Log.e("null", ex.message!!)
+                Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
             } catch (ex: InterruptedException) {
-                Log.e("thread", ex.message!!)
+                Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
             }
         }
     }
-    private fun handleGenericEvent(event: Event)
-    {
-        Log.e("eventAdvanced", event.data)
-    }
+
     private fun handleConnectionEvent(event: Event)
     {
         try {
-            Log.e(ConnectionStateChangedEvent::class.java.simpleName, event.data)
+            Log.i(ConnectionStateChangedEvent::class.java.simpleName, event.data)
             val connectionEvent = ConnectionEvent(this)
             connectionEvent.eventSender = parseJsonSenderMacData(event.data, mContext)
             connectionEvent.connectionData = parseJsonConnectionData(event.data, mContext)
@@ -82,13 +80,14 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
             EventBus.getDefault().post(connectionEvent)
 
         } catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleBatteryEvent(event: Event, eventSender: String)
     {
         try {
-            Log.e(BatteryStateChangedEvent::class.java.simpleName, event.data)
+            Log.i(BatteryStateChangedEvent::class.java.simpleName, event.data)
             val batteryEvent = BatteryEvent(this)
             batteryEvent.eventSender = eventSender
             batteryEvent.batteryData = parseJsonBatteryStateData(event.data, mContext)
@@ -96,13 +95,14 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
             EventBus.getDefault().post(batteryEvent)
 
         } catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleMemoryEvent(event: Event, eventSender: String) {
 
         try {
-            Log.e(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
+            Log.i(CurrentMemoryCharacteristicChangedEvent::class.java.simpleName, event.data)
 
             val memoryEvent = MemoryEvent(this)
             memoryEvent.eventSender = eventSender
@@ -111,9 +111,10 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
             EventBus.getDefault().post(memoryEvent)
 
         } catch (ex: JSONException) {
-            Log.e("parseError", ex.message!!)
+            Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     private fun handleVolumeEvent(event: Event, eventSender: String)
     {
         try {
@@ -126,15 +127,17 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
         }
         catch (ex: JSONException)
         {
-            Log.e("parseError", ex.message!!)
+            Log.e(AdvancedFragmentEventListener::class.simpleName, ex.message!!)
         }
     }
+
     @Synchronized
     fun stopListener()
     {
         mListener?.interrupt()
         eventHandler.exit()
     }
+
     @Synchronized
     fun isListenerOnBoard() : Boolean
     {
