@@ -16,6 +16,7 @@
     <string name="edittext_contact_number_hint" translatable="true">Kontaktnummer</string>
     <string name="dialog_contact_save_success_text">Die Telefonnummer wurde gespeichert</string>
     <string name="edittext_contact_number_national_code_hint" translatable="true">+49</string>
+    <string name="dialog_connection_requires_battery_voltage_text" translatable="true">Bei der Verbindung mit akkubetriebenen Modellen darf der Batteriestand nicht unter 50% liegen</string>
     <string name="dialog_save_contact_number_textview_text" translatable="true">Sie können die\nCleverEar Hörgeräte-Smart-Tracking-Funktion\n aktivieren, indem Sie die Telefonnummer der Person speichern, die im Notfall bezüglich des Hörgeräts per SMS benachrichtigt wird.</string>
     <string name="button_save_contact_number_text" translatable="true">Kontakt speichern</string>
     <string name="fallen_device_sms_body" translatable="true">Die CleverEar-Anwendung hat einen Vorfall erkannt, bei dem ein Hörgerät mit der Seriennummer %s, das von einer Ihrer nahestehenden Personen verwendet wird, gefallen ist.

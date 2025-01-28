@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -36,6 +37,7 @@ import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
@@ -96,6 +98,19 @@ class MainActivity : AppCompatActivity() {
         checkBluetoothEnabled()
         checkForUpdates()
     }
+
+    override fun onStart()
+    {
+        super.onStart()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.dialog_info_title))
+            .setIcon(AppCompatResources.getDrawable(this, R.drawable.icon_warning))
+            .setCancelable(false)
+            .setMessage(getString(R.string.dialog_connection_requires_battery_voltage_text))
+            .setPositiveButton(getString(R.string.alert_dialog_connection_problem_ok_button)) { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
     override fun onResume()
     {
         super.onResume()
@@ -122,12 +137,14 @@ class MainActivity : AppCompatActivity() {
                         AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()) } }
 
     }
+
     override fun onDestroy()
     {
         super.onDestroy()
         unregisterReceiver(enableBluetoothBroadCast)
         configuration.isMainActivityOnScreen = false
     }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && mBinding.webView.canGoBack()) {
@@ -138,20 +155,24 @@ class MainActivity : AppCompatActivity() {
 
         return super.onKeyDown(keyCode, event)
     }
+
     private fun bluetoothTurnedOn()
     {
         Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
         configuration.isBluetoothEnabled = true
     }
+
     private fun initialize()
     {
         initBinding()
         registerReceiver(enableBluetoothBroadCast, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
     }
+
     private fun initBinding() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mBinding.viewModel = MainActivityListenersViewModel(this)
     }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkAndRequestPermissionForQ() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -168,6 +189,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
     private fun checkAndRequestPermissionForN() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
             PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
@@ -184,6 +206,7 @@ class MainActivity : AppCompatActivity() {
                 1
             )
     }
+
     private fun scanBluetoothPermissions()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -197,6 +220,7 @@ class MainActivity : AppCompatActivity() {
             checkAndRequestPermissionForN()
         }
     }
+
     private fun scanGPS()
     {
         val locationManager : LocationManager = getSystemService(LocationManager::class.java)
@@ -204,6 +228,7 @@ class MainActivity : AppCompatActivity() {
             Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply { gpsActivityResultLauncher.launch(this) }
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.S)
     private fun checkAndRequestPermissionForS()
     {
@@ -221,10 +246,12 @@ class MainActivity : AppCompatActivity() {
                 1
             )
     }
+
     private fun gpsTurnedOn()
     {
         Toast.makeText(this, R.string.toast_gps_on, Toast.LENGTH_LONG).show()
     }
+
     private fun checkBluetoothPermission()
     {
         mIsBluetoothPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -248,6 +275,7 @@ class MainActivity : AppCompatActivity() {
     {
         Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_LONG).show()
     }
+
     private fun controlButtonAnimation() : AnimationListener
     {
         return object : AnimationListener {
@@ -266,6 +294,7 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
+
     private fun infoButtonAnimation() : AnimationListener
     {
         return object : AnimationListener {
@@ -288,10 +317,12 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationRepeat(animation: Animation?) {}
         }
     }
+
     private fun checkBluetoothEnabled()
     {
         configuration.isBluetoothEnabled = getSystemService(BluetoothManager::class.java).adapter.isEnabled
     }
+
     private fun searchBluetooth()
     {
         val bluetoothAdapter = getSystemService(BluetoothManager::class.java).adapter
@@ -312,6 +343,7 @@ class MainActivity : AppCompatActivity() {
             else
                 configuration.isBluetoothEnabled = true
     }
+
     private fun checkForUpdates()
     {
 
@@ -328,6 +360,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     fun buttonSingleDeviceClick() {
 
         if (!configuration.isBluetoothEnabled) {
@@ -344,6 +377,7 @@ class MainActivity : AppCompatActivity() {
             scanBluetoothPermissions()
         }
     }
+
     fun buttonDoubleDeviceClick()
     {
         if (!configuration.isBluetoothEnabled) {
@@ -363,6 +397,7 @@ class MainActivity : AppCompatActivity() {
             scanBluetoothPermissions()
         }
     }
+
     fun buttonControlClicked()
     {
         if (!configuration.isBluetoothEnabled) {
@@ -376,6 +411,7 @@ class MainActivity : AppCompatActivity() {
                     R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
         }
     }
+
     fun buttonInfoClicked()
     {
         mBinding.imageButtonInfo.apply {
