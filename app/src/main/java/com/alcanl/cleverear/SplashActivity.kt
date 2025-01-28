@@ -8,7 +8,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,6 +30,10 @@ import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.ark.EventHandler
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -51,7 +59,21 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     private var isAshaConnected = false
 
+    private var isUpdatedVersion = true
+
     private lateinit var mAddressArray : Array<String>
+
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(applicationContext) }
+
+    private val updateAppResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
+        if (result.resultCode != RESULT_OK) {
+            Toast.makeText(this, R.string.toast_update_need_text, Toast.LENGTH_LONG).show()
+            Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
+        }
+        else
+            isUpdatedVersion = true
+    }
 
     private val mPostNotificationPermission by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -79,11 +101,24 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
         initialize()
+        checkForUpdates()
 
-        if (mForeGroundServicePermission && mPostNotificationPermission) {
+        if (mForeGroundServicePermission && mPostNotificationPermission && isUpdatedVersion) {
             initCountDownTimer()
             cleanEvents()
         }
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    updateAppResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()) } }
     }
 
     override fun onRequestPermissionsResult(
@@ -217,6 +252,22 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     private fun cleanEvents()
     {
         lifecycleScope.launch(Dispatchers.Default) { cleanEventsCallback() }
+    }
+
+    private fun checkForUpdates()
+    {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+
+                isUpdatedVersion = false
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    updateAppResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
+            }
+        }
     }
 
     private suspend fun cleanEventsCallback()

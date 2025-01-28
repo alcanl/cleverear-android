@@ -9,8 +9,6 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.View
@@ -38,10 +36,6 @@ import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.UpdateAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -57,8 +51,6 @@ class MainActivity : AppCompatActivity() {
     private var mIsBluetoothPermissionsGranted = false
 
     private var mIsWebViewActive = false
-
-    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
     private lateinit var mBinding: ActivityMainBinding
 
@@ -77,14 +69,6 @@ class MainActivity : AppCompatActivity() {
             bluetoothTurnedOn()
     }
 
-    private val updateAppResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-        if (result.resultCode != RESULT_OK) {
-            Toast.makeText(this, R.string.toast_update_need_text, Toast.LENGTH_LONG).show()
-            Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()
@@ -96,12 +80,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkBluetoothEnabled()
-        checkForUpdates()
     }
 
     override fun onStart()
     {
         super.onStart()
+
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.dialog_info_title))
             .setIcon(AppCompatResources.getDrawable(this, R.drawable.icon_warning))
@@ -124,18 +108,11 @@ class MainActivity : AppCompatActivity() {
             android.view.animation.AnimationUtils.loadAnimation
                 (this, R.anim.translate_button_left_to_right)
         )
+
         mBinding.buttonDoubleDevice.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation
                 (this, R.anim.translate_button_right_to_left)
         )
-
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                    appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        updateAppResultLauncher,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()) } }
-
     }
 
     override fun onDestroy()
@@ -344,22 +321,7 @@ class MainActivity : AppCompatActivity() {
                 configuration.isBluetoothEnabled = true
     }
 
-    private fun checkForUpdates()
-    {
 
-        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-            ) {
-                appUpdateManager.startUpdateFlowForResult(
-                    appUpdateInfo,
-                    updateAppResultLauncher,
-                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
-            }
-        }
-    }
 
     fun buttonSingleDeviceClick() {
 

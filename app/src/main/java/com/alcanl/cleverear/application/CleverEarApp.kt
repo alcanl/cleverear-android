@@ -16,7 +16,8 @@ class CleverEarApp : Application() {
         super.onCreate()
 
         try {
-            BleUtil.BleManager_Init(applicationContext)
+            BleUtil.BleManager_Init(this)
+
         } catch (ex: ArkException) {
             Log.e(CleverEarApp::class.simpleName, "Error while initializing the BLE library")
         }

@@ -82,7 +82,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
-        if (event is ConnectionEvent && event.connectionData == 1)
+        if (event is ConnectionEvent && event.connectionData == 1 && configuration.isConnected)
             lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
                 requireActivity().finish()
