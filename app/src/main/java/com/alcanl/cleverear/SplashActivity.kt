@@ -59,7 +59,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     private var isAshaConnected = false
 
-    private var isUpdatedVersion = true
+    private var isUpdatedVersion = false
 
     private lateinit var mAddressArray : Array<String>
 
@@ -260,7 +260,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-
                 isUpdatedVersion = false
                 appUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,

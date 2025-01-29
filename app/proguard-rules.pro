@@ -23,3 +23,10 @@
 -keep class ca.unitcircle.androidble.BleManagerImpl { *; }
 -keep class com.alcanl.** { *; }
 -dontwarn com.alcanl.**
+-keep class com.eartechnic.** { *; }
+-keep class * extends android.app.Application { *; }
+-keepclassmembers class * { native <methods>; }
+-keep class * implements android.os.Parcelable { *; }
+-keep class * { native <methods>; }
+-keep class com.ark.ProductManager { *; }
+

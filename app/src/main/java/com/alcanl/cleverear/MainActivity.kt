@@ -82,18 +82,6 @@ class MainActivity : AppCompatActivity() {
         checkBluetoothEnabled()
     }
 
-    override fun onStart()
-    {
-        super.onStart()
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.dialog_info_title))
-            .setIcon(AppCompatResources.getDrawable(this, R.drawable.icon_warning))
-            .setCancelable(false)
-            .setMessage(getString(R.string.dialog_connection_requires_battery_voltage_text))
-            .setPositiveButton(getString(R.string.alert_dialog_connection_problem_ok_button)) { dialog, _ -> dialog.dismiss() }
-            .show()
-    }
 
     override fun onResume()
     {
@@ -113,6 +101,15 @@ class MainActivity : AppCompatActivity() {
             android.view.animation.AnimationUtils.loadAnimation
                 (this, R.anim.translate_button_right_to_left)
         )
+
+        if (mIsBluetoothPermissionsGranted)
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.dialog_info_title))
+                .setIcon(AppCompatResources.getDrawable(this, R.drawable.icon_warning))
+                .setCancelable(false)
+                .setMessage(getString(R.string.dialog_connection_requires_battery_voltage_text))
+                .setPositiveButton(getString(R.string.alert_dialog_connection_problem_ok_button)) { dialog, _ -> dialog.dismiss() }
+                .show()
     }
 
     override fun onDestroy()
