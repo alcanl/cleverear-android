@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -34,6 +33,8 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.ktx.isImmediateUpdateAllowed
+import com.google.android.play.core.ktx.requestAppUpdateInfo
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -42,6 +43,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,9 +61,11 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     private var isAshaConnected = false
 
-    private var isUpdatedVersion = false
+    private var isUpdatedVersion : AtomicBoolean = AtomicBoolean(true)
 
     private lateinit var mAddressArray : Array<String>
+
+    private val mHandler = Handler(Looper.myLooper()!!)
 
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(applicationContext) }
 
@@ -72,7 +76,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
         }
         else
-            isUpdatedVersion = true
+            isUpdatedVersion = AtomicBoolean(true)
     }
 
     private val mPostNotificationPermission by lazy {
@@ -98,13 +102,22 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        lifecycleScope.launch(Dispatchers.IO) {
+            isUpdatedVersion = AtomicBoolean(appUpdateManager.requestAppUpdateInfo().isImmediateUpdateAllowed)
+        }
+
         super.onCreate(savedInstanceState)
         EventBus.getDefault().register(this)
         initialize()
         checkForUpdates()
+    }
 
-        if (mForeGroundServicePermission && mPostNotificationPermission && isUpdatedVersion) {
-            initCountDownTimer()
+    override fun onStart()
+    {
+        super.onStart()
+
+        if (mForeGroundServicePermission && mPostNotificationPermission && isUpdatedVersion.get()) {
+            mHandler.postDelayed(::finalizeSplash, 4000)
             cleanEvents()
         }
     }
@@ -129,14 +142,14 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         if (requestCode == 22)
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission)
-                    initCountDownTimer()
+                    mHandler.postDelayed(::finalizeSplash, 4000)
                 else
                     Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
 
         if (requestCode == 23)
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission)
-                    initCountDownTimer()
+                    mHandler.postDelayed(::finalizeSplash, 4000)
                 else
                     Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
 
@@ -175,42 +188,35 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     }
 
-    private fun initCountDownTimer()
+    private fun handleConnectedBefore()
     {
-        object: CountDownTimer(4000, 1000) {
-            private fun handleConnectedBefore()
-            {
-                val adapter = getSystemService(BluetoothManager::class.java).adapter
-                if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
-                    isAshaConnected = true
-            }
-            override fun onTick(millisUntilFinished: Long) {}
-            override fun onFinish()
-            {
-                handleConnectedBefore()
+        val adapter = getSystemService(BluetoothManager::class.java).adapter
+        if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
+            isAshaConnected = true
+    }
 
-                if (configuration.isConnected) {
-                    Intent(this@SplashActivity, MainContainerActivity::class.java).apply { startActivity(this); finish() }
-                    return
-                }
-                else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
-                {
-                    if (isAshaConnected) {
-                        startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
-                        finish()
-                    }
-                    else
-                        mAlertDialog.show()
-                }
-                else {
-                    Intent(
-                        this@SplashActivity,
-                        MainActivity::class.java
-                    ).apply { startActivity(this) }
-                    finish()
-                }
+    private fun finalizeSplash()
+    {
+        handleConnectedBefore()
+
+        if (configuration.isConnected) {
+            Intent(this@SplashActivity, MainContainerActivity::class.java).apply { startActivity(this); finish() }
+            return
+        }
+        else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
+        {
+            if (isAshaConnected) {
+                startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
+                finish()
             }
-        }.start()
+            else
+                mAlertDialog.show()
+        }
+        else {
+            Intent(this@SplashActivity, MainActivity::class.java)
+                .apply { startActivity(this) }
+                    finish()
+        }
     }
     private fun checkPrefs()
     {
@@ -260,7 +266,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                isUpdatedVersion = false
                 appUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
                     updateAppResultLauncher,
@@ -278,12 +283,14 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
         } catch (_: InterruptedException) {}
     }
+
     fun alertDialogPositiveButtonClicked()
     {
         mAlertDialog.dismiss()
         startActivity(Intent(this, AutoConnectActivity::class.java))
         finish()
     }
+
     fun alertDialogNegativeButtonClicked()
     {
         configuration.isConnectedBefore = false
