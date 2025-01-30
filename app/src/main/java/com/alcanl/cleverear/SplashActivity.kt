@@ -28,22 +28,20 @@ import com.alcanl.cleverear.util.dialog.CustomAlertDialogConnectedBefore
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
-import com.ark.EventHandler
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.play.core.ktx.isImmediateUpdateAllowed
 import com.google.android.play.core.ktx.requestAppUpdateInfo
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,29 +52,27 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     lateinit var configuration: ConfigurationModule
 
     @Inject
-    lateinit var eventHandler: EventHandler
-
-    @Inject
     lateinit var listener: SplashActivityEventListener
 
-    private var isAshaConnected = false
+    @Inject
+    lateinit var handler : Handler
 
-    private var isUpdatedVersion : AtomicBoolean = AtomicBoolean(true)
+    private var mIsAshaConnected = false
 
     private lateinit var mAddressArray : Array<String>
 
-    private val mHandler = Handler(Looper.myLooper()!!)
+    private var mIsUpdatedVersion = true
 
-    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(applicationContext) }
+    private val mAppUpdateManager by lazy { AppUpdateManagerFactory.create(applicationContext) }
 
-    private val updateAppResultLauncher = registerForActivityResult(
+    private val mUpdateAppResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
         if (result.resultCode != RESULT_OK) {
             Toast.makeText(this, R.string.toast_update_need_text, Toast.LENGTH_LONG).show()
             Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
         }
         else
-            isUpdatedVersion = AtomicBoolean(true)
+            mIsUpdatedVersion = true
     }
 
     private val mPostNotificationPermission by lazy {
@@ -102,23 +98,28 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        lifecycleScope.launch(Dispatchers.IO) {
-            isUpdatedVersion = AtomicBoolean(appUpdateManager.requestAppUpdateInfo().isImmediateUpdateAllowed)
-        }
-
         super.onCreate(savedInstanceState)
+
         EventBus.getDefault().register(this)
         initialize()
-        checkForUpdates()
-    }
 
-    override fun onStart()
-    {
-        super.onStart()
+        lifecycleScope.launch(Dispatchers.IO) {
+            async {
+                mIsUpdatedVersion = try {
+                    mAppUpdateManager.requestAppUpdateInfo().updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                } catch (_: Exception) { true }
+            }.await()
 
-        if (mForeGroundServicePermission && mPostNotificationPermission && isUpdatedVersion.get()) {
-            mHandler.postDelayed(::finalizeSplash, 4000)
-            cleanEvents()
+            launch(Dispatchers.Main) {
+                if (!mIsUpdatedVersion)
+                    doUpdate()
+                else if (!mForeGroundServicePermission || !mPostNotificationPermission)
+                    checkAndRequestNotificationPermission()
+                else {
+                    cleanEvents()
+                    handler.postDelayed(::finalizeSplash, 4000)
+                }
+            }
         }
     }
 
@@ -126,11 +127,11 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     {
         super.onResume()
 
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+        mAppUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                appUpdateManager.startUpdateFlowForResult(
+                mAppUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
-                    updateAppResultLauncher,
+                    mUpdateAppResultLauncher,
                     AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()) } }
     }
 
@@ -141,15 +142,19 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     ) {
         if (requestCode == 22)
             if (grantResults.isNotEmpty())
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission)
-                    mHandler.postDelayed(::finalizeSplash, 4000)
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission) {
+                    cleanEvents()
+                    handler.postDelayed(::finalizeSplash, 4000)
+                }
                 else
                     Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
 
         if (requestCode == 23)
             if (grantResults.isNotEmpty())
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission)
-                    mHandler.postDelayed(::finalizeSplash, 4000)
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission) {
+                    cleanEvents()
+                    handler.postDelayed(::finalizeSplash, 4000)
+                }
                 else
                     Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
 
@@ -180,19 +185,19 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                 22
             )
+
         if (!mForeGroundServicePermission)
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE),
                 23)
-
     }
 
     private fun handleConnectedBefore()
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
         if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
-            isAshaConnected = true
+            mIsAshaConnected = true
     }
 
     private fun finalizeSplash()
@@ -200,12 +205,13 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         handleConnectedBefore()
 
         if (configuration.isConnected) {
-            Intent(this@SplashActivity, MainContainerActivity::class.java).apply { startActivity(this); finish() }
+            Intent(this@SplashActivity, MainContainerActivity::class.java)
+                .apply { startActivity(this); finish() }
             return
         }
         else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
         {
-            if (isAshaConnected) {
+            if (mIsAshaConnected) {
                 startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
                 finish()
             }
@@ -214,8 +220,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         }
         else {
             Intent(this@SplashActivity, MainActivity::class.java)
-                .apply { startActivity(this) }
-                    finish()
+                .apply { startActivity(this) }; finish()
         }
     }
     private fun checkPrefs()
@@ -251,7 +256,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     private fun initialize()
     {
         DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
-        checkAndRequestNotificationPermission()
         checkPrefs()
     }
 
@@ -260,15 +264,15 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         lifecycleScope.launch(Dispatchers.Default) { cleanEventsCallback() }
     }
 
-    private fun checkForUpdates()
+    private fun doUpdate()
     {
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+        mAppUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
 
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                appUpdateManager.startUpdateFlowForResult(
+                mAppUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
-                    updateAppResultLauncher,
+                    mUpdateAppResultLauncher,
                     AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build())
             }
         }

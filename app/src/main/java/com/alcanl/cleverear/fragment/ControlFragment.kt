@@ -27,7 +27,6 @@ import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.alcanl.cleverear.viewmodel.ControlFragmentListenersViewModel
 import com.ark.ArkException
-import com.ark.EventHandler
 import com.ark.ParameterSpace
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,9 +42,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ControlFragment : Fragment(), IEventListener {
-
-    @Inject
-    lateinit var eventHandler: EventHandler
 
     @Inject
     lateinit var configuration : ConfigurationModule

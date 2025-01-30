@@ -13,7 +13,6 @@ import android.content.SharedPreferences.Editor
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -71,6 +70,9 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var listener: LoadingActivityEventListener
+
+    @Inject
+    lateinit var handler: Handler
 
     private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
 
@@ -247,7 +249,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                     configuration.hearingAidMap[EarSide.Left]?.isConnected!!) {
 
                     mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ startActivity(
+                    handler.postDelayed({ startActivity(
                         Intent(this@LoadingActivity, LoadingActivity::class.java))
                         finish() }
                         , 3000)
@@ -260,7 +262,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                 if (!configuration.hearingAidMap[EarSide.Left]?.isConnected!!) {
                     mBinding.textViewConnecting.text =
                         getString(R.string.textview_device_detection_not_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
+                    handler.postDelayed({ finish() }, 3000)
                 }
                 else {
                     runOnUiThread {
@@ -311,7 +313,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                 if (!configuration.isConnected) {
                     mBinding.textViewConnecting.text =
                         getString(R.string.textview_device_detection_not_connected_text)
-                    Handler(Looper.myLooper()!!).postDelayed({ finish() }, 2000)
+                    handler.postDelayed({ finish() }, 2000)
                 }
                 else {
                     runOnUiThread {
@@ -350,7 +352,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     private fun finalizeConnectedLoadingTimer()
     {
         mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
-        Handler(Looper.myLooper()!!).postDelayed({
+        handler.postDelayed({
             if (!configuration.isRemoteFittingConnection)
                 if (configuration.isConnectedBefore)
                     Intent(this@LoadingActivity, MainContainerActivity::class.java)
@@ -367,7 +369,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             finalizeConnectedLoadingTimer()
         else {
             mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_not_connected_text)
-            Handler(Looper.myLooper()!!).postDelayed({ finish() }, 3000)
+            handler.postDelayed({ finish() }, 3000)
         }
     }
     private fun initialize()
