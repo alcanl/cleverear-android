@@ -36,7 +36,7 @@
     <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nBağlı hiçbir cihaz modeli bu özelliği desteklememektedir</string>
     <string name="navbar_beacon_text" translatable="true">Ölçümler</string>
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>
-    <string name="toast_no_permission_splash_activity" translatable="true">Devam Edebilmek İçin Zorunlu İzin Taleplerini Kabul Edilmesi Gerekmektedir</string>
+    <string name="toast_no_permission_splash_activity" translatable="true">Uygulama İçin Zorunlu İzinlerin Kabul Edilmesi Gerekmektedir</string>
     <string name="groupbox_select_device_text" translatable="true">Bağlanmak İçin Cihaz Seçin</string>
     <string name="textview_program_text">Programlar</string>
     <string name="textview_left_device_text">Sol Kulak</string>

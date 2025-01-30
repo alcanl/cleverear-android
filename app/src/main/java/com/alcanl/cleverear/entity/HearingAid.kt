@@ -37,7 +37,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             wirelessControl?.setCommunicationAdaptor(communicationAdaptor)
 
         } catch (ex: ArkException) {
-            Log.e("SDKAdaptors", ex.message!!)
+            Log.e(HearingAid::class.simpleName, ex.message!!)
         }
     }
 
@@ -58,7 +58,7 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
             }
         }
         catch (e : ArkException) {
-            Log.e("Read Config Error", e.message!!)
+            Log.e(HearingAid::class.simpleName, e.message!!)
         }
     }
 
@@ -72,7 +72,9 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
         try {
             communicationAdaptor?.disconnect()
             isConnected = false
-        } catch (_: ArkException) {}
+        } catch (ex: ArkException) {
+            Log.e(HearingAid::class.simpleName, ex.message!!)
+        }
     }
 
     override fun equals(other: Any?): Boolean

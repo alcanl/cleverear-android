@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Process.killProcess
+import android.os.Process.myPid
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -147,7 +149,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                     handler.postDelayed(::finalizeSplash, 4000)
                 }
                 else
-                    Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+                    onPermissionResultNegative()
 
         if (requestCode == 23)
             if (grantResults.isNotEmpty())
@@ -156,7 +158,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                     handler.postDelayed(::finalizeSplash, 4000)
                 }
                 else
-                    Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+                    onPermissionResultNegative()
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
@@ -174,6 +176,12 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 else
                     hearingAidMap[earSide]?.batteryLevel = event.batteryData
             }
+    }
+
+    private fun onPermissionResultNegative()
+    {
+        Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
+        handler.postDelayed({ killProcess(myPid()) }, 2000)
     }
 
     @SuppressLint("InlinedApi")
