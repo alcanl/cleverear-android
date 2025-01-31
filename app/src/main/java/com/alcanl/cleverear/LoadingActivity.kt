@@ -46,6 +46,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -391,11 +392,11 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     }
 
     @SuppressLint("MissingPermission")
-    private fun connectToDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
+    private suspend fun connectToDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
         try {
             hearingAid.communicationAdaptor?.connect()
-            Thread.sleep(6000)
+            delay(6000)
 
             if (hearingAid.isConnected && hearingAid.bondStatus == BluetoothDevice.BOND_NONE)
                 adapter.getRemoteDevice(hearingAid.address).createBond()
