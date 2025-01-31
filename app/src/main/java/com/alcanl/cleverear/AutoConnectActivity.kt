@@ -40,7 +40,6 @@ class AutoConnectActivity : AppCompatActivity() {
     override fun onResume()
     {
         super.onResume()
-
         with(configuration) {
 
             mBinding.apply {

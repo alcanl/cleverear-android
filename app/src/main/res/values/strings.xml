@@ -67,6 +67,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="toast_device_must_pair_text" translatable="true">Hearing Aid Must Be Paired With Mobile Phone</string>
     <string name="toast_bt_on" translatable="true">Bluetooth On</string>
     <string name="toast_gps_on" translatable="true">Location On</string>
+    <string name="groupbox_layout_select_device_label_text" translatable="true">Select Your Device or Devices</string>
     <string name="textview_connect_to_selected_device_text" translatable="true">Connect via Selected Device</string>
     <string name="bubble_textview_control_device_text" translatable="true">Control previous device connections</string>
     <string name="toast_invalid_phone_number_format_text" translatable="true">Invalid format for a phone number</string>

@@ -117,6 +117,7 @@
     <string name="textview_in_situ_warning_text" translatable="true">Bu test sadece bilgilendirme ve cihaz konfigürasyonu için uygulanmakta olup, resmi sağlık kuruluşlarında uygulanan işitme testlerinin yerine geçmemektedir.</string>
     <string name="checkbox_memory_retention_text" translatable="true">Program Hafızası</string>
     <string name="checkbox_volume_retention_text" translatable="true">Ses Hafızası</string>
+    <string name="groupbox_layout_select_device_label_text" translatable="true">Bağlanmak İçin Cihaz Seçiniz</string>
     <string name="textview_connect_to_selected_device_text" translatable="true">Seçili Cihaza Bağlan</string>
     <string name="textview_click_for_connect_text" translatable="true">Bağlanmak İçin Tıkla</string>
     <string name="toast_test_result_saved_text" translatable="true">Test Sonucu Galeriye Kaydedildi</string>

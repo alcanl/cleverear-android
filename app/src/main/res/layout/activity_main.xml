@@ -136,7 +136,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <com.daasuu.bl.BubbleLayout
-            android:layout_width="125dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:padding="8dp"
@@ -156,11 +156,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginStart="6dp"
                 android:text="@string/bubble_textview_control_device_text"
                 android:textAlignment="center"
                 android:textColor="@color/ap_gray"
-                android:textSize="5sp"
+                android:textSize="6sp"
                 tools:ignore="SmallSp,TextContrastCheck" />
 
         </com.daasuu.bl.BubbleLayout>
