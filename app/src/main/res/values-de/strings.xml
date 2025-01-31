@@ -24,8 +24,8 @@
     <string name="dialog_connection_requires_battery_voltage_text" translatable="true">Bei der Verbindung mit akkubetriebenen Modellen darf der Batteriestand nicht unter 50% liegen</string>
     <string name="dialog_save_contact_number_textview_text" translatable="true">Sie können die\nCleverEar Hörgeräte-Smart-Tracking-Funktion\n aktivieren, indem Sie die Telefonnummer der Person speichern, die im Notfall bezüglich des Hörgeräts per SMS benachrichtigt wird.</string>
     <string name="button_save_contact_number_text" translatable="true">Kontakt speichern</string>
-    <string name="fallen_device_sms_body" translatable="true">Die CleverEar-Anwendung hat einen Vorfall erkannt, bei dem ein Hörgerät mit der Seriennummer %s, das von einer Ihrer nahestehenden Personen verwendet wird, gefallen ist.
-Diese Nachricht wurde vom CleverEar-System automatisch zu Informationszwecken gesendet. Sollten Sie der Meinung sein, dass es sich um eine falsche Information handelt, ignorieren Sie diese Nachricht bitte.</string>
+    <string name="groupbox_layout_select_ear_side_label_text" translatable="true">Wählen Sie die Ohrseite</string>
+    <string name="fallen_device_sms_body" translatable="true">Die CleverEar-Anwendung hat einen Vorfall erkannt, bei dem ein Hörgerät mit der Seriennummer %s, das von einer Ihrer nahestehenden Personen verwendet wird, gefallen ist. Diese Nachricht wurde vom CleverEar-System automatisch zu Informationszwecken gesendet. Sollten Sie der Meinung sein, dass es sich um eine falsche Information handelt, ignorieren Sie diese Nachricht bitte.</string>
     <string name="textview_eddystone_tracking_description_text" translatable="true">Mit der Aktivierung beginnt die App, die Gerätemeldungen im Hintergrundmodus zu verfolgen und benachrichtigt den Benutzer über kritische Daten.\nZum Beispiel hohe Temperatur, gefallenes Gerät oder große Kommunikationsentfernung</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">Keine Verbindung</string>
     <string name="textview_eddystone_not_supporting_text" translatable="true">Nicht unterstützt</string>

@@ -30,79 +30,92 @@
             app:srcCompat="@drawable/cleverear_logo"
             tools:ignore="ImageContrastCheck" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="414dp"
-            android:layout_height="350dp"
-            android:layout_marginTop="33dp"
-            android:orientation="horizontal"
+        <ir.programmerplus.groupbox.GroupBoxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="15dp"
+            android:paddingBottom="15dp"
+            app:labelTextSize="16sp"
+            app:borderColor="#128ba6"
+            app:labelTextColor="#128ba6"
+            app:labelText="@string/groupbox_layout_select_ear_side_label_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2"
-            android:baselineAligned="false"
-            tools:ignore="VisualLintBounds">
+            app:layout_constraintTop_toBottomOf="@+id/imageView2">
 
-            <FrameLayout
-                android:id="@+id/frameLayoutLeftEar"
+            <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="323dp"
-                android:layout_weight="5">
+                android:layout_height="350dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                tools:ignore="VisualLintBounds"
+                tools:layout_editor_absoluteY="283dp">
 
-                <ImageButton
-                    android:layout_width="119dp"
-                    android:layout_height="151dp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:background="#00FFFFFF"
-                    android:contentDescription="@string/textview_left_device_text"
-                    android:onClick="@{()-> viewModel.handleLeftEarButton()}"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/leftear_blue"
-                    tools:ignore="DuplicateSpeakableTextCheck" />
+                <FrameLayout
+                    android:id="@+id/frameLayoutLeftEar"
+                    android:layout_width="match_parent"
+                    android:layout_height="323dp"
+                    android:layout_weight="5">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="110dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/left_ear_side_text"
-                    android:textColor="@color/ap_black"
-                    android:textSize="20sp" />
+                    <ImageButton
+                        android:layout_width="119dp"
+                        android:layout_height="151dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:background="#00FFFFFF"
+                        android:contentDescription="@string/textview_left_device_text"
+                        android:onClick="@{()-> viewModel.handleLeftEarButton()}"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/leftear_blue"
+                        tools:ignore="DuplicateSpeakableTextCheck" />
 
-            </FrameLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="110dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/left_ear_side_text"
+                        android:textColor="@color/ap_black"
+                        android:textSize="20sp" />
 
-            <FrameLayout
-                android:id="@+id/frameLayoutRightEar"
-                android:layout_width="match_parent"
-                android:layout_height="323dp"
-                android:layout_weight="5">
+                </FrameLayout>
 
-                <ImageButton
-                    android:layout_width="119dp"
-                    android:layout_height="151dp"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="10dp"
-                    android:background="#00FFFFFF"
-                    android:contentDescription="@string/textview_right_device_text"
-                    android:onClick="@{() -> viewModel.handleRightEarButton()}"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/rightear_red"
-                    tools:ignore="DuplicateSpeakableTextCheck" />
+                <FrameLayout
+                    android:id="@+id/frameLayoutRightEar"
+                    android:layout_width="match_parent"
+                    android:layout_height="323dp"
+                    android:layout_weight="5">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="110dp"
-                    android:layout_marginEnd="10dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/right_ear_side_text"
-                    android:textColor="@color/ap_black"
-                    android:textSize="20sp" />
-            </FrameLayout>
-        </LinearLayout>
+                    <ImageButton
+                        android:layout_width="119dp"
+                        android:layout_height="151dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="10dp"
+                        android:background="#00FFFFFF"
+                        android:contentDescription="@string/textview_right_device_text"
+                        android:onClick="@{() -> viewModel.handleRightEarButton()}"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/rightear_red"
+                        tools:ignore="DuplicateSpeakableTextCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="110dp"
+                        android:layout_marginEnd="10dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@string/right_ear_side_text"
+                        android:textColor="@color/ap_black"
+                        android:textSize="20sp" />
+                </FrameLayout>
+            </LinearLayout>
+        </ir.programmerplus.groupbox.GroupBoxLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
