@@ -157,32 +157,37 @@ class AutoConnectActivity : AppCompatActivity() {
             {
                 with(configuration) {
 
-                    if (isLeftSelected && isRightSelected)
-                        if (isValidDeviceData(true, "")) {
-                            isDoubleDeviceConnection = true
-                            controlButtonClickedCommon()
-                        }
-                        else
-                            toastInvalidDeviceData()
-                    else if (isLeftSelected)
-                        if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())){
-                            isDoubleDeviceConnection = false
-                            earSide = EarSide.Left
-                            controlButtonClickedCommon()
-                        }
-                        else
-                            toastInvalidDeviceData()
-                    else if (isRightSelected)
-                        if (isValidDeviceData(false, mBinding.textViewRight.text.toString())){
-                            isDoubleDeviceConnection = false
-                            earSide = EarSide.Right
-                            controlButtonClickedCommon()
-                        }
-                        else
-                            toastInvalidDeviceData()
+                    when {
+                        isLeftSelected && isRightSelected ->
+                            if (isValidDeviceData(true, "")) {
+                                isDoubleDeviceConnection = true
+                                controlButtonClickedCommon()
+                            } else
+                                toastInvalidDeviceData()
 
-                    else
-                        Toast.makeText(this@AutoConnectActivity, R.string.toast_no_device_selected, Toast.LENGTH_LONG).show()
+                        isLeftSelected ->
+                            if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())) {
+                                isDoubleDeviceConnection = false
+                                earSide = EarSide.Left
+                                controlButtonClickedCommon()
+                            } else
+                                toastInvalidDeviceData()
+
+                        isRightSelected ->
+                            if (isValidDeviceData(false, mBinding.textViewRight.text.toString())) {
+                                isDoubleDeviceConnection = false
+                                earSide = EarSide.Right
+                                controlButtonClickedCommon()
+                            } else
+                                toastInvalidDeviceData()
+
+                        else ->
+                            Toast.makeText(
+                                this@AutoConnectActivity,
+                                R.string.toast_no_device_selected,
+                                Toast.LENGTH_LONG
+                            ).show()
+                    }
                 }
             }
             override fun onAnimationEnd(animation: Animation?) {}
