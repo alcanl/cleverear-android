@@ -389,6 +389,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
         mConnectorFutures.add( threadPool.submit { connectToDeviceCallback(adapter, hearingAid) } )
     }
+
     @SuppressLint("MissingPermission")
     private fun connectToDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {

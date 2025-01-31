@@ -12,7 +12,9 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="toast_require_internet_connection_text" translatable="true">Die Selbst- oder Fernanpassung erfordert eine verfügbare Internetverbindung.</string>
     <string name="button_cancel_text" translatable="true">Abbrechen</string>
+    <string name="toast_invalid_phone_number_format_text">Ungültiges Format für eine Telefonnummer</string>
     <string name="edittext_contact_number_hint" translatable="true">Kontaktnummer</string>
     <string name="dialog_contact_save_success_text">Die Telefonnummer wurde gespeichert</string>
     <string name="edittext_contact_number_national_code_hint" translatable="true">+49</string>

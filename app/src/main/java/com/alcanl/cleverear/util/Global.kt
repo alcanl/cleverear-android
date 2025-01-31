@@ -2,6 +2,8 @@ package com.alcanl.cleverear.util
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.ui.text.intl.Locale
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
@@ -21,7 +23,7 @@ private const val VOLUME_STATE = 1
 const val ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE = 60
 const val ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE = 61
 const val SMS_PERMISSION_REQUEST_CODE = 62
-const val EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER = "NOT_SUPPORTING_YET"
+const val EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER = "Biyonix E S-P"
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"
@@ -158,3 +160,10 @@ fun getSystemLanguage() : String
     return Locale.current.language
 }
 
+fun isInternetAvailable(context: Context): Boolean
+{
+    val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+    val network = connectivityManager.activeNetwork ?: return false
+    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}

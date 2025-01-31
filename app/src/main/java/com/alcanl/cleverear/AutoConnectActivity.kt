@@ -14,6 +14,7 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.HA_LEFT_NAME
 import com.alcanl.cleverear.util.HA_RIGHT_NAME
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.viewmodel.AutoConnectActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -193,6 +194,11 @@ class AutoConnectActivity : AppCompatActivity() {
         return object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?)
             {
+                if (!isInternetAvailable(this@AutoConnectActivity)) {
+                    Toast.makeText(this@AutoConnectActivity,"" , Toast.LENGTH_LONG).show()
+                    return
+                }
+
                 with(configuration) {
 
                     if (isLeftSelected && isRightSelected)

@@ -13,8 +13,10 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:padding="15dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -26,7 +28,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textFieldContactNumberNationalCode"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="55dp"
+            android:layout_width="50dp"
             android:layout_height="55dp"
             android:layout_marginStart="30dp"
             android:layout_marginTop="15dp"
@@ -50,7 +52,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="225dp"
+            android:layout_width="215dp"
             android:layout_height="55dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="30dp"
@@ -64,10 +66,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:textSize="11sp"
                 android:maxLength="10"
                 android:textAlignment="center"
                 android:textColor="@color/ap_black"
+                android:textSize="11sp"
+                android:digits="0123456789"
                 tools:ignore="TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -150,13 +153,13 @@
                 android:id="@+id/buttonOk"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_marginTop="8dp"
                 android:layout_gravity="center"
-                android:visibility="invisible"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="@color/design_default_color_secondary_variant"
                 android:onClick="@{(view) -> viewModel.handleDialogButtons(view)}"
                 android:text="@string/alert_dialog_connection_problem_ok_button"
                 android:textColor="@color/white"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.332"
                 app:layout_constraintStart_toStartOf="parent"
@@ -167,11 +170,11 @@
                 android:id="@+id/textViewContactSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
                 android:layout_gravity="center_horizontal"
-                android:visibility="invisible"
-                android:textSize="13sp"
+                android:layout_marginTop="30dp"
                 android:text="@string/dialog_contact_save_success_text"
+                android:textSize="13sp"
+                android:visibility="invisible"
                 tools:ignore="VisualLintBounds" />
 
         </FrameLayout>

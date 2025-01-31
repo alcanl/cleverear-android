@@ -38,7 +38,9 @@
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>
     <string name="toast_no_permission_splash_activity" translatable="true">Uygulama İçin Zorunlu İzinlerin Kabul Edilmesi Gerekmektedir</string>
     <string name="groupbox_select_device_text" translatable="true">Bağlanmak İçin Cihaz Seçin</string>
+    <string name="toast_require_internet_connection_text" translatable="true">Bireysel ya da Uzaktan Cihaz Konfigürasyonu İçin Aktif Bir İnternet Bağlantısı Gereklidir</string>
     <string name="textview_program_text">Programlar</string>
+    <string name="toast_invalid_phone_number_format_text" translatable="true">Geçersiz bir telefon numarası formatı girildi</string>
     <string name="textview_left_device_text">Sol Kulak</string>
     <string name="textview_right_device_text">Sağ Kulak</string>
     <string name="switch_dual_device_text">Binaural Kullanım</string>

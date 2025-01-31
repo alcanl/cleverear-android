@@ -28,6 +28,7 @@ import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogConnectedBefore
 import com.alcanl.cleverear.util.isConnected
+import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -40,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -107,8 +109,12 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
         lifecycleScope.launch(Dispatchers.IO) {
             async {
-                mIsUpdatedVersion = try {
-                    mAppUpdateManager.requestAppUpdateInfo().updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                mIsUpdatedVersion = if (!isInternetAvailable(this@SplashActivity)) true
+                else try {
+                    withTimeout(5000) {
+                        mAppUpdateManager.requestAppUpdateInfo()
+                            .updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    }
                 } catch (_: Exception) { true }
             }.await()
 

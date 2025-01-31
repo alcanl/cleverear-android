@@ -91,6 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="165dp"
                 android:layout_marginStart="50dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginEnd="50dp"
                 android:visibility="invisible"
                 app:borderColor="#A8A3A3"
@@ -122,9 +123,8 @@
                 android:layout_width="233dp"
                 android:layout_height="41dp"
                 android:layout_marginStart="89dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginEnd="89dp"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="50dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"
@@ -132,14 +132,13 @@
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <FrameLayout
                 android:id="@+id/frameLayoutEndConnection"
                 android:layout_width="289dp"
                 android:layout_height="83dp"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="20dp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -177,8 +176,8 @@
                 <ProgressBar
                     android:id="@+id/progressBar"
                     style="?android:attr/progressBarStyle"
-                    android:layout_width="69dp"
-                    android:layout_height="63dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:indeterminateTint="@color/design_default_color_secondary_variant"
                     android:visibility="gone" />

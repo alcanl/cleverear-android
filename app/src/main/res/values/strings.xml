@@ -48,7 +48,8 @@ This message has been automatically sent by the CleverEar system for information
     <string name="button_check_tick_content_desc" translatable="false">Set Channel Done</string>
     <string name="edittext_channel_hint" translatable="false">1–255</string>
     <string name="button_stop_scan_text" translatable="false">\tStop Scanning</string>
-    <string name="dialog_already_connected_message" translatable="true">Are you sure to end current connection?</string>
+    <string name="toast_require_internet_connection_text" translatable="true">Self or Remote Fitting Operation Needs An Available Internet Connection</string>
+    <string name="dialog_already_connected_message" translatable="true">Are you sure that you want to end the current connection?</string>
     <string name="dialog_connection_requires_battery_voltage_text" translatable="true">For connection with rechargeable battery-powered models, the battery level should not be below 50%</string>
     <string name="textview_count_device_found_text" translatable="true">Device Found</string>
     <string name="button_stop_connection_text" translatable="true">\t\t\tStop Connection</string>
@@ -66,6 +67,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="toast_device_must_pair_text" translatable="true">Hearing Aid Must Be Paired With Mobile Phone</string>
     <string name="toast_bt_on" translatable="true">Bluetooth On</string>
     <string name="toast_gps_on" translatable="true">Location On</string>
+    <string name="toast_invalid_phone_number_format_text" translatable="true">Invalid format for a phone number</string>
     <string name="text_active_memory" translatable="true">Active program is </string>
     <string name="empty_string" translatable="false"> </string>
     <string name="button_text_one" translatable="false">1</string>

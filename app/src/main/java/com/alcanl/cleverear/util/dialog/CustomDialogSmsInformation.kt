@@ -2,6 +2,7 @@ package com.alcanl.cleverear.util.dialog
 
 import android.app.Dialog
 import android.content.Context.MODE_PRIVATE
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
@@ -29,12 +30,20 @@ class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(acti
 
     fun saveSmsContactInformationToPref()
     {
+        binding.editTextContactNumber.apply {
+            if (text == null || text?.length!! < 10 || !text?.codePoints()?.mapToObj {c -> c.toChar() }?.allMatch(Character::isDigit)!!) {
+                Toast.makeText(context, "", Toast.LENGTH_LONG).show()
+                return
+            }
+        }
+
         val phoneNumber = (binding.editTextContactNumberNationalCode.text?.toString()
             ?.ifBlank {
                 with (mWeakReference.get()!!) {
                     val code = this.getString(R.string.edittext_contact_number_national_code_hint)
                     code.substring(1, code.length)
                 } + binding.editTextContactNumber.text?.toString() })
+
 
         val editor = mWeakReference.get()?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)?.edit()
         editor?.putString(EMERGENCY_NUMBER, phoneNumber!!)
