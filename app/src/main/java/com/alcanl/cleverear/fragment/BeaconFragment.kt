@@ -41,7 +41,6 @@ import com.ark.ParameterSpace
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -305,7 +304,7 @@ class BeaconFragment : Fragment(), IEventListener {
 
         discoverEddyStoneBeacons()
 
-        mJob = CoroutineScope(Dispatchers.IO).launch {
+        mJob = lifecycleScope.launch(Dispatchers.IO) {
             while (isActive) {
                 try {
                     mHandler.apply {

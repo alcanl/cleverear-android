@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivityLoadingBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.ConfigurationModule.earSide
@@ -42,12 +43,14 @@ import com.ark.ArkException
 import com.ark.EventHandler
 import com.ark.ProductManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -58,9 +61,6 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var eventHandler: EventHandler
-
-    @Inject
-    lateinit var threadPool: ExecutorService
 
     @Inject
     lateinit var productManager: ProductManager
@@ -74,7 +74,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     @Inject
     lateinit var handler: Handler
 
-    private val mConnectorFutures : MutableList<Future<*>> = mutableListOf()
+    private val mConnectorCoroutines : MutableList<Deferred<*>> = mutableListOf()
 
     private lateinit var mBinding : ActivityLoadingBinding
 
@@ -273,7 +273,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                         ).show()
                     }
                     finish()
-                    threadPool.execute {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         configuration.hearingAidMap[EarSide.Left]?.endConnectionSession()
                         configuration.hearingAidMap[EarSide.Left]?.isConnected = false
                     }
@@ -303,7 +303,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             {
                 commonUnBondDeviceOnTick(millisUntilFinished)
 
-                if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected && mConnectorFutures.all { it.isDone }) {
+                if (hearingAid.bondStatus == BluetoothDevice.BOND_BONDED && configuration.isConnected && mConnectorCoroutines.all { it.isCompleted }) {
                     finalizeConnectedLoadingTimer()
                     this.cancel()
                 }
@@ -324,7 +324,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                         ).show()
                     }
                     finish()
-                    threadPool.execute {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         configuration.hearingAidMap[earSide]?.endConnectionSession()
                         configuration.isConnected = false
                     }
@@ -338,7 +338,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             override fun onTick(millisUntilFinished: Long)
             {
                 commonBondDeviceOnTick(millisUntilFinished)
-                if (configuration.isConnected && mConnectorFutures.all { it.isDone }) {
+                if (configuration.isConnected && mConnectorCoroutines.all { it.isCompleted }) {
                     finalizeConnectedLoadingTimer()
                     this.cancel()
                 }
@@ -387,7 +387,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     private fun connectToDevice(hearingAid: HearingAid)
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
-        mConnectorFutures.add( threadPool.submit { connectToDeviceCallback(adapter, hearingAid) } )
+        mConnectorCoroutines.add( lifecycleScope.async(Dispatchers.IO) { connectToDeviceCallback(adapter, hearingAid) } )
     }
 
     @SuppressLint("MissingPermission")
