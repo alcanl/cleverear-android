@@ -11,9 +11,8 @@ import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAutoConnectBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.HA_LEFT_NAME
-import com.alcanl.cleverear.util.HA_RIGHT_NAME
-import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
+import com.alcanl.cleverear.util.getRightHearingAidModelNumber
 import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.viewmodel.AutoConnectActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,10 +44,10 @@ class AutoConnectActivity : AppCompatActivity() {
             mBinding.apply {
 
                 imageButtonLeft.isEnabled = if (hearingAidMap[EarSide.Left] != null) !hearingAidMap[EarSide.Left]?.isConnected!!
-                                            else getLeftEarModelNumber().isNotBlank()
+                                            else getLeftHearingAidModelNumber(this@AutoConnectActivity).isNotBlank()
 
                 imageButtonRight.isEnabled = if (hearingAidMap[EarSide.Right] != null) !hearingAidMap[EarSide.Right]?.isConnected!!
-                                            else getRightEarModelNumber().isNotBlank()
+                                            else getRightHearingAidModelNumber(this@AutoConnectActivity).isNotBlank()
 
                 bubbleLayoutLeftEar.visibility = if (hearingAidMap[EarSide.Left] == null) View.INVISIBLE
                                                 else if (!hearingAidMap[EarSide.Left]?.isConnected!!) View.INVISIBLE else View.VISIBLE
@@ -70,14 +69,7 @@ class AutoConnectActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_auto_connect)
         mBinding.viewModel = AutoConnectActivityListenersViewModel(this)
     }
-    fun getLeftEarModelNumber() : String
-    {
-        return getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(HA_LEFT_NAME, "")!!
-    }
-    fun getRightEarModelNumber() : String
-    {
-        return getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(HA_RIGHT_NAME, "")!!
-    }
+
     fun leftEarButtonClicked()
     {
         mBinding.imageButtonLeft.apply {

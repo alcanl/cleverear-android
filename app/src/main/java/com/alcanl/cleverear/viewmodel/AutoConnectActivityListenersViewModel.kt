@@ -3,6 +3,8 @@ package com.alcanl.cleverear.viewmodel
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.AutoConnectActivity
 import com.alcanl.cleverear.R
+import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
+import com.alcanl.cleverear.util.getRightHearingAidModelNumber
 import java.lang.ref.WeakReference
 
 class AutoConnectActivityListenersViewModel(activity: AutoConnectActivity) {
@@ -10,14 +12,12 @@ class AutoConnectActivityListenersViewModel(activity: AutoConnectActivity) {
 
     fun getLeftEarModelNumber() : String
     {
-        val model = mWeakReference.get()?.getLeftEarModelNumber()!!
-
+        val model = getLeftHearingAidModelNumber(mWeakReference.get()!!)
         return model.ifBlank { getString(mWeakReference.get()!!, R.string.textview_no_previous_device_info) }
     }
     fun getRightEarModelNumber() : String
     {
-        val model = mWeakReference.get()?.getRightEarModelNumber()!!
-
+        val model = getRightHearingAidModelNumber(mWeakReference.get()!!)
         return model.ifBlank { getString(mWeakReference.get()!!, R.string.textview_no_previous_device_info) }
     }
     fun handleLeftEarButtonClick()

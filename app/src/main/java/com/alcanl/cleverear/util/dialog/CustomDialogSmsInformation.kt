@@ -1,14 +1,12 @@
 package com.alcanl.cleverear.util.dialog
 
 import android.app.Dialog
-import android.content.Context.MODE_PRIVATE
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.LayoutDialogSmsInformationBinding
-import com.alcanl.cleverear.util.EMERGENCY_NUMBER
-import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.saveEmergencyNumberToPrefs
 import com.alcanl.cleverear.viewmodel.SmsInformationDialogListenersViewModel
 import java.lang.ref.WeakReference
 
@@ -44,9 +42,6 @@ class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(acti
                     code.substring(1, code.length)
                 } + binding.editTextContactNumber.text?.toString() })
 
-
-        val editor = mWeakReference.get()?.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)?.edit()
-        editor?.putString(EMERGENCY_NUMBER, phoneNumber!!)
-        editor?.apply()
+        saveEmergencyNumberToPrefs(mWeakReference.get()!!, phoneNumber!!)
     }
 }

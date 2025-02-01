@@ -8,8 +8,6 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.IntentFilter.SYSTEM_HIGH_PRIORITY
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -26,18 +24,12 @@ import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
-import com.alcanl.cleverear.util.HA_LEFT_NAME
-import com.alcanl.cleverear.util.HA_LEFT_RSSI
-import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
-import com.alcanl.cleverear.util.HA_RIGHT_NAME
-import com.alcanl.cleverear.util.HA_RIGHT_RSSI
-import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
-import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
-import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
+import com.alcanl.cleverear.util.getLeftSideHearingAid
+import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.service.broadcast.BondHearingAidBroadcastReceiver
 import com.alcanl.cleverear.util.listeners.LoadingActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
+import com.alcanl.cleverear.util.saveHearingAidInfoToPrefs
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.ark.ArkException
 import com.ark.EventHandler
@@ -154,44 +146,32 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                     }
                 }
     }
+
     private fun startService()
     {
         Intent(this, AutoConnectService::class.java).apply {
             ContextCompat.startForegroundService(this@LoadingActivity, this)
         }
     }
+
     private fun handleSharedPrefs()
     {
         with(configuration) {
-            if (isConnected) {
-
-                val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-                val editor = prefs.edit()
-
+            if (isConnected)
                 if (isDoubleDeviceConnection)
-                    hearingAidMap.forEach { handleSharedPrefs(editor, it.value) }
-
+                    hearingAidMap.forEach { saveHearingAidInfoToPrefs(this@LoadingActivity, it.value) }
                 else
-                    handleSharedPrefs(editor, hearingAidMap[earSide]!!)
-
-                editor.apply()
-            }
+                    saveHearingAidInfoToPrefs(this@LoadingActivity, hearingAidMap[earSide]!!)
         }
     }
-    private fun handleSharedPrefs(editor: Editor, hearingAid: HearingAid)
-    {
-        editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_ADDRESS else HA_RIGHT_ADDRESS, hearingAid.address)
-        editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_NAME else HA_RIGHT_NAME, hearingAid.name)
-        editor.putInt(if (hearingAid.side == EarSide.Left) HA_LEFT_RSSI else HA_RIGHT_RSSI, hearingAid.rssi)
-        editor.putString(if (hearingAid.side == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT, hearingAid.manufacturerData)
-    }
+
     private fun handleSingleDeviceConnection()
     {
         with(configuration) {
             checkDeviceBondStatus(hearingAidMap[earSide]!!)
 
             hearingAidMap[earSide]!!.getPropertiesFromSDK(productManager, eventHandler)
-            connectForSingleDevice()
+            connectToDevice(configuration.hearingAidMap[earSide]!!)
 
             if (hearingAidMap[earSide]!!.bondStatus == BluetoothDevice.BOND_BONDED) {
                 initBondedDeviceCountDownTimer()
@@ -203,28 +183,30 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     }
     private fun handleDoubleDeviceConnection()
     {
-        with(configuration) {
+        configuration.apply {
+
             hearingAidMap.forEach { checkDeviceBondStatus(it.value) }
 
-            if (hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED }) {
-                hearingAidMap.forEach {
-                    it.value.getPropertiesFromSDK(productManager, eventHandler)
-                    connectToDevice(it.value)
-                }
+            when {
+                hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED } -> {
+                    hearingAidMap.forEach {
+                        it.value.getPropertiesFromSDK(productManager, eventHandler)
+                        connectToDevice(it.value)
+                    }
                 initBondedDeviceCountDownTimer()
             }
 
-            else if (hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE })
+            hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_NONE } ->
                 unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Left]!!, true)
 
-            else if (hearingAidMap[EarSide.Right]?.bondStatus == BluetoothDevice.BOND_NONE)
+            hearingAidMap[EarSide.Right]?.bondStatus == BluetoothDevice.BOND_NONE ->
                 unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Right]!!, false)
 
-            else
-                unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Left]!!, false)
-
+            else -> unBoundDoubleDeviceInitialization(hearingAidMap[EarSide.Left]!!, false)
+            }
         }
     }
+
     private fun unBoundDoubleDeviceInitialization(hearingAid: HearingAid, isDualUnBound: Boolean)
     {
         hearingAid.apply {
@@ -239,6 +221,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         }
     }
+
     private fun initUnBondDoubleDeviceCountDownTimer()
     {
         object: CountDownTimer(30000, 1000) {
@@ -282,6 +265,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             }
         }.start()
     }
+
     private fun commonBondDeviceOnTick(millisUntilFinished: Long)
     {
         if (millisUntilFinished in 2000L..2999 || millisUntilFinished in 6000L..<6999)
@@ -289,6 +273,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         mBinding.textViewConnecting.text = String.format("${mBinding.textViewConnecting.text}" + ".")
     }
+
     private fun commonUnBondDeviceOnTick(millisUntilFinished: Long)
     {
         if (millisUntilFinished in 5000L..5999 || millisUntilFinished in 10000L..<10999
@@ -297,6 +282,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         mBinding.textViewConnecting.text = String.format("${mBinding.textViewConnecting.text}" + ".")
     }
+
     private fun initUnBondSingleDeviceCountDownTimer(hearingAid: HearingAid)
     {
         object: CountDownTimer(30000, 1000) {
@@ -333,6 +319,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             }
         }.start()
     }
+
     private fun initBondedDeviceCountDownTimer()
     {
         object: CountDownTimer(12000, 1000) {
@@ -344,12 +331,9 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                     this.cancel()
                 }
             }
-            override fun onFinish()
-            {
-                finalizeLoadingTimer()
-            }
-        }.start()
+            override fun onFinish() { finalizeLoadingTimer() } }.start()
     }
+
     private fun finalizeConnectedLoadingTimer()
     {
         mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
@@ -364,6 +348,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                 Intent(this@LoadingActivity, SelfFittingActivity::class.java
             ).apply { startActivity(this) };  finish() }, 3000)
     }
+
     private fun finalizeLoadingTimer()
     {
         if (configuration.isConnected)
@@ -373,16 +358,13 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             handler.postDelayed({ finish() }, 3000)
         }
     }
+
     private fun initialize()
     {
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
         listener.startEventListener()
-    }
-    private fun connectForSingleDevice()
-    {
-        connectToDevice(configuration.hearingAidMap[earSide]!!)
     }
 
     private fun connectToDevice(hearingAid: HearingAid)
@@ -418,6 +400,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             Log.e(LoadingActivity::class.simpleName, ex.message!!)
         }
     }
+
     @SuppressLint("MissingPermission")
     private fun checkDeviceBondStatus(hearingAid: HearingAid)
     {
@@ -427,39 +410,20 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             hearingAid.bondStatus = BluetoothDevice.BOND_BONDED
 
     }
+
     private fun loadPrefs()
     {
-        val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-
         with(configuration) {
-            if (isDoubleDeviceConnection) {
-                hearingAidMap[EarSide.Left] = getLeftDevice(prefs)
-                hearingAidMap[EarSide.Right] = getRightDevice(prefs)
+            when {
+                isDoubleDeviceConnection -> {
+                    hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@LoadingActivity)
+                    hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@LoadingActivity)
+                }
+                else -> hearingAidMap[earSide] = if (earSide == EarSide.Left)
+                        getLeftSideHearingAid(this@LoadingActivity)
+                    else
+                        getRightSideHearingAid(this@LoadingActivity)
             }
-            else
-                hearingAidMap[earSide] = if (earSide == EarSide.Left) getLeftDevice(prefs) else getRightDevice(prefs)
         }
-
-    }
-    private fun getLeftDevice(prefs: SharedPreferences) : HearingAid
-    {
-        val deviceAddress = prefs.getString(HA_LEFT_ADDRESS, "")
-        val deviceName = prefs.getString(HA_LEFT_NAME, "")
-        val deviceRSSI = prefs.getInt(HA_LEFT_RSSI, 0)
-        val deviceManu = prefs.getString(MANUFACTURER_CODE_LEFT, "")
-
-        return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Left)
-
-    }
-
-    private fun getRightDevice(prefs: SharedPreferences) : HearingAid
-    {
-        val deviceAddress = prefs.getString(HA_RIGHT_ADDRESS, "")
-        val deviceName = prefs.getString(HA_RIGHT_NAME, "")
-        val deviceRSSI = prefs.getInt(HA_RIGHT_RSSI, 0)
-        val deviceManu = prefs.getString(MANUFACTURER_CODE_RIGHT, "")
-
-        return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Right)
-
     }
 }

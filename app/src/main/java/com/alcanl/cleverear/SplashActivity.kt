@@ -23,10 +23,9 @@ import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.HA_LEFT_ADDRESS
-import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
-import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogConnectedBefore
+import com.alcanl.cleverear.util.getLeftHearingAidAddress
+import com.alcanl.cleverear.util.getRightHearingAidAddress
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
@@ -239,11 +238,10 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     }
     private fun checkPrefs()
     {
-        val prefs = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-        val addressLeft = prefs.getString(HA_LEFT_ADDRESS, "")
-        val addressRight = prefs.getString(HA_RIGHT_ADDRESS, "")
+        val addressLeft = getLeftHearingAidAddress(this)
+        val addressRight = getRightHearingAidAddress(this)
 
-        if (addressLeft?.isNotEmpty()!! && addressRight?.isNotEmpty()!!)
+        if (addressLeft.isNotEmpty() && addressRight.isNotEmpty())
             configuration.apply {
                 isDoubleDeviceConnection = true
                 isConnectedBefore = true
@@ -257,7 +255,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 mAddressArray = arrayOf(addressLeft)
             }
 
-        else if (addressRight?.isNotEmpty()!!)
+        else if (addressRight.isNotEmpty())
             configuration.apply {
                 earSide = EarSide.Right
                 isConnectedBefore = true
