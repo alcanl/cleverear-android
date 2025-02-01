@@ -64,7 +64,7 @@
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="38dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/textview_channel_text"
                     android:textColor="@color/design_default_color_secondary_variant"
@@ -73,7 +73,8 @@
                     app:layout_constraintTop_toBottomOf="@+id/textViewMode"
                     tools:ignore="TextContrastCheck,TextSizeCheck" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
                     android:id="@+id/buttonModeOne"
                     android:layout_width="60dp"
                     android:layout_height="45dp"
@@ -91,8 +92,8 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TouchTargetSizeCheck" />
 
-                <Button
-
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
                     android:id="@+id/buttonModeTwo"
                     android:layout_width="60dp"
                     android:layout_height="45dp"
@@ -110,7 +111,8 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TouchTargetSizeCheck" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="?attr/materialButtonOutlinedStyle"
                     android:id="@+id/buttonModeThree"
                     android:layout_width="60dp"
                     android:layout_height="45dp"
@@ -128,39 +130,51 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TouchTargetSizeCheck" />
 
-                <EditText
-                    android:id="@+id/editTextChannel"
-                    android:layout_width="155dp"
-                    android:layout_height="45dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="80dp"
-                    android:autofillHints=""
-                    android:ems="10"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="@string/edittext_channel_hint"
-                    android:inputType="number"
-                    android:textAlignment="center"
-                    android:textColor="@color/ap_black"
-                    android:textColorHint="@color/ap_gray"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toEndOf="@+id/textViewChannel"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
-
                 <ImageButton
                     android:id="@+id/imageButton"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="70dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="80dp"
                     android:backgroundTint="#00FFFFFF"
                     android:contentDescription="@string/button_check_tick_content_desc"
                     android:onClick="@{(v)-> viewModel.handleSetChannelButtonClick(v)}"
                     android:scaleType="fitCenter"
-                    app:layout_constraintStart_toEndOf="@+id/editTextChannel"
+                    app:layout_constraintStart_toEndOf="@+id/outlinedTextField"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/check_tick"
                     tools:ignore="ImageContrastCheck" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="?attr/textInputOutlinedStyle"
+                    android:id="@+id/outlinedTextField"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="80dp"
+                    android:textAlignment="center"
+                    android:textColorHint="@color/ap_gray"
+                    app:boxBackgroundColor="@color/off_white"
+                    app:boxStrokeColor="@color/text_layout_box_color"
+                    app:layout_constraintStart_toEndOf="@+id/textViewChannel"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextChannel"
+                        android:layout_width="155dp"
+                        android:layout_height="45dp"
+                        android:hint="@string/edittext_channel_hint"
+                        android:maxLength="3"
+                        android:gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:inputType="number"
+                        android:textAlignment="center"
+                        android:textColor="@color/ap_black"
+                        android:textSize="20sp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -412,16 +426,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout5">
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchDual"
-                    android:layout_width="wrap_content"
+                    android:layout_width="150dp"
                     android:layout_height="0dp"
-                    android:layout_gravity="top"
                     android:checked="@={config.INSTANCE.dualDeviceConfig}"
                     android:enabled="@{config.INSTANCE.doubleDeviceConnection}"
                     android:fontFamily="sans-serif-medium"
                     android:onCheckedChanged="@{()-> viewModel.handleSwitchCheckedChange()}"
                     android:text="@string/switch_dual_device_text"
+                    android:textAlignment="center"
                     android:textColor="@color/ap_black"
                     android:textSize="12sp"
                     android:visibility="invisible"
@@ -430,7 +444,9 @@
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:thumbTint="@drawable/switch_theme" />
+                    app:thumbTint="@color/switch_thumb_color"
+                    app:trackTint="@color/switch_track_color"
+                    tools:ignore="TouchTargetSizeCheck" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

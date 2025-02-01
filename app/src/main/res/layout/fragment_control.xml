@@ -82,24 +82,25 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:warning_level="15" />
             </FrameLayout>
 
-            <androidx.appcompat.widget.SwitchCompat
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchDualConfiguration"
-                android:layout_width="159dp"
+                android:layout_width="155dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="148dp"
-                android:layout_marginEnd="148dp"
                 android:checked="@={config.INSTANCE.dualDeviceConfig}"
                 android:enabled="@{config.INSTANCE.doubleDeviceConnection}"
                 android:fontFamily="sans-serif-medium"
                 android:onCheckedChanged="@{()-> viewModel.handleSwitchCheckedChange()}"
                 android:text="@string/switch_dual_device_text"
+                android:textAlignment="center"
                 android:textColor="@color/ap_black"
                 android:textSize="12sp"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:thumbTint="@drawable/switch_theme" />
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color"
+                tools:ignore="TextSizeCheck,TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/textViewRightSeekBar"
@@ -160,7 +161,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
                 android:layout_marginEnd="-30dp"
-                android:enabled="@{config.INSTANCE.doubleDeviceConnection ? true : false}"
+                android:enabled="@{config.INSTANCE.doubleDeviceConnection}"
                 android:rotation="270"
                 android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Right).component8() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component8()}"
                 android:valueFrom="0.0"
@@ -257,9 +258,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                 android:layout_height="wrap_content"
                 android:padding="10dp">
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonOne"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -273,9 +274,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonTwo"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="10dp"
@@ -289,9 +290,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonThree"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -305,9 +306,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonFour"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -327,9 +328,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                 android:layout_height="72dp"
                 android:padding="10dp">
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonFive"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -343,9 +344,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonSix"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -359,9 +360,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonSeven"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -375,9 +376,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                     app:cornerRadius="0dp"
                     tools:ignore="VisualLintButtonSize" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonEight"
-                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -404,8 +405,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
             android:textColor="@color/design_default_color_secondary_variant"
             android:textSize="22sp"
             app:layout_constraintBottom_toTopOf="@+id/tableLayout"
-            app:layout_constraintEnd_toEndOf="@+id/tableLayout"
-            app:layout_constraintStart_toStartOf="@+id/tableLayout" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
