@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Process.killProcess
 import android.os.Process.myPid
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -112,9 +113,12 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 else try {
                     withTimeout(5000) {
                         mAppUpdateManager.requestAppUpdateInfo()
-                            .updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                            .updateAvailability() != UpdateAvailability.UPDATE_AVAILABLE
                     }
-                } catch (_: Exception) { true }
+                } catch (ex: Exception) {
+                    Log.e(SplashActivity::class.simpleName, ex.message!!)
+                    true
+                }
             }.await()
 
             launch(Dispatchers.Main) {
