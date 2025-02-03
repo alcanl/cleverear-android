@@ -70,6 +70,7 @@ class ControlFragment : Fragment(), IEventListener {
         initialize()
         EventBus.getDefault().register(this)
     }
+
     override fun onResume()
     {
         super.onResume()
@@ -96,6 +97,7 @@ class ControlFragment : Fragment(), IEventListener {
         if (!listener.isListenerOnBoard())
             listener.startEventListener()
     }
+
     override fun onStop()
     {
         super.onStop()
@@ -104,6 +106,7 @@ class ControlFragment : Fragment(), IEventListener {
             listener.stopListener()
 
     }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -112,6 +115,7 @@ class ControlFragment : Fragment(), IEventListener {
             listener.stopListener()
 
     }
+
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
@@ -123,6 +127,7 @@ class ControlFragment : Fragment(), IEventListener {
                 is ConnectionEvent -> onConnectionEventReceived(event)
             }
     }
+
     private fun onBatteryEventReceived(event: BatteryEvent)
     {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -147,6 +152,7 @@ class ControlFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun onVolumeEventReceived(event: VolumeEvent)
     {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -173,6 +179,7 @@ class ControlFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun onMemoryEventReceived(event: MemoryEvent)
     {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -189,6 +196,7 @@ class ControlFragment : Fragment(), IEventListener {
             setSelectedMemoryButtonView(getMemoryEventButton(event.memoryData), event.memoryData)
         }
     }
+
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1)
@@ -203,6 +211,7 @@ class ControlFragment : Fragment(), IEventListener {
                 }
             }
     }
+
     private fun getMemoryEventButton(memoryState: Int) : Button
     {
         return when (memoryState) {
@@ -216,6 +225,7 @@ class ControlFragment : Fragment(), IEventListener {
             else -> mBinding.buttonEight
         }
     }
+
     private fun initBatteryViews()
     {
         if (configuration.isDoubleDeviceConnection) {
@@ -247,30 +257,33 @@ class ControlFragment : Fragment(), IEventListener {
             }
         }
     }
+
     private fun initBinding()
     {
         mBinding.viewModel = ControlFragmentListenersViewModel(this)
     }
+
     private fun initDoubleDeviceConnectionSliders()
     {
-        mBinding.sliderLeft.apply {
-            visibility = View.VISIBLE
-            mBinding.textViewLeftSeekBar.visibility = View.VISIBLE
+        mBinding.apply {
+            sliderLeft.apply {
+                visibility = View.VISIBLE
+                textViewLeftSeekBar.visibility = View.VISIBLE
+            }
+            sliderRight.apply {
+                visibility = View.VISIBLE
+                textViewRightSeekBar.visibility = View.VISIBLE
+            }
+            sliderCommon.visibility = View.INVISIBLE
+            textViewCommon.visibility = View.INVISIBLE
         }
-        mBinding.sliderRight.apply {
-            visibility = View.VISIBLE
-            mBinding.textViewRightSeekBar.visibility = View.VISIBLE
-        }
-        mBinding.sliderCommon.visibility = View.INVISIBLE
-        mBinding.textViewCommon.visibility = View.INVISIBLE
     }
+
     private fun initialize()
     {
         initBinding()
         initMemoryButtons()
         initBatteryViews()
-        initSwitch()
-
     }
 
     private fun initTextViews()
@@ -354,11 +367,7 @@ class ControlFragment : Fragment(), IEventListener {
             else R.string.textview_right_device_text)
         }
     }
-    private fun initSwitch()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            mBinding.switchDualConfiguration.visibility = View.VISIBLE
-    }
+
     private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)
     {
         hearingAid.numberOfMemories.also {
@@ -493,7 +502,7 @@ class ControlFragment : Fragment(), IEventListener {
     }
     fun switchOnCheckedChanged()
     {
-        if (!configuration.isDualDeviceConfig) {
+        if (!configuration.isDualDeviceConfig)
 
             lifecycleScope.launch(Dispatchers.Main) {
                 mBinding.apply {
@@ -501,17 +510,15 @@ class ControlFragment : Fragment(), IEventListener {
                     sliderRight.startVolumeSliderFirstAnimation(requireContext(), this, R.anim.translate_right_to_left_right_slider)
                 }
             }
-            configuration.isDualDeviceConfig = true
-        }
-        else {
+
+        else
             lifecycleScope.launch(Dispatchers.Main) {
 
                 mBinding.apply {
                     sliderLeft.startVolumeSliderSecondAnimation(requireContext(), this, R.anim.translate_right_to_left_left_slider)
                     sliderRight.startVolumeSliderSecondAnimation(requireContext(), this, R.anim.translate_left_to_right_right_slider)
                 }
-            }
-            configuration.isDualDeviceConfig = false
+
         }
     }
 }

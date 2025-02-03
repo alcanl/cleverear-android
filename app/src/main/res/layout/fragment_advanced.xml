@@ -6,6 +6,7 @@
         <import type="com.alcanl.cleverear.viewmodel.AdvancedFragmentListenersViewModel"/>
         <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <import type="com.alcanl.cleverear.util.EarSide"/>
+        <import type="android.view.View"/>
         <variable name="viewModel" type="com.alcanl.cleverear.viewmodel.AdvancedFragmentListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />
     </data>
@@ -438,7 +439,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/ap_black"
                     android:textSize="12sp"
-                    android:visibility="invisible"
+                    android:visibility="@{config.INSTANCE.doubleDeviceConnection ? View.VISIBLE : View.INVISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"

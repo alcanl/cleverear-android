@@ -194,7 +194,6 @@ class AdvancedFragment : Fragment(), IEventListener {
     private fun initialize()
     {
         initBinding()
-        initSwitch()
         initSliders()
         initTextViews()
     }
@@ -275,12 +274,6 @@ class AdvancedFragment : Fragment(), IEventListener {
                 else
                     setStreamAddressButtonClickedCallback(result, channel, hearingAidMap[earSide]!!)
         }
-    }
-
-    private fun initSwitch()
-    {
-        if (configuration.isDoubleDeviceConnection)
-            mBinding.switchDual.visibility = View.VISIBLE
     }
 
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
@@ -497,26 +490,60 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     fun switchOnCheckedChanged()
     {
-        with(configuration) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                isDualDeviceConfig =
+        configuration.apply {
+
                     if (!isDualDeviceConfig)
-                        with(mBinding) {
-                            sliderAuxLeft.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_left)
-                            sliderMicLeft.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_left)
-                            sliderAuxRight.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_right)
-                            sliderMicRight.startAuxMicSlidersFirstAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_right)
-                            true
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            with(mBinding) {
+                                sliderAuxLeft.startAuxMicSlidersFirstAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_left_to_right_left
+                                )
+                                sliderMicLeft.startAuxMicSlidersFirstAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_left_to_right_left
+                                )
+                                sliderAuxRight.startAuxMicSlidersFirstAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_right_to_left_right
+                                )
+                                sliderMicRight.startAuxMicSlidersFirstAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_right_to_left_right
+                                )
+
+                            }
                         }
                      else
-                        with(mBinding) {
-                            sliderAuxLeft.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_left)
-                            sliderMicLeft.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_right_to_left_left)
-                            sliderAuxRight.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_right)
-                            sliderMicRight.startAuxMicSlidersSecondAnimation(this, requireContext(), R.anim.translate_slider_adv_left_to_right_right)
-                            false
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            mBinding.apply {
+                                sliderAuxLeft.startAuxMicSlidersSecondAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_right_to_left_left
+                                )
+                                sliderMicLeft.startAuxMicSlidersSecondAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_right_to_left_left
+                                )
+                                sliderAuxRight.startAuxMicSlidersSecondAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_left_to_right_right
+                                )
+                                sliderMicRight.startAuxMicSlidersSecondAnimation(
+                                    this,
+                                    requireContext(),
+                                    R.anim.translate_slider_adv_left_to_right_right
+                                )
+
+                            }
                         }
-            }
         }
     }
 }

@@ -144,6 +144,13 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         super.onResume()
 
+        configuration.apply {
+            if (!isConnected) {
+                mBleDeviceSet.clear()
+                hearingAidMap.clear()
+            }
+        }
+
         if (!connectionFragmentEventListener.isListenerOnBoard())
             connectionFragmentEventListener.startEventListener()
 

@@ -29,6 +29,7 @@ import com.alcanl.cleverear.util.SMS_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.dialog.CustomDialogSmsInformation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 
 @AndroidEntryPoint
@@ -40,6 +41,8 @@ class MainContainerActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainContainerBinding
 
     private lateinit var mTrackingButton: AppCompatButton
+
+    private var mSelectedNavItem by Delegates.notNull<Int>()
 
     private lateinit var mSelectedTrackingEddystoneEarSide: EarSide
 
@@ -76,6 +79,7 @@ class MainContainerActivity : AppCompatActivity() {
         if (!hasPermissionsForBluetoothLocation())
             requestLocationPermission()
 
+        mSelectedNavItem = R.id.navbar_connection
         initializeNavController()
     }
 
@@ -123,28 +127,39 @@ class MainContainerActivity : AppCompatActivity() {
 
     private fun initializeNavController()
     {
+
+
         binding.navigationViewContainer.setOnItemSelectedListener {
 
             when (it.itemId) {
-                R.id.navbar_connection -> { navigateTo(ConnectionFragment()); true }
+                R.id.navbar_connection -> {
+                    if (mSelectedNavItem == R.id.navbar_connection)
+                        false
+                    else {
+                        mSelectedNavItem = R.id.navbar_connection
+                        navigateTo(ConnectionFragment()); true }
+                }
                 R.id.navbar_control -> {
-                    if (!configuration.isConnected)
+                    if (!configuration.isConnected || mSelectedNavItem == R.id.navbar_control)
                         false
                     else {
                         runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                        mSelectedNavItem = R.id.navbar_control
                         navigateTo(ControlFragment()); true
                     }
                 }
                 R.id.navbar_beacon -> {
-                    if (!configuration.isConnected)
+                    if (!configuration.isConnected || mSelectedNavItem == R.id.navbar_beacon)
                         false
                     else {
+                        mSelectedNavItem = R.id.navbar_beacon
                         navigateTo(BeaconFragment()); true }
                 }
                 else -> {
-                    if (!configuration.isConnected)
+                    if (!configuration.isConnected || mSelectedNavItem == R.id.navbar_advanced)
                         false
                     else {
+                        mSelectedNavItem = R.id.navbar_advanced
                         navigateTo(AdvancedFragment()); true }
                 }
             }

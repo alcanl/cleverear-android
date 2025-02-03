@@ -12,15 +12,20 @@ import com.google.android.material.slider.Slider
 private fun Slider.setAuxMicSlidersSecondAnimation(binding: FragmentAdvancedBinding) : AnimationListener
 {
     return object : AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {
+        override fun onAnimationStart(animation: Animation?)
+        {
             with(binding) {
                 sliderAuxCommon.apply {
-                    visibility = View.INVISIBLE
-                    isEnabled = false
+                    if (visibility != View.INVISIBLE) {
+                        visibility = View.INVISIBLE
+                        isEnabled = false
+                    }
                 }
                 sliderMicCommon.apply {
-                    visibility = View.INVISIBLE
-                    isEnabled = false
+                    if (visibility != View.INVISIBLE) {
+                        visibility = View.INVISIBLE
+                        isEnabled = false
+                    }
                 }
 
                 textViewAuxL.visibility = View.VISIBLE
@@ -31,8 +36,11 @@ private fun Slider.setAuxMicSlidersSecondAnimation(binding: FragmentAdvancedBind
         }
         override fun onAnimationEnd(animation: Animation?) {
             this@setAuxMicSlidersSecondAnimation.apply {
-                visibility = View.VISIBLE
-                isEnabled = true
+
+                if (this@setAuxMicSlidersSecondAnimation.visibility != View.VISIBLE) {
+                    visibility = View.VISIBLE
+                    isEnabled = true
+                }
             }
         }
         override fun onAnimationRepeat(animation: Animation?) {}
@@ -42,11 +50,14 @@ private fun Slider.setAuxMicSlidersSecondAnimation(binding: FragmentAdvancedBind
 private fun Slider.setAuxMicSlidersFirstAnimation(context: Context, binding: FragmentAdvancedBinding) : AnimationListener
 {
     return object : AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {
-            this@setAuxMicSlidersFirstAnimation.visibility = View.INVISIBLE
+        override fun onAnimationStart(animation: Animation?)
+        {
+            if (this@setAuxMicSlidersFirstAnimation.visibility != View.INVISIBLE)
+                this@setAuxMicSlidersFirstAnimation.visibility = View.INVISIBLE
         }
-        override fun onAnimationEnd(animation: Animation?) {
 
+        override fun onAnimationEnd(animation: Animation?)
+        {
             binding.sliderAuxCommon.startAuxMicCommonSlidersAnimation(context)
             binding.sliderMicCommon.startAuxMicCommonSlidersAnimation(context)
 
@@ -147,8 +158,11 @@ fun Slider.startAuxMicCommonSlidersAnimation(context: Context) {
                     override fun onAnimationStart(animation: Animation?) {}
 
                     override fun onAnimationEnd(animation: Animation?) {
-                        this@startAuxMicCommonSlidersAnimation.visibility = View.VISIBLE
-                        this@startAuxMicCommonSlidersAnimation.isEnabled = true
+
+                        if (this@startAuxMicCommonSlidersAnimation.visibility != View.VISIBLE) {
+                            this@startAuxMicCommonSlidersAnimation.visibility = View.VISIBLE
+                            this@startAuxMicCommonSlidersAnimation.isEnabled = true
+                        }
                     }
 
                     override fun onAnimationRepeat(animation: Animation?) {}
