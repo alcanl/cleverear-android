@@ -149,7 +149,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="textview_initialize_unknown_problem_text" translatable="true">Unknown Problem Occurred While Initializing The Device</string>
     <string name="textview_initialize_network_problem_text" translatable="true">External Server Error\nPlease Try To Connect Later</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Could Not Found The Compatible Library File For The Connected Device</string>
-    <string name="alert_dialog_connected_before_text" translatable="true">Detected A Previous Saved Device Connection. Do You Want To Continue Connection With Previous Device/Devices?</string>
+    <string name="alert_dialog_connected_before_text" translatable="true">Detected A Previous Saved Device Connection.\nDo You Want To Continue Connection With Previous Device/Devices?</string>
     <string name="navbar_home_text" translatable="false">Device</string>
     <string name="navbar_in_situ_text" translatable="false">In Situ</string>
     <string name="navbar_fitting_text" translatable="false">Fitting</string>

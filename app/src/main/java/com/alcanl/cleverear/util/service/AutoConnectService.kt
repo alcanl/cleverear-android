@@ -30,7 +30,6 @@ import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.sdk.events.ConnectionStateChangedEvent
 import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
@@ -80,7 +79,8 @@ class AutoConnectService : Service()
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
 
-    private lateinit var mConnectorThread: Future<*>
+    private var mConnectorThread: Future<*>? = null
+
     private lateinit var mHandler: AutoConnectHandler
     private lateinit var mConnectedNotification: Notification
 
@@ -212,27 +212,27 @@ class AutoConnectService : Service()
             with(configuration) {
                 if (!isDoubleDeviceConnection) {
                     if (isConnected) {
-                        Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Single Device Connected")
+                        Log.d(AutoConnectService::class.simpleName, "Single Device Connected")
                         return
                     } else if (isBluetoothEnabled) {
                         doConnection(hearingAidMap[earSide]!!)
-                        mConnectorThread.get()
+                        mConnectorThread?.get()
                     }
                 }
                 else {
                     if (hearingAidMap.all { it.value.isConnected }) {
-                        Log.d(ConnectionStateChangedEvent::class.java.simpleName, "Double Device Connected")
+                        Log.d(AutoConnectService::class.simpleName, "Double Device Connected")
                         return
                     }
 
                     if (!hearingAidMap[EarSide.Left]?.isConnected!! && isBluetoothEnabled) {
                         doConnection(hearingAidMap[EarSide.Left]!!)
-                        mConnectorThread.get()
+                        mConnectorThread?.get()
                     }
 
                     if (!hearingAidMap[EarSide.Right]?.isConnected!! && isBluetoothEnabled) {
                         doConnection(hearingAidMap[EarSide.Right]!!)
-                        mConnectorThread.get()
+                        mConnectorThread?.get()
                     }
                 }
             }

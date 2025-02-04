@@ -7,9 +7,8 @@ import com.alcanl.cleverear.databinding.LayoutAlertDialogEndConnectionBinding
 import com.alcanl.cleverear.viewmodel.ActiveConnectionDialogListenersViewModel
 import com.alcanl.cleverear.fragment.ConnectionFragment
 
-class CustomAlertDialogActiveConnection(fragment: ConnectionFragment): Dialog(fragment.requireContext(), R.style.DialogStyle) {
+class CustomAlertDialogActiveConnection(fragment: ConnectionFragment): Dialog(fragment.requireContext(), R.style.RoundedDialogTheme) {
     init {
-        window?.setBackgroundDrawableResource(R.drawable.drawable_alert_dialog)
         setCancelable(false)
         val binding: LayoutAlertDialogEndConnectionBinding = DataBindingUtil.inflate(layoutInflater,
             R.layout.layout_alert_dialog_end_connection, null, false)

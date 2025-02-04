@@ -134,7 +134,7 @@
     <string name="textview_initialize_unknown_problem_text" translatable="true">Cihaz Hazırlanırken Bilinmeyen Bir Problem İle Karşılaşıldı</string>
     <string name="textview_initialize_network_problem_text" translatable="true">Uzak Sunucu Hatası\nLütfen Daha Sonra Tekrar Deneyin</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Bağlı Cihaz İle Uyumlu Dosyalar Bulunamadı</string>
-    <string name="alert_dialog_connected_before_text">Daha Önceden Kayıtlı Cihaz/Cihazlar Tespit Edildi. Bağlantıya Bu Cihaz/Cihazlar İle Devam Etmek İster Misiniz?</string>
+    <string name="alert_dialog_connected_before_text">Kayıtlı Cihaz/Cihazlar Tespit Edildi.\nBağlantıya Bu Cihaz/Cihazlar İle Devam Etmek İster Misiniz?</string>
 
     <string-array name="feedbackCancelerValues">
         <item>Dış Ortam</item>
