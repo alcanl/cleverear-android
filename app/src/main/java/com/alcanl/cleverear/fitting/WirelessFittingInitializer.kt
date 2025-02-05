@@ -21,13 +21,14 @@ import com.ark.DeviceInfo
 import com.ark.Library
 import com.ark.Product
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import retrofit2.awaitResponse
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -40,9 +41,6 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
 
     @Inject
     lateinit var fittingConfig: FittingConfigurationModule
-
-    @Inject
-    lateinit var threadPool: ExecutorService
 
     @Inject
     lateinit var earTechnicService: IEarTechnicLibraryService
@@ -103,7 +101,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             val response = call.awaitResponse()
             paramInfo = response.body()
             paramInfo?.let {
-                paramFile = writeDataToFilesDir(it.convertParamData(), "default_$modelNumber.param").get()
+                paramFile = writeDataToFilesDir(it.convertParamData(), "default_$modelNumber.param").await()
             }
         } catch (ex: Throwable) {
             throw NetworkException(ex)
@@ -124,7 +122,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
             libraryInfo = response.body()
             libraryInfo?.let {
                 val idHex = Integer.toHexString(libId.toInt())
-                libFile = writeDataToFilesDir(it.convertLibraryData(), "$idHex.library").get()
+                libFile = writeDataToFilesDir(it.convertLibraryData(), "$idHex.library").await()
             }
         } catch (ex: Throwable) {
             throw NetworkException(ex)
@@ -133,9 +131,9 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
         return libFile
     }
 
-    private fun writeDataToFilesDir(byteArray: ByteArray, fileName: String) : Future<File?>
+    private fun writeDataToFilesDir(byteArray: ByteArray, fileName: String) : Deferred<File?>
     {
-        return threadPool.submit(Callable { writeDataToFilesDirCallback(byteArray, fileName) })
+        return CoroutineScope(Dispatchers.IO).async { writeDataToFilesDirCallback(byteArray, fileName) }
     }
 
     fun createProduct(productId : Int, library: Library): Product = library.products.getById(productId).createProduct()
