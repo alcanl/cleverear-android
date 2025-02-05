@@ -29,11 +29,14 @@ import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.util.getEmergencyNumber
+import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
+import com.alcanl.cleverear.util.getRightHearingAidModelNumber
 import com.alcanl.cleverear.util.listeners.BeaconFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.alcanl.cleverear.util.listeners.event.VolumeEvent
+import com.alcanl.cleverear.util.saveEmergencyNumberToPrefs
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.ark.ParameterSpace
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
@@ -244,6 +247,21 @@ class BeaconFragment : Fragment(), IEventListener {
     {
         binding.viewModel = BeaconFragmentListenersViewModel(this)
         mHandler = BeaconHandler(this)
+        initializeTrackingButtons()
+    }
+
+    private fun initializeTrackingButtons()
+    {
+        configuration.apply {
+            if (getEmergencyNumber(requireContext()).isNotBlank()
+                && getLeftHearingAidModelNumber(requireContext()).isNotBlank())
+                binding.buttonTrackLeftDevice.text = getString(R.string.button_disable_tracking_text)
+
+            if (getEmergencyNumber(requireContext()).isNotBlank()
+                && getRightHearingAidModelNumber(requireContext()).isNotBlank())
+                binding.buttonTrackRightDevice.text = getString(R.string.button_disable_tracking_text)
+
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -389,6 +407,8 @@ class BeaconFragment : Fragment(), IEventListener {
                     binding.buttonTrackLeftDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
                 else
                     binding.buttonTrackRightDevice.text = getString(if (isTrackingActive) R.string.button_disable_tracking_text else R.string.button_enable_tracking_text)
+
+                saveEmergencyNumberToPrefs(requireContext(), "")
             }
     }
 }

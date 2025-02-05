@@ -42,9 +42,9 @@ class MainContainerActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityMainContainerBinding
 
-    private lateinit var mTrackingButton: AppCompatButton
-
     private var mSelectedNavItem by Delegates.notNull<Int>()
+
+    private lateinit var mTrackingButton: AppCompatButton
 
     private lateinit var mSelectedTrackingEddystoneEarSide: EarSide
 

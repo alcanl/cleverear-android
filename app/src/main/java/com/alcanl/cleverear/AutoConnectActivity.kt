@@ -60,45 +60,6 @@ class AutoConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun initialize()
-    {
-        initBinding()
-    }
-    private fun initBinding()
-    {
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_auto_connect)
-        mBinding.viewModel = AutoConnectActivityListenersViewModel(this)
-    }
-
-    fun leftEarButtonClicked()
-    {
-        mBinding.imageButtonLeft.apply {
-            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
-                R.anim.alpha_blink_anim).also { it.setAnimationListener(imageButtonAnimation(this, EarSide.Left)) })
-        }
-    }
-    fun rightEarButtonClicked()
-    {
-        mBinding.imageButtonRight.apply {
-            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
-                R.anim.alpha_blink_anim).also { it.setAnimationListener(imageButtonAnimation(this, EarSide.Right)) })
-        }
-    }
-    fun controlButtonClicked()
-    {
-
-        mBinding.imageButtonControl.apply {
-            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
-                R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
-        }
-    }
-    fun remoteFittingButtonClicked()
-    {
-        mBinding.imageButtonRemoteConf.apply {
-            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
-                R.anim.alpha_blink_anim).also { it.setAnimationListener(remoteFittingButtonAnimation()) })
-        }
-    }
     private fun controlButtonClickedCommon()
     {
         configuration.isConnectedBefore = true
@@ -227,6 +188,45 @@ class AutoConnectActivity : AppCompatActivity() {
             }
             override fun onAnimationEnd(animation: Animation?) {}
             override fun onAnimationRepeat(animation: Animation?) {}
+        }
+    }
+
+    private fun initialize()
+    {
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_auto_connect)
+        mBinding.viewModel = AutoConnectActivityListenersViewModel(this)
+    }
+
+    fun leftEarButtonClicked()
+    {
+        mBinding.imageButtonLeft.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(imageButtonAnimation(this, EarSide.Left)) })
+        }
+    }
+
+    fun rightEarButtonClicked()
+    {
+        mBinding.imageButtonRight.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(imageButtonAnimation(this, EarSide.Right)) })
+        }
+    }
+
+    fun controlButtonClicked()
+    {
+
+        mBinding.imageButtonControl.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(controlButtonAnimation()) })
+        }
+    }
+
+    fun remoteFittingButtonClicked()
+    {
+        mBinding.imageButtonRemoteConf.apply {
+            startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
+                R.anim.alpha_blink_anim).also { it.setAnimationListener(remoteFittingButtonAnimation()) })
         }
     }
 }
