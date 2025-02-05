@@ -43,9 +43,7 @@ object ConfigurationModule {
 
     val hearingAidMap : EnumMap<EarSide, HearingAid> = EnumMap(EarSide::class.java)
 
-    val eddyStoneMap : EnumMap<EarSide, EddystoneHearingAid> by lazy {
-        EnumMap(EarSide::class.java)
-    }
+    val eddyStoneMap : EnumMap<EarSide, EddystoneHearingAid> = EnumMap(EarSide::class.java)
 
     @Singleton
     @Provides

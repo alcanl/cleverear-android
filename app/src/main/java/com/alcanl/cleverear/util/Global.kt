@@ -16,6 +16,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.reflect.Method
 
+//"Biyonix E S-P"
 private const val DEVICE_NAME = 0
 private const val DEVICE_MAC = 1
 private const val DEVICE_RSSI = 2
@@ -27,7 +28,7 @@ private const val VOLUME_STATE = 1
 const val ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE = 60
 const val ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE = 61
 const val SMS_PERMISSION_REQUEST_CODE = 62
-const val EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER = "NOT_IMPLEMENTED_YET"
+const val EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER = "NOT_IMPLEMENT_YET"
 const val MANUFACTURING_DATA = 3
 const val MANUFACTURER_CODE_LEFT = "d60900"
 const val MANUFACTURER_CODE_RIGHT = "d60901"

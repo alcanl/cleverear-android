@@ -5,15 +5,14 @@ import com.alcanl.cleverear.fragment.BeaconFragment
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 
 data class EddystoneHearingAid(
-    @get:Synchronized @set:Synchronized var tlmVersion : Int, @get:Synchronized @set:Synchronized var batteryVoltage : Int,
-    @get:Synchronized @set:Synchronized var temperature : Double, @get:Synchronized @set:Synchronized var advertisementCount : Long,
-    @get:Synchronized @set:Synchronized var elapsedTime : Long, @get:Synchronized @set:Synchronized var stepCount : Long,
-    @get:Synchronized @set:Synchronized var isFallen : Boolean, @get:Synchronized @set:Synchronized var distance : Long,
-    @get:Synchronized @set:Synchronized var isDefault : Boolean, var isTrackingActive : Boolean,
-    var macAddress: String) {
+    var tlmVersion : Int, var batteryVoltage : Int, var temperature : Double,
+    var advertisementCount : Long, var elapsedTime : Long, var stepCount : Long,
+    var isFallen : Boolean, var distance : Long, var isDefault : Boolean,
+    var isTrackingActive : Boolean, var macAddress: String) {
 
-    constructor() : this(0, 0, 0.0, 0L, 0L,
-                        0L, false, 0L, false, false, "")
+    constructor() : this(
+        0,0, 0.0, 0L, 0L, 0L,
+        false, 0L, false, false, "")
 
     private fun setStepCount(stepCountFirstData: Byte, stepCountSecondData: Byte)
     {

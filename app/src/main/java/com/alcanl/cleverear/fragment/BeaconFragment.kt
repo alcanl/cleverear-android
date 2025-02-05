@@ -342,7 +342,6 @@ class BeaconFragment : Fragment(), IEventListener {
 
         private val mWeakReference = WeakReference(fragment)
 
-        @SuppressLint("SetTextI18n")
         private fun fillTextViewsForDeviceCallback(earSide: EarSide, hearingAid: EddystoneHearingAid)
         {
             mWeakReference.get()?.binding?.let {
