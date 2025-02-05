@@ -42,8 +42,6 @@ import com.ark.EventHandler
 import com.ark.ProductManager
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -82,8 +80,8 @@ class AutoConnectService : Service()
     private var mConnectorThread: Future<*>? = null
 
     private lateinit var mHandler: AutoConnectHandler
-    private lateinit var mConnectedNotification: Notification
 
+    private lateinit var mConnectedNotification: Notification
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
@@ -91,10 +89,12 @@ class AutoConnectService : Service()
         initialize(intent)
         return START_STICKY
     }
+
     override fun onBind(intent: Intent?): IBinder?
     {
         throw UnsupportedOperationException()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         try {
@@ -116,6 +116,7 @@ class AutoConnectService : Service()
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
+
     private fun initialize(intent: Intent?)
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
@@ -171,11 +172,7 @@ class AutoConnectService : Service()
         }
 
         bleScanner.startScan(scanCallback)
-
-        runBlocking {
-            delay(5000)
-        }
-
+        Thread.sleep(5000)
         bleScanner.stopScan(scanCallback)
 
         if (hearingAid.isTrackingActive && hearingAid.isFallen) {
@@ -281,6 +278,7 @@ class AutoConnectService : Service()
 
         mConnectorThread = threadPool.submit { scheduledThreadConnectDeviceCallback(adapter, hearingAid) }
     }
+
     private fun isConnected() : Boolean
     {
         return if (configuration.isDoubleDeviceConnection)
@@ -288,10 +286,12 @@ class AutoConnectService : Service()
             else
                 configuration.hearingAidMap[configuration.earSide]?.isConnected ?: false
     }
+
     private fun checkDeviceConnectionState(hearingAid: HearingAid, adapter: BluetoothAdapter)
     {
         hearingAid.isConnected = isConnected(adapter.getRemoteDevice(hearingAid.address))
     }
+
     @Synchronized
     private fun scheduledThreadConnectDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
@@ -324,6 +324,7 @@ class AutoConnectService : Service()
             stopDeviceScan(adapter)
         }
     }
+
     private fun createServiceNotification() : Notification
     {
         return NotificationCompat.Builder(this, getString(R.string.service_notification_start_channel_id))
@@ -333,6 +334,7 @@ class AutoConnectService : Service()
             .setAutoCancel(false)
             .build()
     }
+
     private fun handleConnectedNotification(intent: Intent) : Notification
     {
         getSystemService(NotificationManager::class.java).createNotificationChannel(
@@ -342,6 +344,7 @@ class AutoConnectService : Service()
 
         return createConnectedNotification(pendingIntent)
     }
+
     private fun showNotification(notification: Notification)
     {
         if (ActivityCompat.checkSelfPermission(
@@ -350,6 +353,7 @@ class AutoConnectService : Service()
             ) == PackageManager.PERMISSION_GRANTED)
             NotificationManagerCompat.from(this).notify(2, notification)
     }
+
     private fun createConnectedNotification(pendingIntent: PendingIntent) : Notification
     {
         return NotificationCompat.Builder(this, getString(R.string.service_notification_channel_id))
@@ -359,11 +363,13 @@ class AutoConnectService : Service()
             .setContentIntent(pendingIntent)
             .build()
     }
+
     @SuppressLint("MissingPermission")
     private fun startDeviceScan(adapter: BluetoothAdapter)
     {
         adapter.startDiscovery()
     }
+
     @SuppressLint("MissingPermission")
     private fun stopDeviceScan(adapter: BluetoothAdapter)
     {
