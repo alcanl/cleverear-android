@@ -94,7 +94,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="title_Address_" translatable="false">Address:</string>
     <string name="dialog_yes" translatable="true">Yes</string>
     <string name="dialog_no" translatable="true">No</string>
-    <string name="device_connected_text" translatable="true">Connected to Earnet</string>
+    <string name="device_connected_text" translatable="true">Connected to Device %s</string>
     <string name="device_already_connected_text" translatable="true">Connected</string>
     <string name="notification_reconnect_text" translatable="true">Hearing Aid Re-Connected</string>
     <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ear Side\nThe Connection Of The Device\n %s Has Lost.\nPlease Wait While Trying To Reconnect.</string>

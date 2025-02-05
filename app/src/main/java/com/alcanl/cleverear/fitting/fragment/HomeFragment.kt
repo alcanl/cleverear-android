@@ -121,7 +121,7 @@ class HomeFragment : Fragment() {
         product.initializeDevice(hearingAid.communicationAdaptor)
 
         with(fittingConfig) {
-            if (product.ear == 0) {
+            if (product.ear == EarSide.Left.ordinal) {
                 deviceInfoExtMap[EarSide.Left] =
                     DeviceInfoExt(product, deviceInfo, hearingAidDTO, library, equalizerValuesDTO = equalizerValuesDTO)
                 with(mBinding) {

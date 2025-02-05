@@ -4,10 +4,14 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import androidx.compose.ui.text.intl.Locale
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
+import com.alcanl.cleverear.entity.HearingAid
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.reflect.Method
@@ -86,6 +90,7 @@ fun parseJsonScanData(data: String, context: Context): DiscoveredDeviceInfo
         throw JSONException(ex.cause)
     }
 }
+
 @Throws(JSONException::class)
 fun parseJsonConnectionData(data: String, context: Context) : Int
 {
@@ -111,6 +116,7 @@ fun parseJsonBatteryStateData(data: String, context: Context) : Int
     }
 
 }
+
 @Throws(JSONException::class)
 fun parseJsonSenderMacData(data: String, context: Context) : String
 {
@@ -123,6 +129,7 @@ fun parseJsonSenderMacData(data: String, context: Context) : String
         throw JSONException(ex.cause)
     }
 }
+
 @Throws(JSONException::class)
 fun parseJsonMemoryActiveData(data: String, context: Context) : Int
 {
@@ -135,6 +142,7 @@ fun parseJsonMemoryActiveData(data: String, context: Context) : Int
         throw JSONException(ex.cause)
     }
 }
+
 @Throws(JSONException::class)
 fun parseJsonVolumeData(data: String, context: Context) : Int
 {
@@ -147,6 +155,7 @@ fun parseJsonVolumeData(data: String, context: Context) : Int
     }
 
 }
+
 fun isConnected(device: BluetoothDevice): Boolean
 {
     return try {
@@ -166,4 +175,17 @@ fun isInternetAvailable(context: Context): Boolean
     val network = connectivityManager.activeNetwork ?: return false
     val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
     return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}
+
+fun getSpannableDeviceString(context: Context, hearingAid: HearingAid) : SpannableString
+{
+    val spannable = SpannableString(context.getString(R.string.device_connected_text, hearingAid))
+    val startIndex = spannable.indexOf(hearingAid.name)
+    val endIndex = startIndex + hearingAid.name.length
+
+    spannable.setSpan(
+        ForegroundColorSpan(if (hearingAid.side == EarSide.Left) android.graphics.Color.BLUE else android.graphics.Color.RED),
+        startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+    return spannable
 }

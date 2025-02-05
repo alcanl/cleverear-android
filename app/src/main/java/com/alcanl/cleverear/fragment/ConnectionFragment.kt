@@ -28,6 +28,7 @@ import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
+import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
@@ -159,7 +160,23 @@ class ConnectionFragment : Fragment(), IEventListener {
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
-            textViewDeviceState.text = getString(if (configuration.isConnected)  R.string.device_connected_text else R.string.textview_device_detection_not_found_text)
+
+            configuration.apply {
+                if (isConnected)
+                    when {
+                        !isDoubleDeviceConnection -> textViewDeviceState.text = getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
+
+                        else -> {
+                            textViewDeviceState.text = getSpannableDeviceString(requireContext(), hearingAidMap[EarSide.Left]!!)
+                            textViewDeviceStateSecond.apply {
+                                text = getSpannableDeviceString(requireContext(), hearingAidMap[EarSide.Right]!!)
+                                visibility = View.VISIBLE
+                            }
+                        }
+                    }
+
+            }
+
             textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
         }
@@ -294,6 +311,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             progressBar.visibility = View.VISIBLE
             textViewScanProcess.text = getString(R.string.textview_scan_process_scanning_text)
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+            textViewDeviceStateSecond.visibility = View.INVISIBLE
             adapter!!.clear()
             adapter!!.notifyDataSetChanged()
         }
@@ -373,6 +391,10 @@ class ConnectionFragment : Fragment(), IEventListener {
                 mBinding.apply {
                     textViewScanProcess.text = getString(R.string.textview_detect_device_text)
                     textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+                    textViewDeviceStateSecond.apply {
+                        text = getString(R.string.textview_device_detection_not_found_text)
+                        visibility = View.INVISIBLE
+                    }
                     frameLayoutStopConnection.visibility = View.GONE
                     imageButtonDetect.isEnabled = true
                 }

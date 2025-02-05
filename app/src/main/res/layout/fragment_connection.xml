@@ -26,6 +26,21 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0">
 
+            <TextView
+                android:id="@+id/textViewDeviceStateSecond"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="@string/textview_device_detection_not_found_text"
+                android:textColor="#121111"
+                android:textSize="20sp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/textViewDeviceState"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <ImageButton
                 android:id="@+id/buttonBack"
                 android:layout_width="48dp"
@@ -120,11 +135,9 @@
 
             <TextView
                 android:id="@+id/textViewDeviceState"
-                android:layout_width="233dp"
-                android:layout_height="41dp"
-                android:layout_marginStart="89dp"
-                android:layout_marginEnd="89dp"
-                android:layout_marginBottom="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"

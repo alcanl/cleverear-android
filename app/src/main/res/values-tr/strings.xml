@@ -83,7 +83,7 @@
     <string name="dialog_no">Hayır</string>
     <string name="textview_eddystone_tracking_description_text" translatable="true">Etkinleştirme ile uygulama, cihaz bildirimlerini arka plan modunda takip etmeye başlar ve kullanıcıyı kritik veriler hakkında bilgilendirir.\nÖrneğin yüksek sıcaklık, düşen cihaz veya uzun iletişim mesafesi gibi</string>
     <string name="text_active_memory" translatable="true">Aktif Program </string>
-    <string name="device_connected_text">Earnet ile Bağlanıldı</string>
+    <string name="device_connected_text">Cihaz %s ile Bağlanıldı</string>
     <string name="device_already_connected_text" translatable="true">Bağlı</string>
     <string name="textview_mode_text">Mod   </string>
     <string name="textview_channel_text">Kanal</string>

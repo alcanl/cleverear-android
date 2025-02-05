@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +36,9 @@ class MainContainerActivity : AppCompatActivity() {
 
     @Inject
     lateinit var configuration: ConfigurationModule
+
+    @Inject
+    lateinit var handler: Handler
 
     lateinit var binding : ActivityMainContainerBinding
 
@@ -83,6 +85,14 @@ class MainContainerActivity : AppCompatActivity() {
         initializeNavController()
     }
 
+    override fun onResume()
+    {
+        super.onResume()
+
+        if (configuration.isConnected)
+            handler.postDelayed({binding.navigationViewContainer.selectedItemId = R.id.navbar_control}, 1000)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -127,8 +137,6 @@ class MainContainerActivity : AppCompatActivity() {
 
     private fun initializeNavController()
     {
-
-
         binding.navigationViewContainer.setOnItemSelectedListener {
 
             when (it.itemId) {
@@ -217,7 +225,7 @@ class MainContainerActivity : AppCompatActivity() {
                 textViewContactSave.visibility = View.INVISIBLE
                 progressBar.visibility = View.VISIBLE
 
-                Handler(Looper.myLooper()!!).postDelayed({
+                handler.postDelayed({
                     progressBar.visibility = View.INVISIBLE
                     textViewContactSave.visibility = View.VISIBLE
                     buttonOk.visibility = View.VISIBLE
