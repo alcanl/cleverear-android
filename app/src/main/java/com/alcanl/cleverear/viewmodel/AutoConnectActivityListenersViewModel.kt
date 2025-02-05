@@ -22,18 +22,22 @@ class AutoConnectActivityListenersViewModel(activity: AutoConnectActivity) {
     }
     fun handleLeftEarButtonClick()
     {
-        mWeakReference.get()?.leftEarButtonClicked()
+        mWeakReference.get()?.onLeftEarButtonClicked()
     }
     fun handleRightEarButtonClick()
     {
-        mWeakReference.get()?.rightEarButtonClicked()
+        mWeakReference.get()?.onRightEarButtonClicked()
     }
     fun handleControlButtonClick()
     {
-        mWeakReference.get()?.controlButtonClicked()
+        mWeakReference.get()?.onControlButtonClicked()
     }
     fun handleRemoteFittingButtonClick()
     {
-        mWeakReference.get()?.remoteFittingButtonClicked()
+        mWeakReference.get()?.onRemoteFittingButtonClicked()
+    }
+    fun handleBackButton()
+    {
+        mWeakReference.get()?.onBackButtonClicked()
     }
 }

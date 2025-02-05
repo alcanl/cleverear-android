@@ -158,32 +158,34 @@ class AutoConnectActivity : AppCompatActivity() {
 
                 with(configuration) {
 
-                    if (isLeftSelected && isRightSelected)
-                        if (isValidDeviceData(true, "")) {
-                            isDoubleDeviceConnection = true
-                            remoteFittingButtonClickedCommon()
-                        }
+                    when {
+                        isLeftSelected && isRightSelected ->
+                            if (isValidDeviceData(true, "")) {
+                                isDoubleDeviceConnection = true
+                                remoteFittingButtonClickedCommon()
+                            }
                         else
                             toastInvalidDeviceData()
-                    else if (isLeftSelected)
-                        if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())){
-                            isDoubleDeviceConnection = false
-                            earSide = EarSide.Left
-                            remoteFittingButtonClickedCommon()
-                        }
-                        else
-                            toastInvalidDeviceData()
-                    else if (isRightSelected)
-                        if (isValidDeviceData(false, mBinding.textViewRight.text.toString())){
-                            isDoubleDeviceConnection = false
-                            earSide = EarSide.Right
-                            remoteFittingButtonClickedCommon()
-                        }
-                        else
-                            toastInvalidDeviceData()
+                        isLeftSelected ->
+                            if (isValidDeviceData(false, mBinding.textViewLeft.text.toString())) {
+                                isDoubleDeviceConnection = false
+                                earSide = EarSide.Left
+                                remoteFittingButtonClickedCommon()
+                            }
+                            else
+                                toastInvalidDeviceData()
+                        isRightSelected ->
+                            if (isValidDeviceData(false, mBinding.textViewRight.text.toString())){
+                                isDoubleDeviceConnection = false
+                                earSide = EarSide.Right
+                                remoteFittingButtonClickedCommon()
+                            }
+                            else
+                                toastInvalidDeviceData()
 
-                    else
-                        Toast.makeText(this@AutoConnectActivity, R.string.toast_no_device_selected, Toast.LENGTH_LONG).show()
+                        else -> Toast.makeText(this@AutoConnectActivity,
+                            R.string.toast_no_device_selected, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             override fun onAnimationEnd(animation: Animation?) {}
@@ -197,7 +199,7 @@ class AutoConnectActivity : AppCompatActivity() {
         mBinding.viewModel = AutoConnectActivityListenersViewModel(this)
     }
 
-    fun leftEarButtonClicked()
+    fun onLeftEarButtonClicked()
     {
         mBinding.imageButtonLeft.apply {
             startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
@@ -205,7 +207,7 @@ class AutoConnectActivity : AppCompatActivity() {
         }
     }
 
-    fun rightEarButtonClicked()
+    fun onRightEarButtonClicked()
     {
         mBinding.imageButtonRight.apply {
             startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
@@ -213,7 +215,7 @@ class AutoConnectActivity : AppCompatActivity() {
         }
     }
 
-    fun controlButtonClicked()
+    fun onControlButtonClicked()
     {
 
         mBinding.imageButtonControl.apply {
@@ -222,11 +224,16 @@ class AutoConnectActivity : AppCompatActivity() {
         }
     }
 
-    fun remoteFittingButtonClicked()
+    fun onRemoteFittingButtonClicked()
     {
         mBinding.imageButtonRemoteConf.apply {
             startAnimation(android.view.animation.AnimationUtils.loadAnimation(this@AutoConnectActivity,
                 R.anim.alpha_blink_anim).also { it.setAnimationListener(remoteFittingButtonAnimation()) })
         }
+    }
+
+    fun onBackButtonClicked()
+    {
+        finish()
     }
 }

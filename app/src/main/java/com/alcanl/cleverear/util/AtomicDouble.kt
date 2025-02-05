@@ -1,8 +1,8 @@
 package com.alcanl.cleverear.util
 
-import jakarta.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
 class AtomicDouble @Inject constructor (initialValue: Double) {
 

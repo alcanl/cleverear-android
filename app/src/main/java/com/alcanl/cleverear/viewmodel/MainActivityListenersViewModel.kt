@@ -8,18 +8,18 @@ class MainActivityListenersViewModel (activity: MainActivity) {
 
     fun handleSingleDeviceButton()
     {
-        mWeakReference.get()?.buttonSingleDeviceClick()
+        mWeakReference.get()?.onButtonSingleDeviceClick()
     }
     fun handleDoubleDeviceButton()
     {
-        mWeakReference.get()?.buttonDoubleDeviceClick()
+        mWeakReference.get()?.onButtonDoubleDeviceClick()
     }
     fun handleControlButton()
     {
-        mWeakReference.get()?.buttonControlClicked()
+        mWeakReference.get()?.onButtonControlClicked()
     }
     fun handleInfoButton()
     {
-        mWeakReference.get()?.buttonInfoClicked()
+        mWeakReference.get()?.onButtonInfoClicked()
     }
 }

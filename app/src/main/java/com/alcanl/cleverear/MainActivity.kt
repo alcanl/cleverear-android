@@ -320,7 +320,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun buttonSingleDeviceClick() {
+    fun onButtonSingleDeviceClick() {
 
         if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
@@ -337,7 +337,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun buttonDoubleDeviceClick()
+    fun onButtonDoubleDeviceClick()
     {
         if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun buttonControlClicked()
+    fun onButtonControlClicked()
     {
         if (!configuration.isBluetoothEnabled) {
             searchBluetooth()
@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun buttonInfoClicked()
+    fun onButtonInfoClicked()
     {
         mBinding.imageButtonInfo.apply {
             startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.alpha_blink_anim)

@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.viewmodel
 
 import com.alcanl.cleverear.EarSideSelectionActivity
+import com.alcanl.cleverear.util.EarSide
 import java.lang.ref.WeakReference
 
 class EarSideSelectionActivityListenersViewModel (activity : EarSideSelectionActivity){
@@ -8,10 +9,14 @@ class EarSideSelectionActivityListenersViewModel (activity : EarSideSelectionAct
 
     fun handleLeftEarButton()
     {
-        mWeakReference.get()?.leftEarButtonClicked()
+        mWeakReference.get()?.onEarButtonClicked(EarSide.Left)
     }
     fun handleRightEarButton()
     {
-        mWeakReference.get()?.rightEarButtonClicked()
+        mWeakReference.get()?.onEarButtonClicked(EarSide.Right)
+    }
+    fun handleBackButton()
+    {
+        mWeakReference.get()?.onBackButtonClicked()
     }
 }

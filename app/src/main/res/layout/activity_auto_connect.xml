@@ -12,6 +12,19 @@
         android:layout_height="match_parent"
         android:background="@drawable/background">
 
+        <ImageButton
+            android:id="@+id/buttonBack"
+            android:layout_width="48dp"
+            android:layout_height="54dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="@string/button_previous_activity"
+            android:onClick="@{()->viewModel.handleBackButton()}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/baseline_arrow_back_24" />
+
         <TextView
             android:id="@+id/textViewRemoteConf"
             android:layout_width="wrap_content"
@@ -52,6 +65,7 @@
             app:borderColor="#128ba6"
             app:labelText="@string/groupbox_layout_select_device_label_text"
             app:labelTextColor="#128ba6"
+            app:labelTextSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -220,7 +234,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:text="@string/textview_connect_to_selected_device_text"
             android:textColor="#128ba6"
-            android:textSize="16sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageButtonControl"

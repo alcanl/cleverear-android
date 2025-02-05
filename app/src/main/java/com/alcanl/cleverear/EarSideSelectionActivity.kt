@@ -33,21 +33,22 @@ class EarSideSelectionActivity : AppCompatActivity() {
         mBinding.frameLayoutRightEar.startAnimation(android.view.animation.AnimationUtils.loadAnimation
             (this, R.anim.translate_ear_button_down_to_up))
     }
+
     private fun initialize()
     {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_ear_side_selection)
         mBinding.viewModel = EarSideSelectionActivityListenersViewModel(this)
     }
-    fun leftEarButtonClicked()
+
+    fun onEarButtonClicked(earSide: EarSide)
     {
-        configuration.earSide = EarSide.Left
+        configuration.earSide = earSide
         Intent(this, MainContainerActivity::class.java).apply { startActivity(this) }
         finish()
     }
-    fun rightEarButtonClicked()
+
+    fun onBackButtonClicked()
     {
-        configuration.earSide = EarSide.Right
-        Intent(this, MainContainerActivity::class.java).apply { startActivity(this) }
         finish()
     }
 }

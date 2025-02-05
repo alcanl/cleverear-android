@@ -7,6 +7,12 @@
         <import type="com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel"/>
         <import type="android.widget.ArrayAdapter"/>
         <import type="com.alcanl.cleverear.entity.DiscoveredDeviceInfo"/>
+        <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
+        <import type="android.view.View"/>
+        <import type="com.alcanl.cleverear.R"/>
+        <import type="android.content.Context"/>
+        <import type="androidx.appcompat.content.res.AppCompatResources"/>
+        <variable name="config" type="ConfigurationModule" />
         <variable name="viewModel" type="com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel" />
         <variable name="adapter" type="ArrayAdapter&lt;String&gt;" />
     </data>
@@ -86,7 +92,7 @@
                     android:contentDescription="@string/textview_detect_device_text"
                     android:onClick="@{()->viewModel.handleDetectDeviceButton()}"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/transparentbluetooth_2"
+                    app:srcCompat="@{config.INSTANCE.connected ? AppCompatResources.getDrawable(context, R.drawable.baseline_bluetooth_connected_24) : AppCompatResources.getDrawable(context, R.drawable.transparentbluetooth_2)}"
                     tools:ignore="DuplicateSpeakableTextCheck" />
 
                 <TextView
@@ -115,12 +121,11 @@
                 app:labelText="@string/groupbox_select_device_text"
                 app:labelTextColor="@color/ap_black"
                 app:labelTextSize="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewDeviceState"
+                app:layout_constraintBottom_toTopOf="@+id/textViewDeviceStateSecond"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/frameLayoutEndConnection"
-                app:layout_constraintVertical_bias="0.497">
+                app:layout_constraintTop_toBottomOf="@+id/frameLayoutEndConnection">
 
                 <ListView
                     android:id="@+id/listView"
@@ -137,7 +142,7 @@
                 android:id="@+id/textViewDeviceState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="35dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"
@@ -159,7 +164,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/frameLayoutStartScan"
                 app:layout_constraintVertical_bias="0.0">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/buttonStopConnection"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -169,10 +174,12 @@
                     android:enabled="true"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
+                    android:visibility="@{config.INSTANCE.connected ? View.VISIBLE : View.INVISIBLE}"
                     android:onClick="@{()-> viewModel.handleStopConnectionButton()}"
                     android:text="@string/button_stop_connection_text"
                     android:textColor="@color/ap_black"
                     android:textSize="18sp"
+                    app:cornerRadius="25dp"
                     app:iconTint="#0E0E0E"
                     app:strokeColor="#00695C" />
 
