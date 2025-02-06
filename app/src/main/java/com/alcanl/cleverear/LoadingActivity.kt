@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -336,7 +337,12 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     private fun finalizeConnectedLoadingTimer()
     {
-        mBinding.textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
+        mBinding.apply {
+            textViewConnecting.text = getString(R.string.textview_device_detection_device_connected_text)
+            progressBar.visibility = View.INVISIBLE
+            check.check()
+        }
+
         handler.postDelayed({
             if (!configuration.isRemoteFittingConnection)
                 if (configuration.isConnectedBefore)

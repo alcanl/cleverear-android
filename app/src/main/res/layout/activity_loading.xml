@@ -9,7 +9,6 @@
         tools:context=".LoadingActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout3"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -36,12 +35,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ProgressBar
+                <com.google.android.material.progressindicator.CircularProgressIndicator
                     style="?android:attr/progressBarStyle"
+                    android:id="@+id/progressBar"
                     android:layout_width="95dp"
-                    android:layout_height="94dp"
+                    android:layout_height="95dp"
                     android:layout_gravity="center"
                     android:indeterminateTint="@color/design_default_color_secondary_variant" />
+
+                <cdflynn.android.library.checkview.CheckView
+                    android:id="@+id/check"
+                    android:layout_width="95dp"
+                    android:layout_height="95dp"
+                    android:layout_gravity="center"
+                    app:checkView_strokeColor="@color/design_default_color_secondary_variant"
+                    app:checkView_strokeWidth="10dp" />
 
                 <TextView
                     android:id="@+id/textViewConnecting"
