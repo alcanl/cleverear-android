@@ -23,10 +23,10 @@ import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
+import com.alcanl.cleverear.util.extension.recognizeEarSide
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
 import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
@@ -155,7 +155,8 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (!connectionFragmentEventListener.isListenerOnBoard())
             connectionFragmentEventListener.startEventListener()
 
-        with(mBinding) {
+        mBinding.apply {
+
             imageButtonDetect.isEnabled = !configuration.isConnected
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
@@ -174,13 +175,35 @@ class ConnectionFragment : Fragment(), IEventListener {
                             }
                         }
                     }
-
             }
-
             textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
         }
     }
+
+    private fun alertDialogPositiveButtonCallback()
+    {
+        configuration.apply {
+            if (isDoubleDeviceConnection)
+                hearingAidMap.forEach {it.value.endConnectionSession()}
+            else
+                hearingAidMap[earSide]?.endConnectionSession()
+
+            isConnected = false
+        }
+
+        mBinding.apply {
+            textViewScanProcess.text = getString(R.string.textview_detect_device_text)
+            textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+            textViewDeviceStateSecond.apply {
+                text = getString(R.string.textview_device_detection_not_found_text)
+                visibility = View.INVISIBLE
+            }
+            frameLayoutStopConnection.visibility = View.GONE
+            imageButtonDetect.isEnabled = true
+        }
+    }
+
     private fun finalizeConnectionConfiguration()
     {
         if (isScanContinue)
@@ -202,18 +225,15 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     private fun putItemToDeviceMap(earSide: EarSide, device: DiscoveredDeviceInfo)
     {
-        if (configuration.hearingAidMap.containsKey(earSide))
-            return
+        configuration.apply {
+            if (hearingAidMap.containsKey(earSide))
+                return
 
-        configuration.hearingAidMap[earSide] = HearingAid(
-            device.address,
-            device.name, device.rssi, device.manufacturerData, earSide
-        )
-    }
-
-    private fun recognizeEarSide(manufacturerData: String): EarSide
-    {
-        return if (manufacturerData.substring(0, 6) == MANUFACTURER_CODE_LEFT) EarSide.Left else EarSide.Right
+            hearingAidMap[earSide] = HearingAid(
+                device.address,
+                device.name, device.rssi, device.manufacturerData, earSide
+            )
+        }
     }
 
     private fun scanDevicesWithBluetooth()
@@ -241,7 +261,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             adapter!!.add(device.toString())
 
-            if (configuration.isDoubleDeviceConnection && recognizeEarSide(device.manufacturerData) == EarSide.Right)
+            if (configuration.isDoubleDeviceConnection && device.manufacturerData.recognizeEarSide() == EarSide.Right)
                 deviceListAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
 
             else if (configuration.earSide == EarSide.Right)
@@ -282,7 +302,7 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (selectedDevice != null) {
             mSelectedHearingAid = HearingAid(
                 selectedDevice.address, selectedDevice.name, selectedDevice.rssi,
-                selectedDevice.manufacturerData, recognizeEarSide(selectedDevice.manufacturerData)
+                selectedDevice.manufacturerData, selectedDevice.manufacturerData.recognizeEarSide()
             )
 
             configuration.hearingAidMap[configuration.earSide] = mSelectedHearingAid
@@ -325,8 +345,10 @@ class ConnectionFragment : Fragment(), IEventListener {
         try {
             isScanContinue = false
             deviceScanner.endScanProcess(mAsyncResult)
-            mBinding.textViewScanProcess.text = getString(R.string.textview_detect_device_text)
-            mBinding.progressBar.visibility = View.GONE
+            mBinding.apply {
+                textViewScanProcess.text = getString(R.string.textview_detect_device_text)
+                progressBar.visibility = View.GONE
+            }
 
         } catch (ex: ArkException) {
             Log.e(ConnectionFragment::class.simpleName, ex.message!!)
@@ -378,28 +400,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             configuration.isServiceOnBoard = false
         }
 
-        Handler(Looper.myLooper()!!).postDelayed (
-            {
-                with(configuration) {
-                    if (isDoubleDeviceConnection)
-                        hearingAidMap.forEach {it.value.endConnectionSession()}
-                    else
-                        hearingAidMap[earSide]?.endConnectionSession()
-
-                    isConnected = false
-                }
-                mBinding.apply {
-                    textViewScanProcess.text = getString(R.string.textview_detect_device_text)
-                    textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
-                    textViewDeviceStateSecond.apply {
-                        text = getString(R.string.textview_device_detection_not_found_text)
-                        visibility = View.INVISIBLE
-                    }
-                    frameLayoutStopConnection.visibility = View.GONE
-                    imageButtonDetect.isEnabled = true
-                }
-            }, 6000
-        )
+        Handler(Looper.myLooper()!!).postDelayed (::alertDialogPositiveButtonCallback, 6000)
     }
 
     fun onAlertDialogNegativeButtonClicked()
