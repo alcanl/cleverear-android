@@ -39,7 +39,7 @@ import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
 import com.alcanl.cleverear.util.WHAT_SOUND_GENERATE_ERROR
 import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
 import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
-import com.alcanl.cleverear.util.extension.startAlphaAnimation
+import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.Manufacturing
@@ -222,7 +222,7 @@ class InSituFragment : Fragment(), IEventListener {
     }
     private fun changeText(textView: TextView, value: Int)
     {
-        textView.startAlphaAnimation(requireContext(),
+        textView.startTextAlphaAnimation(requireContext(),
             String.format(getString(
                 if (textView == mBinding.textViewFrequency) R.string.textview_frequency_hertz_text
                 else R.string.textview_decibel_text), value))

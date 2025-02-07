@@ -27,7 +27,7 @@ import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
-import com.alcanl.cleverear.util.extension.startAlphaAnimation
+import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.util.getEmergencyNumber
 import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
 import com.alcanl.cleverear.util.getRightHearingAidModelNumber
@@ -346,20 +346,20 @@ class BeaconFragment : Fragment(), IEventListener {
         {
             mWeakReference.get()?.binding?.let {
                 if (earSide == EarSide.Left) {
-                    it.textViewLeftDeviceTLMVersion.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
-                    it.textViewLeftDeviceTLMAdvertisementCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
-                    it.textViewLeftDeviceTLMTemperature.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
-                    it.textViewLeftDeviceTLMStepCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
-                    it.textViewLeftDeviceTLMBatteryVoltage.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
-                    it.textViewLeftDeviceTLMElapsedTime.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
+                    it.textViewLeftDeviceTLMVersion.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
+                    it.textViewLeftDeviceTLMAdvertisementCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
+                    it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.textViewLeftDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.textViewLeftDeviceTLMBatteryVoltage.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
+                    it.textViewLeftDeviceTLMElapsedTime.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
                 else {
-                    it.textViewRightDeviceTLMVersion.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
-                    it.textViewRightDeviceTLMAdvertisementCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
-                    it.textViewRightDeviceTLMTemperature.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
-                    it.textViewRightDeviceTLMStepCount.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
-                    it.textViewRightDeviceTLMBatteryVoltage.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
-                    it.textViewRightDeviceTLMElapsedTime.startAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
+                    it.textViewRightDeviceTLMVersion.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
+                    it.textViewRightDeviceTLMAdvertisementCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
+                    it.textViewRightDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.textViewRightDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.textViewRightDeviceTLMBatteryVoltage.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
+                    it.textViewRightDeviceTLMElapsedTime.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
             }
         }

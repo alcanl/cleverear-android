@@ -170,7 +170,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginVertical="5dp"
-                    android:backgroundTint="@color/design_default_color_secondary_variant"
+                    android:backgroundTint="#128ba6"
                     android:enabled="true"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"

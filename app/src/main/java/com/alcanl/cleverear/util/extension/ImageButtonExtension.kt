@@ -14,9 +14,8 @@ private fun setStreamChannelAnimation(functionStart : () -> Unit, functionEnd: (
     }
 }
 
-fun ImageButton.startSetStreamChannelAnimation(context: Context, functionStart: () -> Unit, functionEnd: () -> Unit)
-{
-    this.startAnimation( android.view.animation.AnimationUtils.loadAnimation(
-        context, R.anim.alpha_blink_anim
-    ).also { setStreamChannelAnimation(functionStart, functionEnd) })
+fun ImageButton.startSetStreamChannelAnimation(context: Context, functionStart: () -> Unit, functionEnd: () -> Unit) {
+    val animation = android.view.animation.AnimationUtils.loadAnimation(context, R.anim.alpha_blink_anim)
+    animation.setAnimationListener(setStreamChannelAnimation(functionStart, functionEnd))
+    this.startAnimation(animation)
 }

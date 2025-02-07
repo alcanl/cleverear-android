@@ -43,6 +43,7 @@ import com.alcanl.cleverear.util.extension.hideFrames
 import com.alcanl.cleverear.util.extension.postDelayAnimation
 import com.alcanl.cleverear.util.extension.showFrames
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
+import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.viewmodel.HomeFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.DeviceInfo
@@ -205,7 +206,7 @@ class HomeFragment : Fragment() {
         private fun handleInitializeDeviceFail(text : String)
         {
             mWeakReference.get()?.let {
-                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), text)
+                it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), text)
                 it.mBinding.progressBar.visibility = View.INVISIBLE
                 it.mBinding.buttonRetry.visibility = View.VISIBLE
             }
@@ -228,12 +229,12 @@ class HomeFragment : Fragment() {
                 with(it.mBinding) {
                     progressBar.visibility = View.INVISIBLE
                     imageViewHearingAid.startAlphaAnimation(it.requireContext())
-                    textViewInitialize.startAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
+                    textViewInitialize.startTextAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
                     postDelayed({
                         (it.activity as SelfFittingActivity).binding.navigationView.menu.forEach { item ->
                             item.isEnabled = true
                         }
-                        textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
+                        textViewInitialize.startTextAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
                     }, 2000)
                 }
 
@@ -246,7 +247,7 @@ class HomeFragment : Fragment() {
                     selectedEarSide = earSide
                     deviceInfoExtMap[earSide]?.isInitFinished = true
                 }
-                it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), String.format(
+                it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), String.format(
                     it.requireContext().getString(R.string.textview_device_initialized_text),
                     it.fittingConfig.deviceInfoExtMap[earSide]?.hearingAidDTO?.modelName))
                 startFrameAnimations()
@@ -267,16 +268,16 @@ class HomeFragment : Fragment() {
             when (msg.what) {
                 11 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_unknown_problem_text)!!)
                 12 -> { mWeakReference.get()?.let {
-                        it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_library_found_text)) }}
+                        it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_library_found_text)) }}
                 13 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_network_problem_text)!!)
                 14 -> readParameterSuccess()
                 15 -> { mWeakReference.get()?.let {
-                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_fail_text)) }}
+                    it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_fail_text)) }}
                 16 -> handleInitializeDeviceFail(mWeakReference.get()?.getString(R.string.textview_initialize_library_not_found_text)!!)
                 17 -> deviceInitializeFinished(EarSide.Left)
                 18 -> deviceInitializeFinished(EarSide.Right)
                 21 -> { mWeakReference.get()?.let {
-                    it.mBinding.textViewInitialize.startAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_process_text)) }}
+                    it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), it.getString(R.string.textview_parameter_read_process_text)) }}
                 22 -> startFrameAnimations()
                 26 -> handleConnectionLost()
             }
@@ -285,7 +286,7 @@ class HomeFragment : Fragment() {
     fun retryButtonClicked()
     {
         with(mBinding) {
-            textViewInitialize.startAlphaAnimation(requireContext(), getString(R.string.textview_initializing_text))
+            textViewInitialize.startTextAlphaAnimation(requireContext(), getString(R.string.textview_initializing_text))
             buttonRetry.visibility = View.INVISIBLE
             progressBar.visibility = View.VISIBLE
         }

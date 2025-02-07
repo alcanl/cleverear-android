@@ -115,6 +115,7 @@
     <string name="button_play_sound_text" translatable="true">Sesi Çal</string>
     <string name="button_save_in_situ_text" translatable="true">Testi Kaydet</string>
     <string name="button_retry_text" translatable="true">Retry</string>
+    <string name="settings_updated" translatable="true">Ayarlar Güncellendi</string>
     <string name="spinner_feedback_hint_text" translatable="true">Geri Besleme Ortamı</string>
     <string name="dialog_textview_unsaved_fitting_text" translatable="true">Cihaza kaydedilmemiş değişiklikler bulunmaktadır. Devam etmeden önce kaydetmek ister misiniz?</string>
     <string name="textview_in_situ_warning_text" translatable="true">Bu test sadece bilgilendirme ve cihaz konfigürasyonu için uygulanmakta olup, resmi sağlık kuruluşlarında uygulanan işitme testlerinin yerine geçmemektedir.</string>

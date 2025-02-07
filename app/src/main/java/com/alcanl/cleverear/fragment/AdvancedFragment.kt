@@ -33,6 +33,7 @@ import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.viewmodel.AdvancedFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.ParameterSpace
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -481,10 +482,17 @@ class AdvancedFragment : Fragment(), IEventListener {
 
             try {
                 val channel = mBinding.editTextChannel.text.toString().toInt()
-                imageButton.startSetStreamChannelAnimation(requireContext(),
-                    { setStreamAddressButtonClicked(channel) }, {
-                        Toast.makeText(requireContext(), getString(R.string.toast_channel_and_mode_set_text,
-                            configuration.hearingAidMap[configuration.earSide]?.streamChannelList!!, channel), Toast.LENGTH_LONG).show()
+                mBinding.editTextChannel.setText(R.string.empty_string)
+                imageButton.startSetStreamChannelAnimation(requireContext(), { setStreamAddressButtonClicked(channel) },
+                    {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(R.string.settings_updated))
+                        .setIcon(AppCompatResources.getDrawable(requireContext(), R.drawable.check_tick))
+                        .setMessage(getString(R.string.toast_channel_and_mode_set_text,
+                            configuration.hearingAidMap[configuration.earSide]?.streamChannelList!!, channel))
+                        .setPositiveButton(getString(R.string.alert_dialog_connection_problem_ok_button)) { d,_ -> d.dismiss()}
+                        .setCancelable(true)
+                        .show()
                     })
             } catch (_: NumberFormatException) {
                 Toast.makeText(requireContext(), R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()

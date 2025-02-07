@@ -54,6 +54,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="textview_count_device_found_text" translatable="true">Device Found</string>
     <string name="button_stop_connection_text" translatable="true">\t\t\tEnd Connection</string>
     <string name="textview_volume_text" translatable="true">Volume and Battery</string>
+    <string name="settings_updated" translatable="true">Settings Updated Successfully</string>
     <string name="textview_advanced_description_text" translatable="true">In this section,\nYou can set stream mode and channel of your device\nfor pairing it with a Connect Line\nAlso you can easily set device mic and aux streaming levels</string>
     <string name="textview_control_description_text" translatable="true">In this section,\nYou can control your device volume, battery and programs</string>
     <string name="toast_channel_and_mode_set_text" translatable="true">The mode %d and the channel %d has been set for Connect Line streaming</string>
