@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -163,18 +164,27 @@ class ConnectionFragment : Fragment(), IEventListener {
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
 
             configuration.apply {
-                if (isConnected)
+                if (isConnected) {
+                    imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.baseline_bluetooth_connected_24))
                     when {
-                        !isDoubleDeviceConnection -> textViewDeviceState.text = getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
+                        !isDoubleDeviceConnection -> textViewDeviceState.text =
+                            getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
 
                         else -> {
-                            textViewDeviceState.text = getSpannableDeviceString(requireContext(), hearingAidMap[EarSide.Left]!!)
+                            textViewDeviceState.text = getSpannableDeviceString(
+                                requireContext(),
+                                hearingAidMap[EarSide.Left]!!
+                            )
                             textViewDeviceStateSecond.apply {
-                                text = getSpannableDeviceString(requireContext(), hearingAidMap[EarSide.Right]!!)
+                                text = getSpannableDeviceString(
+                                    requireContext(),
+                                    hearingAidMap[EarSide.Right]!!
+                                )
                                 visibility = View.VISIBLE
                             }
                         }
                     }
+                }
             }
             textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
@@ -206,11 +216,11 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     private fun finalizeConnectionConfiguration()
     {
-        if (isScanContinue)
-            stopScanProcess()
-
         mIsDeviceFound = true
         startActivity(Intent(activity, LoadingActivity::class.java))
+
+        if (isScanContinue)
+            stopScanProcess()
     }
 
     private fun initBinding()
@@ -390,6 +400,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         mAlertDialog.dismiss()
         mBinding.apply {
+            imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.transparentbluetooth_2))
             frameLayoutStopConnection.visibility = View.VISIBLE
             buttonStopConnection.visibility = View.INVISIBLE
             imageViewStopConnection.visibility = View.INVISIBLE
