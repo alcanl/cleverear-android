@@ -53,7 +53,8 @@ This message has been automatically sent by the CleverEar system for information
     <string name="dialog_connection_requires_battery_voltage_text" translatable="true">For connection with rechargeable battery-powered models, the battery level should not be below 50%</string>
     <string name="textview_count_device_found_text" translatable="true">Device Found</string>
     <string name="button_stop_connection_text" translatable="true">\t\t\tEnd Connection</string>
-    <string name="textview_volume_text" translatable="true">Volume</string>
+    <string name="textview_volume_text" translatable="true">Volume and Battery</string>
+    <string name="textview_control_description_text" translatable="true">In this section,\nYou can control your device volume, battery and programs</string>
     <string name="textview_program_text" translatable="true">Programs</string>
     <string name="textview_left_device_text" translatable="true">Left Device</string>
     <string name="textview_right_device_text" translatable="true">Right Device</string>

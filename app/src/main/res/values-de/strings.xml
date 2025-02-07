@@ -50,7 +50,8 @@
     <string name="dialog_already_connected_message">Möchten Sie die aktuelle Verbindung wirklich beenden?</string>
     <string name="textview_count_device_found_text">Geräte gefunden</string>
     <string name="button_stop_connection_text">\tVerbindung beenden</string>
-    <string name="textview_volume_text">Lautstärke</string>
+    <string name="textview_volume_text">Lautstärke und Batterie</string>
+    <string name="textview_control_description_text" translatable="true">In diesem Abschnitt\nkönnen Sie die Lautstärke, den Akku und die Programme Ihres Geräts steuern</string>
     <string name="textview_program_text">Programme</string>
     <string name="bubble_textview_single_device_text" translatable="true">Wenn Sie nur ein einziges Hörgerät benutzen, können Sie mit…</string>
     <string name="bubble_textview_double_device_text" translatable="true">Wenn Sie Hörgeräte für beide Ohren benutzen, können Sie mit dem…</string>
