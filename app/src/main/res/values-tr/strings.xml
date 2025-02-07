@@ -14,6 +14,8 @@
     <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
     <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses ve Pil</string>
+    <string name="textview_advanced_description_text" translatable="true">Geişmiş ekranında cihazınızı bir Connect Line ile eşleştirmek için\n Stream modunu ve kanalını belirleyebilir,\nAyrıca cihazın mikrofon ve Stream Aux seviyelerini kolayca ayarlayabilirsiniz</string>
+    <string name="toast_channel_and_mode_set_text" translatable="true">Mod %d ve Kanal %d Connect-Line-Streaming eşleşmesi için cihaz ayarlandı</string>
     <string name="textview_control_description_text" translatable="true">Kontrol ekranında cihazınız pil değerini takip edebilir,\nses ve program seçeneklerini ayarlayabilirsiniz</string>
     <string name="dialog_connection_requires_battery_voltage_text" translatable="true">Şarjlı pil ile çalışan modeller ile bağlantı için pil seviyesi %50 altında olmamalıdır</string>
     <string name="edittext_contact_number_hint" translatable="true">Telefon Numarası</string>

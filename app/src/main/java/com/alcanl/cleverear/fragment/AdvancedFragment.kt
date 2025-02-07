@@ -278,7 +278,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     private fun setStreamAddressButtonClickedCallback(result: Int, channel: Int, hearingAid: HearingAid)
     {
-        lifecycleScope.launch(Dispatchers.Default) {
+        lifecycleScope.launch(Dispatchers.IO) {
 
             try {
                 with(hearingAid) {
@@ -481,7 +481,11 @@ class AdvancedFragment : Fragment(), IEventListener {
 
             try {
                 val channel = mBinding.editTextChannel.text.toString().toInt()
-                imageButton.startSetStreamChannelAnimation(requireContext()) { setStreamAddressButtonClicked(channel) }
+                imageButton.startSetStreamChannelAnimation(requireContext(),
+                    { setStreamAddressButtonClicked(channel) }, {
+                        Toast.makeText(requireContext(), getString(R.string.toast_channel_and_mode_set_text,
+                            configuration.hearingAidMap[configuration.earSide]?.streamChannelList!!, channel), Toast.LENGTH_LONG).show()
+                    })
             } catch (_: NumberFormatException) {
                 Toast.makeText(requireContext(), R.string.toast_channel_error_text, Toast.LENGTH_LONG).show()
             }

@@ -51,6 +51,8 @@
     <string name="textview_count_device_found_text">Geräte gefunden</string>
     <string name="button_stop_connection_text">\tVerbindung beenden</string>
     <string name="textview_volume_text">Lautstärke und Batterie</string>
+    <string name="textview_advanced_description_text" translatable="true">In diesem Abschnitt\nkönnen Sie den Streaming-Modus und den Kanal Ihres Geräts einstellen,\num es mit einer Connect Line zu koppeln.\nAußerdem können Sie leicht die Mikrofon- und AUX-Streaming-Pegel des Geräts einstellen.</string>
+    <string name="toast_channel_and_mode_set_text" translatable="true">Der Modus %d und der Kanal %d wurden für das Connect-Line-Streaming eingestellt</string>
     <string name="textview_control_description_text" translatable="true">In diesem Abschnitt\nkönnen Sie die Lautstärke, den Akku und die Programme Ihres Geräts steuern</string>
     <string name="textview_program_text">Programme</string>
     <string name="bubble_textview_single_device_text" translatable="true">Wenn Sie nur ein einziges Hörgerät benutzen, können Sie mit…</string>

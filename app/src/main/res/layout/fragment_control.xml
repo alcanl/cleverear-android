@@ -99,7 +99,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchDualConfiguration"
                     android:layout_width="155dp"
-                    android:layout_height="40dp"
+                    android:layout_height="35dp"
                     android:checked="@={config.INSTANCE.dualDeviceConfig}"
                     android:enabled="@{config.INSTANCE.doubleDeviceConnection}"
                     android:fontFamily="sans-serif-medium"
