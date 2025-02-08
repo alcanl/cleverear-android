@@ -9,14 +9,12 @@ import com.alcanl.cleverear.R
 
 fun TextView.startTextAlphaAnimation(context: Context, string: String)
 {
-    this.startAnimation(AnimationUtils.loadAnimation(context, R.anim.alpha_blink_anim).also()
-    {
-        it.setAnimationListener(object: AnimationListener{
-            override fun onAnimationStart(p0: Animation?) {
-                this@startTextAlphaAnimation.text = string
-            }
-            override fun onAnimationEnd(p0: Animation?) {}
-            override fun onAnimationRepeat(p0: Animation?) {}
-        })
-    })
+    val animationListener = object: AnimationListener{
+        override fun onAnimationStart(p0: Animation?) { this@startTextAlphaAnimation.text = string }
+        override fun onAnimationEnd(p0: Animation?) {}
+        override fun onAnimationRepeat(p0: Animation?) {}
+    }
+    val animation = AnimationUtils.loadAnimation(context, R.anim.alpha_blink_anim)
+    animation.setAnimationListener(animationListener)
+    this.startAnimation(animation)
 }
