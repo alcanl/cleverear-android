@@ -245,28 +245,30 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         val addressLeft = getLeftHearingAidAddress(this)
         val addressRight = getRightHearingAidAddress(this)
 
-        if (addressLeft.isNotEmpty() && addressRight.isNotEmpty())
-            configuration.apply {
-                isDoubleDeviceConnection = true
-                isConnectedBefore = true
-                mAddressArray = arrayOf(addressLeft, addressRight)
-            }
+        when {
+            addressLeft.isNotEmpty() && addressRight.isNotEmpty() ->
+                configuration.apply {
+                    isDoubleDeviceConnection = true
+                    isConnectedBefore = true
+                    mAddressArray = arrayOf(addressLeft, addressRight)
+                }
 
-        else if (addressLeft.isNotEmpty())
-            configuration.apply {
-                earSide = EarSide.Left
-                isConnectedBefore = true
-                mAddressArray = arrayOf(addressLeft)
-            }
+            addressLeft.isNotEmpty() ->
+                configuration.apply {
+                    earSide = EarSide.Left
+                    isConnectedBefore = true
+                    mAddressArray = arrayOf(addressLeft)
+                }
 
-        else if (addressRight.isNotEmpty())
-            configuration.apply {
-                earSide = EarSide.Right
-                isConnectedBefore = true
-                mAddressArray = arrayOf(addressRight)
-            }
-        else
-            mAddressArray = emptyArray()
+            addressRight.isNotEmpty() ->
+                configuration.apply {
+                    earSide = EarSide.Right
+                    isConnectedBefore = true
+                    mAddressArray = arrayOf(addressRight)
+                }
+
+            else -> mAddressArray = emptyArray()
+        }
     }
 
     private fun initialize()

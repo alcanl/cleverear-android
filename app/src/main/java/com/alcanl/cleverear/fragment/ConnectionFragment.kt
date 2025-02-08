@@ -97,6 +97,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             }
 
         else if (event is DeviceFoundEvent) {
+            Thread.sleep(2000)
             mBleDeviceSet.add(event.hearingAid)
             lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
         }
@@ -164,16 +165,20 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             configuration.apply {
                 if (isConnected) {
-                    imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.baseline_bluetooth_connected_24))
+                    imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_connected))
                     when {
-                        !isDoubleDeviceConnection -> textViewDeviceState.text =
-                            getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
-
+                        !isDoubleDeviceConnection -> textViewDeviceState.apply {
+                            text = getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
+                            visibility = View.VISIBLE
+                        }
                         else -> {
-                            textViewDeviceState.text = getSpannableDeviceString(
-                                requireContext(),
-                                hearingAidMap[EarSide.Left]!!
-                            )
+                            textViewDeviceState.apply {
+                                text = getSpannableDeviceString(
+                                    requireContext(),
+                                    hearingAidMap[EarSide.Left]!!
+                                )
+                                visibility = View.VISIBLE
+                            }
                             textViewDeviceStateSecond.apply {
                                 text = getSpannableDeviceString(
                                     requireContext(),
@@ -383,7 +388,10 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     fun onDetectDeviceButtonClicked()
     {
-        mBinding.pulseLayout.startAlphaBlinkAnimation()
+        mBinding.apply {
+            pulseLayout.startAlphaBlinkAnimation()
+            textViewDeviceState.visibility = View.VISIBLE
+        }
 
         if (isScanContinue) {
             stopScanProcess()

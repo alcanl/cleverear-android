@@ -40,8 +40,9 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"
-                android:textColor="#121111"
+                android:textColor="#128ba6"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toTopOf="@+id/textViewDeviceState"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -124,7 +125,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="165dp"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="50dp"
                 android:visibility="invisible"
                 app:borderColor="#128ba6"
@@ -157,11 +158,14 @@
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"
-                android:textColor="#121111"
+                android:textAlignment="center"
+                android:textColor="#128ba6"
                 android:textSize="20sp"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="TextContrastCheck" />
 
 
             <com.google.android.material.button.MaterialButton
@@ -169,24 +173,24 @@
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:backgroundTint="#128ba6"
                 android:fontFamily="sans-serif-medium"
                 android:onClick="@{()-> viewModel.handleStopConnectionButton()}"
                 android:text="@string/button_stop_connection_text"
                 android:textAlignment="viewStart"
-                android:textColor="@color/ap_black"
+                android:textColor="@color/off_white"
                 android:textSize="18sp"
                 android:visibility="@{!config.INSTANCE.connected ? View.VISIBLE : View.INVISIBLE}"
                 app:cornerRadius="5dp"
                 app:elevation="50dp"
                 app:icon="@drawable/bluetooth_end_connection"
-                app:iconPadding="5dp"
+                app:iconPadding="8dp"
                 app:iconSize="30dp"
-                app:iconTint="@color/ap_black"
+                app:iconTint="@color/light_blue_900"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutDeviceList" />
+                app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutDeviceList"
+                tools:ignore="TextContrastCheck" />
 
             <FrameLayout
                 android:id="@+id/frameLayoutStopConnection"
@@ -222,7 +226,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="TextContrastCheck" />
+                tools:ignore="TextContrastCheck,VisualLintLocaleText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
