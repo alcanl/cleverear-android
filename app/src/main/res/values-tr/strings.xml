@@ -3,7 +3,7 @@
     <string name="app_name">CleverEar</string>
     <string name="button_single_device_connection_text">Tek Cihaz İle Bağlantı</string>
     <string name="button_double_device_connection_text">Çift Cihaz İle Bağlantı</string>
-    <string name="textview_detect_device_text">Cihaz Bul</string>
+    <string name="textview_detect_device_text">Tarama Başlat</string>
     <string name="textview_device_detection_not_found_text">Cihaz Bulunamadı</string>
     <string name="textview_device_detection_device_connected_text">Cihaza Bağlanıldı</string>
     <string name="textview_device_detection_connection_in_process_text">Cihaza Bağlanılıyor</string>

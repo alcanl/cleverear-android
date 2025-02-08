@@ -160,7 +160,6 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             imageButtonDetect.isEnabled = !configuration.isConnected
             buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
-            imageViewStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
 
             configuration.apply {
@@ -186,7 +185,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                     }
                 }
             }
-            textViewScanProcess.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
+            textViewDeviceScan.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
                 if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
         }
     }
@@ -203,7 +202,7 @@ class ConnectionFragment : Fragment(), IEventListener {
         }
 
         mBinding.apply {
-            textViewScanProcess.text = getString(R.string.textview_detect_device_text)
+            textViewDeviceScan.text = getString(R.string.textview_detect_device_text)
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
             textViewDeviceStateSecond.apply {
                 text = getString(R.string.textview_device_detection_not_found_text)
@@ -338,8 +337,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
         mBinding.apply {
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
-            textViewScanProcess.text = getString(R.string.textview_scan_process_scanning_text)
+            mBinding.textViewDeviceScan.text = getString(R.string.textview_scan_process_scanning_text)
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
             textViewDeviceStateSecond.visibility = View.INVISIBLE
             adapter!!.clear()
@@ -356,8 +354,8 @@ class ConnectionFragment : Fragment(), IEventListener {
             isScanContinue = false
             deviceScanner.endScanProcess(mAsyncResult)
             mBinding.apply {
-                textViewScanProcess.text = getString(R.string.textview_detect_device_text)
-                progressBar.visibility = View.GONE
+                pulseLayout.stop()
+                textViewDeviceScan.text = getString(R.string.textview_detect_device_text)
             }
 
         } catch (ex: ArkException) {
@@ -385,7 +383,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     fun onDetectDeviceButtonClicked()
     {
-        mBinding.frameLayoutStartScan.startAlphaBlinkAnimation()
+        mBinding.pulseLayout.startAlphaBlinkAnimation()
 
         if (isScanContinue) {
             stopScanProcess()
@@ -400,10 +398,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         mAlertDialog.dismiss()
         mBinding.apply {
-            imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.transparentbluetooth_2))
+            imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_not_connected))
             frameLayoutStopConnection.visibility = View.VISIBLE
             buttonStopConnection.visibility = View.INVISIBLE
-            imageViewStopConnection.visibility = View.INVISIBLE
         }
 
         if (configuration.isServiceOnBoard) {

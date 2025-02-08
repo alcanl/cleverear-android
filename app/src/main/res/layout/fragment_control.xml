@@ -96,7 +96,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
                         app:warning_level="15" />
                 </FrameLayout>
 
-                <com.google.android.material.materialswitch.MaterialSwitch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchDualConfiguration"
                     android:layout_width="155dp"
                     android:layout_height="35dp"

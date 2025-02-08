@@ -15,11 +15,14 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_LEFT_EAR_INITIALIZED
 import com.alcanl.cleverear.util.WHAT_RIGHT_EAR_INITIALIZED
 import ir.programmerplus.groupbox.GroupBoxLayout
+import pl.bclogic.pulsator4droid.library.PulsatorLayout
 
-fun FrameLayout.startAlphaBlinkAnimation()
+fun PulsatorLayout.startAlphaBlinkAnimation()
 {
+    this.start()
+
     val anim: Animation = AlphaAnimation(0.0f, 1.0f)
-    anim.duration = 400
+    anim.duration = 600
     anim.startOffset = 20
     anim.repeatCount = 0
     this.startAnimation(anim)
