@@ -269,7 +269,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     @SuppressLint("DefaultLocale")
     private fun addHearingAidToListCallback(device: DiscoveredDeviceInfo)
     {
-        with(mBinding) {
+        mBinding.apply {
 
             if (adapter!!.isEmpty)
                 groupBoxLayoutDeviceList.startAlphaBlinkAnimation()
@@ -343,7 +343,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
         mBinding.apply {
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
-            mBinding.textViewDeviceScan.startTextAlphaAnimation(requireContext(),getString(R.string.textview_scan_process_scanning_text))
+            textViewDeviceScan.startTextAlphaAnimation(requireContext(),getString(R.string.textview_scan_process_scanning_text))
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
             textViewDeviceStateSecond.visibility = View.INVISIBLE
             adapter!!.clear()
