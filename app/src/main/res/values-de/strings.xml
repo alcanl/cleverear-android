@@ -49,7 +49,7 @@
     <string name="dialog_textview_device_disconnected_text" translatable="true">%s Ohrseite, Der Anschluss des Geräts %s Has Lost.\nBitte warten Sie, während Sie versuchen, die Verbindung wiederherzustellen.</string>
     <string name="dialog_already_connected_message">Möchten Sie die aktuelle Verbindung wirklich beenden?</string>
     <string name="textview_count_device_found_text">Geräte gefunden</string>
-    <string name="button_stop_connection_text">\tVerbindung beenden</string>
+    <string name="button_stop_connection_text">Verbindung beenden</string>
     <string name="textview_volume_text">Lautstärke und Batterie</string>
     <string name="settings_updated" translatable="true">Einstellungen erfolgreich aktualisiert</string>
     <string name="textview_advanced_description_text" translatable="true">In diesem Abschnitt\nkönnen Sie den Streaming-Modus und den Kanal Ihres Geräts einstellen,\num es mit einer Connect Line zu koppeln.\nAußerdem können Sie leicht die Mikrofon- und AUX-Streaming-Pegel des Geräts einstellen.</string>

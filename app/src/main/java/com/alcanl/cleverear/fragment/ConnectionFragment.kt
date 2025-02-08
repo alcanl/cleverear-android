@@ -29,6 +29,7 @@ import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.extension.recognizeEarSide
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
+import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
@@ -190,8 +191,8 @@ class ConnectionFragment : Fragment(), IEventListener {
                     }
                 }
             }
-            textViewDeviceScan.text = getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
-                if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text)
+            textViewDeviceScan.startTextAlphaAnimation(requireContext(), getString(if (configuration.isConnected)  R.string.textview_scan_process_connected_text else
+                if (isScanContinue) R.string.textview_scan_process_scanning_text else R.string.textview_detect_device_text))
         }
     }
 
@@ -207,7 +208,7 @@ class ConnectionFragment : Fragment(), IEventListener {
         }
 
         mBinding.apply {
-            textViewDeviceScan.text = getString(R.string.textview_detect_device_text)
+            textViewDeviceScan.startTextAlphaAnimation(requireContext(), getString(R.string.textview_detect_device_text))
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
             textViewDeviceStateSecond.apply {
                 text = getString(R.string.textview_device_detection_not_found_text)
@@ -342,7 +343,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
         mBinding.apply {
             groupBoxLayoutDeviceList.visibility = View.INVISIBLE
-            mBinding.textViewDeviceScan.text = getString(R.string.textview_scan_process_scanning_text)
+            mBinding.textViewDeviceScan.startTextAlphaAnimation(requireContext(),getString(R.string.textview_scan_process_scanning_text))
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
             textViewDeviceStateSecond.visibility = View.INVISIBLE
             adapter!!.clear()
@@ -360,7 +361,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             deviceScanner.endScanProcess(mAsyncResult)
             mBinding.apply {
                 pulseLayout.stop()
-                textViewDeviceScan.text = getString(R.string.textview_detect_device_text)
+                textViewDeviceScan.startTextAlphaAnimation(requireContext(), getString(R.string.textview_detect_device_text))
             }
 
         } catch (ex: ArkException) {

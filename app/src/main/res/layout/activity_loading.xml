@@ -59,7 +59,7 @@
                     android:layout_marginTop="80dp"
                     android:gravity="center_horizontal"
                     android:text="@string/textview_device_detection_connection_in_process_text"
-                    android:textColor="@color/ap_black"
+                    android:textColor="#128ba6"
                     android:textSize="24sp" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
