@@ -125,7 +125,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="165dp"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="50dp"
                 android:visibility="invisible"
                 app:borderColor="#128ba6"
@@ -137,7 +137,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutScan">
+                app:layout_constraintTop_toBottomOf="@+id/buttonStopConnection">
 
                 <ListView
                     android:id="@+id/listView"
@@ -154,7 +154,7 @@
                 android:id="@+id/textViewDeviceState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="25dp"
+                android:layout_marginBottom="20dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/textview_device_detection_not_found_text"
@@ -173,6 +173,7 @@
                 style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
                 android:backgroundTint="#128ba6"
                 android:fontFamily="sans-serif-medium"
                 android:onClick="@{()-> viewModel.handleStopConnectionButton()}"
@@ -189,7 +190,7 @@
                 app:iconTint="@color/light_blue_900"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutDeviceList"
+                app:layout_constraintTop_toBottomOf="@+id/groupBoxLayoutScan"
                 tools:ignore="TextContrastCheck" />
 
             <FrameLayout
@@ -198,6 +199,8 @@
                 android:layout_height="0dp"
                 android:background="#FFFFFF"
                 android:backgroundTint="#D7EEEEEE"
+                android:translationZ="10dp"
+                android:elevation="10dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -217,7 +220,7 @@
                 android:id="@+id/textViewDeviceScan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="35dp"
                 android:text="@string/textview_detect_device_text"
                 android:textAlignment="center"
                 android:textColor="#128ba6"

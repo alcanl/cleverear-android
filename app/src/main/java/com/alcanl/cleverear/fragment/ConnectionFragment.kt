@@ -27,6 +27,7 @@ import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
+import com.alcanl.cleverear.util.dpToPx
 import com.alcanl.cleverear.util.extension.recognizeEarSide
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
@@ -166,7 +167,13 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             configuration.apply {
                 if (isConnected) {
-                    imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_connected))
+                    imageButtonDetect.apply {
+                        setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_connected))
+                        val params = layoutParams
+                        params.width = dpToPx(requireContext(), 200)
+                        params.height = dpToPx(requireContext(), 200)
+                        layoutParams = params
+                    }
                     when {
                         !isDoubleDeviceConnection -> textViewDeviceState.apply {
                             text = getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
@@ -407,7 +414,14 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         mAlertDialog.dismiss()
         mBinding.apply {
-            imageButtonDetect.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_not_connected))
+            imageButtonDetect.apply {
+                setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_not_connected))
+                val params = layoutParams
+                params.width = dpToPx(requireContext(), 110)
+                params.height = dpToPx(requireContext(), 110)
+                layoutParams = params
+
+            }
             frameLayoutStopConnection.visibility = View.VISIBLE
             buttonStopConnection.visibility = View.INVISIBLE
         }

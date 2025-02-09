@@ -190,3 +190,5 @@ fun getSpannableDeviceString(context: Context, hearingAid: HearingAid) : Spannab
 
     return spannable
 }
+
+fun dpToPx(context: Context, dp: Int) = (context.resources.displayMetrics.density * dp).toInt()
