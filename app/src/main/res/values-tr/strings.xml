@@ -8,6 +8,8 @@
     <string name="textview_device_detection_device_connected_text">Cihaza Bağlanıldı</string>
     <string name="textview_device_detection_connection_in_process_text">Cihaza Bağlanılıyor</string>
     <string name="textview_device_detection_not_connected_text">Cihaza Bağlanılamadı</string>
+    <string name="dialog_device_disconnected_title">Cihaz Bağlantısı Kesildi</string>
+    <string name="dialog_device_disconnected_body">Aktif cihaz bağlantısı başarıyla sonlandırıldı.</string>
     <string name="dialog_already_connected_message">Aktif bağlantıyı sonlandırmak istediğinizden emin misiniz?</string>
     <string name="textview_count_device_found_text">Cihaz Bulundu</string>
     <string name="button_stop_connection_text">Bağlantıyı Sonlandır</string>
@@ -138,7 +140,7 @@
     <string name="textview_initialize_unknown_problem_text" translatable="true">Cihaz Hazırlanırken Bilinmeyen Bir Problem İle Karşılaşıldı</string>
     <string name="textview_initialize_network_problem_text" translatable="true">Uzak Sunucu Hatası\nLütfen Daha Sonra Tekrar Deneyin</string>
     <string name="textview_initialize_library_not_found_text" translatable="true">Bağlı Cihaz İle Uyumlu Dosyalar Bulunamadı</string>
-    <string name="alert_dialog_connected_before_text">Kayıtlı Cihaz/Cihazlar Tespit Edildi.\nBağlantıya Bu Cihaz/Cihazlar İle Devam Etmek İster Misiniz?</string>
+    <string name="alert_dialog_connected_before_text">Kayıtlı Cihaz/Cihazlar Tespit Edildi.\nBağlantıya Bu Cihazlar İle Devam Etmek İster Misiniz?</string>
 
     <string-array name="feedbackCancelerValues">
         <item>Dış Ortam</item>

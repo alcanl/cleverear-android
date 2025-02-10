@@ -24,13 +24,19 @@ import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.dialog.CustomAlertDialogConnectedBefore
 import com.alcanl.cleverear.util.getLeftHearingAidAddress
 import com.alcanl.cleverear.util.getRightHearingAidAddress
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
+import com.example.awesomedialog.AwesomeDialog
+import com.example.awesomedialog.body
+import com.example.awesomedialog.icon
+import com.example.awesomedialog.onNegative
+import com.example.awesomedialog.onPositive
+import com.example.awesomedialog.position
+import com.example.awesomedialog.title
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
@@ -94,10 +100,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 this, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
             ) == PackageManager.PERMISSION_GRANTED
         else true
-    }
-
-    private val mAlertDialog: CustomAlertDialogConnectedBefore by lazy {
-        CustomAlertDialogConnectedBefore(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -233,7 +235,31 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 finish()
             }
             else
-                mAlertDialog.show()
+                AwesomeDialog.build(this)
+                    .position(AwesomeDialog.POSITIONS.BOTTOM)
+                    .title(
+                        getString(R.string.dialog_info_title),
+                        titleColor = ContextCompat.getColor(this, android.R.color.black)
+                    )
+                    .body(
+                        getString(R.string.alert_dialog_connected_before_text),
+                        color = ContextCompat.getColor(this, android.R.color.black)
+                    )
+                    .icon(R.drawable.dialog_info)
+                    .onPositive(
+                        getString(R.string.dialog_yes),
+                        buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+                        textColor = ContextCompat.getColor(this, android.R.color.white)
+                    ) {
+                        alertDialogPositiveButtonClicked()
+                    }
+                    .onNegative(
+                        getString(R.string.dialog_no),
+                        buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+                        textColor = ContextCompat.getColor(this, android.R.color.white)
+                    ) {
+                        alertDialogNegativeButtonClicked()
+                    }.show()
         }
         else {
             Intent(this@SplashActivity, MainActivity::class.java)
@@ -306,17 +332,15 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         } catch (_: InterruptedException) {}
     }
 
-    fun alertDialogPositiveButtonClicked()
+    private fun alertDialogPositiveButtonClicked()
     {
-        mAlertDialog.dismiss()
         startActivity(Intent(this, AutoConnectActivity::class.java))
         finish()
     }
 
-    fun alertDialogNegativeButtonClicked()
+    private fun alertDialogNegativeButtonClicked()
     {
         configuration.isConnectedBefore = false
-        mAlertDialog.dismiss()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }

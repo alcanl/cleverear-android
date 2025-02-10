@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -25,7 +25,6 @@ import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
-import com.alcanl.cleverear.util.dialog.CustomAlertDialogActiveConnection
 import com.alcanl.cleverear.util.dpToPx
 import com.alcanl.cleverear.util.extension.recognizeEarSide
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
@@ -39,6 +38,13 @@ import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
+import com.example.awesomedialog.AwesomeDialog
+import com.example.awesomedialog.body
+import com.example.awesomedialog.icon
+import com.example.awesomedialog.onNegative
+import com.example.awesomedialog.onPositive
+import com.example.awesomedialog.position
+import com.example.awesomedialog.title
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,6 +69,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     @Inject
     lateinit var connectionFragmentEventListener: ConnectionFragmentEventListener
 
+    @Inject
+    lateinit var handler: Handler
+
     @Volatile
     private var mDeviceCount = 0
 
@@ -78,10 +87,6 @@ class ConnectionFragment : Fragment(), IEventListener {
     private lateinit var mSelectedHearingAid: HearingAid
 
     private lateinit var mBinding: FragmentConnectionBinding
-
-    private val mAlertDialog: CustomAlertDialogActiveConnection by lazy {
-        CustomAlertDialogActiveConnection(this)
-    }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
@@ -218,6 +223,15 @@ class ConnectionFragment : Fragment(), IEventListener {
             frameLayoutStopConnection.visibility = View.GONE
             imageButtonDetect.isEnabled = true
         }
+
+        val dialog = AwesomeDialog.build(requireActivity())
+            .position(AwesomeDialog.POSITIONS.CENTER)
+            .title(getString(R.string.dialog_device_disconnected_title))
+            .body(getString(R.string.dialog_device_disconnected_body))
+            .icon(R.drawable.check_tick)
+
+        dialog.show()
+        handler.postDelayed({ dialog.dismiss() }, 1500)
     }
 
     private fun finalizeConnectionConfiguration()
@@ -383,7 +397,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             stopScanProcess()
 
         if (configuration.isConnected)
-            mAlertDialog.show()
+            showStopConnectionDialog()
         else
             requireActivity().finish()
     }
@@ -404,10 +418,8 @@ class ConnectionFragment : Fragment(), IEventListener {
             scanDevices()
     }
 
-    fun onAlertDialogPositiveButtonClicked()
+    private fun onAlertDialogPositiveButtonClicked()
     {
-        mAlertDialog.dismiss()
-
         mBinding.apply {
             imageButtonDetect.apply {
                 setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_not_connected))
@@ -428,18 +440,13 @@ class ConnectionFragment : Fragment(), IEventListener {
             }
         }
 
-        Handler(Looper.myLooper()!!).postDelayed (::alertDialogPositiveButtonCallback, 5000)
-    }
-
-    fun onAlertDialogNegativeButtonClicked()
-    {
-        mAlertDialog.dismiss()
+        handler.postDelayed (::alertDialogPositiveButtonCallback, 5000)
     }
 
     fun onHearingAidItemClicked(pos: Int)
     {
         if (configuration.isConnected) {
-            mAlertDialog.show()
+            showStopConnectionDialog()
             return
         }
 
@@ -451,9 +458,36 @@ class ConnectionFragment : Fragment(), IEventListener {
         selectSingleItem(pos)
     }
 
+    private fun showStopConnectionDialog()
+    {
+        AwesomeDialog.build(requireActivity())
+            .position(AwesomeDialog.POSITIONS.CENTER)
+            .title(
+                getString(R.string.alert_dialog_connection_problem_title),
+                titleColor = ContextCompat.getColor(requireContext(), android.R.color.black)
+            )
+            .body(
+                getString(R.string.dialog_already_connected_message),
+                color = ContextCompat.getColor(requireContext(), android.R.color.black)
+            )
+            .icon(R.drawable.icon_warning_new)
+            .onPositive(
+                getString(R.string.dialog_yes),
+                buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+                textColor = ContextCompat.getColor(requireContext(), android.R.color.white)
+            ) {
+                onAlertDialogPositiveButtonClicked()
+            }
+            .onNegative(
+                getString(R.string.dialog_no),
+                buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+                textColor = ContextCompat.getColor(requireContext(), android.R.color.white)
+            ).show()
+    }
+
     fun onStopConnectionButtonClicked()
     {
-        mAlertDialog.show()
+        showStopConnectionDialog()
     }
 }
 

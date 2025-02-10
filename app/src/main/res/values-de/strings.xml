@@ -85,6 +85,8 @@
     <string name="toast_problem_occurred_text">Problem beim Verbinden mit dem Gerät aufgetreten</string>
     <string name="navbar_connection_text">Verbindung</string>
     <string name="navbar_control_text">Kontrolle</string>
+    <string name="dialog_device_disconnected_title">Gerät Getrennt</string>
+    <string name="dialog_device_disconnected_body">Die aktive Gerätesitzung wurde erfolgreich beendet.</string>
     <string name="navbar_advanced_text">Erweitert</string>
     <string name="toast_bluetooth_not_found_text">Ihr Gerät unterstützt keine Bluetooth-Verbindung</string>
     <string name="dialog_yes">Ja</string>

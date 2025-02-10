@@ -41,6 +41,8 @@ This message has been automatically sent by the CleverEar system for information
     <string name="toast_no_previous_device_for_selection" translatable="true">No Previous Device Info For Selection</string>
     <string name="textview_mode_text">Mode</string>
     <string name="textview_channel_text">Channel</string>
+    <string name="dialog_device_disconnected_title">Device Disconnected</string>
+    <string name="dialog_device_disconnected_body">The Active Device Connection Has Been Ended Successfully</string>
     <string name="textview_scan_process_scanning_text" translatable="true">Scanning</string>
     <string name="textview_scan_process_connected_text" translatable="true">Connected</string>
     <string name="textview_R_text" translatable="false">R</string>
