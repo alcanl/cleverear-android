@@ -223,7 +223,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     private fun finalizeConnectionConfiguration()
     {
         mIsDeviceFound = true
-        startActivity(Intent(activity, LoadingActivity::class.java))
+        startActivity(Intent(requireActivity(), LoadingActivity::class.java))
 
         if (isScanContinue)
             stopScanProcess()
@@ -385,7 +385,7 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (configuration.isConnected)
             mAlertDialog.show()
         else
-            activity?.finish()
+            requireActivity().finish()
     }
 
     fun onDetectDeviceButtonClicked()

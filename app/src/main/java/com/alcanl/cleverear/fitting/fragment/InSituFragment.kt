@@ -124,7 +124,7 @@ class InSituFragment : Fragment(), IEventListener {
 
     override fun onResume()
     {
-        (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
         super.onResume()
     }
 
@@ -275,8 +275,8 @@ class InSituFragment : Fragment(), IEventListener {
                 Toast.makeText(it.requireContext(), R.string.toast_unknown_problem_text,
                     Toast.LENGTH_LONG).show()
                 Intent(it.requireContext(), MainActivity::class.java).apply {
-                    it.activity?.startActivity(this)
-                    it.activity?.finish()
+                    it.requireActivity().startActivity(this)
+                    it.requireActivity().finish()
                 }
             }
         }
@@ -326,7 +326,7 @@ class InSituFragment : Fragment(), IEventListener {
 
     fun playSoundButtonClicked()
     {
-        (activity as SelfFittingActivity).isInSituInProgress = true
+        (requireActivity() as SelfFittingActivity).isInSituInProgress = true
         mHandler.sendEmptyMessage(WHAT_SHOW_IN_SITU_DIALOG)
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -378,7 +378,7 @@ class InSituFragment : Fragment(), IEventListener {
 
     fun saveButtonClicked()
     {
-        (activity as SelfFittingActivity).isInSituInProgress = false
+        (requireActivity() as SelfFittingActivity).isInSituInProgress = false
 
         lifecycleScope.launch(Dispatchers.IO) {
             saveMediaToStorage(mBinding.lineChart.chartBitmap)
@@ -442,7 +442,7 @@ class InSituFragment : Fragment(), IEventListener {
     fun dialogEndTestButtonClicked()
     {
         try {
-            (activity as SelfFittingActivity).isInSituInProgress = false
+            (requireActivity() as SelfFittingActivity).isInSituInProgress = false
             manufacturing.prepareDeviceForModeling(false)
             mFrequencyIndex = 0
             mDecibelIndex = 2

@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume()
     {
-        (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
         if (fittingConfig.isInitializeCompleted) {
             with(mBinding) {
                 progressBar.visibility = View.INVISIBLE
@@ -184,7 +184,7 @@ class HomeFragment : Fragment() {
     private fun initializeProduct()
     {
         lifecycleScope.launch(Dispatchers.Main) {
-            (activity as SelfFittingActivity).binding.navigationView.menu.forEach {
+            (requireActivity() as SelfFittingActivity).binding.navigationView.menu.forEach {
                 it.isEnabled = false
             }
         }
@@ -231,7 +231,7 @@ class HomeFragment : Fragment() {
                     imageViewHearingAid.startAlphaAnimation(it.requireContext())
                     textViewInitialize.startTextAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
                     postDelayed({
-                        (it.activity as SelfFittingActivity).binding.navigationView.menu.forEach { item ->
+                        (it.requireActivity() as SelfFittingActivity).binding.navigationView.menu.forEach { item ->
                             item.isEnabled = true
                         }
                         textViewInitialize.startTextAlphaAnimation(it.requireContext(), it.getString(R.string.textview_initialize_success_text))
@@ -259,7 +259,7 @@ class HomeFragment : Fragment() {
                 Toast.makeText(it.requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_LONG).show()
                 Intent(it.requireContext(), AutoConnectActivity::class.java).apply {
                     it.requireContext().startActivity(this)
-                    it.activity?.finish()
+                    it.requireActivity().finish()
                 }
             }
         }

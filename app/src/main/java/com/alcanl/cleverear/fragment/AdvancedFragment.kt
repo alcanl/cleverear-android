@@ -83,7 +83,7 @@ class AdvancedFragment : Fragment(), IEventListener {
         super.onResume()
 
         if (!configuration.isConnected) {
-            activity?.finish()
+            requireActivity().finish()
             return
         }
 

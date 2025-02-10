@@ -76,14 +76,14 @@ class ControlFragment : Fragment(), IEventListener {
     override fun onResume()
     {
         super.onResume()
-        (activity as MainContainerActivity).apply {
+        (requireActivity() as MainContainerActivity).apply {
             lifecycleScope.launch(Dispatchers.Main) {
                 this@apply.binding.frameLayoutLoading.visibility = View.GONE
             }
         }
 
         if (!configuration.isConnected) {
-            activity?.finish()
+            requireActivity().finish()
             return
         }
 

@@ -102,7 +102,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     override fun onResume()
     {
-        (activity as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
         super.onResume()
     }
 
@@ -263,7 +263,7 @@ class FittingFragment : Fragment(), IEventListener {
                 }
             }
         }
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
@@ -279,7 +279,7 @@ class FittingFragment : Fragment(), IEventListener {
                 }
             }
         }
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
@@ -295,19 +295,19 @@ class FittingFragment : Fragment(), IEventListener {
                 }
             }
         }
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) { handleSynchronized() }
     }
 
     fun wideBandSliderValueChanged(value: Float)
     {
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) { wideBandSliderValueChangedCallback(value.toInt()) }
     }
 
     fun equalizerCheckedChanged()
     {
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 deviceInfoExtMap[selectedEarSide]?.let {
@@ -323,7 +323,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     fun feedbackCancelerCheckedChanged()
     {
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         mBinding.spinnerFeedbackCanceler.isEnabled = mBinding.checkBoxFeedbackCanceler.isChecked
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -350,7 +350,7 @@ class FittingFragment : Fragment(), IEventListener {
                     burnParametersToAllMemories()
             }.await()
 
-            (activity as SelfFittingActivity).isFittingChangesMade = false
+            (requireActivity() as SelfFittingActivity).isFittingChangesMade = false
         }
     }
 
@@ -369,7 +369,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     fun memoryRetentionCheckedChanged()
     {
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 mBinding.checkBoxMemoryRetention.handleFittingCheckedChanged(
@@ -381,7 +381,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     fun volumeRetentionCheckedChanged()
     {
-        (activity as SelfFittingActivity).isFittingChangesMade = true
+        (requireActivity() as SelfFittingActivity).isFittingChangesMade = true
         lifecycleScope.launch(Dispatchers.IO) {
             fittingConfig.apply {
                 mBinding.checkBoxVolumeRetention.handleFittingCheckedChanged(
