@@ -77,12 +77,19 @@ class MainContainerActivity : AppCompatActivity() {
     {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_container)
+        configuration.isMainActivityOnScreen = true
 
         if (!hasPermissionsForBluetoothLocation())
             requestLocationPermission()
 
         mSelectedNavItem = R.id.navbar_connection
         initializeNavController()
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        configuration.isMainActivityOnScreen = false
     }
 
     override fun onResume()
@@ -205,11 +212,6 @@ class MainContainerActivity : AppCompatActivity() {
             arrayOf(Manifest.permission.SEND_SMS),
             SMS_PERMISSION_REQUEST_CODE
         )
-    }
-
-    fun stopService()
-    {
-        configuration.stopServiceFlag = true
     }
 
     fun onSMSContactDialogButtonClicked(button: AppCompatButton)

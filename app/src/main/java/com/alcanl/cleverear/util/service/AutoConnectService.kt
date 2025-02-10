@@ -101,6 +101,7 @@ class AutoConnectService : Service()
             unregisterReceiver(mDisconnectReceiver)
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
+            scheduledExecutor.shutdownNow()
 
             with(configuration) {
                 if (isConnected)
@@ -109,6 +110,7 @@ class AutoConnectService : Service()
                     else
                         hearingAidMap[earSide]?.endConnectionSession()
 
+                isConnected = false
                 isServiceOnBoard = false
             }
             Log.i(AutoConnectService::class.simpleName, "Service Stopped")
@@ -144,7 +146,7 @@ class AutoConnectService : Service()
 
     private fun checkDeviceConnectionState(intent: Intent?)
     {
-        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 90, TimeUnit.SECONDS)
+        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 60, TimeUnit.SECONDS)
     }
 
     private fun checkDeviceEddystoneValues()
@@ -199,13 +201,6 @@ class AutoConnectService : Service()
     private fun scheduledThreadCallback(intent: Intent?)
     {
         try {
-            if (configuration.stopServiceFlag) {
-                configuration.stopServiceFlag = false
-                scheduledExecutor.shutdownNow()
-                stopSelf()
-                return
-            }
-
             with(configuration) {
                 if (!isDoubleDeviceConnection) {
                     if (isConnected) {

@@ -16,7 +16,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.LoadingActivity
-import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -36,6 +35,7 @@ import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
 import com.alcanl.cleverear.util.scan.DeviceScanner
+import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
@@ -86,16 +86,16 @@ class ConnectionFragment : Fragment(), IEventListener {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
-        if (event is ConnectionEvent && event.connectionData == 1 && configuration.isConnected)
+        if (event is ConnectionEvent && event.connectionData == 1 && !configuration.isUserDisconnected)
             lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
                 requireActivity().finish()
                 configuration.apply {
                     isConnected = false
                     hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
                         .values.first().isConnected = false
                 }
-                onDetectDeviceButtonClicked()
             }
 
         else if (event is DeviceFoundEvent) {
@@ -205,18 +205,12 @@ class ConnectionFragment : Fragment(), IEventListener {
 
     private fun alertDialogPositiveButtonCallback()
     {
-        configuration.apply {
-            if (isDoubleDeviceConnection)
-                hearingAidMap.forEach {it.value.endConnectionSession()}
-            else
-                hearingAidMap[earSide]?.endConnectionSession()
-
-            isConnected = false
-        }
-
         mBinding.apply {
             textViewDeviceScan.startTextAlphaAnimation(requireContext(), getString(R.string.textview_detect_device_text))
-            textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
+            textViewDeviceState.apply {
+                text = getString(R.string.textview_device_detection_not_found_text)
+                visibility = View.INVISIBLE
+            }
             textViewDeviceStateSecond.apply {
                 text = getString(R.string.textview_device_detection_not_found_text)
                 visibility = View.INVISIBLE
@@ -413,6 +407,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     fun onAlertDialogPositiveButtonClicked()
     {
         mAlertDialog.dismiss()
+
         mBinding.apply {
             imageButtonDetect.apply {
                 setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.bluetooth_not_connected))
@@ -420,18 +415,20 @@ class ConnectionFragment : Fragment(), IEventListener {
                 params.width = dpToPx(requireContext(), 110)
                 params.height = dpToPx(requireContext(), 110)
                 layoutParams = params
-
             }
             frameLayoutStopConnection.visibility = View.VISIBLE
             buttonStopConnection.visibility = View.INVISIBLE
         }
 
-        if (configuration.isServiceOnBoard) {
-            (activity as MainContainerActivity).stopService()
-            configuration.isServiceOnBoard = false
+        configuration.apply {
+            isUserDisconnected = true
+            if (isServiceOnBoard) {
+                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
+                isServiceOnBoard = false
+            }
         }
 
-        Handler(Looper.myLooper()!!).postDelayed (::alertDialogPositiveButtonCallback, 6000)
+        Handler(Looper.myLooper()!!).postDelayed (::alertDialogPositiveButtonCallback, 5000)
     }
 
     fun onAlertDialogNegativeButtonClicked()

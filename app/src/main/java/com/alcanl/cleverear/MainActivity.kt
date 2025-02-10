@@ -87,7 +87,6 @@ class MainActivity : AppCompatActivity() {
     {
         super.onResume()
         checkBluetoothPermission()
-        configuration.isMainActivityOnScreen = true
 
         if (mIsWebViewActive)
             mBinding.frameLayoutWebView.visibility = View.GONE
@@ -116,7 +115,6 @@ class MainActivity : AppCompatActivity() {
     {
         super.onDestroy()
         unregisterReceiver(enableBluetoothBroadCast)
-        configuration.isMainActivityOnScreen = false
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean

@@ -20,9 +20,6 @@ object ConfigurationModule {
     @Volatile
     var canBondDeviceReConnect = false
 
-    @Volatile
-    var stopServiceFlag = false
-
     var isDoubleDeviceConnection = false
 
     var isDualDeviceConfig = false
@@ -32,6 +29,8 @@ object ConfigurationModule {
     var isServiceOnBoard = false
 
     var isBluetoothEnabled = false
+
+    var isUserDisconnected = false
 
     var isEddyStoneScanInProgress = false
 

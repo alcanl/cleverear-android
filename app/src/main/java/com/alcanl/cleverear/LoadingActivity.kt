@@ -343,6 +343,8 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
             check.check()
         }
 
+        configuration.isUserDisconnected = false
+
         handler.postDelayed({
             if (!configuration.isRemoteFittingConnection)
                 if (configuration.isConnectedBefore)

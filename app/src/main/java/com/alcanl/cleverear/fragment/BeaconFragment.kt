@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -37,6 +38,7 @@ import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.util.saveEmergencyNumberToPrefs
+import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
 import com.ark.ParameterSpace
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
@@ -166,6 +168,7 @@ class BeaconFragment : Fragment(), IEventListener {
 
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
                 requireActivity().finish()
+                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
                 configuration.apply {
                     isConnected = false
                     hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
