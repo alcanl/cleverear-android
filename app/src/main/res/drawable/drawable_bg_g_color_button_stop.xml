@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@color/material_dynamic_primary50"/>
+    <item android:state_enabled="false" android:drawable="@color/material_dynamic_neutral_variant40"/>
+    <item android:drawable="@color/material_dynamic_neutral_variant80"/>
+</selector>
