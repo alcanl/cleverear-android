@@ -97,14 +97,14 @@
         </receiver>
         <receiver
             android:name=".util.service.broadcast.BondHearingAidBroadcastReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_BOND_STATE_CHANGED" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".util.service.broadcast.DeviceFoundBroadcastReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACTION_FOUND" />
             </intent-filter>

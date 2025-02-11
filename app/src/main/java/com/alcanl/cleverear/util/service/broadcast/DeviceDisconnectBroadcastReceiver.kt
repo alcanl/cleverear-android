@@ -55,7 +55,7 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     {
         try {
             if (device.address == leftDevice) {
-                Log.d("debug", String.format("The Device %s disconnected", leftDevice))
+                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format("The Device %s disconnected", leftDevice))
                 handleLeftDeviceDisconnect()
                 showNotification(context, notification)
                 EventBus.getDefault().post(DisconnectEvent(this,
@@ -64,7 +64,7 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
             }
 
             if (device.address == rightDevice) {
-                Log.d("debug", String.format("The Device %s disconnected", rightDevice))
+                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format("The Device %s disconnected", rightDevice))
                 handleRightDeviceDisconnect()
                 showNotification(context, notification)
                 EventBus.getDefault().post(DisconnectEvent(this,

@@ -206,7 +206,8 @@ class AutoConnectService : Service()
                     if (isConnected) {
                         Log.d(AutoConnectService::class.simpleName, "Single Device Connected")
                         return
-                    } else if (isBluetoothEnabled) {
+                    }
+                    else if (isBluetoothEnabled) {
                         doConnection(hearingAidMap[earSide]!!)
                         mConnectorThread?.get()
                     }

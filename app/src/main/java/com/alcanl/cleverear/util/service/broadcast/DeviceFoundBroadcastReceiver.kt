@@ -10,8 +10,10 @@ import com.alcanl.cleverear.util.EarSide
 import javax.inject.Inject
 
 class DeviceFoundBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
+
     @Inject
     lateinit var configuration: ConfigurationModule
+
     @Suppress("DEPRECATION")
     override fun onReceive(context: Context?, intent: Intent?)
     {

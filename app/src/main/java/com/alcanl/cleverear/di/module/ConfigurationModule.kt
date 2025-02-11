@@ -28,6 +28,7 @@ object ConfigurationModule {
 
     var isServiceOnBoard = false
 
+    @Volatile
     var isBluetoothEnabled = false
 
     var isUserDisconnected = false
