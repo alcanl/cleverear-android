@@ -24,23 +24,23 @@ class DeviceFoundBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver(
             val device  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
             else
-                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE) as BluetoothDevice?
 
             if (device != null && isHearingAid(device)) {
                 with(configuration) {
                     if (!isDoubleDeviceConnection) {
                         hearingAidMap[earSide]?.isDeviceInRange = true
-                        Log.d("deviceFound", hearingAidMap[earSide]?.name ?: "null")
+                        Log.d(DeviceFoundBroadcastReceiver::class.simpleName, hearingAidMap[earSide]?.name ?: "null")
                     }
 
                     else
                         if (device.address == hearingAidMap[EarSide.Left]?.address) {
                             hearingAidMap[EarSide.Left]?.isDeviceInRange = true
-                            Log.d("deviceFound", hearingAidMap[EarSide.Left]?.name!!)
+                            Log.d(DeviceFoundBroadcastReceiver::class.simpleName, hearingAidMap[EarSide.Left]?.name!!)
                         }
                         else {
                             hearingAidMap[EarSide.Right]?.isDeviceInRange = true
-                            Log.d("deviceFound", hearingAidMap[EarSide.Right]?.name!!)
+                            Log.d(DeviceFoundBroadcastReceiver::class.simpleName, hearingAidMap[EarSide.Right]?.name!!)
                         }
 
                     canBondDeviceReConnect = true

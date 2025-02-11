@@ -1,13 +1,17 @@
 package com.alcanl.cleverear.util
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.compose.ui.text.intl.Locale
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
@@ -15,6 +19,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.reflect.Method
+
 
 //"Biyonix E S-P"
 private const val DEVICE_NAME = 0
@@ -192,3 +197,15 @@ fun getSpannableDeviceString(context: Context, hearingAid: HearingAid) : Spannab
 }
 
 fun dpToPx(context: Context, dp: Int) = (context.resources.displayMetrics.density * dp).toInt()
+
+fun hasBackgroundLocationPermission(context: Context): Boolean
+{
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+    return true
+}
