@@ -187,7 +187,7 @@ class AutoConnectService : Service()
 
     private fun sendDeviceFellSMS(serialNumber: String)
     {
-        try {
+        /*try {
             val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
             val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
             val smsManager = getSystemService(SmsManager::class.java)
@@ -195,7 +195,7 @@ class AutoConnectService : Service()
 
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
-        }
+        }*/
     }
 
     private fun scheduledThreadCallback(intent: Intent?)
