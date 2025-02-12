@@ -30,6 +30,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -89,9 +90,10 @@
             </intent-filter>
         </activity>
 
+        <!--suppress AndroidDomInspection -->
         <service
             android:name=".util.service.AutoConnectService"
-            android:foregroundServiceType="connectedDevice" />
+            android:foregroundServiceType="location | connectedDevice" />
 
         <receiver
             android:name=".util.service.broadcast.DeviceDisconnectBroadcastReceiver"
