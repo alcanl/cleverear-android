@@ -31,15 +31,10 @@ import com.alcanl.cleverear.util.GERMAN
 import com.alcanl.cleverear.util.GERMAN_MANUAL_URL
 import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
+import com.alcanl.cleverear.util.dialog.showBatteryVoltageForConnectionDialog
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
-import com.example.awesomedialog.AwesomeDialog
-import com.example.awesomedialog.body
-import com.example.awesomedialog.icon
-import com.example.awesomedialog.onPositive
-import com.example.awesomedialog.position
-import com.example.awesomedialog.title
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -106,22 +101,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         if (mIsBluetoothPermissionsGranted)
-            AwesomeDialog.build(this)
-                .position(AwesomeDialog.POSITIONS.CENTER)
-                .title(
-                    getString(R.string.dialog_info_title),
-                    titleColor = ContextCompat.getColor(this, android.R.color.black)
-                )
-                .body(
-                    getString(R.string.dialog_connection_requires_battery_voltage_text),
-                    color = ContextCompat.getColor(this, android.R.color.black)
-                )
-                .icon(R.drawable.icon_warning_new)
-                .onPositive(
-                    getString(R.string.alert_dialog_connection_problem_ok_button),
-                    buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
-                    textColor = ContextCompat.getColor(this, android.R.color.white)
-                ).show()
+            showBatteryVoltageForConnectionDialog(this)
     }
 
     override fun onDestroy()

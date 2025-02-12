@@ -24,19 +24,13 @@ import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.dialog.showDeviceConnectedBeforeDialog
 import com.alcanl.cleverear.util.getLeftHearingAidAddress
 import com.alcanl.cleverear.util.getRightHearingAidAddress
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
-import com.example.awesomedialog.AwesomeDialog
-import com.example.awesomedialog.body
-import com.example.awesomedialog.icon
-import com.example.awesomedialog.onNegative
-import com.example.awesomedialog.onPositive
-import com.example.awesomedialog.position
-import com.example.awesomedialog.title
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
@@ -235,31 +229,9 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 finish()
             }
             else
-                AwesomeDialog.build(this)
-                    .position(AwesomeDialog.POSITIONS.BOTTOM)
-                    .title(
-                        getString(R.string.dialog_info_title),
-                        titleColor = ContextCompat.getColor(this, android.R.color.black)
-                    )
-                    .body(
-                        getString(R.string.alert_dialog_connected_before_text),
-                        color = ContextCompat.getColor(this, android.R.color.black)
-                    )
-                    .icon(R.drawable.dialog_info)
-                    .onPositive(
-                        getString(R.string.dialog_yes),
-                        buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
-                        textColor = ContextCompat.getColor(this, android.R.color.white)
-                    ) {
-                        alertDialogPositiveButtonClicked()
-                    }
-                    .onNegative(
-                        getString(R.string.dialog_no),
-                        buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
-                        textColor = ContextCompat.getColor(this, android.R.color.white)
-                    ) {
-                        alertDialogNegativeButtonClicked()
-                    }.show()
+                showDeviceConnectedBeforeDialog(this,
+                    ::alertDialogPositiveButtonClicked,
+                    ::alertDialogNegativeButtonClicked)
         }
         else {
             Intent(this@SplashActivity, MainActivity::class.java)

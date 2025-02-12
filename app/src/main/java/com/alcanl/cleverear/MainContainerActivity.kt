@@ -3,13 +3,10 @@ package com.alcanl.cleverear
 import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,15 +27,10 @@ import com.alcanl.cleverear.util.ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.SMS_PERMISSION_REQUEST_CODE
 import com.alcanl.cleverear.util.dialog.CustomDialogSmsInformation
+import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantSuccessDialog
+import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantUnSuccessDialog
+import com.alcanl.cleverear.util.dialog.showBackgroundLocationPermissionActionDialog
 import com.alcanl.cleverear.util.hasBackgroundLocationPermission
-import com.alcanl.cleverear.util.service.AutoConnectService
-import com.example.awesomedialog.AwesomeDialog
-import com.example.awesomedialog.body
-import com.example.awesomedialog.icon
-import com.example.awesomedialog.onNegative
-import com.example.awesomedialog.onPositive
-import com.example.awesomedialog.position
-import com.example.awesomedialog.title
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -86,12 +78,14 @@ class MainContainerActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private val settingsLauncher =
+    val settingsLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
             if (hasBackgroundLocationPermission(this))
-                Toast.makeText(this, "Uygulama cihaz bağlantısını takip ediyor", Toast.LENGTH_LONG).show()
+                createBackgroundLocationPermissionGrantSuccessDialog(this)
+                    .apply { show() }.also { handler.postDelayed({ it.dismiss() }, 1500) }
             else
-                Toast.makeText(this, "Gerekli izin verilmedi", Toast.LENGTH_LONG).show()
+                createBackgroundLocationPermissionGrantUnSuccessDialog(this)
+                    .apply { show() }.also { handler.postDelayed({ it.dismiss() }, 1500) }
         }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -118,7 +112,7 @@ class MainContainerActivity : AppCompatActivity() {
         super.onResume()
 
         if (configuration.isConnected && !hasBackgroundLocationPermission(this)) {
-            showBackgroundLocationPermissionActionDialog()
+            showBackgroundLocationPermissionActionDialog(this, configuration)
             return
         }
 
@@ -168,33 +162,7 @@ class MainContainerActivity : AppCompatActivity() {
         fragmentTransaction.commit()
     }
 
-    private fun showBackgroundLocationPermissionActionDialog()
-    {
-        AwesomeDialog.build(this)
-            .onNegative(
-                text = getString(R.string.dialog_no),
-                buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
-                textColor = ContextCompat.getColor(this, android.R.color.white))
-            {
-                if (configuration.isServiceOnBoard)
-                    stopService(Intent(this, AutoConnectService::class.java))
-            }
-            .onPositive(
-                text = getString(R.string.dialog_yes),
-                buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
-                textColor = ContextCompat.getColor(this, android.R.color.white))
-            {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    .apply { data = Uri.fromParts("package", packageName, null) }
 
-                settingsLauncher.launch(intent)
-            }
-            .title(getString(R.string.dialog_info_title))
-            .body("CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için uygulamanın ayarlar sayfasından konum izninin  \"Her Zaman\" olarak verilmesi gerekmektedir.\n CleverEar'ın otomatik işitme cihazı bağlantısını takip etmesini ister misiniz?", color = ContextCompat.getColor(this, android.R.color.black))
-            .icon(R.drawable.dialog_info, true)
-            .position(AwesomeDialog.POSITIONS.BOTTOM)
-            .show()
-    }
 
     private fun initializeNavController()
     {
