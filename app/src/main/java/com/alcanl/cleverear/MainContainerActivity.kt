@@ -12,6 +12,7 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
@@ -85,6 +86,14 @@ class MainContainerActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    private val settingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+            if (hasBackgroundLocationPermission(this))
+                Toast.makeText(this, "Uygulama cihaz bağlantısını takip ediyor", Toast.LENGTH_LONG).show()
+            else
+                Toast.makeText(this, "Gerekli izin verilmedi", Toast.LENGTH_LONG).show()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -108,11 +117,13 @@ class MainContainerActivity : AppCompatActivity() {
     {
         super.onResume()
 
+        if (configuration.isConnected && !hasBackgroundLocationPermission(this)) {
+            showBackgroundLocationPermissionActionDialog()
+            return
+        }
+
         if (configuration.isConnected)
             handler.postDelayed({binding.navigationViewContainer.selectedItemId = R.id.navbar_control}, 1000)
-
-        if (!hasBackgroundLocationPermission(this))
-            showBackgroundLocationPermissionActionDialog()
     }
 
     override fun onRequestPermissionsResult(
@@ -173,12 +184,13 @@ class MainContainerActivity : AppCompatActivity() {
                 buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
                 textColor = ContextCompat.getColor(this, android.R.color.white))
             {
-                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    .apply { data = Uri.parse("package:${packageName}") }
-                    .also { startActivity(it) }
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .apply { data = Uri.fromParts("package", packageName, null) }
+
+                settingsLauncher.launch(intent)
             }
             .title(getString(R.string.dialog_info_title))
-            .body("CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için konum izninin \"Her Zaman\" olarak verilmesi gerekmektedir.\n CleverEar'ın otomatik işitme cihazı bağlantısını takip etmesini ister misiniz?", color = ContextCompat.getColor(this, android.R.color.black))
+            .body("CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için uygulamanın ayarlar sayfasından konum izninin  \"Her Zaman\" olarak verilmesi gerekmektedir.\n CleverEar'ın otomatik işitme cihazı bağlantısını takip etmesini ister misiniz?", color = ContextCompat.getColor(this, android.R.color.black))
             .icon(R.drawable.dialog_info, true)
             .position(AwesomeDialog.POSITIONS.BOTTOM)
             .show()

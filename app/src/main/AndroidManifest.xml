@@ -4,6 +4,10 @@
     android:versionCode="331"
     android:versionName="3.3.1">
 
+    <queries>
+        <package android:name="com.eartechnic.Biyonix"/>
+    </queries>
+
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
@@ -30,6 +34,8 @@
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_SETTINGS"/>
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -53,6 +59,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CleverEar"
         android:usesCleartextTraffic="true"
+        android:exported="true"
         tools:ignore="DiscouragedApi">
 
         <activity
