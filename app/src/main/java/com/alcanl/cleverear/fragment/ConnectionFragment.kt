@@ -61,7 +61,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     lateinit var deviceListAdapter: DeviceListAdapter
 
     @Inject
-    lateinit var connectionFragmentEventListener: ConnectionFragmentEventListener
+    lateinit var listener: ConnectionFragmentEventListener
 
     @Inject
     lateinit var handler: Handler
@@ -109,8 +109,10 @@ class ConnectionFragment : Fragment(), IEventListener {
         super.onStart()
         initBinding()
 
-        if (!EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this)
+        EventBus.getDefault().apply {
+            if (!isRegistered(this@ConnectionFragment))
+                register(this@ConnectionFragment)
+        }
 
         if (!configuration.isConnected)
             onDetectDeviceButtonClicked()
@@ -119,10 +121,16 @@ class ConnectionFragment : Fragment(), IEventListener {
     override fun onDestroy()
     {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
 
-        if (connectionFragmentEventListener.isListenerOnBoard())
-            connectionFragmentEventListener.stopListener()
+        EventBus.getDefault().apply {
+            if (isRegistered(this@ConnectionFragment))
+                unregister(this@ConnectionFragment)
+        }
+
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
     }
 
     override fun onCreateView(
@@ -140,8 +148,10 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (isScanContinue)
             stopScanProcess()
 
-        if (connectionFragmentEventListener.isListenerOnBoard())
-            connectionFragmentEventListener.stopListener()
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
 
         super.onStop()
     }
@@ -157,8 +167,10 @@ class ConnectionFragment : Fragment(), IEventListener {
             }
         }
 
-        if (!connectionFragmentEventListener.isListenerOnBoard())
-            connectionFragmentEventListener.startEventListener()
+        listener.apply {
+            if (!isListenerOnBoard())
+                startEventListener()
+        }
 
         mBinding.apply {
 

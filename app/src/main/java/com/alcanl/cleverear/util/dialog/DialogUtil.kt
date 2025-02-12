@@ -90,7 +90,7 @@ fun showBackgroundLocationPermissionActionDialog(activity: AppCompatActivity, co
             (activity as MainContainerActivity).settingsLauncher.launch(intent)
         }
         .title(activity.getString(R.string.dialog_info_title))
-        .body("CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için uygulamanın ayarlar sayfasından konum izninin  \"Her Zaman\" olarak verilmesi gerekmektedir.\n CleverEar'ın otomatik işitme cihazı bağlantısını takip etmesini ister misiniz?",
+        .body(activity.getString(R.string.alert_dialog_background_permission_required_text),
             color = ContextCompat.getColor(activity, android.R.color.black))
         .icon(R.drawable.dialog_info, true)
         .position(AwesomeDialog.POSITIONS.BOTTOM)
@@ -137,8 +137,8 @@ fun createBackgroundLocationPermissionGrantSuccessDialog(activity: FragmentActiv
 {
     return AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
-        .title("Success")
-        .body("CleverEar artık cihaz bağlantınızı arka planda takip ediyor.")
+        .title(activity.getString(R.string.permission_given_success_text))
+        .body(activity.getString(R.string.alert_dialog_foreground_service_active_text))
         .icon(R.drawable.check_tick)
 }
 
@@ -146,7 +146,7 @@ fun createBackgroundLocationPermissionGrantUnSuccessDialog(activity: FragmentAct
 {
     return AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
-        .title("Permission Not Given")
-        .body("CleverEar cihaz bağlantınız takip etmeyecek!")
+        .title(activity.getString(R.string.permission_given_unsuccess_text))
+        .body(activity.getString(R.string.alert_dialog_foreground_service_inactive_text))
         .icon(R.drawable.icon_warning_new)
 }

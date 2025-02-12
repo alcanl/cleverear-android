@@ -70,7 +70,11 @@ class ControlFragment : Fragment(), IEventListener {
     {
         super.onStart()
         initialize()
-        EventBus.getDefault().register(this)
+
+        EventBus.getDefault().apply {
+            if (!isRegistered(this@ControlFragment))
+                register(this@ControlFragment)
+        }
     }
 
     override fun onResume()
@@ -96,26 +100,34 @@ class ControlFragment : Fragment(), IEventListener {
 
         }
 
-        if (!listener.isListenerOnBoard())
-            listener.startEventListener()
+        listener.apply {
+            if (!isListenerOnBoard())
+                startEventListener()
+        }
     }
 
     override fun onStop()
     {
         super.onStop()
 
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
-
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        EventBus.getDefault().unregister(this)
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
+        EventBus.getDefault().apply {
+            if (isRegistered(this@ControlFragment))
+                unregister(this@ControlFragment)
+        }
 
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)

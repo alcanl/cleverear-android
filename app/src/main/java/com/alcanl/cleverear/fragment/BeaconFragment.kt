@@ -194,7 +194,11 @@ class BeaconFragment : Fragment(), IEventListener {
     override fun onDestroy()
     {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
+
+        EventBus.getDefault().apply {
+            if (isRegistered(this@BeaconFragment))
+                unregister(this@BeaconFragment)
+        }
 
         binding.shimmerLayout.apply {
             if (isShimmerVisible) {
@@ -203,8 +207,10 @@ class BeaconFragment : Fragment(), IEventListener {
             }
         }
 
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
 
         if (mJob != null && !mJob!!.isCancelled)
             mJob?.cancel()
@@ -216,8 +222,15 @@ class BeaconFragment : Fragment(), IEventListener {
     override fun onStart()
     {
         super.onStart()
-        EventBus.getDefault().register(this)
-        listener.startEventListener()
+        EventBus.getDefault().apply {
+            if (!isRegistered(this@BeaconFragment))
+                register(this@BeaconFragment)
+        }
+
+        listener.apply {
+            if (!isListenerOnBoard())
+                startEventListener()
+        }
     }
 
     override fun onPause()

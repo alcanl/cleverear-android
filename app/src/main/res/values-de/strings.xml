@@ -12,6 +12,11 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="permission_given_unsuccess_text" translatable="true">Berechtigung wurde nicht erteilt</string>
+    <string name="permission_given_success_text" translatable="true">Berechtigung erfolgreich erteilt</string>
+    <string name="alert_dialog_foreground_service_inactive_text" translatable="true">CleverEar wird Ihre Geräteverbindung nicht mehr verfolgen!</string>
+    <string name="alert_dialog_foreground_service_active_text" translatable="true">CleverEar verfolgt nun Ihre Geräteverbindung im Hintergrund.</string>
+    <string name="alert_dialog_background_permission_required_text" translatable="true">Damit die CleverEar-App die Geräteverbindung verfolgen kann, muss die Standortberechtigung in den App-Einstellungen auf "Immer" gesetzt sein.\nMöchten Sie, dass die CleverEar-App die Verbindung zum Hörgerät verfolgt?</string>
     <string name="textview_connect_to_selected_device_text" translatable="true">Über das ausgewählte Gerät verbinden</string>
     <string name="bubble_textview_control_device_text" translatable="true">Frühere Geräteverbindungen überprüfen</string>
     <string name="toast_require_internet_connection_text" translatable="true">Die Selbst- oder Fernanpassung erfordert eine verfügbare Internetverbindung.</string>

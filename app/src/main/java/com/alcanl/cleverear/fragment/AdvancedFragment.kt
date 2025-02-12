@@ -75,8 +75,16 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         super.onStart()
         initialize()
-        listener.startEventListener()
-        EventBus.getDefault().register(this)
+
+        listener.apply {
+            if (!isListenerOnBoard())
+                startEventListener()
+        }
+
+        EventBus.getDefault().apply {
+            if (!isRegistered(this@AdvancedFragment))
+                register(this@AdvancedFragment)
+        }
     }
     override fun onResume()
     {
@@ -87,24 +95,31 @@ class AdvancedFragment : Fragment(), IEventListener {
             return
         }
 
-        if (!listener.isListenerOnBoard())
-            listener.startEventListener()
+        listener.apply {
+            if (!isListenerOnBoard())
+                startEventListener()
+        }
     }
     override fun onStop()
     {
         super.onStop()
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
-
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
     }
     override fun onDestroy() {
         super.onDestroy()
 
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
+        listener.apply {
+            if (isListenerOnBoard())
+                stopListener()
+        }
 
-        EventBus.getDefault().unregister(this)
-
+        EventBus.getDefault().apply {
+            if (isRegistered(this@AdvancedFragment))
+                unregister(this@AdvancedFragment)
+        }
     }
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
