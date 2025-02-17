@@ -25,6 +25,12 @@ import com.alcanl.cleverear.util.HA_RIGHT_ADDRESS
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
+
+
+const val DEVICE_DISCONNECTED = "The Device %s disconnected"
+const val DISCONNECTED = "Disconnected"
+const val CLEVER_EAR = "CleverEar"
+
 class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
 
     @Inject
@@ -55,7 +61,8 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     {
         try {
             if (device.address == leftDevice) {
-                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format("The Device %s disconnected", leftDevice))
+                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format(
+                    DEVICE_DISCONNECTED, leftDevice))
                 handleLeftDeviceDisconnect()
                 showNotification(context, notification)
                 EventBus.getDefault().post(DisconnectEvent(this,
@@ -64,7 +71,8 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
             }
 
             if (device.address == rightDevice) {
-                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format("The Device %s disconnected", rightDevice))
+                Log.d(DeviceDisconnectBroadcastReceiver::class.simpleName, String.format(
+                    DEVICE_DISCONNECTED, rightDevice))
                 handleRightDeviceDisconnect()
                 showNotification(context, notification)
                 EventBus.getDefault().post(DisconnectEvent(this,
@@ -122,7 +130,7 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     }
     private fun createDisconnectNotification(context: Context, pendingIntent: PendingIntent) : Notification
     {
-        return NotificationCompat.Builder(context, "Disconnected")
+        return NotificationCompat.Builder(context, DISCONNECTED)
             .setSmallIcon(R.drawable.cleverear_logo)
             .setContentTitle(context.getString(R.string.notification_disconnect_text))
             .setAutoCancel(true)
@@ -132,7 +140,7 @@ class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastRece
     private fun handleNotification(context: Context, intent: Intent) : Notification
     {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel("Disconnected", "CleverEar", NotificationManager.IMPORTANCE_DEFAULT)
+            NotificationChannel(DISCONNECTED, CLEVER_EAR, NotificationManager.IMPORTANCE_DEFAULT)
         )
 
         val pendingIntent = PendingIntent.getActivity(context, 8, intent, PendingIntent.FLAG_IMMUTABLE)

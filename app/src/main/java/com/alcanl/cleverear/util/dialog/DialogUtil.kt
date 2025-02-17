@@ -146,7 +146,7 @@ fun createBackgroundLocationPermissionGrantUnSuccessDialog(activity: FragmentAct
 {
     return AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
-        .title(activity.getString(R.string.permission_given_unsuccess_text))
+        .title(activity.getString(R.string.permission_given_un_success_text))
         .body(activity.getString(R.string.alert_dialog_foreground_service_inactive_text))
         .icon(R.drawable.icon_warning_new)
 }

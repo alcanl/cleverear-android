@@ -7,12 +7,12 @@
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
     <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
-    <string name="app_version_text" translatable="false">v 3.3.1</string>
+    <string name="app_version_text" translatable="false">v 3.2.0</string>
     <string name="permission_given_success_text" translatable="true">Permission Given Success</string>
-    <string name="permission_given_unsuccess_text" translatable="true">Permission Has Not Given</string>
+    <string name="permission_given_un_success_text" translatable="true">Permission Has Not Given</string>
     <string name="alert_dialog_foreground_service_inactive_text" translatable="true">CleverEar will no longer track your device connection!</string>
     <string name="alert_dialog_foreground_service_active_text" translatable="true">CleverEar is now tracking your device connection in the background</string>
-    <string name="alert_dialog_background_permission_required_text" translatable="true">To allow the CleverEar app to track device connections, the location permission must be set to "Always" in the app's settings.\nWould you like the CleverEar app to track the hearing aid connection?</string>
+    <string name="alert_dialog_background_permission_required_text" translatable="true">To allow the CleverEar app to track device connections, the location permission must be set to "Always" in the app\'s settings.\nWould you like the CleverEar app to track the hearing aid connection?</string>
     <string name="button_info_context_text" translatable="false">User Manual</string>
     <string name="volume_common_slider_desc" translatable="false">Dual Volume Slider</string>
     <string name="aux_common_slider_desc" translatable="false">Dual Aux Slider</string>

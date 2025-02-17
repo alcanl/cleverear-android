@@ -12,9 +12,12 @@ import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.util.EarSide
 import javax.inject.Inject
 import kotlin.system.exitProcess
+
 class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
+
     @Inject
     lateinit var configuration : ConfigurationModule
+
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?)
     {
@@ -25,7 +28,7 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
             val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)
 
             if (state < 0)
-                Log.e("test", "notWorkingBroadcast")
+                Log.e(BondHearingAidBroadcastReceiver::class.simpleName, "notWorkingBroadcast")
 
             else if (state == BluetoothDevice.BOND_BONDED)
                 handleStateBonded()
