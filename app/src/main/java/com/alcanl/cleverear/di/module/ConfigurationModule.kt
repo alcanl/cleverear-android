@@ -20,16 +20,23 @@ object ConfigurationModule {
     @Volatile
     var canBondDeviceReConnect = false
 
+    @Volatile
+    var keepConnectionForServiceDestroy = false
+
+    @Volatile
+    var isBluetoothEnabled = false
+
+    @Volatile
+    var isServiceOnBoard = false
+
+    @Volatile
+    var trackLocationAlwaysSuccessFlag = true
+
     var isDoubleDeviceConnection = false
 
     var isDualDeviceConfig = false
 
     var isConnectedBefore = false
-
-    var isServiceOnBoard = false
-
-    @Volatile
-    var isBluetoothEnabled = false
 
     var isUserDisconnected = false
 

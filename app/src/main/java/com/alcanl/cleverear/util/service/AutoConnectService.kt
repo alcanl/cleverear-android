@@ -101,14 +101,15 @@ class AutoConnectService : Service()
             unregisterReceiver(mDeviceFoundReceiver)
             scheduledExecutor.shutdownNow()
 
-            with(configuration) {
-                if (isConnected)
+            configuration.apply {
+                if (isConnected && !keepConnectionForServiceDestroy) {
                     if (isDoubleDeviceConnection)
                         hearingAidMap.forEach { it.value.endConnectionSession() }
                     else
                         hearingAidMap[earSide]?.endConnectionSession()
 
-                isConnected = false
+                    isConnected = false
+                }
                 isServiceOnBoard = false
             }
             Log.i(AutoConnectService::class.simpleName, "Service Stopped")

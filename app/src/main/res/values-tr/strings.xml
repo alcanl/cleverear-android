@@ -105,7 +105,7 @@
     <string name="permission_given_un_success_text" translatable="true">İzin Verilmedi</string>
     <string name="alert_dialog_foreground_service_inactive_text">CleverEar cihaz bağlantınızı takip etmeyecek!</string>
     <string name="alert_dialog_foreground_service_active_text" translatable="true">CleverEar artık cihaz bağlantınızı arka planda takip ediyor</string>
-    <string name="alert_dialog_background_permission_required_text" translatable="true">CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için uygulama ayarlarında konum izninin "Her Zaman" olarak verilmesi gerekmektedir.\nCleverEar uygulamasının işitme cihazı bağlantısını takip etmesini ister misiniz?</string>
+    <string name="alert_dialog_background_permission_required_text" translatable="true">CleverEar uygulamasının cihaz bağlantısını takip edebilmesi için uygulama ayarlarında konum izninin \n"Her Zaman" olarak verilmesi gerekmektedir.\nCleverEar uygulamasının işitme cihazı bağlantısını takip etmesini ister misiniz?</string>
     <string name="toast_connection_problem_text">Cihaza Bağlanılamadı</string>
     <string name="button_previous_activity">Önceki</string>
     <string name="dialog_info_title">Bilgi</string>

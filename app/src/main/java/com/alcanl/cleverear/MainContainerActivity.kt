@@ -3,6 +3,7 @@ package com.alcanl.cleverear
 import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -31,6 +32,7 @@ import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantS
 import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantUnSuccessDialog
 import com.alcanl.cleverear.util.dialog.showBackgroundLocationPermissionActionDialog
 import com.alcanl.cleverear.util.hasBackgroundLocationPermission
+import com.alcanl.cleverear.util.service.AutoConnectService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -85,7 +87,8 @@ class MainContainerActivity : AppCompatActivity() {
                     .apply { show() }.also { handler.postDelayed({ it.dismiss() }, 1500) }
             else
                 createBackgroundLocationPermissionGrantUnSuccessDialog(this)
-                    .apply { show() }.also { handler.postDelayed({ it.dismiss() }, 1500) }
+                    .apply { show() }.also { configuration.trackLocationAlwaysSuccessFlag = false
+                        handler.postDelayed({ it.dismiss() }, 1500) }
         }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -111,13 +114,23 @@ class MainContainerActivity : AppCompatActivity() {
     {
         super.onResume()
 
-        if (configuration.isConnected && !hasBackgroundLocationPermission(this)) {
-            showBackgroundLocationPermissionActionDialog(this, configuration)
-            return
-        }
+        configuration.apply {
 
-        if (configuration.isConnected)
-            handler.postDelayed({binding.navigationViewContainer.selectedItemId = R.id.navbar_control}, 1000)
+            if (isConnected && !hasBackgroundLocationPermission(this@MainContainerActivity) && trackLocationAlwaysSuccessFlag) {
+                showBackgroundLocationPermissionActionDialog(this@MainContainerActivity, this)
+                return
+            }
+
+            handler.postDelayed( {
+                if (isConnected && isServiceOnBoard && !trackLocationAlwaysSuccessFlag) {
+                    keepConnectionForServiceDestroy = true
+                    stopService(Intent(this@MainContainerActivity, AutoConnectService::class.java))
+                }
+            }, 2000)
+
+            if (isConnected)
+                handler.postDelayed({ binding.navigationViewContainer.selectedItemId = R.id.navbar_control }, 1000)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -161,8 +174,6 @@ class MainContainerActivity : AppCompatActivity() {
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
-
-
 
     private fun initializeNavController()
     {

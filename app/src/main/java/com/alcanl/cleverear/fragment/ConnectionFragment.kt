@@ -436,10 +436,25 @@ class ConnectionFragment : Fragment(), IEventListener {
 
         configuration.apply {
             isUserDisconnected = true
+
             if (isServiceOnBoard) {
-                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
-                isServiceOnBoard = false
+                keepConnectionForServiceDestroy = false
+                requireActivity().stopService(
+                    Intent(
+                        requireActivity(),
+                        AutoConnectService::class.java
+                    )
+                )
             }
+            else
+                if (isConnected) {
+                    if (isDoubleDeviceConnection)
+                        hearingAidMap.forEach { it.value.endConnectionSession() }
+                    else
+                        hearingAidMap[earSide]?.endConnectionSession()
+
+                    isConnected = false
+                }
         }
 
         handler.postDelayed (::alertDialogPositiveButtonCallback, 5000)

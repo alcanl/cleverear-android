@@ -76,8 +76,15 @@ fun showBackgroundLocationPermissionActionDialog(activity: AppCompatActivity, co
             buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
             textColor = ContextCompat.getColor(activity, android.R.color.white))
         {
-            if (configuration.isServiceOnBoard)
-                (activity as MainContainerActivity).stopService(Intent(activity, AutoConnectService::class.java))
+            configuration.apply {
+                keepConnectionForServiceDestroy = true
+
+                if (isServiceOnBoard)
+                    (activity as MainContainerActivity).stopService(Intent(activity, AutoConnectService::class.java))
+            }
+
+            (activity as MainContainerActivity).handler.
+            postDelayed({ activity.binding.navigationViewContainer.selectedItemId = R.id.navbar_control}, 1000)
         }
         .onPositive(
             text = activity.getString(R.string.dialog_yes),
