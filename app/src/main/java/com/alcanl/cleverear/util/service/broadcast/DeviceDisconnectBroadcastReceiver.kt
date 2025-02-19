@@ -27,9 +27,9 @@ import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 
-const val DEVICE_DISCONNECTED = "The Device %s disconnected"
-const val DISCONNECTED = "Disconnected"
-const val CLEVER_EAR = "CleverEar"
+private const val DEVICE_DISCONNECTED = "The Device %s disconnected"
+private const val DISCONNECTED = "Disconnected"
+private const val CLEVER_EAR = "CleverEar"
 
 class DeviceDisconnectBroadcastReceiver @Inject constructor(): HiltBroadcastReceiver() {
 
