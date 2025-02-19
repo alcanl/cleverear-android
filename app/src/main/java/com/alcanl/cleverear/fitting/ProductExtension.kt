@@ -8,12 +8,12 @@ import com.ark.ArkException
 import com.ark.ParameterSpace
 import com.ark.Product
 
-const val VOLUME_RETENTION_ENABLE = "X_VolumeRetention_Enable"
-const val MEMORY_RETENTION_ENABLE = "X_MemoryRetention_Enable"
-const val EQ_ENABLE = "X_EQ_Enable"
-const val EQ_CHANNEL_GAIN = "X_EQ_ChannelGain_dB[%d]"
-const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
-const val WIDE_BAND_GAIN = "X_LIM_TargetGain_dB"
+private const val VOLUME_RETENTION_ENABLE = "X_VolumeRetention_Enable"
+private const val MEMORY_RETENTION_ENABLE = "X_MemoryRetention_Enable"
+private const val EQ_ENABLE = "X_EQ_Enable"
+private const val EQ_CHANNEL_GAIN = "X_EQ_ChannelGain_dB[%d]"
+private const val FEEDBACK_CANCELER_ENABLE = "X_FBC_Enable"
+private const val WIDE_BAND_GAIN = "X_LIM_TargetGain_dB"
 
 private fun Product.isSystemParameter(parameterName: String) : Boolean
 {
