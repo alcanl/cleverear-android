@@ -50,6 +50,9 @@ import javax.inject.Inject
 
 private const val FOREGROUND_PERMISSION_REQUEST_CODE = 23
 private const val POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 22
+private const val DELAY_TWO_SECONDS = 2000L
+private const val DELAY_FOUR_SECONDS = 4000L
+private const val DELAY_FIVE_SECONDS = 5000L
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
@@ -76,7 +79,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
         if (result.resultCode != RESULT_OK) {
             Toast.makeText(this, R.string.toast_update_need_text, Toast.LENGTH_LONG).show()
-            Handler(Looper.myLooper()!!).postDelayed({ finish() },2000)
+            Handler(Looper.myLooper()!!).postDelayed({ finish() }, DELAY_TWO_SECONDS)
         }
         else
             mIsUpdatedVersion = true
@@ -110,7 +113,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             async {
                 mIsUpdatedVersion = if (!isInternetAvailable(this@SplashActivity)) true
                 else try {
-                    withTimeout(5000) {
+                    withTimeout(DELAY_FIVE_SECONDS) {
                         mAppUpdateManager.requestAppUpdateInfo()
                             .updateAvailability() != UpdateAvailability.UPDATE_AVAILABLE
                     }
@@ -127,7 +130,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                     checkAndRequestNotificationPermission()
                 else {
                     cleanEvents()
-                    handler.postDelayed(::finalizeSplash, 4000)
+                    handler.postDelayed(::finalizeSplash, DELAY_FOUR_SECONDS)
                 }
             }
         }
@@ -154,7 +157,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission) {
                     cleanEvents()
-                    handler.postDelayed(::finalizeSplash, 4000)
+                    handler.postDelayed(::finalizeSplash, DELAY_FOUR_SECONDS)
                 }
                 else
                     onPermissionResultNegative()
@@ -163,7 +166,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission) {
                     cleanEvents()
-                    handler.postDelayed(::finalizeSplash, 4000)
+                    handler.postDelayed(::finalizeSplash, DELAY_FOUR_SECONDS)
                 }
                 else
                     onPermissionResultNegative()
@@ -189,7 +192,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     private fun onPermissionResultNegative()
     {
         Toast.makeText(this, getString(R.string.toast_no_permission_splash_activity), Toast.LENGTH_LONG).show()
-        handler.postDelayed({ killProcess(myPid()) }, 2000)
+        handler.postDelayed({ killProcess(myPid()) }, DELAY_TWO_SECONDS)
     }
 
     @SuppressLint("InlinedApi")
@@ -301,7 +304,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     {
         try {
             listener.startEventListener()
-            delay(2000)
+            delay(DELAY_TWO_SECONDS)
             listener.stopListener()
 
         } catch (_: InterruptedException) {}
