@@ -136,9 +136,8 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                         isConnected = true
                     }
                     else {
-                        if (event.eventSender == hearingAidMap[EarSide.Left]?.address) {
+                        if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
                             hearingAidMap[EarSide.Left]?.isConnected = true
-                        }
                         else
                             hearingAidMap[EarSide.Right]?.isConnected = true
 
