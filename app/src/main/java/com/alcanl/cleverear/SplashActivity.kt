@@ -48,6 +48,9 @@ import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
 import javax.inject.Inject
 
+private const val FOREGROUND_PERMISSION_REQUEST_CODE = 23
+private const val POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 22
+
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity(), IEventListener {
@@ -147,7 +150,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == 22)
+        if (requestCode == POST_NOTIFICATION_PERMISSION_REQUEST_CODE)
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mForeGroundServicePermission) {
                     cleanEvents()
@@ -156,7 +159,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 else
                     onPermissionResultNegative()
 
-        if (requestCode == 23)
+        if (requestCode == FOREGROUND_PERMISSION_REQUEST_CODE)
             if (grantResults.isNotEmpty())
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mPostNotificationPermission) {
                     cleanEvents()
@@ -196,14 +199,14 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                22
+                POST_NOTIFICATION_PERMISSION_REQUEST_CODE
             )
 
         if (!mForeGroundServicePermission)
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE),
-                23)
+                FOREGROUND_PERMISSION_REQUEST_CODE)
     }
 
     private fun handleConnectedBefore()
