@@ -27,6 +27,7 @@ import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
+import com.alcanl.cleverear.util.hasForegroundServicePermission
 import com.alcanl.cleverear.util.service.broadcast.BondHearingAidBroadcastReceiver
 import com.alcanl.cleverear.util.listeners.LoadingActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
@@ -115,13 +116,16 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
         with(configuration) {
             if (isDoubleDeviceConnection) {
-                if (!isServiceOnBoard && isConnected && hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
+                if (hasForegroundServicePermission(this@LoadingActivity) &&
+                    !isServiceOnBoard && isConnected &&
+                    hearingAidMap.all { it.value.bondStatus == BluetoothDevice.BOND_BONDED })
                     startService()
             }
 
-            else if (!isServiceOnBoard && isConnected && hearingAidMap[earSide]?.bondStatus == BluetoothDevice.BOND_BONDED)
+            else if (hasForegroundServicePermission(this@LoadingActivity) &&
+                !isServiceOnBoard && isConnected &&
+                hearingAidMap[earSide]?.bondStatus == BluetoothDevice.BOND_BONDED)
                 startService()
-
         }
     }
 

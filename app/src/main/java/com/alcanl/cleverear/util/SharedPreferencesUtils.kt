@@ -19,6 +19,8 @@ import com.alcanl.cleverear.api.equalizer.EqualizerValuesDTO
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
+import com.google.gson.Gson
+
 
 private fun getPrivatePrefs(context: Context) = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
 
@@ -154,4 +156,41 @@ fun getEqualizerDTOPref(context: Context, configuration: ConfigurationModule, fi
         valuesList,
         prefs.getString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!
     )
+}
+
+fun markServiceAsRestarted(context: Context)
+{
+    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    prefs.edit().putBoolean(SERVICE_RESTART_FLAG, true).apply()
+}
+
+fun markServiceAsClosed(context: Context)
+{
+    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    prefs.edit().putBoolean(SERVICE_RESTART_FLAG, false).apply()
+}
+
+fun isServiceRestarted(context: Context) : Boolean
+{
+    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    return prefs.getBoolean(SERVICE_RESTART_FLAG, false)
+}
+
+fun saveConfigurations(configuration: ConfigurationModule, context: Context)
+{
+    val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
+    editor.putString(CONFIGURATION_JSON, Gson().toJson(configuration))
+    editor.apply()
+}
+
+fun readConfigurations(configuration: ConfigurationModule, context: Context)
+{
+    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    val json = prefs.getString(CONFIGURATION_JSON, "")!!
+
+    if (json.isNotBlank()) {
+        val gson = Gson()
+        val instance = gson.fromJson(json, ConfigurationModule::class.java)
+        configuration.reSetConfiguration(instance)
+    }
 }

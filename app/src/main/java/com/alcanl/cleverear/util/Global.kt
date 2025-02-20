@@ -45,6 +45,8 @@ const val HA_RIGHT_NAME = "HA_RIGHT_NAME"
 const val HA_LEFT_RSSI = "HA_LEFT_RSSI"
 const val HA_RIGHT_RSSI = "HA_RIGHT_RSSI"
 const val EMERGENCY_NUMBER = "EMERGENCY_NUMBER"
+const val SERVICE_RESTART_FLAG = "SERVICE_RESTART_FLAG"
+const val CONFIGURATION_JSON = "CONFIGURATION_JSON"
 const val WHAT_BACKGROUND_CONNECTED = 0
 const val WHAT_PRODUCT_CREATE_FAIL = 11
 const val WHAT_LIBRARY_SEARCH_SUCCESS = 12
@@ -208,4 +210,19 @@ fun hasBackgroundLocationPermission(context: Context): Boolean
                 PackageManager.PERMISSION_GRANTED
     }
     return true
+}
+
+fun hasForegroundServicePermission(context: Context) : Boolean
+{
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
+        ) == PackageManager.PERMISSION_GRANTED
+    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    else
+        true
 }

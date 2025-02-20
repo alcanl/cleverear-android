@@ -32,6 +32,10 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
+import com.alcanl.cleverear.util.isServiceRestarted
+import com.alcanl.cleverear.util.markServiceAsRestarted
+import com.alcanl.cleverear.util.readConfigurations
+import com.alcanl.cleverear.util.saveConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
@@ -46,7 +50,6 @@ import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class AutoConnectService : Service()
@@ -85,7 +88,7 @@ class AutoConnectService : Service()
     {
         Log.i(AutoConnectService::class.simpleName, "Service On Board")
         initialize(intent)
-        return START_STICKY
+        return START_REDELIVER_INTENT
     }
 
     override fun onBind(intent: Intent?): IBinder?
@@ -93,7 +96,15 @@ class AutoConnectService : Service()
         throw UnsupportedOperationException()
     }
 
-    override fun onDestroy() {
+    override fun onTaskRemoved(rootIntent: Intent?)
+    {
+        super.onTaskRemoved(rootIntent)
+        saveConfigurations(configuration, this)
+        markServiceAsRestarted(this)
+    }
+
+    override fun onDestroy()
+    {
         super.onDestroy()
         try {
             unregisterReceiver(mDisconnectReceiver)
@@ -120,6 +131,9 @@ class AutoConnectService : Service()
 
     private fun initialize(intent: Intent?)
     {
+        if (isServiceRestarted(this))
+            readConfigurations(configuration, this)
+
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))

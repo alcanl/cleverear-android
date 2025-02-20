@@ -37,6 +37,7 @@ import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
 import com.alcanl.cleverear.util.listeners.event.VolumeEvent
+import com.alcanl.cleverear.util.markServiceAsClosed
 import com.alcanl.cleverear.util.saveEmergencyNumberToPrefs
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.BeaconFragmentListenersViewModel
@@ -167,8 +168,17 @@ class BeaconFragment : Fragment(), IEventListener {
             lifecycleScope.launch(Dispatchers.Main) {
 
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+
+                if (configuration.isServiceOnBoard) {
+                    markServiceAsClosed(requireContext())
+                    requireActivity().stopService(
+                        Intent(
+                            requireActivity(),
+                            AutoConnectService::class.java
+                        )
+                    )
+                }
                 requireActivity().finish()
-                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
                 configuration.apply {
                     isConnected = false
                     hearingAidMap.filter { ha -> ha.value.address == event.eventSender }

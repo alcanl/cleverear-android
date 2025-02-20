@@ -69,4 +69,25 @@ object ConfigurationModule {
         } catch (_ : Throwable) { false }
     }
 
+    fun reSetConfiguration(config : ConfigurationModule)
+    {
+        isConnected = config.isConnected
+        canBondDeviceReConnect = config.canBondDeviceReConnect
+        keepConnectionForServiceDestroy = config.keepConnectionForServiceDestroy
+        isBluetoothEnabled = config.isBluetoothEnabled
+        isServiceOnBoard = config.isServiceOnBoard
+        trackLocationAlwaysSuccessFlag = config.trackLocationAlwaysSuccessFlag
+        isDoubleDeviceConnection = config.isDoubleDeviceConnection
+        isDualDeviceConfig = config.isDualDeviceConfig
+        isConnectedBefore = config.isConnectedBefore
+        isUserDisconnected = config.isUserDisconnected
+        isEddyStoneScanInProgress = config.isEddyStoneScanInProgress
+        isRemoteFittingConnection = config.isRemoteFittingConnection
+        isMainActivityOnScreen = config.isMainActivityOnScreen
+        earSide = config.earSide
+        hearingAidMap[EarSide.Left] = config.hearingAidMap[EarSide.Left]
+        hearingAidMap[EarSide.Right] = config.hearingAidMap[EarSide.Right]
+        eddyStoneMap[EarSide.Left] = config.eddyStoneMap[EarSide.Left]
+        eddyStoneMap[EarSide.Right] = config.eddyStoneMap[EarSide.Right]
+    }
 }

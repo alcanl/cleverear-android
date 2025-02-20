@@ -34,6 +34,7 @@ import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
+import com.alcanl.cleverear.util.markServiceAsClosed
 import com.alcanl.cleverear.util.scan.DeviceScanner
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
@@ -88,7 +89,16 @@ class ConnectionFragment : Fragment(), IEventListener {
         if (event is ConnectionEvent && event.connectionData == 1 && !configuration.isUserDisconnected)
             lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
-                requireActivity().stopService(Intent(requireActivity(), AutoConnectService::class.java))
+
+                if (configuration.isServiceOnBoard) {
+                    markServiceAsClosed(requireContext())
+                    requireActivity().stopService(
+                        Intent(
+                            requireActivity(),
+                            AutoConnectService::class.java
+                        )
+                    )
+                }
                 requireActivity().finish()
                 configuration.apply {
                     isConnected = false
@@ -439,6 +449,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             if (isServiceOnBoard) {
                 keepConnectionForServiceDestroy = false
+                markServiceAsClosed(requireContext())
                 requireActivity().stopService(
                     Intent(
                         requireActivity(),
