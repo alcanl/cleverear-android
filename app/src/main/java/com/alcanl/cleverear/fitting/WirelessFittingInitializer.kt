@@ -59,7 +59,7 @@ class WirelessFittingInitializer @Inject constructor(@ApplicationContext context
 
             return file
         } catch (ex: IOException) {
-            Log.e("writeLibraryToFilesDir", ex.message!!)
+            Log.e(WirelessFittingInitializer::class.simpleName, ex.message!!)
             return null
         }
     }
