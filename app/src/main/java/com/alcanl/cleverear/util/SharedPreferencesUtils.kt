@@ -18,7 +18,9 @@ import com.alcanl.cleverear.api.aid.HearingAidDTO
 import com.alcanl.cleverear.api.equalizer.EqualizerValuesDTO
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.di.module.FittingConfigurationModule
+import com.alcanl.cleverear.entity.ConfigurationData
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.util.mapper.ConfigurationMapper
 import com.google.gson.Gson
 
 
@@ -184,7 +186,8 @@ fun areConfigurationsSavedBefore(context: Context) : Boolean
 fun saveConfigurations(configuration: ConfigurationModule, context: Context)
 {
     val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
-    editor.putString(CONFIGURATION_JSON, Gson().toJson(configuration))
+    val mapper = ConfigurationMapper()
+    editor.putString(CONFIGURATION_JSON, Gson().toJson(mapper.toConfigurationData(configuration)))
     editor.apply()
 }
 
@@ -195,7 +198,8 @@ fun readConfigurations(configuration: ConfigurationModule, context: Context)
 
     if (json.isNotBlank()) {
         val gson = Gson()
-        val instance = gson.fromJson(json, ConfigurationModule::class.java)
-        configuration.reSetConfiguration(instance)
+        val mapper = ConfigurationMapper()
+        val data = gson.fromJson(json, ConfigurationData::class.java)
+        mapper.toConfigurationModule(data, configuration)
     }
 }
