@@ -101,6 +101,7 @@ class AutoConnectService : Service()
         super.onTaskRemoved(rootIntent)
         saveConfigurations(configuration, this)
         markServiceAsRestarted(this)
+        Log.i(AutoConnectService::class.simpleName, "Service Task Removed")
     }
 
     override fun onDestroy()

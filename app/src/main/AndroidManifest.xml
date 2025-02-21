@@ -93,7 +93,8 @@
         <!--suppress AndroidDomInspection -->
         <service
             android:name=".util.service.AutoConnectService"
-            android:foregroundServiceType="location | connectedDevice" />
+            android:foregroundServiceType="location|connectedDevice"
+            android:permission="android.permission.FOREGROUND_SERVICE"/>
 
         <receiver
             android:name=".util.service.broadcast.DeviceDisconnectBroadcastReceiver"
