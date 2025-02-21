@@ -44,17 +44,17 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
     fun readDeviceConfiguration()
     {
         try {
-            with(wirelessControl!!) {
-                this@HearingAid.batteryLevel = batteryLevel
-                this@HearingAid.volume = volume
-                this@HearingAid.numberOfMemories = numberOfMemories
-                this@HearingAid.currentMemory = currentMemory
-                this@HearingAid.micAttenuation = micAttenuation
-                this@HearingAid.auxAttenuation = auxAttenuation
-                this@HearingAid.streamChannelList = streamChannelList
-                this@HearingAid.streamAddressRaw = streamAddress
-                this@HearingAid.streamAddress = streamAddressRaw shr 16
-                this@HearingAid.isEddystoneTLM = wirelessControl?.modelNumber == EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
+            wirelessControl?.let {
+                batteryLevel = it.batteryLevel
+                volume = it.volume
+                numberOfMemories = it.numberOfMemories
+                currentMemory = it.currentMemory
+                micAttenuation = it.micAttenuation
+                auxAttenuation = it.auxAttenuation
+                streamChannelList = it.streamChannelList
+                streamAddressRaw = it.streamAddress
+                streamAddress = streamAddressRaw shr 16
+                isEddystoneTLM = it.modelNumber == EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER
             }
         }
         catch (e : ArkException) {
