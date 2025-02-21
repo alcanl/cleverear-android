@@ -176,6 +176,11 @@ fun isServiceRestarted(context: Context) : Boolean
     return prefs.getBoolean(SERVICE_RESTART_FLAG, false)
 }
 
+fun areConfigurationsSavedBefore(context: Context) : Boolean
+{
+    return context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(CONFIGURATION_JSON, "")!!.isNotBlank()
+}
+
 fun saveConfigurations(configuration: ConfigurationModule, context: Context)
 {
     val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
