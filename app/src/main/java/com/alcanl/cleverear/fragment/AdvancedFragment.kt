@@ -72,10 +72,16 @@ class AdvancedFragment : Fragment(), IEventListener {
         mBinding.lifecycleOwner = this
         return mBinding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
+        super.onViewCreated(view, savedInstanceState)
+        initialize()
+    }
+
     override fun onStart()
     {
         super.onStart()
-        initialize()
 
         listener.apply {
             if (!isListenerOnBoard())
@@ -87,6 +93,7 @@ class AdvancedFragment : Fragment(), IEventListener {
                 register(this@AdvancedFragment)
         }
     }
+
     override fun onResume()
     {
         super.onResume()

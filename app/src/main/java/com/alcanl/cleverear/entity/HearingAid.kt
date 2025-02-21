@@ -64,7 +64,9 @@ data class HearingAid(val address: String, val name: String, val rssi: Int, val 
 
     fun getModelNumber() : String
     {
-        return wirelessControl?.modelNumber ?: ""
+        return try {
+            return wirelessControl?.modelNumber ?: ""
+        } catch (_ : ArkException) { "" }
     }
 
     fun endConnectionSession()

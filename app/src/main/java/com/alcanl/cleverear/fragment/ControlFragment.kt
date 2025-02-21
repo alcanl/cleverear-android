@@ -70,12 +70,17 @@ class ControlFragment : Fragment(), IEventListener {
     override fun onStart()
     {
         super.onStart()
-        initialize()
 
         EventBus.getDefault().apply {
             if (!isRegistered(this@ControlFragment))
                 register(this@ControlFragment)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
+        super.onViewCreated(view, savedInstanceState)
+        initialize()
     }
 
     override fun onResume()
@@ -257,11 +262,11 @@ class ControlFragment : Fragment(), IEventListener {
             with(configuration.hearingAidMap) {
 
                 mBinding.batteryViewLeftDevice. apply {
-                    batteryLevel = this@with[EarSide.Left]?.batteryLevel!!
+                    batteryLevel = this@with[EarSide.Left]?.batteryLevel ?: 95
                     mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
                 }
                 mBinding.batteryViewRightDevice.apply {
-                    batteryLevel = this@with[EarSide.Right]?.batteryLevel!!
+                    batteryLevel = this@with[EarSide.Right]?.batteryLevel ?: 95
                     mBinding.batteryViewRightDevice.visibility = View.VISIBLE
                 }
             }

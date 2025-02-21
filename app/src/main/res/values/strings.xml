@@ -7,7 +7,7 @@
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
     <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
-    <string name="app_version_text" translatable="false">v 3.2.0</string>
+    <string name="app_version_text" translatable="false">v 3.2.1</string>
     <string name="permission_given_success_text" translatable="true">Permission Given Success</string>
     <string name="permission_given_un_success_text" translatable="true">Permission Has Not Given</string>
     <string name="alert_dialog_foreground_service_inactive_text" translatable="true">CleverEar will no longer track your device connection!</string>
