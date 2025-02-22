@@ -10,10 +10,18 @@ class ConfigurationMapper @Inject constructor() {
     fun toConfigurationModule(data: ConfigurationData, configuration: ConfigurationModule)
     {
         configuration.apply {
-            hearingAidMap[EarSide.Left] = data.hearingAidLeft
-            hearingAidMap[EarSide.Right] = data.hearingAidRight
-            eddyStoneMap[EarSide.Left] = data.eddyStoneLeft
-            eddyStoneMap[EarSide.Right] = data.eddyStoneRight
+            if (data.hearingAidLeft != null)
+                hearingAidMap[EarSide.Left] = data.hearingAidLeft
+
+            if (data.hearingAidRight != null)
+                hearingAidMap[EarSide.Right] = data.hearingAidRight
+
+            if (data.eddyStoneLeft != null)
+                eddyStoneMap[EarSide.Left] = data.eddyStoneLeft
+
+            if (data.eddyStoneRight != null)
+                eddyStoneMap[EarSide.Right] = data.eddyStoneRight
+
             isConnected = data.isConnected
             isUserDisconnected = data.isUserDisconnected
             isBluetoothEnabled = data.isBluetoothEnabled

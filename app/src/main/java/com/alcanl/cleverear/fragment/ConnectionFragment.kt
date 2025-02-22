@@ -100,10 +100,14 @@ class ConnectionFragment : Fragment(), IEventListener {
                     )
                 }
                 requireActivity().finish()
-                configuration.apply {
-                    isConnected = false
-                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                        .values.first().isConnected = false
+                try {
+                    configuration.apply {
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
+                } catch (ex: NoSuchElementException) {
+                    Log.e(ConnectionFragment::class.simpleName, ex.message!!)
                 }
             }
 

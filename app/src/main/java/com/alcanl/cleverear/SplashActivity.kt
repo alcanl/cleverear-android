@@ -24,7 +24,6 @@ import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.areConfigurationsSavedBefore
 import com.alcanl.cleverear.util.dialog.showDeviceConnectedBeforeDialog
 import com.alcanl.cleverear.util.getLeftHearingAidAddress
 import com.alcanl.cleverear.util.getRightHearingAidAddress
@@ -32,7 +31,6 @@ import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isInternetAvailable
 import com.alcanl.cleverear.util.listeners.SplashActivityEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
-import com.alcanl.cleverear.util.readConfigurations
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
@@ -102,14 +100,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
                 this, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
             ) == PackageManager.PERMISSION_GRANTED
         else true
-    }
-
-    override fun onDestroy()
-    {
-        super.onDestroy()
-
-        if (areConfigurationsSavedBefore(this))
-            readConfigurations(configuration, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?)

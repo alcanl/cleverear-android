@@ -35,9 +35,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.isConnected
-import com.alcanl.cleverear.util.isServiceRestarted
 import com.alcanl.cleverear.util.markServiceAsRestarted
-import com.alcanl.cleverear.util.readConfigurations
 import com.alcanl.cleverear.util.saveConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
@@ -135,9 +133,6 @@ class AutoConnectService : Service()
 
     private fun initialize(intent: Intent?)
     {
-        if (isServiceRestarted(this))
-            readConfigurations(configuration, this)
-
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
