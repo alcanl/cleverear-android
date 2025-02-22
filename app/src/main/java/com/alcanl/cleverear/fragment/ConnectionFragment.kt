@@ -87,42 +87,43 @@ class ConnectionFragment : Fragment(), IEventListener {
     @Subscribe(threadMode = ThreadMode.ASYNC)
     override fun onEventReceive(event: EventObject)
     {
-        if (event is ConnectionEvent && event.connectionData == 1 && !configuration.isUserDisconnected)
-            lifecycleScope.launch(Dispatchers.Main) {
-                Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+        if (isVisible)
+            if (event is ConnectionEvent && event.connectionData == 1 && !configuration.isUserDisconnected)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
 
-                configuration.apply {
-                    if (isServiceOnBoard) {
-                        isSystemRestartOnService = false
-                        requireActivity().stopService(
-                            Intent(
-                                requireActivity(),
-                                AutoConnectService::class.java
-                            )
-                        )
-                    }
-                }
-                try {
                     configuration.apply {
-                        if (isAshaConnected || requireActivity().intent.getBooleanExtra(BUNDLE_INTENT_FROM_SPLASH, false))
-                            requireActivity().apply {
-                                startActivity(Intent(this, MainActivity::class.java))
-                            }
-                        isConnected = false
-                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                            .values.first().isConnected = false
+                        if (isServiceOnBoard) {
+                            isSystemRestartOnService = false
+                            requireActivity().stopService(
+                                Intent(
+                                    requireActivity(),
+                                    AutoConnectService::class.java
+                                )
+                            )
+                        }
                     }
-                } catch (ex: NoSuchElementException) {
-                    Log.e(ConnectionFragment::class.simpleName, ex.message!!)
+                    try {
+                        configuration.apply {
+                            if (isAshaConnected || requireActivity().intent.getBooleanExtra(BUNDLE_INTENT_FROM_SPLASH, false))
+                                requireActivity().apply {
+                                    startActivity(Intent(this, MainActivity::class.java))
+                                }
+                            isConnected = false
+                            hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                                .values.first().isConnected = false
+                        }
+                    } catch (ex: NoSuchElementException) {
+                        Log.e(ConnectionFragment::class.simpleName, ex.message!!)
+                    }
+                    requireActivity().finish()
                 }
-                requireActivity().finish()
-            }
 
-        else if (event is DeviceFoundEvent) {
-            Thread.sleep(2000)
-            mBleDeviceSet.add(event.hearingAid)
-            lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
-        }
+            else if (event is DeviceFoundEvent) {
+                Thread.sleep(2000)
+                mBleDeviceSet.add(event.hearingAid)
+                lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
+            }
     }
 
     override fun onStart()

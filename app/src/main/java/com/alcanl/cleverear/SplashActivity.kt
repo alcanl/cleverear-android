@@ -214,8 +214,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     private fun handleConnectedBefore()
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
-        if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
-            configuration.isAshaConnected = true
+        configuration.isAshaConnected = mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) }
     }
 
     private fun finalizeSplash()

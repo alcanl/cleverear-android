@@ -102,6 +102,6 @@ class ConnectionFragmentEventListener @Inject constructor (@ApplicationContext c
         if (mListener == null)
             return false
 
-        return mListener?.isAlive!!
+        return mListener?.isAlive ?: false
     }
 }

@@ -37,13 +37,14 @@ object ConfigurationModule {
     @Volatile
     var trackLocationAlwaysSuccessFlag = true
 
+    @Volatile
+    var isAshaConnected = false
+
     var isDoubleDeviceConnection = false
 
     var isDualDeviceConfig = false
 
     var isConnectedBefore = false
-
-    var isAshaConnected = false
 
     var isSystemRestartOnService = true
 
