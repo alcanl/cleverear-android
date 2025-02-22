@@ -223,8 +223,10 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         handleConnectedBefore()
 
         if (configuration.isConnected) {
+            val bundle = Bundle()
+            bundle.putBoolean(BUNDLE_INTENT_FROM_SPLASH, true)
             Intent(this@SplashActivity, MainContainerActivity::class.java)
-                .apply { startActivity(this); finish() }
+                .apply { putExtras(bundle); setResult(RESULT_OK); startActivity(this); finish() }
             return
         }
         else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)

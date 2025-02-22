@@ -22,6 +22,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
@@ -103,7 +104,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                 }
                 try {
                     configuration.apply {
-                        if (isAshaConnected)
+                        if (isAshaConnected || requireActivity().intent.getBooleanExtra(BUNDLE_INTENT_FROM_SPLASH, false))
                             requireActivity().apply {
                                 startActivity(Intent(this, MainActivity::class.java))
                             }

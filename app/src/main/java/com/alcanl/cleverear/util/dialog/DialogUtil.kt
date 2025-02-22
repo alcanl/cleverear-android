@@ -31,7 +31,7 @@ fun showBatteryVoltageForConnectionDialog(activity: AppCompatActivity)
             activity.getString(R.string.dialog_connection_requires_battery_voltage_text),
             color = ContextCompat.getColor(activity, android.R.color.black)
         )
-        .icon(R.drawable.icon_warning_new)
+        .icon(R.drawable.icon_warning_new, true)
         .onPositive(
             activity.getString(R.string.alert_dialog_connection_problem_ok_button),
             buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,

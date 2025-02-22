@@ -19,12 +19,14 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentBeaconBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
@@ -175,12 +177,21 @@ class BeaconFragment : Fragment(), IEventListener {
                     }
                 }
 
-                requireActivity().finish()
-                configuration.apply {
-                    isConnected = false
-                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                        .values.first().isConnected = false
+                try {
+                    configuration.apply {
+                        if (isAshaConnected || requireActivity().intent.getBooleanExtra(
+                                BUNDLE_INTENT_FROM_SPLASH, false))
+                            requireActivity().apply {
+                                startActivity(Intent(this, MainActivity::class.java))
+                            }
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
+                } catch (ex: NoSuchElementException) {
+                    Log.e(ConnectionFragment::class.simpleName, ex.message!!)
                 }
+                requireActivity().finish()
             }
     }
 

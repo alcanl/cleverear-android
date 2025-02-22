@@ -17,11 +17,13 @@ import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentAdvancedBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.extension.startSetStreamChannelAnimation
 import com.alcanl.cleverear.util.extension.startAuxMicSlidersFirstAnimation
@@ -213,12 +215,21 @@ class AdvancedFragment : Fragment(), IEventListener {
                     }
                 }
 
-                requireActivity().finish()
-                configuration.apply {
-                    isConnected = false
-                    hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                        .values.first().isConnected = false
+                try {
+                    configuration.apply {
+                        if (isAshaConnected || requireActivity().intent.getBooleanExtra(
+                                BUNDLE_INTENT_FROM_SPLASH, false))
+                            requireActivity().apply {
+                                startActivity(Intent(this, MainActivity::class.java))
+                            }
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
+                    }
+                } catch (ex: NoSuchElementException) {
+                    Log.e(ConnectionFragment::class.simpleName, ex.message!!)
                 }
+                requireActivity().finish()
             }
         }
     }
