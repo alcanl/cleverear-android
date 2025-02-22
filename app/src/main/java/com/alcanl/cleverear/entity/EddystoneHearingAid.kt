@@ -4,11 +4,10 @@ import android.util.Log
 import com.alcanl.cleverear.fragment.BeaconFragment
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 
-data class EddystoneHearingAid(
-    var tlmVersion : Int, var batteryVoltage : Int, var temperature : Double,
-    var advertisementCount : Long, var elapsedTime : Long, var stepCount : Long,
-    var isFallen : Boolean, var distance : Long, var isDefault : Boolean,
-    var isTrackingActive : Boolean, var macAddress: String) {
+data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, var temperature : Double,
+                               var advertisementCount : Long, var elapsedTime : Long, var stepCount : Long,
+                               var isFallen : Boolean, var distance : Long, var isDefault : Boolean,
+                               var isTrackingActive : Boolean, var macAddress: String) {
 
     constructor() : this(
         0,0, 0.0, 0L, 0L, 0L,

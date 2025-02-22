@@ -34,8 +34,12 @@ import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
+import com.alcanl.cleverear.util.getLeftSideHearingAid
+import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.isConnected
+import com.alcanl.cleverear.util.isServiceRestarted
 import com.alcanl.cleverear.util.markServiceAsRestarted
+import com.alcanl.cleverear.util.readConfigurations
 import com.alcanl.cleverear.util.saveConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
@@ -131,11 +135,39 @@ class AutoConnectService : Service()
         }
     }
 
+    private fun handleServiceRestart(intent: Intent?)
+    {
+        readConfigurations(configuration, this)
+        threadPool.execute {
+            threadPool.submit {
+                configuration.apply {
+
+                    if (isDoubleDeviceConnection) {
+                        hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
+                        hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
+                    }
+                    else if (earSide == EarSide.Left)
+                        hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
+                    else
+                        hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
+
+                    if (hearingAidMap.any { it.value.isEddystoneTLM })
+                        hearingAidMap.filter { it.value.isEddystoneTLM }
+                            .forEach { eddyStoneMap[it.value.side] = EddystoneHearingAid() }
+                }
+            }.get()
+            scheduledThreadCallback(intent)
+        }
+    }
+
     private fun initialize(intent: Intent?)
     {
         registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
         registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
         registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
+
+        if (isServiceRestarted(this))
+            handleServiceRestart(intent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             startForeground(1, createServiceNotification(), FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or FOREGROUND_SERVICE_TYPE_LOCATION)
@@ -218,7 +250,7 @@ class AutoConnectService : Service()
     private fun scheduledThreadCallback(intent: Intent?)
     {
         try {
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection) {
                     if (isConnected) {
                         Log.d(AutoConnectService::class.simpleName, "Single Device Connected")

@@ -42,6 +42,7 @@ fun saveHearingAidInfoToPrefs(context: Context, hearingAid: HearingAid)
     editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_NAME else HA_RIGHT_NAME, hearingAid.name)
     editor.putInt(if (hearingAid.side == EarSide.Left) HA_LEFT_RSSI else HA_RIGHT_RSSI, hearingAid.rssi)
     editor.putString(if (hearingAid.side == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT, hearingAid.manufacturerData)
+    editor.putBoolean(IS_EDDYSTONE_TLM, hearingAid.isEddystoneTLM)
 
     editor.apply()
 }
@@ -54,8 +55,9 @@ fun getLeftSideHearingAid(context: Context) : HearingAid
     val deviceName = prefs.getString(HA_LEFT_NAME, "")
     val deviceRSSI = prefs.getInt(HA_LEFT_RSSI, 0)
     val deviceManu = prefs.getString(MANUFACTURER_CODE_LEFT, "")
+    val isEddystone = prefs.getBoolean(IS_EDDYSTONE_TLM, false)
 
-    return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Left)
+    return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Left, isEddystoneTLM = isEddystone)
 }
 
 fun getRightSideHearingAid(context: Context) : HearingAid
@@ -66,8 +68,9 @@ fun getRightSideHearingAid(context: Context) : HearingAid
     val deviceName = prefs.getString(HA_RIGHT_NAME, "")
     val deviceRSSI = prefs.getInt(HA_RIGHT_RSSI, 0)
     val deviceManu = prefs.getString(MANUFACTURER_CODE_RIGHT, "")
+    val isEddystone = prefs.getBoolean(IS_EDDYSTONE_TLM, false)
 
-    return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Right)
+    return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Right, isEddystoneTLM =  isEddystone)
 
 }
 
@@ -176,11 +179,6 @@ fun isServiceRestarted(context: Context) : Boolean
 {
     val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
     return prefs.getBoolean(SERVICE_RESTART_FLAG, false)
-}
-
-fun areConfigurationsSavedBefore(context: Context) : Boolean
-{
-    return context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(CONFIGURATION_JSON, "")!!.isNotBlank()
 }
 
 fun saveConfigurations(configuration: ConfigurationModule, context: Context)

@@ -2,7 +2,6 @@ package com.alcanl.cleverear.util.mapper
 
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.ConfigurationData
-import com.alcanl.cleverear.util.EarSide
 import javax.inject.Inject
 
 class ConfigurationMapper @Inject constructor() {
@@ -10,19 +9,7 @@ class ConfigurationMapper @Inject constructor() {
     fun toConfigurationModule(data: ConfigurationData, configuration: ConfigurationModule)
     {
         configuration.apply {
-            if (data.hearingAidLeft != null)
-                hearingAidMap[EarSide.Left] = data.hearingAidLeft
 
-            if (data.hearingAidRight != null)
-                hearingAidMap[EarSide.Right] = data.hearingAidRight
-
-            if (data.eddyStoneLeft != null)
-                eddyStoneMap[EarSide.Left] = data.eddyStoneLeft
-
-            if (data.eddyStoneRight != null)
-                eddyStoneMap[EarSide.Right] = data.eddyStoneRight
-
-            isConnected = data.isConnected
             isUserDisconnected = data.isUserDisconnected
             isBluetoothEnabled = data.isBluetoothEnabled
             isServiceOnBoard = data.isServiceOnBoard
@@ -43,12 +30,10 @@ class ConfigurationMapper @Inject constructor() {
     fun toConfigurationData(configuration: ConfigurationModule) : ConfigurationData
     {
         return with(configuration) {
-            ConfigurationData(isConnected, canBondDeviceReConnect, keepConnectionForServiceDestroy,
+            ConfigurationData(canBondDeviceReConnect, keepConnectionForServiceDestroy,
                 isBluetoothEnabled, isServiceOnBoard, trackLocationAlwaysSuccessFlag, isDoubleDeviceConnection,
                 isDualDeviceConfig, isConnectedBefore, isUserDisconnected, isEddyStoneScanInProgress,
-                isRemoteFittingConnection, isMainActivityOnScreen, earSide,
-                hearingAidMap[EarSide.Left], hearingAidMap[EarSide.Right],
-                eddyStoneMap[EarSide.Left], eddyStoneMap[EarSide.Right])
+                isRemoteFittingConnection, isMainActivityOnScreen, earSide)
         }
     }
 }
