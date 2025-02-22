@@ -81,9 +81,6 @@ class LoadingActivityEventListener @Inject constructor (@ApplicationContext cont
     @Synchronized
     fun isListenerOnBoard() : Boolean
     {
-        if (mListener == null)
-            return false
-
-        return mListener?.isAlive!!
+        return if (mListener == null) false else mListener?.isAlive!!
     }
 }

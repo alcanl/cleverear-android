@@ -74,14 +74,16 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_self_fitting)
         initializeNavController()
-        EventBus.getDefault().register(this)
 
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
     }
 
     override fun onDestroy()
     {
         super.onDestroy()
-        EventBus.getDefault().unregister(this)
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)

@@ -40,8 +40,7 @@ class AutoConnectActivity : AppCompatActivity() {
     override fun onResume()
     {
         super.onResume()
-        with(configuration) {
-
+        configuration.apply {
             mBinding.apply {
 
                 imageButtonLeft.isEnabled = if (hearingAidMap[EarSide.Left] != null) !hearingAidMap[EarSide.Left]?.isConnected!!

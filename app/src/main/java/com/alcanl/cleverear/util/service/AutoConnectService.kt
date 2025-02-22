@@ -305,39 +305,36 @@ class AutoConnectService : Service()
 
     private fun isConnected() : Boolean
     {
-        return if (configuration.isDoubleDeviceConnection)
-                configuration.hearingAidMap[EarSide.Left]?.isConnected!! && configuration.hearingAidMap[EarSide.Right]?.isConnected!!
+        return with (configuration) {
+            if (isDoubleDeviceConnection)
+                hearingAidMap[EarSide.Left]?.isConnected!! && hearingAidMap[EarSide.Right]?.isConnected!!
             else
-                configuration.hearingAidMap[configuration.earSide]?.isConnected ?: false
+                hearingAidMap[configuration.earSide]?.isConnected ?: false
+        }
     }
 
-    private fun checkDeviceConnectionState(hearingAid: HearingAid, adapter: BluetoothAdapter)
-    {
-        hearingAid.isConnected = isConnected(adapter.getRemoteDevice(hearingAid.address))
-    }
-
+    @SuppressLint("MissingPermission")
     @Synchronized
     private fun scheduledThreadConnectDeviceCallback(adapter: BluetoothAdapter, hearingAid: HearingAid)
     {
         try {
-            startDeviceScan(adapter)
+            adapter.startDiscovery()
             Thread.sleep(10000)
-            with(configuration) {
-                if (canBondDeviceReConnect) {
-                    hearingAid.getPropertiesFromSDK(productManager, eventHandler)
-                    hearingAid.communicationAdaptor?.connect()
-                    Thread.sleep(10000)
-                    checkDeviceConnectionState(hearingAid, adapter)
+            configuration.apply {
+                if (canBondDeviceReConnect)
+                    hearingAid.apply {
+                        getPropertiesFromSDK(productManager, eventHandler)
+                        communicationAdaptor?.connect()
+                        Thread.sleep(10000)
+                        isConnected = isConnected(adapter.getRemoteDevice(hearingAid.address))
 
-                    if (hearingAid.isConnected && hearingAid.isDeviceInRange)
-                        hearingAid.apply {
+                        if (isConnected && isDeviceInRange) {
                             isDeviceInRange = false
                             readDeviceConfiguration()
                             if (isEddystoneTLM)
-                                eddyStoneMap[this.side] = EddystoneHearingAid()
+                                eddyStoneMap[side] = EddystoneHearingAid()
                         }
-                    else {}
-                }
+                    }
                 else
                     Log.d(AutoConnectService::class.simpleName, "There is not any hearing aid in range!")
             }
@@ -345,7 +342,7 @@ class AutoConnectService : Service()
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
         finally {
-            stopDeviceScan(adapter)
+            adapter.cancelDiscovery()
         }
     }
 
@@ -387,18 +384,4 @@ class AutoConnectService : Service()
             .setContentIntent(pendingIntent)
             .build()
     }
-
-    @SuppressLint("MissingPermission")
-    private fun startDeviceScan(adapter: BluetoothAdapter)
-    {
-        adapter.startDiscovery()
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun stopDeviceScan(adapter: BluetoothAdapter)
-    {
-        adapter.cancelDiscovery()
-
-    }
-
 }

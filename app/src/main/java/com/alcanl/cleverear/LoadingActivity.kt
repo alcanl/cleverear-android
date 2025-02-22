@@ -77,9 +77,11 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     {
         super.onCreate(savedInstanceState)
         initialize()
-        EventBus.getDefault().register(this)
 
-        with(configuration) {
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
+
+        configuration.apply {
             if (isConnectedBefore)
                 loadPrefs()
 
@@ -87,34 +89,30 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                 handleSingleDeviceConnection()
             else
                 handleDoubleDeviceConnection()
-
         }
     }
 
-    override fun onResume() {
+    override fun onResume()
+    {
         super.onResume()
 
         if (!listener.isListenerOnBoard())
             listener.startEventListener()
     }
-    override fun onStop()
-    {
-        super.onStop()
-        if (listener.isListenerOnBoard())
-            listener.stopListener()
 
-    }
     override fun onDestroy()
     {
         super.onDestroy()
         if (listener.isListenerOnBoard())
             listener.stopListener()
 
-        EventBus.getDefault().unregister(this)
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
+
         unregisterReceiver(mBondRequestReceiver)
         handleSharedPrefs()
 
-        with(configuration) {
+        configuration.apply {
             if (isDoubleDeviceConnection) {
                 if (hasForegroundServicePermission(this@LoadingActivity) &&
                     !isServiceOnBoard && isConnected &&
@@ -134,7 +132,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
     {
         if (event is ConnectionEvent)
             if (event.connectionData == 3)
-                with(configuration) {
+                configuration.apply {
                     if (!isDoubleDeviceConnection) {
                         hearingAidMap[earSide]?.isConnected = true
                         isConnected = true
@@ -160,7 +158,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     private fun handleSharedPrefs()
     {
-        with(configuration) {
+        configuration.apply {
             if (isConnected)
                 if (isDoubleDeviceConnection)
                     hearingAidMap.forEach { saveHearingAidInfoToPrefs(this@LoadingActivity, it.value) }
@@ -171,7 +169,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     private fun handleSingleDeviceConnection()
     {
-        with(configuration) {
+         configuration.apply {
             checkDeviceBondStatus(hearingAidMap[earSide]!!)
 
             hearingAidMap[earSide]!!.getPropertiesFromSDK(productManager, eventHandler)
