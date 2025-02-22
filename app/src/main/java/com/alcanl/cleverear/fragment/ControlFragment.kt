@@ -26,7 +26,6 @@ import com.alcanl.cleverear.util.listeners.ControlFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.MemoryEvent
-import com.alcanl.cleverear.util.markServiceAsClosed
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ControlFragmentListenersViewModel
 import com.ark.ArkException
@@ -224,15 +223,18 @@ class ControlFragment : Fragment(), IEventListener {
 
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
 
-                if (configuration.isServiceOnBoard) {
-                    markServiceAsClosed(requireContext())
-                    requireActivity().stopService(
-                        Intent(
-                            requireActivity(),
-                            AutoConnectService::class.java
+                configuration.apply {
+                    if (isServiceOnBoard) {
+                        isSystemRestartOnService = false
+                        requireActivity().stopService(
+                            Intent(
+                                requireActivity(),
+                                AutoConnectService::class.java
+                            )
                         )
-                    )
+                    }
                 }
+
                 requireActivity().finish()
                 configuration.apply {
                     isConnected = false

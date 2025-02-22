@@ -1,8 +1,13 @@
 package com.alcanl.cleverear.di.module
 
+import android.content.Context
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.cleanConfigurations
+import com.alcanl.cleverear.util.markServiceAsClosed
+import com.alcanl.cleverear.util.markServiceAsRestarted
+import com.alcanl.cleverear.util.saveConfigurations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +43,10 @@ object ConfigurationModule {
 
     var isConnectedBefore = false
 
+    var isAshaConnected = false
+
+    var isSystemRestartOnService = true
+
     var isUserDisconnected = false
 
     var isEddyStoneScanInProgress = false
@@ -67,5 +76,28 @@ object ConfigurationModule {
             else
                 hearingAidMap[earSide]?.isConnected ?: false
         } catch (_ : Throwable) { false }
+    }
+
+    fun setServiceStopAndKeepConnectionIfRequired(context: Context)
+    {
+        if (isConnected && !keepConnectionForServiceDestroy) {
+            if (isDoubleDeviceConnection)
+                hearingAidMap.forEach { it.value.endConnectionSession() }
+            else
+                hearingAidMap[earSide]?.endConnectionSession()
+
+            isConnected = false
+        }
+
+        if (isSystemRestartOnService) {
+            saveConfigurations(this, context)
+            markServiceAsRestarted(context)
+        }
+        else {
+            cleanConfigurations(context)
+            markServiceAsClosed(context)
+        }
+
+        isServiceOnBoard = false
     }
 }

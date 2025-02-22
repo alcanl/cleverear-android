@@ -32,7 +32,6 @@ import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantS
 import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantUnSuccessDialog
 import com.alcanl.cleverear.util.dialog.showBackgroundLocationPermissionActionDialog
 import com.alcanl.cleverear.util.hasBackgroundLocationPermission
-import com.alcanl.cleverear.util.markServiceAsClosed
 import com.alcanl.cleverear.util.service.AutoConnectService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -125,7 +124,7 @@ class MainContainerActivity : AppCompatActivity() {
             handler.postDelayed( {
                 if (isConnected && isServiceOnBoard && !trackLocationAlwaysSuccessFlag) {
                     keepConnectionForServiceDestroy = true
-                    markServiceAsClosed(this@MainContainerActivity)
+                    isSystemRestartOnService = false
                     stopService(Intent(this@MainContainerActivity, AutoConnectService::class.java))
                 }
             }, 2000)

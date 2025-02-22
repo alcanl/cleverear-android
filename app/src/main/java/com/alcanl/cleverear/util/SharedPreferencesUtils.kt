@@ -163,6 +163,13 @@ fun getEqualizerDTOPref(context: Context, configuration: ConfigurationModule, fi
     )
 }
 
+fun cleanConfigurations(context: Context)
+{
+    val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
+    editor.putString(CONFIGURATION_JSON, "")
+    editor.apply()
+}
+
 fun markServiceAsRestarted(context: Context)
 {
     val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)

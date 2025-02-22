@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.LoadingActivity
+import com.alcanl.cleverear.MainActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -34,7 +35,6 @@ import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
-import com.alcanl.cleverear.util.markServiceAsClosed
 import com.alcanl.cleverear.util.scan.DeviceScanner
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
@@ -90,18 +90,23 @@ class ConnectionFragment : Fragment(), IEventListener {
             lifecycleScope.launch(Dispatchers.Main) {
                 Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
 
-                if (configuration.isServiceOnBoard) {
-                    markServiceAsClosed(requireContext())
-                    requireActivity().stopService(
-                        Intent(
-                            requireActivity(),
-                            AutoConnectService::class.java
+                configuration.apply {
+                    if (isServiceOnBoard) {
+                        isSystemRestartOnService = false
+                        requireActivity().stopService(
+                            Intent(
+                                requireActivity(),
+                                AutoConnectService::class.java
+                            )
                         )
-                    )
+                    }
                 }
-                requireActivity().finish()
                 try {
                     configuration.apply {
+                        if (isAshaConnected)
+                            requireActivity().apply {
+                                startActivity(Intent(this, MainActivity::class.java))
+                            }
                         isConnected = false
                         hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
                             .values.first().isConnected = false
@@ -109,6 +114,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                 } catch (ex: NoSuchElementException) {
                     Log.e(ConnectionFragment::class.simpleName, ex.message!!)
                 }
+                requireActivity().finish()
             }
 
         else if (event is DeviceFoundEvent) {
@@ -453,7 +459,7 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             if (isServiceOnBoard) {
                 keepConnectionForServiceDestroy = false
-                markServiceAsClosed(requireContext())
+                isSystemRestartOnService = false
                 requireActivity().stopService(
                     Intent(
                         requireActivity(),

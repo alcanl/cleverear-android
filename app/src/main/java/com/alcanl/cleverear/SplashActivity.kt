@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivitySplashBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
+import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.dialog.showDeviceConnectedBeforeDialog
 import com.alcanl.cleverear.util.getLeftHearingAidAddress
@@ -66,8 +67,6 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     @Inject
     lateinit var handler : Handler
-
-    private var mIsAshaConnected = false
 
     private lateinit var mAddressArray : Array<String>
 
@@ -216,7 +215,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
         if (mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) })
-            mIsAshaConnected = true
+            configuration.isAshaConnected = true
     }
 
     private fun finalizeSplash()
@@ -230,7 +229,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         }
         else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
         {
-            if (mIsAshaConnected) {
+            if (configuration.isAshaConnected) {
                 startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
                 finish()
             }
@@ -312,7 +311,13 @@ class SplashActivity : AppCompatActivity(), IEventListener {
 
     private fun alertDialogPositiveButtonClicked()
     {
-        startActivity(Intent(this, AutoConnectActivity::class.java))
+        val bundle = Bundle()
+        bundle.putBoolean(BUNDLE_INTENT_FROM_SPLASH, true)
+        Intent(this, AutoConnectActivity::class.java).apply {
+            putExtras(bundle)
+            setResult(RESULT_OK, this)
+            startActivity(this)
+        }
         finish()
     }
 

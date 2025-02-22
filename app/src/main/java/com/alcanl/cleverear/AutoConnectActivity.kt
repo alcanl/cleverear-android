@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityAutoConnectBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
+import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
 import com.alcanl.cleverear.util.getRightHearingAidModelNumber
@@ -234,6 +235,9 @@ class AutoConnectActivity : AppCompatActivity() {
 
     fun onBackButtonClicked()
     {
+        if (intent.getBooleanExtra(BUNDLE_INTENT_FROM_SPLASH, false))
+            startActivity(Intent(this, MainActivity::class.java))
+
         finish()
     }
 }

@@ -38,9 +38,7 @@ import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isServiceRestarted
-import com.alcanl.cleverear.util.markServiceAsRestarted
 import com.alcanl.cleverear.util.readConfigurations
-import com.alcanl.cleverear.util.saveConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
@@ -101,14 +99,6 @@ class AutoConnectService : Service()
         throw UnsupportedOperationException()
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?)
-    {
-        super.onTaskRemoved(rootIntent)
-        saveConfigurations(configuration, this)
-        markServiceAsRestarted(this)
-        Log.i(AutoConnectService::class.simpleName, "Service Task Removed")
-    }
-
     override fun onDestroy()
     {
         super.onDestroy()
@@ -117,18 +107,7 @@ class AutoConnectService : Service()
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
             scheduledExecutor.shutdownNow()
-
-            configuration.apply {
-                if (isConnected && !keepConnectionForServiceDestroy) {
-                    if (isDoubleDeviceConnection)
-                        hearingAidMap.forEach { it.value.endConnectionSession() }
-                    else
-                        hearingAidMap[earSide]?.endConnectionSession()
-
-                    isConnected = false
-                }
-                isServiceOnBoard = false
-            }
+            configuration.setServiceStopAndKeepConnectionIfRequired(this)
             Log.i(AutoConnectService::class.simpleName, "Service Stopped")
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
