@@ -141,22 +141,31 @@ class AutoConnectService : Service()
 
     private fun initialize(intent: Intent?)
     {
-        registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
-        registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
-        registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
+        try {
+            registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
+            registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
+            registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
 
-        if (isServiceRestarted(this))
-            handleServiceRestart(intent)
+            if (isServiceRestarted(this))
+                handleServiceRestart(intent)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            startForeground(1, createServiceNotification(), FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or FOREGROUND_SERVICE_TYPE_LOCATION)
-        else
-            startForeground(1, createServiceNotification())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                startForeground(
+                    1,
+                    createServiceNotification(),
+                    FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or FOREGROUND_SERVICE_TYPE_LOCATION
+                )
+            else
+                startForeground(1, createServiceNotification())
 
-        mHandler = AutoConnectHandler(this)
-        configuration.isServiceOnBoard = true
-        checkDeviceConnectionState(intent)
-        checkDeviceEddystoneValues()
+            mHandler = AutoConnectHandler(this)
+            configuration.isServiceOnBoard = true
+            checkDeviceConnectionState(intent)
+            checkDeviceEddystoneValues()
+
+        } catch (ex: Exception) {
+            Log.e(AutoConnectService::class.simpleName, "Service Initialize Error")
+        }
     }
 
     private class AutoConnectHandler(service: AutoConnectService) : Handler(Looper.myLooper()!!) {
