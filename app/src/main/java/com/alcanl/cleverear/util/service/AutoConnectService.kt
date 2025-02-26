@@ -146,7 +146,7 @@ class AutoConnectService : Service()
             registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
             registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
 
-            if (isServiceRestarted(this))
+            if (isServiceRestarted(this) && !configuration.isMainActivityOnScreen)
                 handleServiceRestart(intent)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

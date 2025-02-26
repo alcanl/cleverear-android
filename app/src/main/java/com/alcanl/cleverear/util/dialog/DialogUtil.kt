@@ -78,6 +78,7 @@ fun showBackgroundLocationPermissionActionDialog(activity: AppCompatActivity, co
         {
             configuration.apply {
                 keepConnectionForServiceDestroy = true
+                isSystemRestartOnService = false
 
                 if (isServiceOnBoard)
                     (activity as MainContainerActivity).stopService(Intent(activity, AutoConnectService::class.java))
