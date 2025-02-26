@@ -151,7 +151,7 @@ class ControlFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Main) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection) {
                     if (earSide == EarSide.Left)
                         mBinding.batteryViewLeftDevice.batteryLevel = event.batteryData
@@ -176,7 +176,7 @@ class ControlFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Main) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection) {
                     hearingAidMap[earSide]?.volume = event.volumeData
                     mBinding.sliderCommon.value = hearingAidMap[earSide]?.volume?.toFloat() ?: 0F
@@ -203,7 +203,7 @@ class ControlFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Default) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
                 else
@@ -269,33 +269,23 @@ class ControlFragment : Fragment(), IEventListener {
 
     private fun initBatteryViews()
     {
-        if (configuration.isDoubleDeviceConnection) {
-            with(configuration.hearingAidMap) {
-
-                mBinding.batteryViewLeftDevice. apply {
-                    batteryLevel = this@with[EarSide.Left]?.batteryLevel ?: 95
-                    mBinding.batteryViewLeftDevice.visibility = View.VISIBLE
-                }
-                mBinding.batteryViewRightDevice.apply {
-                    batteryLevel = this@with[EarSide.Right]?.batteryLevel ?: 95
-                    mBinding.batteryViewRightDevice.visibility = View.VISIBLE
-                }
-            }
-        }
-        else {
-
-            with(configuration.hearingAidMap[configuration.earSide]!!) {
-                if (side == EarSide.Left)
-                    mBinding.batteryViewLeftDevice.apply {
-                        batteryLevel = this@with.batteryLevel
-                        visibility = View.VISIBLE
+        configuration.apply {
+            if (isDoubleDeviceConnection)
+                hearingAidMap.let {
+                    mBinding.apply {
+                        batteryViewLeftDevice.batteryLevel = it[EarSide.Left]?.batteryLevel ?: 95
+                        batteryViewRightDevice.batteryLevel = it[EarSide.Right]?.batteryLevel ?: 95
                     }
-                else
-                    mBinding.batteryViewRightDevice.apply {
-                        batteryLevel = this@with.batteryLevel
-                        visibility = View.VISIBLE
+                }
+            else
+                hearingAidMap[earSide]?.let {
+                    mBinding.apply {
+                        if (it.side == EarSide.Left)
+                            batteryViewLeftDevice.batteryLevel = it.batteryLevel
+                        else
+                            batteryViewRightDevice.batteryLevel = it.batteryLevel
                     }
-            }
+                }
         }
     }
 
@@ -454,7 +444,7 @@ class ControlFragment : Fragment(), IEventListener {
     fun memoryButtonClicked(buttonNumber: Int, button: Button)
     {
         try {
-            with(configuration) {
+            configuration.apply {
                 if (isDoubleDeviceConnection)
                     hearingAidMap.forEach {
                         it.value.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
