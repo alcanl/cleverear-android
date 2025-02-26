@@ -118,7 +118,7 @@ class AdvancedFragmentEventListener @Inject constructor (@ApplicationContext con
     private fun handleVolumeEvent(event: Event, eventSender: String)
     {
         try {
-            Log.e(VolumeChangeEvent::class.java.simpleName, event.data)
+            Log.i(VolumeChangeEvent::class.java.simpleName, event.data)
             val volumeEvent = VolumeEvent(this)
             volumeEvent.eventSender = eventSender
             volumeEvent.volumeData = parseJsonVolumeData(event.data, mContext)
