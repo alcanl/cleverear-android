@@ -117,24 +117,19 @@ class AutoConnectService : Service()
     private fun handleServiceRestart()
     {
         readConfigurations(configuration, this)
-        threadPool.execute {
-            threadPool.submit {
-                configuration.apply {
+        configuration.apply {
 
-                    if (isDoubleDeviceConnection) {
-                        hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
-                        hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
-                    }
-                    else if (earSide == EarSide.Left)
-                        hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
-                    else
-                        hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
+            if (isDoubleDeviceConnection) {
+                hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
+                hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
+            }
+            else if (earSide == EarSide.Left)
+                hearingAidMap[EarSide.Left] = getLeftSideHearingAid(this@AutoConnectService)
+            else
+                hearingAidMap[EarSide.Right] = getRightSideHearingAid(this@AutoConnectService)
 
-                    if (hearingAidMap.any { it.value.isEddystoneTLM })
-                        hearingAidMap.filter { it.value.isEddystoneTLM }
-                            .forEach { eddyStoneMap[it.value.side] = EddystoneHearingAid() }
-                }
-            }.get()
+            if (hearingAidMap.any { it.value.isEddystoneTLM })
+                hearingAidMap.filter { it.value.isEddystoneTLM }.forEach { eddyStoneMap[it.value.side] = EddystoneHearingAid() }
         }
     }
 
