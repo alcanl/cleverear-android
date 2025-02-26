@@ -7,6 +7,9 @@
         <import type="com.alcanl.cleverear.di.module.ConfigurationModule"/>
         <import type="com.alcanl.cleverear.util.EarSide"/>
         <import type="android.view.View"/>
+        <import type="androidx.core.content.ContextCompat"/>
+        <import type="android.content.Context"/>
+        <import type="com.alcanl.cleverear.R"/>
         <variable name="viewModel" type="com.alcanl.cleverear.viewmodel.AdvancedFragmentListenersViewModel" />
         <variable name="config" type="ConfigurationModule" />
     </data>
@@ -220,17 +223,17 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.hearingAidMap.get(EarSide.Left).component13() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component13()}"
                         android:valueFrom="0.0"
                         android:valueTo="100.0"
-                        android:visibility="visible"
-                        app:haloColor="@color/design_default_color_secondary_variant"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.VISIBLE : View.INVISIBLE : View.VISIBLE}"
+                        app:haloColor="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.497"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:onValueChangeListener="@{(value) -> viewModel.handleAuxDualSliderValueChange(value)}"
-                        app:thumbColor="@color/design_default_color_secondary_variant"
+                        app:thumbColor="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:thumbRadius="16dp"
-                        app:trackColorActive="@color/design_default_color_secondary_variant"
+                        app:trackColorActive="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:trackColorInactive="#A8A3A3"
                         app:trackHeight="12dp" />
 
@@ -244,7 +247,7 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Right).component13() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component13()}"
                         android:valueFrom="0.0"
                         android:valueTo="100.0"
-                        android:visibility="visible"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : View.INVISIBLE}"
                         app:haloColor="@color/right_device_slider"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -266,7 +269,7 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Left).component13() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component13()}"
                         android:valueFrom="0.0"
                         android:valueTo="100.0"
-                        android:visibility="visible"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : View.INVISIBLE}"
                         app:haloColor="@color/left_device_slider"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -284,6 +287,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="57dp"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : config.INSTANCE.earSide.equals(EarSide.Left) ? View.VISIBLE : View.INVISIBLE}"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/textview_L_text"
                         android:textColor="@color/black"
@@ -297,6 +301,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="57dp"
                         android:layout_marginEnd="32dp"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : config.INSTANCE.earSide.equals(EarSide.Right) ? View.VISIBLE : View.INVISIBLE}"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/textview_R_text"
                         android:textColor="@color/black"
@@ -337,6 +342,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="57dp"
                         android:layout_marginEnd="32dp"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : config.INSTANCE.earSide.equals(EarSide.Right) ? View.VISIBLE : View.INVISIBLE}"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/textview_R_text"
                         android:textColor="@color/black"
@@ -351,6 +357,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="57dp"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : config.INSTANCE.earSide.equals(EarSide.Left) ? View.VISIBLE : View.INVISIBLE}"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/textview_L_text"
                         android:textColor="@color/black"
@@ -369,7 +376,7 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Left).component14() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component14()}"
                         android:valueFrom="8.0"
                         android:valueTo="88.0"
-                        android:visibility="visible"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : View.INVISIBLE}"
                         app:haloColor="@color/left_device_slider"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -390,17 +397,17 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Left).component14() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component14()}"
                         android:valueFrom="8.0"
                         android:valueTo="88.0"
-                        android:visibility="visible"
-                        app:haloColor="@color/design_default_color_secondary_variant"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.VISIBLE : View.INVISIBLE : View.VISIBLE}"
+                        app:haloColor="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/sliderMicRight"
                         app:layout_constraintHorizontal_bias="0.497"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:onValueChangeListener="@{(value) -> viewModel.handleMicDualSliderValueChange(value)}"
-                        app:thumbColor="@color/design_default_color_secondary_variant"
+                        app:thumbColor="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:thumbRadius="16dp"
-                        app:trackColorActive="@color/design_default_color_secondary_variant"
+                        app:trackColorActive="@{config.INSTANCE.doubleDeviceConnection ? ContextCompat.getColor(context, R.color.design_default_color_secondary_variant) : config.INSTANCE.earSide.equals(EarSide.Left) ? ContextCompat.getColor(context, R.color.left_device_slider) : ContextCompat.getColor(context, R.color.right_device_slider)}"
                         app:trackColorInactive="#A8A3A3"
                         app:trackHeight="12dp" />
 
@@ -414,7 +421,7 @@
                         android:value="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.hearingAidMap.get(EarSide.Right).component14() : config.INSTANCE.hearingAidMap.get(config.INSTANCE.earSide).component14()}"
                         android:valueFrom="8.0"
                         android:valueTo="88.0"
-                        android:visibility="visible"
+                        android:visibility="@{config.INSTANCE.doubleDeviceConnection ? config.INSTANCE.dualDeviceConfig ? View.INVISIBLE : View.VISIBLE : View.INVISIBLE}"
                         app:haloColor="@color/right_device_slider"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

@@ -12,6 +12,7 @@
     <color name="left_device_slider">#FF01579B</color>
     <color name="colorGrayText">#C3C4C8</color>
     <color name="secondary_variant">#018786</color>
+    <color name="design_default_color_secondary_variant">#018786</color>
 </resources>
 
 

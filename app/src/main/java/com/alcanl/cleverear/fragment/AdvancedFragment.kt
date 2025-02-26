@@ -2,7 +2,6 @@ package com.alcanl.cleverear.fragment
 
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -38,7 +37,6 @@ import com.alcanl.cleverear.viewmodel.AdvancedFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.ParameterSpace
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -236,66 +234,6 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     private fun initialize()
     {
-        initBinding()
-        initSliders()
-        initTextViews()
-    }
-
-    private fun initSliders()
-    {
-        with(configuration) {
-            if (!isDoubleDeviceConnection) {
-                with(mBinding) {
-                    sliderAuxLeft.visibility = View.INVISIBLE
-                    sliderAuxRight.visibility= View.INVISIBLE
-                    sliderMicLeft.visibility = View.INVISIBLE
-                    sliderMicRight.visibility = View.INVISIBLE
-                    initCommonSliderForSingleDevice(sliderMicCommon)
-                    initCommonSliderForSingleDevice(sliderAuxCommon)
-                }
-            }
-            else
-                with(mBinding) {
-                    if (!isDualDeviceConfig) {
-                        sliderAuxCommon.visibility = View.INVISIBLE
-                        sliderMicCommon.visibility = View.INVISIBLE
-                    }
-                    else {
-                        sliderMicLeft.visibility = View.INVISIBLE
-                        sliderAuxLeft.visibility = View.INVISIBLE
-                        sliderMicRight.visibility = View.INVISIBLE
-                        sliderAuxRight.visibility = View.INVISIBLE
-                    }
-                }
-        }
-    }
-
-    private fun initCommonSliderForSingleDevice(slider: Slider)
-    {
-        slider.apply {
-            visibility = View.VISIBLE
-            isEnabled = true
-            trackActiveTintList = initCommonSliderTheme()
-            thumbTintList = initCommonSliderTheme()
-        }
-    }
-
-    private fun initCommonSliderTheme() : ColorStateList
-    {
-        return if (configuration.earSide == EarSide.Left)
-            AppCompatResources.getColorStateList(
-                requireContext(),
-                R.color.left_device_slider
-            )
-        else
-            AppCompatResources.getColorStateList(
-                requireContext(),
-                R.color.right_device_slider
-            )
-    }
-
-    private fun initBinding()
-    {
         mBinding.viewModel = AdvancedFragmentListenersViewModel(this)
     }
 
@@ -353,37 +291,6 @@ class AdvancedFragment : Fragment(), IEventListener {
         }
     }
 
-    private fun initTextViews()
-    {
-        with(configuration) {
-            if (isDoubleDeviceConnection) {
-                if (isDualDeviceConfig)
-                    mBinding.apply {
-                        textViewAuxL.visibility = View.INVISIBLE
-                        textViewAuxR.visibility = View.INVISIBLE
-                        textViewMicL.visibility = View.INVISIBLE
-                        textViewMicR.visibility = View.INVISIBLE
-                    }
-                else
-                    return
-            }
-
-            else
-                if (earSide == EarSide.Left)
-                    mBinding.apply {
-                        textViewMicR.visibility = View.INVISIBLE
-                        textViewAuxR.visibility = View.INVISIBLE
-                    }
-
-                else
-                    mBinding.apply {
-                        textViewAuxL.visibility = View.INVISIBLE
-                        textViewMicL.visibility = View.INVISIBLE
-                    }
-
-        }
-    }
-
     private fun micSliderValueChanged(value: Float, earSide: EarSide)
     {
         lifecycleScope.launch(Dispatchers.IO) { micSliderValueChangedCallback(value, earSide) }
@@ -393,7 +300,7 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         mutex.withLock {
             try {
-                with(configuration) {
+                configuration.apply {
                     if (isConnected) {
                         hearingAidMap[earSide]?.wirelessControl?.micAttenuation = value.toInt()
                         hearingAidMap[earSide]?.micAttenuation = value.toInt()
@@ -452,7 +359,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     fun modeButtonClicked(view: View)
     {
-        with(configuration) {
+        configuration.apply {
             if (isConnected) {
                 setSelectedModeButtonView(view as Button)
 
@@ -466,7 +373,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     fun micDualSliderValueChanged(value: Float)
     {
-        with(configuration) {
+        configuration.apply {
             if (isDoubleDeviceConnection) {
                 micLeftSliderValueChanged(value)
                 micRightSliderValueChanged(value)
@@ -483,7 +390,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
     fun auxDualSliderValueChanged(value: Float)
     {
-        with(configuration) {
+        configuration.apply {
             if (isDoubleDeviceConnection) {
                 auxLeftSliderValueChanged(value)
                 auxRightSliderValueChanged(value)
@@ -548,7 +455,7 @@ class AdvancedFragment : Fragment(), IEventListener {
 
                     if (!isDualDeviceConfig)
                         lifecycleScope.launch(Dispatchers.Main) {
-                            with(mBinding) {
+                            mBinding.apply {
                                 sliderAuxLeft.startAuxMicSlidersFirstAnimation(
                                     this,
                                     requireContext(),

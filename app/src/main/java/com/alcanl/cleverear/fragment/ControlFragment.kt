@@ -33,7 +33,6 @@ import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ControlFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.ParameterSpace
-import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -99,8 +98,6 @@ class ControlFragment : Fragment(), IEventListener {
             return
         }
 
-        lifecycleScope.launch(Dispatchers.Main) { initSliders() }
-        lifecycleScope.launch(Dispatchers.Main) { initTextViews() }
         lifecycleScope.launch(Dispatchers.Main) { initActiveMemory(if (configuration.isDoubleDeviceConnection)
             configuration.hearingAidMap[EarSide.Left]?.currentMemory?.value() ?: 0
         else
@@ -307,37 +304,11 @@ class ControlFragment : Fragment(), IEventListener {
         mBinding.viewModel = ControlFragmentListenersViewModel(this)
     }
 
-    private fun initDoubleDeviceConnectionSliders()
-    {
-        mBinding.apply {
-            sliderLeft.apply {
-                visibility = View.VISIBLE
-                textViewLeftSeekBar.visibility = View.VISIBLE
-            }
-            sliderRight.apply {
-                visibility = View.VISIBLE
-                textViewRightSeekBar.visibility = View.VISIBLE
-            }
-            sliderCommon.visibility = View.INVISIBLE
-            textViewCommon.visibility = View.INVISIBLE
-        }
-    }
-
     private fun initialize()
     {
         initBinding()
         initMemoryButtons()
         initBatteryViews()
-    }
-
-    private fun initTextViews()
-    {
-        if (configuration.isDualDeviceConfig) {
-            mBinding.apply {
-                textViewLeftSeekBar.visibility = View.INVISIBLE
-                textViewRightSeekBar.visibility = View.INVISIBLE
-            }
-        }
     }
 
     private fun initMemoryButtons()
@@ -359,6 +330,7 @@ class ControlFragment : Fragment(), IEventListener {
                 initMemoryButtons(it, mBinding.tableLayout.getChildAt(0) as TableRow)
         }
     }
+
     private fun checkEnabledMemoryCount(hearingAid: HearingAid) : Int
     {
         var count = 0
@@ -373,43 +345,10 @@ class ControlFragment : Fragment(), IEventListener {
 
         return count
     }
+
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
         (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
-    }
-
-    private fun initSliders()
-    {
-        if (configuration.isConnected) {
-            if (!configuration.isDoubleDeviceConnection)
-                initSliders(mBinding.sliderCommon, configuration.hearingAidMap[configuration.earSide]!!)
-
-            else
-                initDoubleDeviceConnectionSliders()
-
-            if (configuration.isDualDeviceConfig)
-                mBinding. apply {
-                    sliderLeft.visibility = View.INVISIBLE
-                    sliderRight.visibility = View.INVISIBLE
-                    sliderCommon.visibility = View.VISIBLE
-                }
-        }
-    }
-    private fun initSliders(slider: Slider,  hearingAid: HearingAid)
-    {
-        slider.apply {
-            value = hearingAid.volume.toFloat()
-            trackActiveTintList = AppCompatResources.getColorStateList(
-                requireContext(), if (hearingAid.side == EarSide.Left) R.color.left_device_slider
-                else R.color.right_device_slider
-            )
-            thumbTintList = AppCompatResources.getColorStateList(
-                requireContext(), if (hearingAid.side == EarSide.Left) R.color.left_device_slider
-                else R.color.right_device_slider
-            )
-            mBinding.textViewCommon.text = getString(if (hearingAid.side == EarSide.Left) R.string.textview_left_device_text
-            else R.string.textview_right_device_text)
-        }
     }
 
     private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)
@@ -423,6 +362,7 @@ class ControlFragment : Fragment(), IEventListener {
                 setButtonsDefaultColor(it, mBinding.tableLayout.getChildAt(0) as TableRow, except)
         }
     }
+
     private fun setButtonsDefaultColor(bound: Int, tableRow: TableRow, except: Int)
     {
         (0..<bound).filter { it != except  }.forEach { tableRow.getChildAt(it).apply {
@@ -455,6 +395,7 @@ class ControlFragment : Fragment(), IEventListener {
             } catch (_: ArkException) {}
         }
     }
+
     private fun initActiveMemory(num: Int)
     {
         val button = with(mBinding) {
@@ -493,20 +434,7 @@ class ControlFragment : Fragment(), IEventListener {
             } catch (_: ArkException) {}
         }
     }
-    fun memoryButtonClicked(buttonNumber: Int, button: Button)
-    {
-        try {
-            with(configuration) {
-                if (isDoubleDeviceConnection)
-                    hearingAidMap.forEach {
-                        it.value.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
-                    }
-                else
-                    hearingAidMap[earSide]?.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
-            }
-            setSelectedMemoryButtonView(button, buttonNumber)
-        } catch (_: ArkException) {}
-    }
+
     private fun setSelectedMemoryButtonView(button: Button, num : Int)
     {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -522,9 +450,25 @@ class ControlFragment : Fragment(), IEventListener {
             else configuration.hearingAidMap[EarSide.Left]!!, num)
         }
     }
+
+    fun memoryButtonClicked(buttonNumber: Int, button: Button)
+    {
+        try {
+            with(configuration) {
+                if (isDoubleDeviceConnection)
+                    hearingAidMap.forEach {
+                        it.value.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
+                    }
+                else
+                    hearingAidMap[earSide]?.wirelessControl?.currentMemory = ParameterSpace.value(buttonNumber)
+            }
+            setSelectedMemoryButtonView(button, buttonNumber)
+        } catch (_: ArkException) {}
+    }
+
     fun sliderDualOnValueChanged(value: Float)
     {
-        with(configuration) {
+        configuration.apply {
             if (isDoubleDeviceConnection) {
                 sliderLeftEarOnValueChanged(value)
                 sliderRightEarOnValueChanged(value)
@@ -535,6 +479,7 @@ class ControlFragment : Fragment(), IEventListener {
                 sliderRightEarOnValueChanged(value)
         }
     }
+
     fun sliderLeftEarOnValueChanged(value: Float)
     {
         lifecycleScope.launch(Dispatchers.Default) { sliderLeftEarOnValueChangedCallback(value) }
@@ -544,6 +489,7 @@ class ControlFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Default) { sliderRightEarOnValueChangedCallback(value) }
     }
+
     fun switchOnCheckedChanged()
     {
         if (!configuration.isDualDeviceConfig)
