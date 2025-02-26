@@ -114,7 +114,7 @@ class AutoConnectService : Service()
         }
     }
 
-    private fun handleServiceRestart(intent: Intent?)
+    private fun handleServiceRestart()
     {
         readConfigurations(configuration, this)
         threadPool.execute {
@@ -135,7 +135,6 @@ class AutoConnectService : Service()
                             .forEach { eddyStoneMap[it.value.side] = EddystoneHearingAid() }
                 }
             }.get()
-            scheduledThreadCallback(intent)
         }
     }
 
@@ -147,7 +146,7 @@ class AutoConnectService : Service()
             registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
 
             if (isServiceRestarted(this) && !configuration.isMainActivityOnScreen)
-                handleServiceRestart(intent)
+                handleServiceRestart()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 startForeground(
