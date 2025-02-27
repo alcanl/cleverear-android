@@ -110,9 +110,9 @@ class MainContainerActivity : AppCompatActivity() {
         configuration.isMainActivityOnScreen = false
     }
 
-    override fun onResume()
+    override fun onPostResume()
     {
-        super.onResume()
+        super.onPostResume()
 
         configuration.apply {
 

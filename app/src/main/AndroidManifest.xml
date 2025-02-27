@@ -65,9 +65,11 @@
 
         <activity
             android:name=".MainContainerActivity"
+            android:launchMode="singleTask"
             android:exported="true" />
         <activity
             android:name=".SelfFittingActivity"
+            android:launchMode="singleTask"
             android:exported="true" />
         <activity
             android:name=".AutoConnectActivity"
