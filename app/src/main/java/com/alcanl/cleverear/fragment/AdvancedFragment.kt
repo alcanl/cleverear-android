@@ -144,7 +144,7 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Default) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.volume = event.volumeData
                 else
@@ -167,7 +167,7 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Default) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.batteryLevel = event.batteryData
                 else
@@ -183,7 +183,7 @@ class AdvancedFragment : Fragment(), IEventListener {
     {
         lifecycleScope.launch(Dispatchers.Default) {
 
-            with(configuration) {
+            configuration.apply {
                 if (!isDoubleDeviceConnection)
                     hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
                 else

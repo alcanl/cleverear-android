@@ -25,6 +25,7 @@ import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.determineHearingAidObjects
 import com.alcanl.cleverear.util.dialog.showDeviceConnectedBeforeDialog
 import com.alcanl.cleverear.util.getLeftHearingAidAddress
 import com.alcanl.cleverear.util.getRightHearingAidAddress
@@ -214,34 +215,39 @@ class SplashActivity : AppCompatActivity(), IEventListener {
     private fun handleConnectedBefore()
     {
         val adapter = getSystemService(BluetoothManager::class.java).adapter
-        configuration.isAshaConnected = mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) }
+        configuration.isAshaConnected = if (mAddressArray.isEmpty())
+                                            false
+                                        else mAddressArray.all { isConnected(adapter.getRemoteDevice(it)) }
     }
 
     private fun finalizeSplash()
     {
         handleConnectedBefore()
 
-        if (configuration.isConnected) {
-            val bundle = Bundle()
-            bundle.putBoolean(BUNDLE_INTENT_FROM_SPLASH, true)
-            Intent(this@SplashActivity, MainContainerActivity::class.java)
-                .apply { putExtras(bundle); setResult(RESULT_OK); startActivity(this); finish() }
-            return
-        }
-        else if (!configuration.isServiceOnBoard && configuration.isConnectedBefore)
-        {
-            if (configuration.isAshaConnected) {
-                startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
-                finish()
+        configuration.apply {
+            if (isConnected) {
+                val bundle = Bundle()
+                bundle.putBoolean(BUNDLE_INTENT_FROM_SPLASH, true)
+                Intent(this@SplashActivity, MainContainerActivity::class.java)
+                    .apply { putExtras(bundle); setResult(RESULT_OK); startActivity(this); finish() }
+                return
             }
-            else
-                showDeviceConnectedBeforeDialog(this,
-                    ::alertDialogPositiveButtonClicked,
-                    ::alertDialogNegativeButtonClicked)
-        }
-        else {
-            Intent(this@SplashActivity, MainActivity::class.java)
-                .apply { startActivity(this) }; finish()
+            else if (!isServiceOnBoard && isConnectedBefore)
+            {
+                if (isAshaConnected) {
+                    determineHearingAidObjects(this, this@SplashActivity)
+                    startActivity(Intent(this@SplashActivity, LoadingActivity::class.java))
+                    finish()
+                }
+                else
+                    showDeviceConnectedBeforeDialog(this@SplashActivity,
+                        ::alertDialogPositiveButtonClicked,
+                        ::alertDialogNegativeButtonClicked)
+            }
+            else {
+                Intent(this@SplashActivity, MainActivity::class.java)
+                    .apply { startActivity(this) }; finish()
+            }
         }
     }
     private fun checkPrefs()

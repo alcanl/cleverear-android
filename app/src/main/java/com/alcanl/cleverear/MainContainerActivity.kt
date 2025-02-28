@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivityMainContainerBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.fragment.AdvancedFragment
@@ -31,9 +33,12 @@ import com.alcanl.cleverear.util.dialog.CustomDialogSmsInformation
 import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantSuccessDialog
 import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantUnSuccessDialog
 import com.alcanl.cleverear.util.dialog.showBackgroundLocationPermissionActionDialog
+import com.alcanl.cleverear.util.dialog.showStopConnectionDialog
 import com.alcanl.cleverear.util.hasBackgroundLocationPermission
 import com.alcanl.cleverear.util.service.AutoConnectService
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
@@ -132,6 +137,24 @@ class MainContainerActivity : AppCompatActivity() {
             if (isConnected)
                 handler.postDelayed({ binding.navigationViewContainer.selectedItemId = R.id.navbar_control }, 1000)
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean
+    {
+        configuration.apply {
+            if (isConnected)
+                showStopConnectionDialog(this@MainContainerActivity) {
+                    binding.frameLayoutLoading.visibility = View.VISIBLE
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        configuration.hearingAidMap.forEach { it.value.endConnectionSession() }
+                        handler.postDelayed({ finish() }, 3000)
+                    }
+                }
+            else
+                finish()
+        }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onRequestPermissionsResult(

@@ -208,3 +208,14 @@ fun readConfigurations(configuration: ConfigurationModule, context: Context)
         mapper.toConfigurationModule(data, configuration)
     }
 }
+
+fun determineHearingAidObjects(configuration: ConfigurationModule, context: Context)
+{
+    configuration.apply {
+       if (getLeftHearingAidAddress(context).isNotBlank())
+           hearingAidMap[EarSide.Left] = getLeftSideHearingAid(context)
+
+       if (getRightHearingAidAddress(context).isNotBlank())
+           hearingAidMap[EarSide.Right] = getRightSideHearingAid(context)
+    }
+}

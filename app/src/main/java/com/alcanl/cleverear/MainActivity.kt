@@ -9,6 +9,8 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.View
@@ -37,6 +39,8 @@ import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiv
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
+private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 1001
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -121,6 +125,18 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray)
+    {
+        if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE &&
+            grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.toast_no_permission_splash_activity, Toast.LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, 1000)
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun bluetoothTurnedOn()
     {
         Toast.makeText(this, R.string.toast_bt_on, Toast.LENGTH_LONG).show()
@@ -150,7 +166,7 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.BLUETOOTH_ADMIN,
                     Manifest.permission.BLUETOOTH
-                ), 1
+                ), BLUETOOTH_PERMISSION_REQUEST_CODE
             )
         }
     }
@@ -168,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_ADMIN,
                     Manifest.permission.BLUETOOTH
                 ),
-                1
+                BLUETOOTH_PERMISSION_REQUEST_CODE
             )
     }
 
@@ -208,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_ADVERTISE
                 ),
-                1
+                BLUETOOTH_PERMISSION_REQUEST_CODE
             )
     }
 
@@ -308,8 +324,6 @@ class MainActivity : AppCompatActivity() {
             else
                 configuration.isBluetoothEnabled = true
     }
-
-
 
     fun onButtonSingleDeviceClick() {
 

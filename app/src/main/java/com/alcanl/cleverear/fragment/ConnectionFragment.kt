@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -34,13 +35,17 @@ import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.util.getSpannableDeviceString
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
+import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
 import com.alcanl.cleverear.util.listeners.event.DeviceFoundEvent
+import com.alcanl.cleverear.util.listeners.event.MemoryEvent
+import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.util.scan.DeviceScanner
 import com.alcanl.cleverear.util.service.AutoConnectService
 import com.alcanl.cleverear.viewmodel.ConnectionFragmentListenersViewModel
 import com.ark.ArkException
 import com.ark.AsyncResult
+import com.ark.ParameterSpace
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,42 +93,122 @@ class ConnectionFragment : Fragment(), IEventListener {
     override fun onEventReceive(event: EventObject)
     {
         if (isVisible)
-            if (event is ConnectionEvent && event.connectionData == 1 && !configuration.isUserDisconnected)
-                lifecycleScope.launch(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), R.string.toast_connection_lost_text, Toast.LENGTH_SHORT).show()
+            when (event) {
+                is VolumeEvent -> onVolumeEventReceived(event)
+                is MemoryEvent -> onMemoryEventReceived(event)
+                is BatteryEvent -> onBatteryEventReceived(event)
+                is ConnectionEvent -> onConnectionEventReceived(event)
+                is DeviceFoundEvent -> onDeviceFoundEventReceived(event)
+            }
+    }
 
-                    configuration.apply {
-                        if (isServiceOnBoard) {
-                            isSystemRestartOnService = false
-                            requireActivity().stopService(
-                                Intent(
-                                    requireActivity(),
-                                    AutoConnectService::class.java
-                                )
+    private fun onVolumeEventReceived(event: VolumeEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            configuration.apply {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.volume = event.volumeData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.volume = event.volumeData
+                    else
+                        hearingAidMap[EarSide.Right]?.volume = event.volumeData
+            }
+
+            launch(Dispatchers.Main) {
+                Toast.makeText(requireContext(), String.format(
+                    ContextCompat.getString(requireContext(),
+                        R.string.listener_volume_level_text
+                    ) + " %d", event.volumeData), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun onBatteryEventReceived(event: BatteryEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            configuration.apply {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.batteryLevel = event.batteryData
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address)
+                        hearingAidMap[EarSide.Left]?.batteryLevel = event.batteryData
+                    else
+                        hearingAidMap[EarSide.Right]?.batteryLevel = event.batteryData
+            }
+        }
+    }
+
+    private fun onMemoryEventReceived(event: MemoryEvent)
+    {
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            configuration.apply {
+                if (!isDoubleDeviceConnection)
+                    hearingAidMap[earSide]?.currentMemory = ParameterSpace.value(event.memoryData)
+                else
+                    if (event.eventSender == hearingAidMap[EarSide.Left]?.address!!)
+                        hearingAidMap[EarSide.Left]?.currentMemory = ParameterSpace.value(event.memoryData)
+                    else
+                        hearingAidMap[EarSide.Right]?.currentMemory = ParameterSpace.value(event.memoryData)
+            }
+        }
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            Toast.makeText(requireContext(), String.format(
+                ContextCompat.getString(requireContext(), R.string.text_active_memory)  + (event.memoryData + 1).toString()), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    private fun onConnectionEventReceived(event: ConnectionEvent)
+    {
+        if (event.connectionData == 1 && !configuration.isUserDisconnected)
+            lifecycleScope.launch(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.toast_connection_lost_text,
+                    Toast.LENGTH_SHORT).show()
+
+                configuration.apply {
+                    if (isServiceOnBoard) {
+                        isSystemRestartOnService = false
+                        requireActivity().stopService(
+                            Intent(
+                                requireActivity(),
+                                AutoConnectService::class.java
                             )
-                        }
+                        )
                     }
+
                     try {
-                        configuration.apply {
-                            if (isAshaConnected || requireActivity().intent.getBooleanExtra(BUNDLE_INTENT_FROM_SPLASH, false))
-                                requireActivity().apply {
-                                    startActivity(Intent(this, MainActivity::class.java))
-                                }
-                            isConnected = false
-                            hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
-                                .values.first().isConnected = false
-                        }
+                        if (isAshaConnected || requireActivity().intent.getBooleanExtra(
+                                BUNDLE_INTENT_FROM_SPLASH,
+                                false
+                        ))
+                            requireActivity().apply {
+                                startActivity(Intent(this, MainActivity::class.java))
+                            }
+                        isConnected = false
+                        hearingAidMap.filter { ha -> ha.value.address == event.eventSender }
+                            .values.first().isConnected = false
                     } catch (ex: NoSuchElementException) {
                         Log.e(ConnectionFragment::class.simpleName, ex.message!!)
                     }
                     requireActivity().finish()
                 }
-
-            else if (event is DeviceFoundEvent) {
-                Thread.sleep(2000)
-                mBleDeviceSet.add(event.hearingAid)
-                lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
             }
+    }
+
+    private fun onDeviceFoundEventReceived(event: DeviceFoundEvent)
+    {
+        if (isVisible) {
+            Thread.sleep(2000)
+            mBleDeviceSet.add(event.hearingAid)
+            lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
+        }
     }
 
     override fun onStart()
@@ -143,6 +228,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     override fun onDestroy()
     {
         super.onDestroy()
+
+        if (isScanContinue)
+            stopScanProcess()
 
         EventBus.getDefault().apply {
             if (isRegistered(this@ConnectionFragment))
