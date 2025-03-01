@@ -72,21 +72,16 @@ object ConfigurationModule {
     fun setConnections()
     {
         isConnected = try {
-            if (isDoubleDeviceConnection)
-                hearingAidMap.all { it.value.isConnected }
-            else
-                hearingAidMap[earSide]?.isConnected ?: false
+                if (hearingAidMap.isEmpty())
+                    false
+                else hearingAidMap.all { it.value.isConnected }
         } catch (_ : Throwable) { false }
     }
 
     fun setServiceStopAndKeepConnectionIfRequired(context: Context)
     {
         if (isConnected && !keepConnectionForServiceDestroy) {
-            if (isDoubleDeviceConnection)
-                hearingAidMap.forEach { it.value.endConnectionSession() }
-            else
-                hearingAidMap[earSide]?.endConnectionSession()
-
+            hearingAidMap.forEach { it.value.endConnectionSession() }
             isConnected = false
         }
 

@@ -309,10 +309,10 @@ class AutoConnectService : Service()
     private fun isConnected() : Boolean
     {
         return with (configuration) {
-            if (isDoubleDeviceConnection)
-                hearingAidMap[EarSide.Left]?.isConnected!! && hearingAidMap[EarSide.Right]?.isConnected!!
+            if (hearingAidMap.isEmpty())
+                false
             else
-                hearingAidMap[configuration.earSide]?.isConnected ?: false
+                hearingAidMap.all { it.value.isConnected }
         }
     }
 
