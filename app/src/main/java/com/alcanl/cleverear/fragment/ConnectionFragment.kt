@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.MainActivity
+import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -221,7 +222,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                 register(this@ConnectionFragment)
         }
 
-        if (!configuration.isConnected)
+        if (!configuration.isConnected && (requireActivity() as MainContainerActivity).mLocationCoarsePermission)
             onDetectDeviceButtonClicked()
     }
 

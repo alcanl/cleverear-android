@@ -69,7 +69,7 @@ class MainContainerActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private val mLocationCoarsePermission by lazy {
+    val mLocationCoarsePermission by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             ContextCompat.checkSelfPermission(
                 this,
