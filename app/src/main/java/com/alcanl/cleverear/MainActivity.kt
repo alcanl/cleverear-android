@@ -20,9 +20,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.alcanl.cleverear.databinding.ActivityMainBinding
@@ -33,6 +31,9 @@ import com.alcanl.cleverear.util.GERMAN
 import com.alcanl.cleverear.util.GERMAN_MANUAL_URL
 import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.TURKISH_MANUAL_URL
+import com.alcanl.cleverear.util.checkAndRequestPermissionForN
+import com.alcanl.cleverear.util.checkAndRequestPermissionForQ
+import com.alcanl.cleverear.util.checkAndRequestPermissionForS
 import com.alcanl.cleverear.util.dialog.showBatteryVoltageForConnectionDialog
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
@@ -154,51 +155,17 @@ class MainActivity : AppCompatActivity() {
         mBinding.viewModel = MainActivityListenersViewModel(this)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun checkAndRequestPermissionForQ() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
-            PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.BLUETOOTH_ADMIN,
-                    Manifest.permission.BLUETOOTH
-                ), BLUETOOTH_PERMISSION_REQUEST_CODE
-            )
-        }
-    }
-
-    private fun checkAndRequestPermissionForN() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-            PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) !=
-            PackageManager.PERMISSION_GRANTED
-        )
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.BLUETOOTH_ADMIN,
-                    Manifest.permission.BLUETOOTH
-                ),
-                BLUETOOTH_PERMISSION_REQUEST_CODE
-            )
-    }
-
     private fun scanBluetoothPermissions()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            checkAndRequestPermissionForS()
+            checkAndRequestPermissionForS(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             scanGPS()
-            checkAndRequestPermissionForQ()
+            checkAndRequestPermissionForQ(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
         }
         else {
             scanGPS()
-            checkAndRequestPermissionForN()
+            checkAndRequestPermissionForN(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
         }
     }
 
@@ -208,24 +175,6 @@ class MainActivity : AppCompatActivity() {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply { gpsActivityResultLauncher.launch(this) }
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    private fun checkAndRequestPermissionForS()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) !=
-            PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-        )
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_CONNECT,
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_ADVERTISE
-                ),
-                BLUETOOTH_PERMISSION_REQUEST_CODE
-            )
     }
 
     private fun gpsTurnedOn()

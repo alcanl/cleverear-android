@@ -1,5 +1,6 @@
 package com.alcanl.cleverear
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -8,9 +9,12 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.IntentFilter.SYSTEM_HIGH_PRIORITY
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -25,6 +29,9 @@ import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.checkAndRequestPermissionForN
+import com.alcanl.cleverear.util.checkAndRequestPermissionForQ
+import com.alcanl.cleverear.util.checkAndRequestPermissionForS
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.hasForegroundServicePermission
@@ -47,6 +54,8 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.EventObject
 import javax.inject.Inject
+
+private const val BLUETOOTH_PERMISSION_REQUEST_CODE = 1002
 
 @AndroidEntryPoint
 class LoadingActivity : AppCompatActivity(), IEventListener {
@@ -73,10 +82,35 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     private lateinit var mBinding : ActivityLoadingBinding
 
+    private var mIsBluetoothPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) == PackageManager.PERMISSION_GRANTED
+    }
+    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    else
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         initialize()
+
+        if (!mIsBluetoothPermissionsGranted) {
+            requestPermissions()
+            return
+        }
 
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this)
@@ -149,11 +183,34 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
                 }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray)
+    {
+        if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE &&
+            grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.toast_no_permission_splash_activity, Toast.LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, 1000)
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun startService()
     {
         Intent(this, AutoConnectService::class.java).apply {
             ContextCompat.startForegroundService(this@LoadingActivity, this)
         }
+    }
+
+    private fun requestPermissions()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            checkAndRequestPermissionForS(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            checkAndRequestPermissionForQ(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
+        else
+            checkAndRequestPermissionForN(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
+
     }
 
     private fun handleSharedPrefs()
@@ -373,7 +430,6 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
-        listener.startEventListener()
     }
 
     private fun connectToDevice(hearingAid: HearingAid)

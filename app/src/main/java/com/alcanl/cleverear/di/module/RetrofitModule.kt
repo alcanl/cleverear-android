@@ -32,7 +32,7 @@ object RetrofitModule {
 
         return Retrofit.Builder()
             .baseUrl(API_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .client(OkHttpClient.Builder()
                 .sslSocketFactory(sslSocketFactory, getX509TrustManager(context))
                 .hostnameVerifier { _, _ -> true }
