@@ -163,6 +163,7 @@ class BeaconFragment : Fragment(), IEventListener {
         }
     }
 
+    @SuppressLint("ImplicitSamInstance")
     private fun onConnectionEventReceived(event: EventObject)
     {
         if (event is ConnectionEvent && event.connectionData == 1)

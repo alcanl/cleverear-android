@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,8 @@ import com.alcanl.cleverear.util.listeners.event.VolumeEvent
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.extension.gone
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.extension.startVolumeSliderFirstAnimation
 import com.alcanl.cleverear.util.extension.startVolumeSliderSecondAnimation
 import com.alcanl.cleverear.util.listeners.ControlFragmentEventListener
@@ -89,7 +92,7 @@ class ControlFragment : Fragment(), IEventListener {
         super.onResume()
         (requireActivity() as MainContainerActivity).apply {
             lifecycleScope.launch(Dispatchers.Main) {
-                this@apply.binding.frameLayoutLoading.visibility = View.GONE
+                this@apply.binding.frameLayoutLoading.gone()
             }
         }
 
@@ -216,6 +219,7 @@ class ControlFragment : Fragment(), IEventListener {
         }
     }
 
+    @SuppressLint("ImplicitSamInstance")
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1)
@@ -338,7 +342,7 @@ class ControlFragment : Fragment(), IEventListener {
 
     private fun initMemoryButtons(bound: Int, tableRow: TableRow)
     {
-        (0..<bound).forEach { tableRow.getChildAt(it).visibility = View.VISIBLE }
+        (0..<bound).forEach { tableRow.getChildAt(it).show() }
     }
 
     private fun setButtonsDefaultColor(hearingAid: HearingAid, except: Int)

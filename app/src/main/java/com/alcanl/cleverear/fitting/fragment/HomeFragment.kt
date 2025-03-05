@@ -39,8 +39,11 @@ import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_FAIL
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_PROCESS
 import com.alcanl.cleverear.util.WHAT_READ_PARAMETERS_SUCCESS
 import com.alcanl.cleverear.util.extension.getFrameLayoutAnimationListener
+import com.alcanl.cleverear.util.extension.gone
+import com.alcanl.cleverear.util.extension.hide
 import com.alcanl.cleverear.util.extension.hideFrames
 import com.alcanl.cleverear.util.extension.postDelayAnimation
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.extension.showFrames
 import com.alcanl.cleverear.util.extension.startAlphaAnimation
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
@@ -88,12 +91,12 @@ class HomeFragment : Fragment() {
 
     override fun onResume()
     {
-        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.gone()
         if (fittingConfig.isInitializeCompleted) {
             with(mBinding) {
-                progressBar.visibility = View.INVISIBLE
-                buttonRetry.visibility = View.INVISIBLE
-                imageViewHearingAid.visibility = View.VISIBLE
+                progressBar.hide()
+                buttonRetry.hide()
+                imageViewHearingAid.show()
                 showFrames()
                 textViewInitialize.text = getText(R.string.textview_initialize_success_text)
             }
@@ -207,8 +210,8 @@ class HomeFragment : Fragment() {
         {
             mWeakReference.get()?.let {
                 it.mBinding.textViewInitialize.startTextAlphaAnimation(it.requireContext(), text)
-                it.mBinding.progressBar.visibility = View.INVISIBLE
-                it.mBinding.buttonRetry.visibility = View.VISIBLE
+                it.mBinding.progressBar.hide()
+                it.mBinding.buttonRetry.show()
             }
         }
         private fun startFrameAnimations()
@@ -227,7 +230,7 @@ class HomeFragment : Fragment() {
         private fun readParameterSuccess() {
             mWeakReference.get()?.let {
                 with(it.mBinding) {
-                    progressBar.visibility = View.INVISIBLE
+                    progressBar.hide()
                     imageViewHearingAid.startAlphaAnimation(it.requireContext())
                     textViewInitialize.startTextAlphaAnimation(it.requireContext(),it.getString(R.string.textview_parameter_read_success_text))
                     postDelayed({
@@ -287,8 +290,8 @@ class HomeFragment : Fragment() {
     {
         with(mBinding) {
             textViewInitialize.startTextAlphaAnimation(requireContext(), getString(R.string.textview_initializing_text))
-            buttonRetry.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
+            buttonRetry.hide()
+            progressBar.show()
         }
         initializeProduct()
     }

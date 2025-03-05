@@ -1,6 +1,7 @@
 package com.alcanl.cleverear.fragment
 
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -200,6 +201,7 @@ class AdvancedFragment : Fragment(), IEventListener {
         }
     }
 
+    @SuppressLint("ImplicitSamInstance")
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1) {

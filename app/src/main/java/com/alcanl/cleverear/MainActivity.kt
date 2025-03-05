@@ -13,7 +13,6 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.view.KeyEvent
-import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
@@ -35,6 +34,8 @@ import com.alcanl.cleverear.util.checkAndRequestPermissionForN
 import com.alcanl.cleverear.util.checkAndRequestPermissionForQ
 import com.alcanl.cleverear.util.checkAndRequestPermissionForS
 import com.alcanl.cleverear.util.dialog.showBatteryVoltageForConnectionDialog
+import com.alcanl.cleverear.util.extension.gone
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.viewmodel.MainActivityListenersViewModel
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         checkBluetoothPermission()
 
         if (mIsWebViewActive)
-            mBinding.frameLayoutWebView.visibility = View.GONE
+            mBinding.frameLayoutWebView.gone()
 
         mBinding.buttonSingleDevice.startAnimation(
             android.view.animation.AnimationUtils.loadAnimation
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && mBinding.webView.canGoBack()) {
             mBinding.webView.goBack()
-            mBinding.frameLayoutWebView.visibility = View.GONE
+            mBinding.frameLayoutWebView.gone()
             return true
         }
 
@@ -244,7 +245,7 @@ class MainActivity : AppCompatActivity() {
                         else -> webView.loadUrl(ENGLISH_MANUAL_URL)
                     }
 
-                    frameLayoutWebView.visibility = View.VISIBLE
+                    frameLayoutWebView.show()
                     mIsWebViewActive = true
                 }
             }

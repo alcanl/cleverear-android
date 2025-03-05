@@ -1,17 +1,13 @@
 package com.alcanl.cleverear.util
 
-import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import androidx.compose.ui.text.intl.Locale
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getString
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.entity.DiscoveredDeviceInfo
@@ -202,29 +198,3 @@ fun getSpannableDeviceString(context: Context, hearingAid: HearingAid) : Spannab
 
 fun dpToPx(context: Context, dp: Int) = (context.resources.displayMetrics.density * dp).toInt()
 
-fun hasBackgroundLocationPermission(context: Context): Boolean
-{
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        ) ==
-                PackageManager.PERMISSION_GRANTED
-    }
-    return true
-}
-
-fun hasForegroundServicePermission(context: Context) : Boolean
-{
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-        ContextCompat.checkSelfPermission(
-            context, Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
-        ) == PackageManager.PERMISSION_GRANTED
-    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-    else
-        true
-}

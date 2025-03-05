@@ -7,7 +7,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
@@ -27,6 +26,8 @@ import com.alcanl.cleverear.util.TURKISH
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogDeviceDisconnected
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogFittingUnsaved
 import com.alcanl.cleverear.util.dialog.CustomAlertDialogInSituInProgress
+import com.alcanl.cleverear.util.extension.hide
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.getSystemLanguage
 import com.alcanl.cleverear.util.isConnected
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,8 +102,8 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
 
             if (hearingAid == null)
                 mDeviceDisconnectedDialog.binding.apply {
-                    progressBar.visibility = View.INVISIBLE
-                    buttonOk.visibility = View.VISIBLE
+                    progressBar.hide()
+                    buttonOk.show()
                     textViewMainMessage.text = getString(R.string.toast_unknown_problem_text)
                 }
             else {
@@ -135,13 +136,13 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             val adapter = getSystemService(BluetoothManager::class.java).adapter
             if (adapter != null && isConnected(adapter.getRemoteDevice(hearingAid.address))) {
                 mDeviceDisconnectedDialog.binding.apply {
-                    progressBar.visibility = View.INVISIBLE
+                    progressBar.hide()
                     textViewMainMessage.text = getString(R.string.notification_reconnect_text) }
                 Handler(Looper.myLooper()!!).postDelayed({ mDeviceDisconnectedDialog.dismiss() }, 2000) }
             else
                 mDeviceDisconnectedDialog.binding.apply {
-                    progressBar.visibility = View.INVISIBLE
-                    buttonOk.visibility = View.VISIBLE
+                    progressBar.hide()
+                    buttonOk.show()
                 }
         }
     }
@@ -170,13 +171,13 @@ class SelfFittingActivity : AppCompatActivity(), IEventListener {
             }
             else when (it.itemId) {
                 R.id.navbar_fitting -> {
-                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    runOnUiThread { binding.frameLayoutLoading.show() }
                     navigateTo(FittingFragment()); true }
                 R.id.navbar_home -> {
-                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    runOnUiThread { binding.frameLayoutLoading.show() }
                     navigateTo(HomeFragment()); true }
                 else -> {
-                    runOnUiThread { binding.frameLayoutLoading.visibility = View.VISIBLE }
+                    runOnUiThread { binding.frameLayoutLoading.show() }
                     navigateTo(InSituFragment()); true }
             }
         }

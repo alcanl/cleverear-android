@@ -39,9 +39,11 @@ import com.alcanl.cleverear.util.WHAT_ENABLE_EQUALIZER_SLIDERS
 import com.alcanl.cleverear.util.WHAT_HIDE_LOADING_FRAME
 import com.alcanl.cleverear.util.WHAT_SHOW_LOADING_FRAME
 import com.alcanl.cleverear.util.dialog.CustomDialogProgramPicker
+import com.alcanl.cleverear.util.extension.gone
 import com.alcanl.cleverear.util.extension.handleFittingCheckedChanged
 import com.alcanl.cleverear.util.extension.setLayoutDisable
 import com.alcanl.cleverear.util.extension.setLayoutEnable
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.viewmodel.FittingFragmentListenersViewModel
 import com.ark.ParameterSpace
 import com.skydoves.powerspinner.IconSpinnerAdapter
@@ -102,7 +104,7 @@ class FittingFragment : Fragment(), IEventListener {
 
     override fun onResume()
     {
-        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.gone()
         super.onResume()
     }
 
@@ -223,13 +225,13 @@ class FittingFragment : Fragment(), IEventListener {
             when (msg.what) {
                 27 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutLoading.visibility = View.VISIBLE
+                        constraintLayoutLoading.show()
                         constraintLayoutMain.setLayoutDisable()
                     }
                 }
                 28 -> mWeakReference.get()?.let {
                     it.mBinding.apply {
-                        constraintLayoutLoading.visibility = View.GONE
+                        constraintLayoutLoading.gone()
                         constraintLayoutMain.setLayoutEnable()
                     }
                 }

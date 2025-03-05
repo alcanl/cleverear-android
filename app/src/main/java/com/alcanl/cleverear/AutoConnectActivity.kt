@@ -3,7 +3,6 @@ package com.alcanl.cleverear
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.view.animation.Animation
 import android.widget.ImageButton
 import android.widget.Toast
@@ -12,6 +11,8 @@ import com.alcanl.cleverear.databinding.ActivityAutoConnectBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.extension.hide
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
 import com.alcanl.cleverear.util.getRightHearingAidModelNumber
 import com.alcanl.cleverear.util.isInternetAvailable
@@ -49,11 +50,13 @@ class AutoConnectActivity : AppCompatActivity() {
                 imageButtonRight.isEnabled = if (hearingAidMap[EarSide.Right] != null) !hearingAidMap[EarSide.Right]?.isConnected!!
                                             else getRightHearingAidModelNumber(this@AutoConnectActivity).isNotBlank()
 
-                bubbleLayoutLeftEar.visibility = if (hearingAidMap[EarSide.Left] == null) View.INVISIBLE
-                                                else if (!hearingAidMap[EarSide.Left]?.isConnected!!) View.INVISIBLE else View.VISIBLE
+                bubbleLayoutLeftEar.apply {
+                    if (hearingAidMap[EarSide.Left] == null) hide()
+                    else if (!hearingAidMap[EarSide.Left]?.isConnected!!) hide() else show() }
 
-                bubbleLayoutRightEar.visibility = if (hearingAidMap[EarSide.Right] == null) View.INVISIBLE
-                                                else if (!hearingAidMap[EarSide.Right]?.isConnected!!) View.INVISIBLE else View.VISIBLE
+                bubbleLayoutRightEar.apply {
+                    if (hearingAidMap[EarSide.Right] == null) hide()
+                    else if (!hearingAidMap[EarSide.Right]?.isConnected!!) hide() else show() }
 
                 imageButtonControl.isEnabled = !configuration.isConnected
             }

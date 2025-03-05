@@ -1,6 +1,5 @@
 package com.alcanl.cleverear
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -34,6 +33,7 @@ import com.alcanl.cleverear.util.checkAndRequestPermissionForQ
 import com.alcanl.cleverear.util.checkAndRequestPermissionForS
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
+import com.alcanl.cleverear.util.hasBluetoothPermission
 import com.alcanl.cleverear.util.hasForegroundServicePermission
 import com.alcanl.cleverear.util.service.broadcast.BondHearingAidBroadcastReceiver
 import com.alcanl.cleverear.util.listeners.LoadingActivityEventListener
@@ -82,25 +82,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
 
     private lateinit var mBinding : ActivityLoadingBinding
 
-    private var mIsBluetoothPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_SCAN
-                ) == PackageManager.PERMISSION_GRANTED
-    }
-    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    else
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    private var mIsBluetoothPermissionsGranted = false
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
@@ -430,6 +412,7 @@ class LoadingActivity : AppCompatActivity(), IEventListener {
         registerReceiver(mBondRequestReceiver, IntentFilter(ACTION_BOND_STATE_CHANGED)
             .apply { priority = SYSTEM_HIGH_PRIORITY })
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_loading)
+        mIsBluetoothPermissionsGranted = hasBluetoothPermission(this)
     }
 
     private fun connectToDevice(hearingAid: HearingAid)

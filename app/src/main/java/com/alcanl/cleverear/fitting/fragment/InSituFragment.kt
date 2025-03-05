@@ -39,6 +39,7 @@ import com.alcanl.cleverear.util.WHAT_SHOW_IN_SITU_DIALOG
 import com.alcanl.cleverear.util.WHAT_SOUND_GENERATE_ERROR
 import com.alcanl.cleverear.util.WHAT_UPDATE_CHART
 import com.alcanl.cleverear.util.dialog.CustomDialogInSituSoundCheck
+import com.alcanl.cleverear.util.extension.gone
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.viewmodel.InSituFragmentListenersViewModel
 import com.ark.ArkException
@@ -124,7 +125,7 @@ class InSituFragment : Fragment(), IEventListener {
 
     override fun onResume()
     {
-        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.visibility = View.GONE
+        (requireActivity() as SelfFittingActivity).binding.frameLayoutLoading.gone()
         super.onResume()
     }
 

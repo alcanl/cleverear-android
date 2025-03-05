@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.LoadingActivity
 import com.alcanl.cleverear.MainActivity
-import com.alcanl.cleverear.MainContainerActivity
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.databinding.FragmentConnectionBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -31,10 +30,14 @@ import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.createDeviceDisconnectSuccessDialog
 import com.alcanl.cleverear.util.dialog.showStopConnectionDialog
 import com.alcanl.cleverear.util.dpToPx
+import com.alcanl.cleverear.util.extension.gone
+import com.alcanl.cleverear.util.extension.hide
 import com.alcanl.cleverear.util.extension.recognizeEarSide
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.extension.startAlphaBlinkAnimation
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.util.getSpannableDeviceString
+import com.alcanl.cleverear.util.hasLocationCoarsePermission
 import com.alcanl.cleverear.util.listeners.ConnectionFragmentEventListener
 import com.alcanl.cleverear.util.listeners.event.BatteryEvent
 import com.alcanl.cleverear.util.listeners.event.ConnectionEvent
@@ -164,6 +167,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     }
 
 
+    @SuppressLint("ImplicitSamInstance")
     private fun onConnectionEventReceived(event: ConnectionEvent)
     {
         if (event.connectionData == 1 && !configuration.isUserDisconnected)
@@ -221,9 +225,6 @@ class ConnectionFragment : Fragment(), IEventListener {
             if (!isRegistered(this@ConnectionFragment))
                 register(this@ConnectionFragment)
         }
-
-        if (!configuration.isConnected && (requireActivity() as MainContainerActivity).mLocationCoarsePermission)
-            onDetectDeviceButtonClicked()
     }
 
     override fun onDestroy()
@@ -283,11 +284,14 @@ class ConnectionFragment : Fragment(), IEventListener {
                 startEventListener()
         }
 
+        if (!configuration.isConnected && hasLocationCoarsePermission(requireActivity()))
+            onDetectDeviceButtonClicked()
+
         mBinding.apply {
 
             imageButtonDetect.isEnabled = !configuration.isConnected
-            buttonStopConnection.visibility = if (configuration.isConnected) View.VISIBLE else View.INVISIBLE
-            groupBoxLayoutDeviceList.visibility = View.INVISIBLE
+            buttonStopConnection.apply { if (configuration.isConnected) show() else hide() }
+            groupBoxLayoutDeviceList.hide()
 
             configuration.apply {
                 if (isConnected) {
@@ -301,7 +305,7 @@ class ConnectionFragment : Fragment(), IEventListener {
                     when {
                         !isDoubleDeviceConnection -> textViewDeviceState.apply {
                             text = getSpannableDeviceString(requireContext(), hearingAidMap[earSide]!!)
-                            visibility = View.VISIBLE
+                            show()
                         }
                         else -> {
                             textViewDeviceState.apply {
@@ -309,14 +313,14 @@ class ConnectionFragment : Fragment(), IEventListener {
                                     requireContext(),
                                     hearingAidMap[EarSide.Left]!!
                                 )
-                                visibility = View.VISIBLE
+                                show()
                             }
                             textViewDeviceStateSecond.apply {
                                 text = getSpannableDeviceString(
                                     requireContext(),
                                     hearingAidMap[EarSide.Right]!!
                                 )
-                                visibility = View.VISIBLE
+                                show()
                             }
                         }
                     }
@@ -331,15 +335,9 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         mBinding.apply {
             textViewDeviceScan.startTextAlphaAnimation(requireContext(), getString(R.string.textview_detect_device_text))
-            textViewDeviceState.apply {
-                text = getString(R.string.textview_device_detection_not_found_text)
-                visibility = View.INVISIBLE
-            }
-            textViewDeviceStateSecond.apply {
-                text = getString(R.string.textview_device_detection_not_found_text)
-                visibility = View.INVISIBLE
-            }
-            frameLayoutStopConnection.visibility = View.GONE
+            textViewDeviceState.apply { text = getString(R.string.textview_device_detection_not_found_text); hide() }
+            textViewDeviceStateSecond.apply { text = getString(R.string.textview_device_detection_not_found_text); hide() }
+            frameLayoutStopConnection.gone()
             imageButtonDetect.isEnabled = true
         }
 
@@ -470,10 +468,10 @@ class ConnectionFragment : Fragment(), IEventListener {
         mIsDeviceFound = false
 
         mBinding.apply {
-            groupBoxLayoutDeviceList.visibility = View.INVISIBLE
+            groupBoxLayoutDeviceList.hide()
             textViewDeviceScan.startTextAlphaAnimation(requireContext(),getString(R.string.textview_scan_process_scanning_text))
             textViewDeviceState.text = getString(R.string.textview_device_detection_not_found_text)
-            textViewDeviceStateSecond.visibility = View.INVISIBLE
+            textViewDeviceStateSecond.hide()
             adapter!!.clear()
             adapter!!.notifyDataSetChanged()
         }
@@ -519,7 +517,7 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         mBinding.apply {
             pulseLayout.startAlphaBlinkAnimation()
-            textViewDeviceState.visibility = View.VISIBLE
+            textViewDeviceState.show()
         }
 
         if (isScanContinue) {
@@ -531,6 +529,7 @@ class ConnectionFragment : Fragment(), IEventListener {
             scanDevices()
     }
 
+    @SuppressLint("ImplicitSamInstance")
     private fun onAlertDialogPositiveButtonClicked()
     {
         mBinding.apply {
@@ -541,8 +540,8 @@ class ConnectionFragment : Fragment(), IEventListener {
                 params.height = dpToPx(requireContext(), 110)
                 layoutParams = params
             }
-            frameLayoutStopConnection.visibility = View.VISIBLE
-            buttonStopConnection.visibility = View.INVISIBLE
+            frameLayoutStopConnection.show()
+            buttonStopConnection.hide()
         }
 
         configuration.apply {

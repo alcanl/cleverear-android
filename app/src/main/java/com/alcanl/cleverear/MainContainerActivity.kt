@@ -3,6 +3,7 @@ package com.alcanl.cleverear
 import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -34,7 +35,10 @@ import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantS
 import com.alcanl.cleverear.util.dialog.createBackgroundLocationPermissionGrantUnSuccessDialog
 import com.alcanl.cleverear.util.dialog.showBackgroundLocationPermissionActionDialog
 import com.alcanl.cleverear.util.dialog.showStopConnectionDialog
+import com.alcanl.cleverear.util.extension.hide
+import com.alcanl.cleverear.util.extension.show
 import com.alcanl.cleverear.util.hasBackgroundLocationPermission
+import com.alcanl.cleverear.util.requestLocationPermission
 import com.alcanl.cleverear.util.service.AutoConnectService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +73,7 @@ class MainContainerActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    val mLocationCoarsePermission by lazy {
+    private val mLocationCoarsePermission by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             ContextCompat.checkSelfPermission(
                 this,
@@ -103,7 +107,7 @@ class MainContainerActivity : AppCompatActivity() {
         configuration.isMainActivityOnScreen = true
 
         if (!hasPermissionsForBluetoothLocation())
-            requestLocationPermission()
+            requestLocationPermission(this)
 
         mSelectedNavItem = R.id.navbar_connection
         initializeNavController()
@@ -115,6 +119,7 @@ class MainContainerActivity : AppCompatActivity() {
         configuration.isMainActivityOnScreen = false
     }
 
+    @SuppressLint("ImplicitSamInstance")
     override fun onPostResume()
     {
         super.onPostResume()
@@ -144,7 +149,7 @@ class MainContainerActivity : AppCompatActivity() {
         configuration.apply {
             if (isConnected)
                 showStopConnectionDialog(this@MainContainerActivity) {
-                    binding.frameLayoutLoading.visibility = View.VISIBLE
+                    binding.frameLayoutLoading.show()
                     lifecycleScope.launch(Dispatchers.IO) {
                         configuration.hearingAidMap.forEach { it.value.endConnectionSession() }
                         handler.postDelayed({ finish() }, 3000)
@@ -238,22 +243,6 @@ class MainContainerActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestLocationPermission()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),
-                ACCESS_COARSE_LOCATION_PERMISSION_REQUEST_CODE
-            )
-        else
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(ACCESS_FINE_LOCATION),
-                ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE
-            )
-    }
-
     private fun hasPermissionsForBluetoothLocation() : Boolean
     {
         return mLocationCoarsePermission && mLocationFinePermission
@@ -279,15 +268,15 @@ class MainContainerActivity : AppCompatActivity() {
             mTrackingButton.text = getString(R.string.button_disable_tracking_text)
 
             mDialogSmsInformation.binding.apply {
-                frameLayoutOk.visibility = View.VISIBLE
-                buttonOk.visibility = View.INVISIBLE
-                textViewContactSave.visibility = View.INVISIBLE
-                progressBar.visibility = View.VISIBLE
+                frameLayoutOk.show()
+                buttonOk.hide()
+                textViewContactSave.hide()
+                progressBar.show()
 
                 handler.postDelayed({
-                    progressBar.visibility = View.INVISIBLE
-                    textViewContactSave.visibility = View.VISIBLE
-                    buttonOk.visibility = View.VISIBLE
+                    progressBar.hide()
+                    textViewContactSave.show()
+                    buttonOk.show()
                 }, 1000)
             }
             return
