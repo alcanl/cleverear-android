@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.alcanl.cleverear.databinding.ActivityMainContainerBinding
 import com.alcanl.cleverear.di.module.ConfigurationModule
@@ -61,6 +62,8 @@ class MainContainerActivity : AppCompatActivity() {
     private var mSelectedNavItem by Delegates.notNull<Int>()
 
     private lateinit var mTrackingButton: AppCompatButton
+
+    private lateinit var fragmentManager: FragmentManager
 
     private lateinit var mSelectedTrackingEddystoneEarSide: EarSide
 
@@ -110,6 +113,7 @@ class MainContainerActivity : AppCompatActivity() {
             requestLocationPermission(this)
 
         mSelectedNavItem = R.id.navbar_connection
+        fragmentManager = supportFragmentManager
         initializeNavController()
     }
 
@@ -171,15 +175,15 @@ class MainContainerActivity : AppCompatActivity() {
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
             grantResults[1] == PackageManager.PERMISSION_GRANTED
         )
-            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
+            fragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
 
         else if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_REQUEST_CODE &&
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
         )
-            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
+            fragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, ConnectionFragment()).commit()
 
         else if (requestCode == SMS_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            supportFragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, BeaconFragment()).commit()
+            fragmentManager.beginTransaction().replace(binding.navHostMainContainer.id, BeaconFragment()).commit()
             mDialogSmsInformation = CustomDialogSmsInformation(this)
             mDialogSmsInformation.show()
         }
@@ -194,7 +198,7 @@ class MainContainerActivity : AppCompatActivity() {
 
     private fun navigateTo(fragment: Fragment)
     {
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        val fragmentTransaction = fragmentManager.beginTransaction()
 
         if (fragment !is ControlFragment)
             fragmentTransaction.setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
