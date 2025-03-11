@@ -200,7 +200,6 @@ class MainContainerActivity : AppCompatActivity() {
             fragmentTransaction.setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
 
         fragmentTransaction.replace(binding.navHostMainContainer.id, fragment)
-        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
