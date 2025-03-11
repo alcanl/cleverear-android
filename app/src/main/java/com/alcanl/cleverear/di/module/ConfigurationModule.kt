@@ -40,20 +40,24 @@ object ConfigurationModule {
     @Volatile
     var isAshaConnected = false
 
+    @Volatile
     var isDoubleDeviceConnection = false
 
     var isDualDeviceConfig = false
 
     var isConnectedBefore = false
 
+    @Volatile
     var isSystemRestartOnService = true
 
+    @Volatile
     var isUserDisconnected = false
 
     var isEddyStoneScanInProgress = false
 
     var isRemoteFittingConnection = false
 
+    @Volatile
     var isMainActivityOnScreen = false
 
     var earSide : EarSide = EarSide.Right

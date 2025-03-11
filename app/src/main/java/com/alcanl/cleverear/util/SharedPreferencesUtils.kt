@@ -22,6 +22,7 @@ import com.alcanl.cleverear.entity.ConfigurationData
 import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.mapper.ConfigurationMapper
 import com.google.gson.Gson
+import androidx.core.content.edit
 
 
 private fun getPrivatePrefs(context: Context) = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
@@ -36,15 +37,27 @@ fun getRightHearingAidModelNumber(context: Context) = getPrivatePrefs(context).g
 
 fun saveHearingAidInfoToPrefs(context: Context, hearingAid: HearingAid)
 {
-    val editor = getPrivatePrefs(context).edit()
+    getPrivatePrefs(context).edit {
 
-    editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_ADDRESS else HA_RIGHT_ADDRESS, hearingAid.address)
-    editor.putString(if (hearingAid.side == EarSide.Left) HA_LEFT_NAME else HA_RIGHT_NAME, hearingAid.name)
-    editor.putInt(if (hearingAid.side == EarSide.Left) HA_LEFT_RSSI else HA_RIGHT_RSSI, hearingAid.rssi)
-    editor.putString(if (hearingAid.side == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT, hearingAid.manufacturerData)
-    editor.putBoolean(IS_EDDYSTONE_TLM, hearingAid.isEddystoneTLM)
+        putString(
+            if (hearingAid.side == EarSide.Left) HA_LEFT_ADDRESS else HA_RIGHT_ADDRESS,
+            hearingAid.address
+        )
+        putString(
+            if (hearingAid.side == EarSide.Left) HA_LEFT_NAME else HA_RIGHT_NAME,
+            hearingAid.name
+        )
+        putInt(
+            if (hearingAid.side == EarSide.Left) HA_LEFT_RSSI else HA_RIGHT_RSSI,
+            hearingAid.rssi
+        )
+        putString(
+            if (hearingAid.side == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT,
+            hearingAid.manufacturerData
+        )
+        putBoolean(IS_EDDYSTONE_TLM, hearingAid.isEddystoneTLM)
 
-    editor.apply()
+    }
 }
 
 fun getLeftSideHearingAid(context: Context) : HearingAid
@@ -76,9 +89,9 @@ fun getRightSideHearingAid(context: Context) : HearingAid
 
 fun saveEmergencyNumberToPrefs(context: Context, phoneNumber: String)
 {
-    val editor = getPrivatePrefs(context).edit()
-    editor.putString(EMERGENCY_NUMBER, phoneNumber)
-    editor.apply()
+    getPrivatePrefs(context).edit {
+        putString(EMERGENCY_NUMBER, phoneNumber)
+    }
 }
 
 fun getEmergencyNumber(context: Context) : String = getPrivatePrefs(context).getString(EMERGENCY_NUMBER, "")!!
@@ -94,16 +107,56 @@ fun saveHearingAidDTOPref(context: Context, configuration : ConfigurationModule,
     if (hearingAidDTO == null)
         return
 
-    val editor = getPrivatePrefs(context).edit()
-    editor.putString(String.format(PREF_DEVICE_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelName)
-    editor.putString(String.format(PREF_LIBRARY_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), Integer.toHexString(hearingAidDTO.libraryId.toInt()))
-    editor.putString(String.format(PREF_ACTIVE_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.activeParamId)
-    editor.putString(String.format(PREF_DEFAULT_PARAM_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.defaultParamId)
-    editor.putInt(String.format(PREF_WDRC_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.wdrcChannelCount)
-    editor.putInt(String.format(PREF_FREQUENCY_CHANNEL_COUNT, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.frequencyChannelCount)
-    editor.putInt(String.format(PREF_MODEL_NUMBER, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.modelNumber)
-    editor.putLong(String.format(PREF_EQUALIZER_VALUES_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), hearingAidDTO.equalizerValuesId)
-    editor.apply()
+    getPrivatePrefs(context).edit {
+        putString(
+            String.format(
+                PREF_DEVICE_SERIAL,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.modelName
+        )
+        putString(
+            String.format(
+                PREF_LIBRARY_ID,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), Integer.toHexString(hearingAidDTO.libraryId.toInt())
+        )
+        putString(
+            String.format(
+                PREF_ACTIVE_PARAM_ID,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.activeParamId
+        )
+        putString(
+            String.format(
+                PREF_DEFAULT_PARAM_ID,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.defaultParamId
+        )
+        putInt(
+            String.format(
+                PREF_WDRC_CHANNEL_COUNT,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.wdrcChannelCount
+        )
+        putInt(
+            String.format(
+                PREF_FREQUENCY_CHANNEL_COUNT,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.frequencyChannelCount
+        )
+        putInt(
+            String.format(
+                PREF_MODEL_NUMBER,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.modelNumber
+        )
+        putLong(
+            String.format(
+                PREF_EQUALIZER_VALUES_ID,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), hearingAidDTO.equalizerValuesId
+        )
+    }
 }
 
 fun getHearingAidDTOFromPrefs(context: Context, configuration: ConfigurationModule, fittingConfig: FittingConfigurationModule) : HearingAidDTO
@@ -132,13 +185,29 @@ fun saveEqualizerDTOPref(context: Context, configuration: ConfigurationModule, f
     if (equalizerValuesDTO == null)
         return
 
-    val editor = getPrivatePrefs(context).edit()
-    editor.putLong(String.format(PREF_EQUALIZER_ID, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.id)
-    editor.putString(String.format(PREF_EQUALIZER_VALUES_MODEL_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), equalizerValuesDTO.equalizerValuesName)
-    equalizerValuesDTO.valueList.forEachIndexed { index, i ->
-        editor.putInt(String.format(PREF_EQUALIZER_VALUES, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(), index), i)
+    getPrivatePrefs(context).edit {
+        putLong(
+            String.format(
+                PREF_EQUALIZER_ID,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), equalizerValuesDTO.id
+        )
+        putString(
+            String.format(
+                PREF_EQUALIZER_VALUES_MODEL_SERIAL,
+                configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()
+            ), equalizerValuesDTO.equalizerValuesName
+        )
+        equalizerValuesDTO.valueList.forEachIndexed { index, i ->
+            putInt(
+                String.format(
+                    PREF_EQUALIZER_VALUES,
+                    configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString(),
+                    index
+                ), i
+            )
+        }
     }
-    editor.apply()
 }
 
 fun getEqualizerValuesModelSerial(context: Context, configuration: ConfigurationModule, fittingConfig: FittingConfigurationModule) : String
@@ -165,40 +234,43 @@ fun getEqualizerDTOPref(context: Context, configuration: ConfigurationModule, fi
 
 fun cleanConfigurations(context: Context)
 {
-    val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
-    editor.putString(CONFIGURATION_JSON, "")
-    editor.apply()
+    getPrivatePrefs(context).edit {
+        putString(CONFIGURATION_JSON, "")
+    }
 }
 
 fun markServiceAsRestarted(context: Context)
 {
-    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-    prefs.edit().putBoolean(SERVICE_RESTART_FLAG, true).apply()
+    getPrivatePrefs(context).edit {
+        putBoolean(SERVICE_RESTART_FLAG, true)
+    }
 }
 
 fun markServiceAsClosed(context: Context)
 {
-    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-    prefs.edit().putBoolean(SERVICE_RESTART_FLAG, false).apply()
+
+    getPrivatePrefs(context).edit {
+        putBoolean(SERVICE_RESTART_FLAG, false).apply()
+    }
 }
 
 fun isServiceRestarted(context: Context) : Boolean
 {
-    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    val prefs = getPrivatePrefs(context)
     return prefs.getBoolean(SERVICE_RESTART_FLAG, false)
 }
 
 fun saveConfigurations(configuration: ConfigurationModule, context: Context)
 {
-    val editor = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).edit()
-    val mapper = ConfigurationMapper()
-    editor.putString(CONFIGURATION_JSON, Gson().toJson(mapper.toConfigurationData(configuration)))
-    editor.apply()
+    getPrivatePrefs(context).edit {
+        val mapper = ConfigurationMapper()
+        putString(CONFIGURATION_JSON, Gson().toJson(mapper.toConfigurationData(configuration)))
+    }
 }
 
 fun readConfigurations(configuration: ConfigurationModule, context: Context)
 {
-    val prefs = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
+    val prefs = getPrivatePrefs(context)
     val json = prefs.getString(CONFIGURATION_JSON, "")!!
 
     if (json.isNotBlank()) {
