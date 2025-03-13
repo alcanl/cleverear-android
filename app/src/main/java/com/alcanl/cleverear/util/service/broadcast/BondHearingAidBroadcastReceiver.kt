@@ -1,7 +1,5 @@
 package com.alcanl.cleverear.util.service.broadcast
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.Intent
@@ -10,6 +8,7 @@ import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.util.EarSide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -18,7 +17,6 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
     @Inject
     lateinit var configuration : ConfigurationModule
 
-    @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?)
     {
         super.onReceive(context, intent)
@@ -42,7 +40,7 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
     private fun handleStateBonded()
     {
 
-        with(configuration) {
+        configuration.apply {
 
             if (!isDoubleDeviceConnection)
                 hearingAidMap[earSide]?.apply {
@@ -70,7 +68,7 @@ class BondHearingAidBroadcastReceiver @Inject constructor(): HiltBroadcastReceiv
     }
     private fun handleStateNotBonded(context: Context)
     {
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
             .setCancelable(true)
             .setMessage(R.string.dialog_unpaired_device_text)
             .setPositiveButton(R.string.alert_dialog_connection_problem_ok_button) {_,_ -> configuration.isConnected = false; exitProcess(1)}

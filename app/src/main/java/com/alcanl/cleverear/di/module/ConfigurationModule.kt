@@ -78,7 +78,12 @@ object ConfigurationModule {
         isConnected = try {
                 if (hearingAidMap.isEmpty())
                     false
-                else hearingAidMap.all { it.value.isConnected }
+                else if (isDoubleDeviceConnection) {
+                    hearingAidMap.all { it.value.isConnected }
+                }
+                else
+                    hearingAidMap[earSide]?.isConnected ?: false
+
         } catch (_ : Throwable) { false }
     }
 

@@ -250,6 +250,7 @@ class SplashActivity : AppCompatActivity(), IEventListener {
             }
         }
     }
+
     private fun checkPrefs()
     {
         val addressLeft = getLeftHearingAidAddress(this)
