@@ -330,10 +330,7 @@ class ControlFragment : Fragment(), IEventListener {
         var count = 0
         try {
             (0..<hearingAid.numberOfMemories).forEach {
-                if (hearingAid.wirelessControl?.memoryEnabled(
-                        ParameterSpace.value(it)
-                    )!!
-                ) ++count
+                if (hearingAid.wirelessControl?.memoryEnabled(ParameterSpace.value(it)) == true) ++count
             }
         } catch (_: ArkException) {}
 

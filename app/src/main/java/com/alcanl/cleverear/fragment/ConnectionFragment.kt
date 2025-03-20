@@ -308,20 +308,22 @@ class ConnectionFragment : Fragment(), IEventListener {
                             show()
                         }
                         else -> {
-                            textViewDeviceState.apply {
-                                text = getSpannableDeviceString(
-                                    requireContext(),
-                                    hearingAidMap[EarSide.Left]!!
-                                )
-                                show()
-                            }
-                            textViewDeviceStateSecond.apply {
-                                text = getSpannableDeviceString(
-                                    requireContext(),
-                                    hearingAidMap[EarSide.Right]!!
-                                )
-                                show()
-                            }
+                            if (hearingAidMap[EarSide.Left] != null)
+                                textViewDeviceState.apply {
+                                    text = getSpannableDeviceString(
+                                        requireContext(),
+                                        hearingAidMap[EarSide.Left]!!
+                                    )
+                                    show()
+                                }
+                            if (hearingAidMap[EarSide.Right] != null)
+                                textViewDeviceStateSecond.apply {
+                                    text = getSpannableDeviceString(
+                                        requireContext(),
+                                        hearingAidMap[EarSide.Right]!!
+                                    )
+                                    show()
+                                }
                         }
                     }
                 }
