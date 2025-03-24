@@ -78,25 +78,17 @@ fun hasLocationCoarsePermission(activity: FragmentActivity) : Boolean
 
 fun hasBluetoothPermission(activity: AppCompatActivity) : Boolean
 {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        ContextCompat.checkSelfPermission(
-            activity,
-            Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.BLUETOOTH_SCAN
-                ) == PackageManager.PERMISSION_GRANTED
+    return when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+        }
+        else -> {
+            ContextCompat.checkSelfPermission(activity, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED
+        }
     }
-    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        ContextCompat.checkSelfPermission(
-            activity,
-            ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    else
-        ContextCompat.checkSelfPermission(
-            activity,
-            ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
 }
 
 fun hasBackgroundLocationPermission(context: Context): Boolean
