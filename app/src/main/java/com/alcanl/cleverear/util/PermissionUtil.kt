@@ -14,15 +14,15 @@ import androidx.fragment.app.FragmentActivity
 
 fun checkAndRequestPermissionForN(activity: AppCompatActivity, requestCode: Int)
 {
-    if (ContextCompat.checkSelfPermission(activity, ACCESS_COARSE_LOCATION) !=
+    if (ContextCompat.checkSelfPermission(activity, ACCESS_FINE_LOCATION) !=
         PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_ADMIN) !=
         PackageManager.PERMISSION_GRANTED
     )
         ActivityCompat.requestPermissions(
             activity,
             arrayOf(
-                ACCESS_COARSE_LOCATION,
                 ACCESS_FINE_LOCATION,
+                ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH_ADMIN,
                 Manifest.permission.BLUETOOTH
             ),
