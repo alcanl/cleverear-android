@@ -12,6 +12,7 @@
     <string name="toast_unknown_problem_text" translatable="true">Es ist ein unbekanntes Problem aufgetreten. Bitte starten Sie die Anwendung neu.</string>
     <string name="textview_mode_text">Modus</string>
     <string name="textview_channel_text">Kanal</string>
+    <string name="toast_turn_on_gps">Bitte schalten Sie die GPS-Standortfunktion ein</string>
     <string name="permission_given_un_success_text" translatable="true">Berechtigung wurde nicht erteilt</string>
     <string name="permission_given_success_text" translatable="true">Berechtigung erfolgreich erteilt</string>
     <string name="alert_dialog_foreground_service_inactive_text" translatable="true">CleverEar wird Ihre Geräteverbindung nicht mehr verfolgen!</string>

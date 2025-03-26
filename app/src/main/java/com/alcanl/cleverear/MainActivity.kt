@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.location.LocationManager.GPS_PROVIDER
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize()
+        scanGPS()
         checkBluetoothPermission()
 
         if (!mIsBluetoothPermissionsGranted) {
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume()
     {
         super.onResume()
+        scanGPS()
         checkBluetoothPermission()
 
         if (mIsWebViewActive)
@@ -106,7 +109,8 @@ class MainActivity : AppCompatActivity() {
                 (this, R.anim.translate_button_right_to_left)
         )
 
-        if (mIsBluetoothPermissionsGranted)
+        if (mIsBluetoothPermissionsGranted && configuration.isBluetoothEnabled &&
+            getSystemService(LocationManager::class.java).isProviderEnabled(GPS_PROVIDER))
             showBatteryVoltageForConnectionDialog(this)
     }
 
@@ -158,23 +162,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun scanBluetoothPermissions()
     {
+        scanGPS()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             checkAndRequestPermissionForS(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            scanGPS()
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
             checkAndRequestPermissionForQ(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
-        }
-        else {
-            scanGPS()
+        else
             checkAndRequestPermissionForN(this, BLUETOOTH_PERMISSION_REQUEST_CODE)
-        }
+
     }
 
     private fun scanGPS()
     {
         val locationManager : LocationManager = getSystemService(LocationManager::class.java)
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
             Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply { gpsActivityResultLauncher.launch(this) }
+            Toast.makeText(this, R.string.toast_turn_on_gps, Toast.LENGTH_LONG).show()
         }
     }
 

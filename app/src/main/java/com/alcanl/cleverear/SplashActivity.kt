@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -256,30 +257,33 @@ class SplashActivity : AppCompatActivity(), IEventListener {
         val addressLeft = getLeftHearingAidAddress(this)
         val addressRight = getRightHearingAidAddress(this)
 
-        when {
-            addressLeft.isNotEmpty() && addressRight.isNotEmpty() ->
-                configuration.apply {
-                    isDoubleDeviceConnection = true
-                    isConnectedBefore = true
-                    mAddressArray = arrayOf(addressLeft, addressRight)
-                }
+        if (getSystemService(BluetoothManager::class.java).adapter.isEnabled &&
+            getSystemService(LocationManager::class.java).isProviderEnabled(LocationManager.GPS_PROVIDER))
+            when {
+                addressLeft.isNotEmpty() && addressRight.isNotEmpty() ->
+                    configuration.apply {
+                        isDoubleDeviceConnection = true
+                        isConnectedBefore = true
+                        mAddressArray = arrayOf(addressLeft, addressRight)
+                    }
 
-            addressLeft.isNotEmpty() ->
-                configuration.apply {
-                    earSide = EarSide.Left
-                    isConnectedBefore = true
-                    mAddressArray = arrayOf(addressLeft)
-                }
+                addressLeft.isNotEmpty() ->
+                    configuration.apply {
+                        earSide = EarSide.Left
+                        isConnectedBefore = true
+                        mAddressArray = arrayOf(addressLeft)
+                    }
 
-            addressRight.isNotEmpty() ->
-                configuration.apply {
-                    earSide = EarSide.Right
-                    isConnectedBefore = true
-                    mAddressArray = arrayOf(addressRight)
-                }
+                addressRight.isNotEmpty() ->
+                    configuration.apply {
+                        earSide = EarSide.Right
+                        isConnectedBefore = true
+                        mAddressArray = arrayOf(addressRight)
+                    }
 
-            else -> mAddressArray = emptyArray()
-        }
+                else -> mAddressArray = emptyArray()
+            }
+        else mAddressArray = emptyArray()
     }
 
     private fun initialize()

@@ -16,6 +16,7 @@
     <string name="button_info_context_text" translatable="false">User Manual</string>
     <string name="volume_common_slider_desc" translatable="false">Dual Volume Slider</string>
     <string name="aux_common_slider_desc" translatable="false">Dual Aux Slider</string>
+    <string name="toast_turn_on_gps" translatable="true">Please Turn On the Gps Location</string>
     <string name="mic_common_slider_desc" translatable="false">Dual Mic Slider</string>
     <string name="aux_left_slider_desc" translatable="false">Aux Left Slider</string>
     <string name="aux_right_slider_desc" translatable="false">Aux Right Slider</string>

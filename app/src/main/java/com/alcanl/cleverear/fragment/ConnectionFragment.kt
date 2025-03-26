@@ -25,6 +25,7 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.fitting.event.listener.IEventListener
 import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.MANUFACTURER_CODE_LEFT
 import com.alcanl.cleverear.util.MANUFACTURER_CODE_RIGHT
 import com.alcanl.cleverear.util.adapter.DeviceListAdapter
 import com.alcanl.cleverear.util.dialog.createDeviceDisconnectSuccessDialog
@@ -211,8 +212,8 @@ class ConnectionFragment : Fragment(), IEventListener {
     {
         if (isVisible) {
             Thread.sleep(2000)
-            mBleDeviceSet.add(event.hearingAid)
-            lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
+            if (mBleDeviceSet.add(event.hearingAid))
+                lifecycleScope.launch(Dispatchers.Main) { addHearingAidToListCallback(event.hearingAid) }
         }
     }
 
@@ -404,6 +405,9 @@ class ConnectionFragment : Fragment(), IEventListener {
 
             adapter!!.add(device.toString())
 
+            if (device.manufacturerData.isBlank())
+                device.manufacturerData = if (configuration.earSide == EarSide.Left) MANUFACTURER_CODE_LEFT else MANUFACTURER_CODE_RIGHT
+
             if (configuration.isDoubleDeviceConnection && device.manufacturerData.recognizeEarSide() == EarSide.Right)
                 deviceListAdapter.changeColorToRed(mDeviceCount, device.manufacturerData.substring(0, 6))
 
@@ -443,10 +447,14 @@ class ConnectionFragment : Fragment(), IEventListener {
         val selectedDevice = searchHearingAidInList(pos)
 
         if (selectedDevice != null) {
-            mSelectedHearingAid = HearingAid(
-                selectedDevice.address, selectedDevice.name, selectedDevice.rssi,
-                selectedDevice.manufacturerData, selectedDevice.manufacturerData.recognizeEarSide()
-            )
+            mSelectedHearingAid = if (selectedDevice.manufacturerData.isBlank())
+                HearingAid(selectedDevice.address, selectedDevice.name, selectedDevice.rssi,
+                    selectedDevice.manufacturerData, configuration.earSide)
+            else
+                HearingAid(
+                    selectedDevice.address, selectedDevice.name, selectedDevice.rssi,
+                    selectedDevice.manufacturerData, selectedDevice.manufacturerData.recognizeEarSide()
+                )
 
             configuration.hearingAidMap[configuration.earSide] = mSelectedHearingAid
             finalizeConnectionConfiguration()

@@ -16,7 +16,7 @@
     <string name="textview_scan_process_scanning_text" translatable="true">Taranıyor</string>
     <string name="textview_scan_process_connected_text" translatable="true">Bağlı</string>
     <string name="textview_volume_text">Ses ve Pil</string>
-    <string name="textview_advanced_description_text" translatable="true">Geişmiş ekranında cihazınızı bir Connect Line ile eşleştirmek için\n Stream modunu ve kanalını belirleyebilir,\nAyrıca cihazın mikrofon ve Stream Aux seviyelerini kolayca ayarlayabilirsiniz</string>
+    <string name="textview_advanced_description_text" translatable="true">Gelişmiş ekranında cihazınızı bir Connect Line ile eşleştirmek için\n Stream modunu ve kanalını belirleyebilir,\nAyrıca cihazın mikrofon ve Stream Aux seviyelerini kolayca ayarlayabilirsiniz</string>
     <string name="toast_channel_and_mode_set_text" translatable="true">Mod %d ve Kanal %d Connect-Line-Streaming eşleşmesi için cihaz ayarlandı</string>
     <string name="textview_control_description_text" translatable="true">Kontrol ekranında cihazınız pil değerini takip edebilir,\nses ve program seçeneklerini ayarlayabilirsiniz</string>
     <string name="dialog_connection_requires_battery_voltage_text" translatable="true">Şarjlı pil ile çalışan modeller ile bağlantı için pil seviyesi %50 altında olmamalıdır</string>
@@ -38,7 +38,7 @@
     <string name="textview_tlm_step_count_text" translatable="true">Adım Sayısı :</string>
     <string name="button_enable_tracking_text" translatable="true">Takibi Aktif Et</string>
     <string name="button_disable_tracking_text" translatable="true">Takibi Devre Dışı Bırak</string>
-    <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nBağlı hiçbir cihaz modeli bu özelliği desteklememektedir</string>
+    <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nCihazınız bu özelliği desteklememektedir</string>
     <string name="navbar_beacon_text" translatable="true">Ölçümler</string>
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>
     <string name="toast_no_permission_splash_activity" translatable="true">Uygulama İçin Zorunlu İzinlerin Kabul Edilmesi Gerekmektedir</string>
@@ -50,6 +50,7 @@
     <string name="textview_left_device_text">Sol Kulak</string>
     <string name="textview_right_device_text">Sağ Kulak</string>
     <string name="switch_dual_device_text">Binaural Kullanım</string>
+    <string name="toast_turn_on_gps">Lütfen konum bilgisini aktif hale getirin</string>
     <string name="toast_no_permission">Bluetooth İzinleri Bulunamadı</string>
     <string name="toast_no_device_selected">Seçili Cihaz Bulunamadı</string>
     <string name="dialog_contact_save_success_text">Kontakt Numarası Kaydedildi</string>
