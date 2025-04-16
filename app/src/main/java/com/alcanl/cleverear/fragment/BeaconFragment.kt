@@ -1,11 +1,15 @@
 package com.alcanl.cleverear.fragment
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
@@ -276,6 +281,15 @@ class BeaconFragment : Fragment(), IEventListener {
             handleNotSupportedHearingAid()
         else
             handleEddystoneTLM()
+
+        if (ContextCompat.checkSelfPermission(requireActivity(), ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(
+                    ACCESS_FINE_LOCATION
+                ), 11
+            )
+        }
     }
 
     private fun initialize()
@@ -317,20 +331,29 @@ class BeaconFragment : Fragment(), IEventListener {
     {
         ADPayloadParser.getInstance().parse(scanRecord).forEach {
 
-            if (it is EddystoneTLM)
+            if (it is EddystoneTLM) {
                 with(configuration) {
-                    if (hearingAidMap.none { ha -> ha.value.address == address })
-                        return
+                   // if (hearingAidMap.none { ha -> ha.value.address == address })
+                     //   return
 
                     if (isDoubleDeviceConnection)
                         when (address) {
-                            hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address)
-                            hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address)
+                            hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(
+                                it,
+                                address
+                            )
+
+                            hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(
+                                it,
+                                address
+                            )
+
                             else -> {}
                         }
                     else
                         eddyStoneMap[earSide]?.setEddystoneProperties(it, address)
                 }
+            }
         }
     }
 
