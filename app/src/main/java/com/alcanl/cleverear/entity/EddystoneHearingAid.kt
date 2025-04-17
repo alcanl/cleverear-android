@@ -13,14 +13,14 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
         0,0, 0.0, 0L, 0L, 0L,
         false, 0L, false, false, "")
 
-    private fun setStepCount(stepCountFirstData: Int, stepCountSecondData: Int)
+    private fun setStepCount(stepCountFirstData: UInt, stepCountSecondData: UInt)
     {
-        stepCount = ((stepCountFirstData shl 8) and stepCountSecondData).toLong()
+        stepCount += ((stepCountFirstData shl 8) or stepCountSecondData).toLong()
     }
 
-    private fun setTemperatureData(tempFirstData: Int, tempSecondData: Int)
+    private fun setTemperatureData(tempFirstData: UInt, tempSecondData: UInt)
     {
-        temperature = (((tempFirstData shl 8) and tempSecondData) / 1000).toDouble()
+        temperature = (((tempFirstData shl 8) or tempSecondData).toInt()).toDouble() / 1000
     }
 
     fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM)
@@ -31,25 +31,16 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
     @OptIn(ExperimentalStdlibApi::class)
     fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String)
     {
-        eddystoneTLM.data.forEach { Log.i("Test", it.toString()) }
         macAddress = mac
         tlmVersion = eddystoneTLM.tlmVersion
         temperature = eddystoneTLM.beaconTemperature.toDouble()
         batteryVoltage = eddystoneTLM.batteryVoltage
         advertisementCount = eddystoneTLM.advertisementCount
         elapsedTime = eddystoneTLM.elapsedTime
-        isFallen = eddystoneTLM.data[38].toHexString().toBoolean()
-        isFallenSecond = eddystoneTLM.data[39].toHexString().toBoolean()
-        setStepCount(eddystoneTLM.data[36].toInt(), eddystoneTLM.data[37].toInt())
-        setTemperatureData(eddystoneTLM.data[12].toInt(), eddystoneTLM.data[13].toInt())
-
-        //it.data.forEach { byte -> Log.d("raw data", byte.toString()) }
-        //6 - 15 kapalı
-        //ikincisi left shift + or
-        //12 13 sıcaklık
-        //14 15 step
-        //16 free fall bool
-        //17 bool defa 0 düşme yine
+        isFallen = eddystoneTLM.data[10].toHexString().toBoolean()
+        isFallenSecond = eddystoneTLM.data[11].toHexString().toBoolean()
+        setStepCount(eddystoneTLM.data[8].toUInt(), eddystoneTLM.data[9].toUInt())
+        setTemperatureData(eddystoneTLM.data[6].toUInt(), eddystoneTLM.data[7].toUInt())
 
         val version = eddystoneTLM.tlmVersion
         Log.d(BeaconFragment::class.simpleName, version.toString())
