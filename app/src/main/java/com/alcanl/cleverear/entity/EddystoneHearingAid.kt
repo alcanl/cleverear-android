@@ -1,7 +1,5 @@
 package com.alcanl.cleverear.entity
 
-import android.util.Log
-import com.alcanl.cleverear.fragment.BeaconFragment
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 
 data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, var temperature : Double,
@@ -18,9 +16,9 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
         stepCount += ((stepCountFirstData shl 8) or stepCountSecondData).toLong()
     }
 
-    private fun setTemperatureData(tempFirstData: UInt, tempSecondData: UInt)
+    private fun setTemperatureData(tempFirstData: String, tempSecondData: String)
     {
-        temperature = (((tempFirstData shl 8) or tempSecondData).toInt()).toDouble() / 1000
+        temperature = (tempFirstData + tempSecondData).toLong(16).toDouble() / 1000
     }
 
     fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM)
@@ -33,29 +31,12 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
     {
         macAddress = mac
         tlmVersion = eddystoneTLM.tlmVersion
-        temperature = eddystoneTLM.beaconTemperature.toDouble()
         batteryVoltage = eddystoneTLM.batteryVoltage
         advertisementCount = eddystoneTLM.advertisementCount
         elapsedTime = eddystoneTLM.elapsedTime
-        isFallen = eddystoneTLM.data[10].toHexString().toBoolean()
-        isFallenSecond = eddystoneTLM.data[11].toHexString().toBoolean()
+        isFallen = eddystoneTLM.data[10].toUInt() == 1u
+        isFallenSecond = eddystoneTLM.data[11].toUInt() == 1u
         setStepCount(eddystoneTLM.data[8].toUInt(), eddystoneTLM.data[9].toUInt())
-        setTemperatureData(eddystoneTLM.data[6].toUInt(), eddystoneTLM.data[7].toUInt())
-
-        val version = eddystoneTLM.tlmVersion
-        Log.d(BeaconFragment::class.simpleName, version.toString())
-
-        val voltage = eddystoneTLM.batteryVoltage
-        Log.d(BeaconFragment::class.simpleName, voltage.toString())
-
-        val temperature = eddystoneTLM.beaconTemperature
-        Log.d(BeaconFragment::class.simpleName, temperature.toString())
-
-        val count = eddystoneTLM.advertisementCount
-        Log.d(BeaconFragment::class.simpleName, count.toString())
-
-        val elapsed = eddystoneTLM.elapsedTime
-        Log.d(BeaconFragment::class.simpleName, elapsed.toString())
-
+        setTemperatureData(eddystoneTLM.data[6].toHexString(), eddystoneTLM.data[7].toHexString())
     }
 }

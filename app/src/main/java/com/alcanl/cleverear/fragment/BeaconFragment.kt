@@ -1,9 +1,8 @@
 package com.alcanl.cleverear.fragment
 
-import android.Manifest
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -35,6 +34,9 @@ import com.alcanl.cleverear.util.BUNDLE_INTENT_FROM_SPLASH
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.WHAT_START_SHIMMER
 import com.alcanl.cleverear.util.WHAT_STOP_SHIMMER
+import com.alcanl.cleverear.util.dialog.showFallenDeviceWarningDialog
+import com.alcanl.cleverear.util.dialog.showHighTemperatureWarningDialog
+import com.alcanl.cleverear.util.dialog.showLowTemperatureWarningDialog
 import com.alcanl.cleverear.util.extension.startTextAlphaAnimation
 import com.alcanl.cleverear.util.getEmergencyNumber
 import com.alcanl.cleverear.util.getLeftHearingAidModelNumber
@@ -104,7 +106,7 @@ class BeaconFragment : Fragment(), IEventListener {
                 is VolumeEvent -> onVolumeEventReceived(event)
                 is MemoryEvent -> onMemoryEventReceived(event)
                 is BatteryEvent -> onBatteryEventReceived(event)
-                is ConnectionEvent -> onConnectionEventReceived(event)
+                //is ConnectionEvent -> onConnectionEventReceived(event)
             }
     }
 
@@ -333,8 +335,8 @@ class BeaconFragment : Fragment(), IEventListener {
 
             if (it is EddystoneTLM) {
                 with(configuration) {
-                   // if (hearingAidMap.none { ha -> ha.value.address == address })
-                     //   return
+                   //if (hearingAidMap.none { ha -> ha.value.address == address })
+                     //  return
 
                     if (isDoubleDeviceConnection)
                         when (address) {
@@ -404,21 +406,25 @@ class BeaconFragment : Fragment(), IEventListener {
         {
             mWeakReference.get()?.binding?.let {
                 if (earSide == EarSide.Left) {
-                    it.textViewLeftDeviceTLMVersion.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
-                    it.textViewLeftDeviceTLMAdvertisementCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
-                    it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString().substring(0, hearingAid.temperature.toString().length - 2))
                     it.textViewLeftDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
-                    it.textViewLeftDeviceTLMBatteryVoltage.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
-                    it.textViewLeftDeviceTLMElapsedTime.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
                 else {
-                    it.textViewRightDeviceTLMVersion.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.tlmVersion.toString())
-                    it.textViewRightDeviceTLMAdvertisementCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.advertisementCount.toString())
                     it.textViewRightDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
                     it.textViewRightDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
-                    it.textViewRightDeviceTLMBatteryVoltage.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.batteryVoltage.toString())
-                    it.textViewRightDeviceTLMElapsedTime.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.elapsedTime.toString())
                 }
+
+                if (hearingAid.isFallen || hearingAid.isFallenSecond) {
+                    showFallenDeviceWarningDialog(mWeakReference.get()?.requireActivity() as Activity)
+                    hearingAid.isFallen = false
+                    hearingAid.isFallenSecond = false
+                }
+
+                if (hearingAid.temperature > 38)
+                    showHighTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
+
+                else if (hearingAid.temperature <= 34)
+                    showLowTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
             }
         }
 

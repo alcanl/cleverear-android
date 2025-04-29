@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.util.dialog
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -29,6 +30,66 @@ fun showBatteryVoltageForConnectionDialog(activity: AppCompatActivity)
         )
         .body(
             activity.getString(R.string.dialog_connection_requires_battery_voltage_text),
+            color = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .icon(R.drawable.icon_warning_new, true)
+        .onPositive(
+            activity.getString(R.string.alert_dialog_connection_problem_ok_button),
+            buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+            textColor = ContextCompat.getColor(activity, android.R.color.white)
+        ).show()
+}
+
+fun showLowTemperatureWarningDialog(activity: Activity)
+{
+    AwesomeDialog.build(activity)
+        .position(AwesomeDialog.POSITIONS.CENTER)
+        .title(
+            activity.getString(R.string.dialog_info_title),
+            titleColor = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .body(
+            "Anormal düşük sıcaklık algılandı!",
+            color = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .icon(R.drawable.icon_warning_new, true)
+        .onPositive(
+            activity.getString(R.string.alert_dialog_connection_problem_ok_button),
+            buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+            textColor = ContextCompat.getColor(activity, android.R.color.white)
+        ).show()
+}
+
+fun showFallenDeviceWarningDialog(activity: Activity)
+{
+    AwesomeDialog.build(activity)
+        .position(AwesomeDialog.POSITIONS.CENTER)
+        .title(
+            activity.getString(R.string.dialog_info_title),
+            titleColor = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .body(
+            "Cihaz düşme algılandı!",
+            color = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .icon(R.drawable.icon_warning_new, true)
+        .onPositive(
+            activity.getString(R.string.alert_dialog_connection_problem_ok_button),
+            buttonBackgroundColor = com.google.android.material.R.color.design_default_color_secondary_variant,
+            textColor = ContextCompat.getColor(activity, android.R.color.white)
+        ).show()
+}
+
+fun showHighTemperatureWarningDialog(activity: Activity)
+{
+    AwesomeDialog.build(activity)
+        .position(AwesomeDialog.POSITIONS.CENTER)
+        .title(
+            activity.getString(R.string.dialog_info_title),
+            titleColor = ContextCompat.getColor(activity, android.R.color.black)
+        )
+        .body(
+            "Anormal yüksek sıcaklık algılandı!",
             color = ContextCompat.getColor(activity, android.R.color.black)
         )
         .icon(R.drawable.icon_warning_new, true)
