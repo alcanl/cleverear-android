@@ -5,6 +5,9 @@
     <string name="main_logo_description_text" translatable="false">Ear Technic Logo</string>
     <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
+    <string name="dialog_low_temp_text" translatable="true">Lower then 35 degree temperature detected!!</string>
+    <string name="dialog_high_temp_text" translatable="true">Higher then 38 degree temperature detected!</string>
+    <string name="dialog_device_fall_text" translatable="true">High fall detected!</string>
     <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>
     <string name="app_version_text" translatable="false">v 3.2.4</string>
@@ -141,13 +144,18 @@ This message has been automatically sent by the CleverEar system for information
     <string name="service_notification_start_channel_id" translatable="false">CleverEarService</string>
     <string name="service_notification_start_channel_name" translatable="false">ServiceNotification</string>
     <string name="dialog_info_title" translatable="true">Info</string>
+    <string name="dialog_warning_title" translatable="true">Warning</string>
     <string name="button_retry_text" translatable="true">Retry</string>
     <string name="textview_tlm_version_text" translatable="true">TLM Version :</string>
     <string name="textview_tlm_battery_voltage_text" translatable="true">TLM Battery Voltage :</string>
-    <string name="textview_tlm_temperature_text" translatable="true">Temperature :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">Body Temperature</string>
     <string name="textview_tlm_advertisement_count_text" translatable="true">Advertisement Count :</string>
     <string name="textview_tlm_elapsed_time_text" translatable="true">Elapsed Time :</string>
-    <string name="textview_tlm_step_count_text" translatable="true">Step Count :</string>
+    <string name="textview_tlm_low_temperature_text" translatable="true">Low Temperature</string>
+    <string name="textview_tlm_high_temperature_text" translatable="true">High Temperature</string>
+    <string name="textview_tlm_temperature_range_text" translatable="true">Normal Range : 35.0 °C - 38.0 °C</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Steps</string>
+    <string name="textview_tlm_today_text" translatable="true">Today</string>
     <string name="button_enable_tracking_text" translatable="true">Enable Tracking</string>
     <string name="button_disable_tracking_text" translatable="true">Disable Tracking</string>
     <string name="dialog_contact_save_success_text">The Contact Number Has Saved</string>

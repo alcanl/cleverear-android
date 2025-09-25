@@ -9,10 +9,12 @@
     <color name="black_overlay">#66000000</color>
     <color name="default_button_color">#A8A3A3</color>
     <color name="right_device_slider">#900D09</color>
-    <color name="left_device_slider">#FF01579B</color>
+    <color name="left_device_slider">#01579B</color>
     <color name="colorGrayText">#C3C4C8</color>
     <color name="secondary_variant">#018786</color>
+    <color name="green_variant">#01C878</color>
     <color name="design_default_color_secondary_variant">#018786</color>
+
 </resources>
 
 

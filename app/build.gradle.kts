@@ -26,12 +26,16 @@ android {
         }
     }
     namespace = "com.alcanl.cleverear"
-    compileSdk = 35
+    compileSdk = 36
+
+    packaging.jniLibs {
+        useLegacyPackaging = false
+    }
 
     defaultConfig {
         applicationId = "com.eartechnic.Biyonix"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 341
         versionName = "3.2.5"
 
@@ -70,18 +74,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        target {
+            compilerOptions {
+                optIn.add("kotlin.RequiresOptIn")
+            }
+        }
     }
     dataBinding.enable = true
     buildFeatures {
         viewBinding = true
         buildConfig = true
     }
-    buildToolsVersion = "35.0.0"
+    buildToolsVersion = "36.0.0"
 }
 
 dependencies {
@@ -104,9 +112,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("com.androidplot:androidplot-core:1.5.10")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
+    implementation("com.androidplot:androidplot-core:1.5.11")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.55")
     implementation("com.github.wisalmuhammad:Android-Battery-View:1.0.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0") {
@@ -126,8 +134,8 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.55")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.8.0")
-    implementation("androidx.compose.material:material:1.8.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.8.1")
+    implementation("androidx.compose.material:material:1.8.1")
 }
 
 kapt {

@@ -1,11 +1,7 @@
 package com.alcanl.cleverear.util.service
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
@@ -16,7 +12,6 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.os.Build
@@ -24,20 +19,23 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Message
+import android.telephony.SmsManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
+import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
+import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isServiceRestarted
+import com.alcanl.cleverear.util.notification.createServiceNotification
+import com.alcanl.cleverear.util.notification.handleConnectedNotification
+import com.alcanl.cleverear.util.notification.showNotification
 import com.alcanl.cleverear.util.readConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
 import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastReceiver
@@ -59,33 +57,26 @@ class AutoConnectService : Service()
 {
     @Inject
     lateinit var threadPool: ExecutorService
-
     @Inject
     lateinit var configuration: ConfigurationModule
-
     @Inject
     lateinit var scheduledExecutor: ScheduledExecutorService
-
     @Inject
     lateinit var productManager: ProductManager
-
     @Inject
     lateinit var eventHandler: EventHandler
-
     @Inject
     lateinit var mDisconnectReceiver : DeviceDisconnectBroadcastReceiver
-
     @Inject
     lateinit var mDeviceFoundReceiver : DeviceFoundBroadcastReceiver
-
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
-
     private var mConnectorThread: Future<*>? = null
-
     private lateinit var mHandler: AutoConnectHandler
-
     private lateinit var mConnectedNotification: Notification
+    private lateinit var mFallenDeviceNotification: Notification
+    private lateinit var mHighTemperatureNotification: Notification
+    private lateinit var mLowTemperatureNotification: Notification
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
@@ -146,11 +137,11 @@ class AutoConnectService : Service()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 startForeground(
                     1,
-                    createServiceNotification(),
+                    createServiceNotification(this),
                     FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE or FOREGROUND_SERVICE_TYPE_LOCATION
                 )
             else
-                startForeground(1, createServiceNotification())
+                startForeground(1, createServiceNotification(this))
 
             mHandler = AutoConnectHandler(this)
             configuration.isServiceOnBoard = true
@@ -158,7 +149,7 @@ class AutoConnectService : Service()
             checkDeviceEddystoneValues()
 
         } catch (ex: Exception) {
-            Log.e(AutoConnectService::class.simpleName, "Service Initialize Error")
+            Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
 
@@ -169,7 +160,7 @@ class AutoConnectService : Service()
             val service = mWeakReference.get()!!
 
             when (msg.what) {
-            WHAT_BACKGROUND_CONNECTED -> service.showNotification(service.mConnectedNotification)
+            WHAT_BACKGROUND_CONNECTED -> showNotification(service.mConnectedNotification, service)
             }
             super.handleMessage(msg)
         }
@@ -200,7 +191,7 @@ class AutoConnectService : Service()
             override fun onScanResult(callbackType: Int, result: ScanResult?)
             {
                 if (result?.device?.address == hearingAid.macAddress)
-                    hearingAid.reSetEddyStoneProperties(EddystoneTLM(17, 0x16, result.scanRecord?.bytes))
+                    hearingAid.reSetEddyStoneProperties(EddystoneTLM(17, 0x16, result.scanRecord?.bytes), this@AutoConnectService)
             }
         }
 
@@ -218,7 +209,7 @@ class AutoConnectService : Service()
 
     private fun sendDeviceFellSMS(serialNumber: String)
     {
-        /*try {
+        try {
             val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
             val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
             val smsManager = getSystemService(SmsManager::class.java)
@@ -226,7 +217,7 @@ class AutoConnectService : Service()
 
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
-        }*/
+        }
     }
 
     private fun scheduledThreadCallback(intent: Intent?)
@@ -262,7 +253,7 @@ class AutoConnectService : Service()
             }
 
             if (isConnected()) {
-                mConnectedNotification = handleConnectedNotification(intent!!)
+                mConnectedNotification = handleConnectedNotification(intent!!, this)
                 configuration.apply {
                     isConnected = true
                     canBondDeviceReConnect = false
@@ -347,44 +338,5 @@ class AutoConnectService : Service()
         finally {
             adapter.cancelDiscovery()
         }
-    }
-
-    private fun createServiceNotification() : Notification
-    {
-        return NotificationCompat.Builder(this, getString(R.string.service_notification_start_channel_id))
-            .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle(getString(R.string.service_notification_start_service_text))
-            .setOngoing(true)
-            .setAutoCancel(false)
-            .build()
-    }
-
-    private fun handleConnectedNotification(intent: Intent) : Notification
-    {
-        getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel(getString(R.string.service_notification_channel_id), getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT))
-
-        val pendingIntent = PendingIntent.getActivity(this, 5, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        return createConnectedNotification(pendingIntent)
-    }
-
-    private fun showNotification(notification: Notification)
-    {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED)
-            NotificationManagerCompat.from(this).notify(2, notification)
-    }
-
-    private fun createConnectedNotification(pendingIntent: PendingIntent) : Notification
-    {
-        return NotificationCompat.Builder(this, getString(R.string.service_notification_channel_id))
-            .setSmallIcon(R.drawable.cleverear_logo)
-            .setContentTitle(getString(R.string.notification_reconnect_text))
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .build()
     }
 }

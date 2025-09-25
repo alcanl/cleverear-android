@@ -73,8 +73,8 @@ class BeaconFragmentTest {
                 with(configuration) {
 
                         when (address) {
-                            EDDYSTONE_LEFT_DEVICE_ADDRESS -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address)
-                            EDDYSTONE_RIGHT_DEVICE_ADDRESS -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address)
+                            EDDYSTONE_LEFT_DEVICE_ADDRESS -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(it, address, appContext)
+                            EDDYSTONE_RIGHT_DEVICE_ADDRESS -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(it, address, appContext)
                             else -> {}
                         }
                 }

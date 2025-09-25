@@ -1,9 +1,12 @@
 package com.alcanl.cleverear.entity
 
+import android.content.Context
+import com.alcanl.cleverear.util.readStepCount
+import com.alcanl.cleverear.util.saveStepCount
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 
-data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, var temperature : Double,
-                               var advertisementCount : Long, var elapsedTime : Long, var stepCount : Long,
+data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, @Volatile var temperature : Double,
+                               var advertisementCount : Long, var elapsedTime : Long, @Volatile var stepCount : Long,
                                var isFallen : Boolean, var distance : Long, var isFallenSecond : Boolean,
                                var isTrackingActive : Boolean, var macAddress: String) {
 
@@ -11,9 +14,10 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
         0,0, 0.0, 0L, 0L, 0L,
         false, 0L, false, false, "")
 
-    private fun setStepCount(stepCountFirstData: UInt, stepCountSecondData: UInt)
+    private fun setStepCount(stepCountFirstData: String, stepCountSecondData: String, context: Context)
     {
-        stepCount += ((stepCountFirstData shl 8) or stepCountSecondData).toLong()
+        stepCount = readStepCount(context, macAddress) + (stepCountFirstData + stepCountSecondData).toLong(16)
+        saveStepCount(stepCount, context, macAddress)
     }
 
     private fun setTemperatureData(tempFirstData: String, tempSecondData: String)
@@ -21,13 +25,16 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
         temperature = (tempFirstData + tempSecondData).toLong(16).toDouble() / 1000
     }
 
-    fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM)
+    fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM, context: Context)
     {
-        setEddystoneProperties(eddystoneTLM, macAddress)
+        setEddystoneProperties(eddystoneTLM, macAddress, context)
     }
 
+    fun isLowTemperature() = temperature < 35.0
+    fun isHighTemperature() = temperature < 38.0
+
     @OptIn(ExperimentalStdlibApi::class)
-    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String)
+    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String, context: Context)
     {
         macAddress = mac
         tlmVersion = eddystoneTLM.tlmVersion
@@ -36,7 +43,7 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, v
         elapsedTime = eddystoneTLM.elapsedTime
         isFallen = eddystoneTLM.data[10].toUInt() == 1u
         isFallenSecond = eddystoneTLM.data[11].toUInt() == 1u
-        setStepCount(eddystoneTLM.data[8].toUInt(), eddystoneTLM.data[9].toUInt())
+        setStepCount(eddystoneTLM.data[8].toHexString(), eddystoneTLM.data[9].toHexString(), context)
         setTemperatureData(eddystoneTLM.data[6].toHexString(), eddystoneTLM.data[7].toHexString())
     }
 }

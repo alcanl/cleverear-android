@@ -291,3 +291,12 @@ fun determineHearingAidObjects(configuration: ConfigurationModule, context: Cont
            hearingAidMap[EarSide.Right] = getRightSideHearingAid(context)
     }
 }
+
+fun saveStepCount(stepCount: Long, context: Context, deviceMac: String)
+{
+    getPrivatePrefs(context).edit {
+        putLong(STEP_COUNT + deviceMac, stepCount)
+    }
+}
+
+fun readStepCount(context: Context, deviceMac: String) = getPrivatePrefs(context).getLong(STEP_COUNT + deviceMac, 0)

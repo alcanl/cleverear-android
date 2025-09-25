@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CleverEar</string>
+    <string name="dialog_high_temp_text" translatable="true">38 dereceden yüksek seviye sıcaklık tespit edildi!</string>
+    <string name="dialog_low_temp_text" translatable="true">35 dereceden düşük seviye sıcaklık tespit edildi!</string>
     <string name="button_single_device_connection_text">Tek Cihaz İle Bağlantı</string>
     <string name="button_double_device_connection_text">Çift Cihaz İle Bağlantı</string>
     <string name="textview_detect_device_text">Tarama Başlat</string>
+    <string name="dialog_warning_title" translatable="true">Uyarı</string>
+    <string name="dialog_device_fall_text" translatable="true">Düşme tespit edildi!</string>
     <string name="textview_device_detection_not_found_text">Cihaz Bulunamadı</string>
     <string name="textview_device_detection_device_connected_text">Cihaza Bağlanıldı</string>
     <string name="textview_device_detection_connection_in_process_text">Cihaza Bağlanılıyor</string>
@@ -32,10 +36,14 @@
     <string name="textview_eddystone_description_text" translatable="true">Anlık Cihaz Ölçüm Verileri</string>
     <string name="textview_tlm_version_text" translatable="true">TLM Versiyon :</string>
     <string name="textview_tlm_battery_voltage_text" translatable="true">TLM Pil Voltajı :</string>
-    <string name="textview_tlm_temperature_text" translatable="true">TLM Sıcaklık :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">Vücut Sıcaklığı</string>
+    <string name="textview_tlm_low_temperature_text" translatable="true">Düşük Sıcaklık</string>
+    <string name="textview_tlm_high_temperature_text" translatable="true">Yüksek Sıcaklık</string>
+    <string name="textview_tlm_temperature_range_text" translatable="true">Normal Aralık : 35.0 °C - 38.0 °C</string>
     <string name="textview_tlm_advertisement_count_text" translatable="true">Yayın Sayısı :</string>
     <string name="textview_tlm_elapsed_time_text" translatable="true">Gecikme Zamanı :</string>
-    <string name="textview_tlm_step_count_text" translatable="true">Adım Sayısı :</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Adımlar</string>
+    <string name="textview_tlm_today_text" translatable="true">Bugün</string>
     <string name="button_enable_tracking_text" translatable="true">Takibi Aktif Et</string>
     <string name="button_disable_tracking_text" translatable="true">Takibi Devre Dışı Bırak</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nCihazınız bu özelliği desteklememektedir</string>

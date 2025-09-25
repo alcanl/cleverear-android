@@ -113,13 +113,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="15dp"
-                        android:layout_marginTop="15dp"
                         android:layout_marginEnd="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:layoutDirection="ltr"
                         android:padding="8dp"
-                        app:borderColor="#A8A3A3"
+                        app:borderColor="#01579B"
                         app:borderCornerRadius="8dp"
                         app:borderStrokeWidth="2.2dp"
                         app:labelText="@string/textview_left_device_text"
@@ -128,77 +129,190 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent">
 
-                        <LinearLayout
-                            android:layout_marginTop="15dp"
-                            android:layout_marginBottom="15dp"
+                        <com.google.android.material.card.MaterialCardView
+                            style="?attr/materialCardViewElevatedStyle"
+                            android:backgroundTint="@color/ap_transparent"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:checkable="false"
+                            android:clickable="false"
+                            android:focusable="true"
+                            app:cardElevation="0dp">
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@string/textview_tlm_temperature_text"
-                                android:textAlignment="center"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
+                                android:layout_height="match_parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewLeftDeviceTLMTemperature"
-                                android:textAlignment="center"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@{config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? String.valueOf(config.INSTANCE.eddyStoneMap.get(EarSide.Left).component3()) : ContextCompat.getString(context, R.string.textview_eddystone_not_supporting_text)  : ContextCompat.getString(context, R.string.textview_eddystone_not_connected_device_text)}"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}" />
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewSteps"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="@string/textview_tlm_step_count_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toTopOf="@+id/appCompatTextViewStepCount"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="TextContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewStepCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Left).component6() : 0}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.green_variant : R.color.default_button_color)}"
+                                    android:textSize="35sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/textview_tlm_today_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="10sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/appCompatTextViewStepCount"
+                                    tools:ignore="SmallSp,TextContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/imageViewStepsLeft"
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginEnd="30dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintVertical_bias="0.609"
+                                    app:srcCompat="@{ContextCompat.getDrawable(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null  ? R.drawable.outline_body_system_60_variant : R.drawable.outline_body_system_60_gray)}"
+                                    tools:ignore="ImageContrastCheck" />
 
 
-                        <LinearLayout
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="15dp"
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/materialCardView2"
+                            style="?attr/materialCardViewElevatedStyle"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:backgroundTint="@color/ap_transparent"
+                            android:checkable="false"
+                            android:clickable="false"
+                            android:focusable="true"
+                            android:padding="0dp"
+                            app:cardElevation="0dp">
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@string/textview_tlm_step_count_text"
-                                android:textAlignment="center"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
+                                android:layout_height="match_parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewLeftDeviceTLMStepCount"
-                                android:textAlignment="center"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@{config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? String.valueOf(config.INSTANCE.eddyStoneMap.get(EarSide.Left).component6()) : ContextCompat.getString(context, R.string.textview_eddystone_not_supporting_text)  : ContextCompat.getString(context, R.string.textview_eddystone_not_connected_device_text)}"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.left_device_slider : R.color.default_button_color : R.color.default_button_color)}" />
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextTemperatureDesc"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="@string/textview_tlm_temperature_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toTopOf="@+id/appCompatTextViewTemperature"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="TextContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewTemperature"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Left).component3() : 0.0}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.right_device_slider : R.color.default_button_color)}"
+                                    android:textSize="35sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginTop="2dp"
+                                    android:visibility="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Left).isLowTemperature() || config.INSTANCE.eddyStoneMap.get(EarSide.Left).isHighTemperature() ? View.VISIBLE : View.INVISIBLE : View.INVISIBLE}"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Left).isLowTemperature() ? ContextCompat.getString(context, R.string.textview_tlm_low_temperature_text) : config.INSTANCE.eddyStoneMap.get(EarSide.Left).isLowTemperature() ? ContextCompat.getString(context, R.string.textview_tlm_high_temperature_text) : ContextCompat.getString(context, R.string.empty_string) : ContextCompat.getString(context, R.string.empty_string)}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="10sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/appCompatTextViewTemperature"
+                                    tools:ignore="SmallSp" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/imageViewTemperatureLeft"
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginEnd="30dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintVertical_bias="0.487"
+                                    app:srcCompat="@{ContextCompat.getDrawable(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null  ? R.drawable.outline_dew_point_60_right : R.drawable.outline_dew_point_60_gray)}"
+                                    tools:ignore="ImageContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="2dp"
+                                    android:text="@string/textview_tlm_temperature_range_text"
+                                    android:textAlignment="center"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="8sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="SmallSp,TextContrastCheck" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <FrameLayout
-                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            android:layout_below="@+id/materialCardView2"
+                            android:layout_marginTop="10dp">
 
                             <androidx.appcompat.widget.AppCompatButton
                                 android:id="@+id/buttonTrackLeftDevice"
                                 android:layout_width="90dp"
                                 android:layout_height="60dp"
                                 android:layout_gravity="end |center_vertical"
-                                android:layout_marginEnd="10dp"
-                                android:textAlignment="center"
-                                android:backgroundTint="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.secondary_variant : R.color.default_button_color : R.color.default_button_color)}"
+                                android:layout_marginEnd="30dp"
+                                android:backgroundTint="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? R.color.secondary_variant : R.color.default_button_color)}"
                                 android:enabled="@{config.INSTANCE.hearingAidMap.get(EarSide.Left) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Left).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? true : false : false}"
                                 android:onClick="@{() -> viewModel.handleActiveEddystoneTrackingButton(EarSide.Left)}"
                                 android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Left) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Left).isTrackingActive() ? R.string.button_disable_tracking_text : R.string.button_enable_tracking_text : R.string.button_enable_tracking_text}"
+                                android:textAlignment="center"
                                 android:textColor="@color/white"
                                 android:textSize="11sp"
                                 tools:ignore="DuplicateSpeakableTextCheck,RtlCompat,SpeakableTextPresentCheck,TextContrastCheck" />
@@ -222,12 +336,15 @@
                         android:id="@+id/groupBoxLayoutRightDevice"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_margin="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:layoutDirection="ltr"
                         android:padding="8dp"
-                        app:borderColor="#A8A3A3"
+                        app:borderColor="#900D09"
                         app:borderCornerRadius="8dp"
                         app:borderStrokeWidth="2.2dp"
                         app:labelText="@string/textview_right_device_text"
@@ -236,65 +353,179 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent">
 
-                        <LinearLayout
-                            android:layout_marginTop="15dp"
-                            android:layout_marginBottom="15dp"
+                        <com.google.android.material.card.MaterialCardView
+                            style="?attr/materialCardViewElevatedStyle"
+                            android:backgroundTint="@color/ap_transparent"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content"
+                            android:padding="0dp"
+                            android:checkable="false"
+                            android:clickable="false"
+                            android:focusable="true"
+                            app:cardElevation="0dp">
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@string/textview_tlm_temperature_text"
-                                android:textAlignment="center"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.right_device_slider : R.color.default_button_color : R.color.default_button_color)}"                                tools:ignore="TextContrastCheck" />
+                                android:layout_height="match_parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewRightDeviceTLMTemperature"
-                                android:textAlignment="center"
-                                android:textSize="16sp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@{config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? String.valueOf(config.INSTANCE.eddyStoneMap.get(EarSide.Right).component3()) : ContextCompat.getString(context, R.string.textview_eddystone_not_supporting_text)  : ContextCompat.getString(context, R.string.textview_eddystone_not_connected_device_text)}"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.right_device_slider : R.color.default_button_color : R.color.default_button_color)}" />
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewStepsRight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="@string/textview_tlm_step_count_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toTopOf="@+id/appCompatTextViewStepCountRight"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="TextContrastCheck" />
 
-                        <LinearLayout
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="15dp"
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewStepCountRight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Right) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Right).component6() : 0}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.green_variant : R.color.default_button_color)}"
+                                    android:textSize="35sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/textview_tlm_today_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="10sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/appCompatTextViewStepCountRight"
+                                    tools:ignore="SmallSp,TextContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/imageViewStepsRight"
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginEnd="30dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintVertical_bias="0.487"
+                                    app:srcCompat="@{ContextCompat.getDrawable(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null  ? R.drawable.outline_body_system_60_variant : R.drawable.outline_body_system_60_gray)}"
+                                    tools:ignore="ImageContrastCheck" />
+
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/materialCardView"
+                            style="?attr/materialCardViewElevatedStyle"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:backgroundTint="@color/ap_transparent"
+                            android:checkable="false"
+                            android:clickable="false"
+                            android:focusable="true"
+                            android:padding="0dp"
+                            app:cardElevation="0dp">
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="16sp"
-                                android:text="@string/textview_tlm_step_count_text"
-                                android:textAlignment="center"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.right_device_slider : R.color.default_button_color : R.color.default_button_color)}"
-                                tools:ignore="TextContrastCheck" />
+                                android:layout_height="match_parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/textViewRightDeviceTLMStepCount"
-                                android:textAlignment="center"
-                                android:textSize="16sp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@{config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? String.valueOf(config.INSTANCE.eddyStoneMap.get(EarSide.Right).component6()) : ContextCompat.getString(context, R.string.textview_eddystone_not_supporting_text)  : ContextCompat.getString(context, R.string.textview_eddystone_not_connected_device_text)}"
-                                android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.right_device_slider : R.color.default_button_color : R.color.default_button_color)}" />
-                        </LinearLayout>
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextTemperatureDescRight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="@string/textview_tlm_temperature_text"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="20sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toTopOf="@+id/appCompatTextViewTemperatureRight"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="TextContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextViewTemperatureRight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Right) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Right).component3() : 0.0}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.right_device_slider : R.color.default_button_color)}"
+                                    android:textSize="35sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/appCompatTextView4"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Right) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Right).isLowTemperature() ? ContextCompat.getString(context, R.string.textview_tlm_low_temperature_text) : config.INSTANCE.eddyStoneMap.get(EarSide.Right).isLowTemperature() ? ContextCompat.getString(context, R.string.textview_tlm_high_temperature_text) : ContextCompat.getString(context, R.string.empty_string) : ContextCompat.getString(context, R.string.empty_string)}"
+                                    android:visibility="@{config.INSTANCE.eddyStoneMap.get(EarSide.Right) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Right).isLowTemperature() || config.INSTANCE.eddyStoneMap.get(EarSide.Right).isHighTemperature() ? View.VISIBLE : View.INVISIBLE : View.INVISIBLE}"
+                                    android:textAlignment="viewStart"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="10sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toBottomOf="@+id/appCompatTextViewTemperatureRight"
+                                    tools:ignore="SmallSp" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/imageViewTemperatureRight"
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginEnd="30dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintVertical_bias="0.487"
+                                    app:srcCompat="@{ContextCompat.getDrawable(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null  ? R.drawable.outline_dew_point_60_right : R.drawable.outline_dew_point_60_gray)}"
+                                    tools:ignore="ImageContrastCheck" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="2dp"
+                                    android:text="@string/textview_tlm_temperature_range_text"
+                                    android:textAlignment="center"
+                                    android:textColor="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? R.color.black : R.color.default_button_color)}"
+                                    android:textSize="8sp"
+                                    android:textStyle="normal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    tools:ignore="SmallSp,TextContrastCheck" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <FrameLayout
-                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_below="@+id/materialCardView"
+                            android:layout_marginTop="10dp"
                             android:orientation="horizontal">
 
                             <androidx.appcompat.widget.AppCompatTextView
@@ -314,15 +545,15 @@
                                 android:layout_width="90dp"
                                 android:layout_height="60dp"
                                 android:layout_gravity="end | center_vertical"
-                                android:layout_marginEnd="10dp"
-                                android:textAlignment="center"
+                                android:layout_marginEnd="30dp"
                                 android:backgroundTint="@{ContextCompat.getColor(context, config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? R.color.secondary_variant : R.color.default_button_color : R.color.default_button_color)}"
                                 android:enabled="@{config.INSTANCE.hearingAidMap.get(EarSide.Right) != null ? config.INSTANCE.hearingAidMap.get(EarSide.Right).getModelNumber().equals(GlobalKt.EDDYSTONE_SUPPORTED_AID_MODEL_NUMBER) ? true : false : false}"
                                 android:onClick="@{() -> viewModel.handleActiveEddystoneTrackingButton(EarSide.Right)}"
                                 android:text="@{config.INSTANCE.eddyStoneMap.get(EarSide.Right) != null ? config.INSTANCE.eddyStoneMap.get(EarSide.Right).isTrackingActive() ? R.string.button_disable_tracking_text : R.string.button_enable_tracking_text : R.string.button_enable_tracking_text}"
+                                android:textAlignment="center"
                                 android:textColor="@color/white"
                                 android:textSize="11sp"
-                                tools:ignore="RtlCompat,SpeakableTextPresentCheck,TextContrastCheck"/>
+                                tools:ignore="RtlCompat,SpeakableTextPresentCheck,TextContrastCheck" />
                         </FrameLayout>
 
                     </ir.programmerplus.groupbox.GroupBoxLayout>

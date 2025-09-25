@@ -1,5 +1,6 @@
 package com.alcanl.cleverear.fragment
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -106,7 +107,7 @@ class BeaconFragment : Fragment(), IEventListener {
                 is VolumeEvent -> onVolumeEventReceived(event)
                 is MemoryEvent -> onMemoryEventReceived(event)
                 is BatteryEvent -> onBatteryEventReceived(event)
-                //is ConnectionEvent -> onConnectionEventReceived(event)
+                is ConnectionEvent -> onConnectionEventReceived(event)
             }
     }
 
@@ -170,7 +171,6 @@ class BeaconFragment : Fragment(), IEventListener {
         }
     }
 
-    @SuppressLint("ImplicitSamInstance")
     private fun onConnectionEventReceived(event: EventObject)
     {
         if (event is ConnectionEvent && event.connectionData == 1)
@@ -274,6 +274,24 @@ class BeaconFragment : Fragment(), IEventListener {
     {
         super.onResume()
 
+        if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(
+                    ACCESS_COARSE_LOCATION
+                ), 12
+            )
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(
+                    ACCESS_FINE_LOCATION
+                ), 11
+            )
+        }
+
         binding.shimmerLayout.apply {
             stopShimmer()
             hideShimmer()
@@ -283,15 +301,6 @@ class BeaconFragment : Fragment(), IEventListener {
             handleNotSupportedHearingAid()
         else
             handleEddystoneTLM()
-
-        if (ContextCompat.checkSelfPermission(requireActivity(), ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                requireActivity(), arrayOf(
-                    ACCESS_FINE_LOCATION
-                ), 11
-            )
-        }
     }
 
     private fun initialize()
@@ -342,18 +351,20 @@ class BeaconFragment : Fragment(), IEventListener {
                         when (address) {
                             hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(
                                 it,
-                                address
+                                address,
+                                requireContext()
                             )
 
                             hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(
                                 it,
-                                address
+                                address,
+                                requireContext()
                             )
 
                             else -> {}
                         }
                     else
-                        eddyStoneMap[earSide]?.setEddystoneProperties(it, address)
+                        eddyStoneMap[earSide]?.setEddystoneProperties(it, address, requireContext())
                 }
             }
         }
@@ -399,19 +410,17 @@ class BeaconFragment : Fragment(), IEventListener {
     }
 
     class BeaconHandler(fragment: BeaconFragment) : Handler(Looper.myLooper()!!) {
-
         private val mWeakReference = WeakReference(fragment)
-
         private fun fillTextViewsForDeviceCallback(earSide: EarSide, hearingAid: EddystoneHearingAid)
         {
             mWeakReference.get()?.binding?.let {
                 if (earSide == EarSide.Left) {
-                    it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString().substring(0, hearingAid.temperature.toString().length - 2))
-                    it.textViewLeftDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    //it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString().substring(0, hearingAid.temperature.toString().length - 2))
+                    //it.textViewLeftDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
                 }
                 else {
-                    it.textViewRightDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
-                    it.textViewRightDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    //it.textViewRightDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    //it.textViewRightDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
                 }
 
                 if (hearingAid.isFallen || hearingAid.isFallenSecond) {
@@ -420,10 +429,10 @@ class BeaconFragment : Fragment(), IEventListener {
                     hearingAid.isFallenSecond = false
                 }
 
-                if (hearingAid.temperature > 38)
+                if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature > 38)
                     showHighTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
 
-                else if (hearingAid.temperature <= 34)
+                else if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature <= 34)
                     showLowTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
             }
         }

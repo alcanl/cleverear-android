@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CleverEar</string>
+    <string name="dialog_low_temp_text" translatable="true">Extrem niedrige Temperatur erkannt!</string>
     <string name="button_single_device_connection_text">Ein Hörgerät koppeln</string>
     <string name="button_double_device_connection_text">Zwei Hörgeräte koppeln</string>
     <string name="textview_detect_device_text">Gerät suchen</string>
+    <string name="dialog_warning_title" translatable="true">Warning</string>
+    <string name="dialog_high_temp_text" translatable="true">Extrem hohe Temperatur erkannt!</string>
+    <string name="dialog_device_fall_text" translatable="true">Sturz aus großer Höhe erkannt!</string>
     <string name="textview_device_detection_not_found_text">Gerät nicht gefunden</string>
     <string name="textview_device_detection_device_connected_text">Verbunden mit Gerät</string>
     <string name="textview_device_detection_connection_in_process_text">Verbinden mit dem Gerät</string>
@@ -40,10 +44,14 @@
     <string name="textview_eddystone_description_text" translatable="true">Echtzeit-Gerätemessdaten</string>
     <string name="textview_tlm_version_text" translatable="true">TLM-Version :</string>
     <string name="textview_tlm_battery_voltage_text" translatable="true">Batteriespannung :</string>
-    <string name="textview_tlm_temperature_text" translatable="true">Temperatur :</string>
+    <string name="textview_tlm_temperature_text" translatable="true">Körpertemperatur</string>
+    <string name="textview_tlm_low_temperature_text" translatable="true">Niedrige Temperatur</string>
+    <string name="textview_tlm_high_temperature_text" translatable="true">Hohe Temperatur</string>
+    <string name="textview_tlm_temperature_range_text" translatable="true">Normaler Bereich: 35,0 °C – 38,0 °C</string>
+    <string name="textview_tlm_today_text" translatable="true">Heute</string>
     <string name="textview_tlm_advertisement_count_text" translatable="true">Werbung Zähler :</string>
     <string name="textview_tlm_elapsed_time_text" translatable="true">Verstrichene Zeit :</string>
-    <string name="textview_tlm_step_count_text" translatable="true">Schrittzähler :</string>
+    <string name="textview_tlm_step_count_text" translatable="true">Schrittzähler</string>
     <string name="button_enable_tracking_text" translatable="true">Verfolgung aktivieren</string>
     <string name="button_disable_tracking_text" translatable="true">Verfolgung deaktivieren</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">Es tut uns leid\nKein verbundenes Gerätemodell unterstützt die Messverfolgungsfunktion</string>

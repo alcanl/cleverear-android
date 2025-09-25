@@ -45,11 +45,11 @@ fun showLowTemperatureWarningDialog(activity: Activity)
     AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
         .title(
-            activity.getString(R.string.dialog_info_title),
+            activity.getString(R.string.dialog_warning_title),
             titleColor = ContextCompat.getColor(activity, android.R.color.black)
         )
         .body(
-            "Anormal düşük sıcaklık algılandı!",
+            activity.getString(R.string.dialog_low_temp_text),
             color = ContextCompat.getColor(activity, android.R.color.black)
         )
         .icon(R.drawable.icon_warning_new, true)
@@ -65,11 +65,11 @@ fun showFallenDeviceWarningDialog(activity: Activity)
     AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
         .title(
-            activity.getString(R.string.dialog_info_title),
+            activity.getString(R.string.dialog_warning_title),
             titleColor = ContextCompat.getColor(activity, android.R.color.black)
         )
         .body(
-            "Cihaz düşme algılandı!",
+            activity.getString(R.string.dialog_device_fall_text),
             color = ContextCompat.getColor(activity, android.R.color.black)
         )
         .icon(R.drawable.icon_warning_new, true)
@@ -85,11 +85,11 @@ fun showHighTemperatureWarningDialog(activity: Activity)
     AwesomeDialog.build(activity)
         .position(AwesomeDialog.POSITIONS.CENTER)
         .title(
-            activity.getString(R.string.dialog_info_title),
+            activity.getString(R.string.dialog_warning_title),
             titleColor = ContextCompat.getColor(activity, android.R.color.black)
         )
         .body(
-            "Anormal yüksek sıcaklık algılandı!",
+            activity.getString(R.string.dialog_high_temp_text),
             color = ContextCompat.getColor(activity, android.R.color.black)
         )
         .icon(R.drawable.icon_warning_new, true)
