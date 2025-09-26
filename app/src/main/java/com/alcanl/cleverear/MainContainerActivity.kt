@@ -1,6 +1,5 @@
 package com.alcanl.cleverear
 
-import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
@@ -15,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -83,13 +81,6 @@ class MainContainerActivity : AppCompatActivity() {
                 ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         else true
-    }
-
-    val mSendSmsPermission by lazy {
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.SEND_SMS
-        ) == PackageManager.PERMISSION_GRANTED
     }
 
     val settingsLauncher =
@@ -195,7 +186,6 @@ class MainContainerActivity : AppCompatActivity() {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
     private fun navigateTo(fragment: Fragment)
     {
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -206,7 +196,6 @@ class MainContainerActivity : AppCompatActivity() {
         fragmentTransaction.replace(binding.navHostMainContainer.id, fragment)
         fragmentTransaction.commit()
     }
-
     private fun initializeNavController()
     {
         binding.navigationViewContainer.setOnItemSelectedListener {
@@ -245,24 +234,10 @@ class MainContainerActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun hasPermissionsForBluetoothLocation() : Boolean
     {
         return mLocationCoarsePermission && mLocationFinePermission
     }
-
-    fun requestSmsPermission(earSide: EarSide, button: AppCompatButton)
-    {
-        mSelectedTrackingEddystoneEarSide = earSide
-        mTrackingButton = button
-
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.SEND_SMS),
-            SMS_PERMISSION_REQUEST_CODE
-        )
-    }
-
     fun onSMSContactDialogButtonClicked(button: AppCompatButton)
     {
         if (button.id == mDialogSmsInformation.binding.buttonSaveContact.id) {

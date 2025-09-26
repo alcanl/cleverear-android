@@ -44,8 +44,8 @@
     <string name="textview_tlm_elapsed_time_text" translatable="true">Gecikme Zamanı :</string>
     <string name="textview_tlm_step_count_text" translatable="true">Adımlar</string>
     <string name="textview_tlm_today_text" translatable="true">Bugün</string>
-    <string name="button_enable_tracking_text" translatable="true">Takibi Aktif Et</string>
-    <string name="button_disable_tracking_text" translatable="true">Takibi Devre Dışı Bırak</string>
+    <string name="button_enable_tracking_text" translatable="true">Aktif Et</string>
+    <string name="button_disable_tracking_text" translatable="true">İptal Et</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">Üzgünüz\nCihazınız bu özelliği desteklememektedir</string>
     <string name="navbar_beacon_text" translatable="true">Ölçümler</string>
     <string name="button_end_in_situ_text" translatable="true">Testi Sonlandır</string>

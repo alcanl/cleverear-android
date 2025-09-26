@@ -60,6 +60,9 @@ android {
         buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
         buildConfigField("String", "API_KEY_HEADER", "\"${properties.getProperty("API_KEY_HEADER")}\"")
         buildConfigField("String", "API_BASE_URL", "\"${properties.getProperty("API_BASE_URL")}\"")
+        buildConfigField("String", "ACCOUNT_SID", "\"${properties.getProperty("TWILIO_ACCOUNT_SID")}\"")
+        buildConfigField("String", "AUTH_TOKEN", "\"${properties.getProperty("TWILIO_AUTH_TOKEN")}\"")
+        buildConfigField("String", "PHONE_NUMBER", "\"${properties.getProperty("TWILIO_PHONE_NUMBER")}\"")
     }
 
     buildTypes {
@@ -90,6 +93,16 @@ android {
         buildConfig = true
     }
     buildToolsVersion = "36.0.0"
+
+    packaging {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
 }
 
 dependencies {
@@ -117,9 +130,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.55")
     implementation("com.github.wisalmuhammad:Android-Battery-View:1.0.0")
-    implementation("com.squareup.retrofit2:retrofit:2.11.0") {
-        exclude(module = "okhttp")
-    }
+    implementation("com.squareup.retrofit2:retrofit:2.11.0") { exclude(module = "okhttp") }
+    implementation("com.twilio.sdk:twilio:10.9.2")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.4.1")

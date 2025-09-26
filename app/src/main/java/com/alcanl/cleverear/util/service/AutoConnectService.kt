@@ -19,8 +19,10 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Message
-import android.telephony.SmsManager
 import android.util.Log
+import com.alcanl.cleverear.BuildConfig.ACCOUNT_SID
+import com.alcanl.cleverear.BuildConfig.AUTH_TOKEN
+import com.alcanl.cleverear.BuildConfig.PHONE_NUMBER
 import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
@@ -29,12 +31,18 @@ import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
 import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
+import com.alcanl.cleverear.util.WHAT_BACKGROUND_DEVICE_FALL
+import com.alcanl.cleverear.util.WHAT_BACKGROUND_HIGH_TEMPERATURE
+import com.alcanl.cleverear.util.WHAT_BACKGROUND_LOW_TEMPERATURE
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.isConnected
 import com.alcanl.cleverear.util.isServiceRestarted
 import com.alcanl.cleverear.util.notification.createServiceNotification
 import com.alcanl.cleverear.util.notification.handleConnectedNotification
+import com.alcanl.cleverear.util.notification.handleDeviceFellNotification
+import com.alcanl.cleverear.util.notification.handleHighTemperatureNotification
+import com.alcanl.cleverear.util.notification.handleLowTemperatureNotification
 import com.alcanl.cleverear.util.notification.showNotification
 import com.alcanl.cleverear.util.readConfigurations
 import com.alcanl.cleverear.util.service.broadcast.BluetoothStateBroadcastReceiver
@@ -43,6 +51,8 @@ import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.EventHandler
 import com.ark.ProductManager
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
+import com.twilio.Twilio
+import com.twilio.type.PhoneNumber
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
@@ -72,6 +82,7 @@ class AutoConnectService : Service()
     @Inject
     lateinit var mBluetoothStateBroadcastReceiver : BluetoothStateBroadcastReceiver
     private var mConnectorThread: Future<*>? = null
+    private var isScanInProgress = false
     private lateinit var mHandler: AutoConnectHandler
     private lateinit var mConnectedNotification: Notification
     private lateinit var mFallenDeviceNotification: Notification
@@ -97,6 +108,7 @@ class AutoConnectService : Service()
             unregisterReceiver(mDisconnectReceiver)
             unregisterReceiver(mBluetoothStateBroadcastReceiver)
             unregisterReceiver(mDeviceFoundReceiver)
+            Twilio.destroy()
             scheduledExecutor.shutdownNow()
             configuration.setServiceStopAndKeepConnectionIfRequired(this)
             Log.i(AutoConnectService::class.simpleName, "Service Stopped")
@@ -130,6 +142,7 @@ class AutoConnectService : Service()
             registerReceiver(mDisconnectReceiver, IntentFilter(ACTION_ACL_DISCONNECTED))
             registerReceiver(mBluetoothStateBroadcastReceiver, IntentFilter(ACTION_STATE_CHANGED))
             registerReceiver(mDeviceFoundReceiver, IntentFilter(IntentFilter(ACTION_FOUND)))
+            Twilio.init(ACCOUNT_SID, AUTH_TOKEN)
 
             if (isServiceRestarted(this) && !configuration.isMainActivityOnScreen)
                 handleServiceRestart()
@@ -146,7 +159,7 @@ class AutoConnectService : Service()
             mHandler = AutoConnectHandler(this)
             configuration.isServiceOnBoard = true
             checkDeviceConnectionState(intent)
-            checkDeviceEddystoneValues()
+            checkDeviceEddystoneValues(intent)
 
         } catch (ex: Exception) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
@@ -160,7 +173,10 @@ class AutoConnectService : Service()
             val service = mWeakReference.get()!!
 
             when (msg.what) {
-            WHAT_BACKGROUND_CONNECTED -> showNotification(service.mConnectedNotification, service)
+                WHAT_BACKGROUND_CONNECTED -> showNotification(service.mConnectedNotification, service)
+                WHAT_BACKGROUND_DEVICE_FALL -> showNotification(service.mFallenDeviceNotification, service)
+                WHAT_BACKGROUND_LOW_TEMPERATURE -> showNotification(service.mLowTemperatureNotification, service)
+                WHAT_BACKGROUND_HIGH_TEMPERATURE -> showNotification(service.mHighTemperatureNotification, service)
             }
             super.handleMessage(msg)
         }
@@ -168,58 +184,80 @@ class AutoConnectService : Service()
 
     private fun checkDeviceConnectionState(intent: Intent?)
     {
-        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 60, TimeUnit.SECONDS)
+        scheduledExecutor.scheduleWithFixedDelay(({ scheduledThreadCallback(intent!!) }),0, 30, TimeUnit.SECONDS)
     }
 
-    private fun checkDeviceEddystoneValues()
+    private fun checkDeviceEddystoneValues(intent: Intent?)
     {
-        if (configuration.isConnected && !configuration.isMainActivityOnScreen)
+        if (configuration.isConnected)
             configuration.hearingAidMap
                 .filter { it.value.isEddystoneTLM }
-                .filter { configuration.eddyStoneMap[it.key]?.isTrackingActive!! }
                 .map { configuration.eddyStoneMap[it.key]!! }
-                .forEach { eddystoneHearingAid -> scheduledExecutor.scheduleWithFixedDelay({ scheduledEddystoneThreadCallback(eddystoneHearingAid) },
-                    0, 1, TimeUnit.MINUTES) }
+                .forEach { eddystoneHearingAid -> scheduledExecutor.scheduleWithFixedDelay({ scheduledEddystoneThreadCallback(eddystoneHearingAid, intent!!) },
+                    0, 30, TimeUnit.SECONDS) }
     }
 
     @SuppressLint("MissingPermission")
-    private fun scheduledEddystoneThreadCallback(hearingAid: EddystoneHearingAid)
+    private fun scheduledEddystoneThreadCallback(hearingAid: EddystoneHearingAid, intent: Intent)
     {
+        if (configuration.isMainActivityOnScreen || !hearingAid.isTrackingActive)
+            return
+
         val bleScanner = getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
         val scanCallback = object : ScanCallback() {
 
             override fun onScanResult(callbackType: Int, result: ScanResult?)
             {
                 if (result?.device?.address == hearingAid.macAddress)
+                {
                     hearingAid.reSetEddyStoneProperties(EddystoneTLM(17, 0x16, result.scanRecord?.bytes), this@AutoConnectService)
+                    var stopScanFlag = false
+
+                    if (hearingAid.isFallen) {
+                        mFallenDeviceNotification = handleDeviceFellNotification(intent, this@AutoConnectService)
+                        sendDeviceFellSMS(hearingAid.deviceName)
+                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_DEVICE_FALL)
+                        stopScanFlag = true
+                    }
+
+                    else if (hearingAid.isLowTemperature()) {
+                        mLowTemperatureNotification = handleLowTemperatureNotification(intent, this@AutoConnectService)
+                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_LOW_TEMPERATURE)
+                        stopScanFlag = true
+                    }
+
+                    else if (hearingAid.isHighTemperature()) {
+                        mHighTemperatureNotification = handleHighTemperatureNotification(intent, this@AutoConnectService)
+                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_HIGH_TEMPERATURE)
+                        stopScanFlag = true
+                    }
+
+                    if (stopScanFlag)
+                    {
+                        isScanInProgress = false
+                        bleScanner.stopScan(this)
+                    }
+                }
             }
         }
 
         bleScanner.startScan(scanCallback)
-        Thread.sleep(5000)
-        bleScanner.stopScan(scanCallback)
-
-        if (hearingAid.isTrackingActive && hearingAid.isFallen) {
-            val serialNumber = configuration.hearingAidMap
-                .entries.first { it.value.address == hearingAid.macAddress }.value.name
-
-            sendDeviceFellSMS(serialNumber)
-        }
+        isScanInProgress = true
+        mHandler.postDelayed({ if (isScanInProgress) bleScanner.stopScan(scanCallback) }, 10000)
     }
-
     private fun sendDeviceFellSMS(serialNumber: String)
     {
         try {
             val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
             val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
-            val smsManager = getSystemService(SmsManager::class.java)
-            smsManager.sendTextMessage(phoneNumber, null, smsText, null, null)
+            com.twilio.rest.api.v2010.account.Message
+                              .creator(PhoneNumber(phoneNumber), PhoneNumber(PHONE_NUMBER), smsText)
+                              .create()
 
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)
         }
     }
-
     private fun scheduledThreadCallback(intent: Intent?)
     {
         try {

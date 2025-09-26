@@ -25,12 +25,11 @@ class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(acti
 
         setContentView(binding.root)
     }
-
     fun saveSmsContactInformationToPref()
     {
         binding.editTextContactNumber.apply {
             if (text == null || text?.length!! < 10 || !text?.codePoints()?.mapToObj {c -> c.toChar() }?.allMatch(Character::isDigit)!!) {
-                Toast.makeText(context, "", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.toast_invalid_phone_number_format_text), Toast.LENGTH_LONG).show()
                 return
             }
         }

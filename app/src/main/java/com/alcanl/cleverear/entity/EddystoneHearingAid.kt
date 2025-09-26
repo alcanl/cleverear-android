@@ -8,34 +8,30 @@ import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, @Volatile var temperature : Double,
                                var advertisementCount : Long, var elapsedTime : Long, @Volatile var stepCount : Long,
                                var isFallen : Boolean, var distance : Long, var isFallenSecond : Boolean,
-                               var isTrackingActive : Boolean, var macAddress: String) {
+                               var isTrackingActive : Boolean, var macAddress: String, var deviceName: String) {
 
     constructor() : this(
         0,0, 0.0, 0L, 0L, 0L,
-        false, 0L, false, false, "")
-
+        false, 0L, false, false, "", "")
     private fun setStepCount(stepCountFirstData: String, stepCountSecondData: String, context: Context)
     {
         stepCount = readStepCount(context, macAddress) + (stepCountFirstData + stepCountSecondData).toLong(16)
         saveStepCount(stepCount, context, macAddress)
     }
-
     private fun setTemperatureData(tempFirstData: String, tempSecondData: String)
     {
         temperature = (tempFirstData + tempSecondData).toLong(16).toDouble() / 1000
     }
-
     fun reSetEddyStoneProperties(eddystoneTLM: EddystoneTLM, context: Context)
     {
-        setEddystoneProperties(eddystoneTLM, macAddress, context)
+        setEddystoneProperties(eddystoneTLM, macAddress, deviceName, context)
     }
-
-    fun isLowTemperature() = temperature < 35.0
-    fun isHighTemperature() = temperature < 38.0
-
+    fun isLowTemperature() = temperature < 35.0 && temperature != 0.0
+    fun isHighTemperature() = temperature > 38.0
     @OptIn(ExperimentalStdlibApi::class)
-    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String, context: Context)
+    fun setEddystoneProperties(eddystoneTLM: EddystoneTLM, mac: String, name: String, context: Context)
     {
+        deviceName = name
         macAddress = mac
         tlmVersion = eddystoneTLM.tlmVersion
         batteryVoltage = eddystoneTLM.batteryVoltage

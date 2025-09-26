@@ -89,6 +89,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="toast_invalid_phone_number_format_text" translatable="true">Invalid format for a phone number</string>
     <string name="text_active_memory" translatable="true">Active program is </string>
     <string name="empty_string" translatable="false"> </string>
+    <string name="degree_symbol" translatable="false"> °C</string>
     <string name="button_text_one" translatable="false">1</string>
     <string name="button_text_two" translatable="false">2</string>
     <string name="button_text_three" translatable="false">3</string>
@@ -158,7 +159,7 @@ This message has been automatically sent by the CleverEar system for information
     <string name="textview_tlm_today_text" translatable="true">Today</string>
     <string name="button_enable_tracking_text" translatable="true">Enable Tracking</string>
     <string name="button_disable_tracking_text" translatable="true">Disable Tracking</string>
-    <string name="dialog_contact_save_success_text">The Contact Number Has Saved</string>
+    <string name="dialog_contact_save_success_text">The Contact Number Has Been Saved</string>
     <string name="textview_eddystone_tracking_description_text" translatable="true">With activation, the app starts tracking the device notifications in background mode and notifies the user about critical data.\nSuch as high temperature, fallen device or long distance for communication etc.</string>
     <string name="textview_eddystone_description_text" translatable="true">Real-Time\nDevice Measurement Data</string>
     <string name="textview_eddystone_not_supported_text" translatable="true">We are sorry\nNo connected device model supports the measurement tracking feature</string>

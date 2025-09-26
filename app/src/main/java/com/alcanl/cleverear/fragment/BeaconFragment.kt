@@ -302,28 +302,28 @@ class BeaconFragment : Fragment(), IEventListener {
         else
             handleEddystoneTLM()
     }
-
     private fun initialize()
     {
         binding.viewModel = BeaconFragmentListenersViewModel(this)
         mHandler = BeaconHandler(this)
         initializeTrackingButtons()
     }
-
     private fun initializeTrackingButtons()
     {
         configuration.apply {
-            if (getEmergencyNumber(requireContext()).isNotBlank()
-                && getLeftHearingAidModelNumber(requireContext()).isNotBlank())
+            if (getEmergencyNumber(requireContext()).isNotBlank() && getLeftHearingAidModelNumber(requireContext()).isNotBlank())
+            {
+                eddyStoneMap[EarSide.Left]?.isTrackingActive = true
                 binding.buttonTrackLeftDevice.text = getString(R.string.button_disable_tracking_text)
+            }
 
-            if (getEmergencyNumber(requireContext()).isNotBlank()
-                && getRightHearingAidModelNumber(requireContext()).isNotBlank())
+            if (getEmergencyNumber(requireContext()).isNotBlank() && getRightHearingAidModelNumber(requireContext()).isNotBlank())
+            {
+                eddyStoneMap[EarSide.Right]?.isTrackingActive = true
                 binding.buttonTrackRightDevice.text = getString(R.string.button_disable_tracking_text)
-
+            }
         }
     }
-
     @SuppressLint("MissingPermission")
     private fun discoverEddyStoneBeacons()
     {
@@ -344,32 +344,31 @@ class BeaconFragment : Fragment(), IEventListener {
 
             if (it is EddystoneTLM) {
                 with(configuration) {
-                   //if (hearingAidMap.none { ha -> ha.value.address == address })
-                     //  return
 
                     if (isDoubleDeviceConnection)
                         when (address) {
                             hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(
                                 it,
                                 address,
+                                hearingAidMap[EarSide.Left]?.name ?: "",
                                 requireContext()
                             )
 
                             hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(
                                 it,
                                 address,
+                                hearingAidMap[EarSide.Right]?.name ?: "",
                                 requireContext()
                             )
 
                             else -> {}
                         }
                     else
-                        eddyStoneMap[earSide]?.setEddystoneProperties(it, address, requireContext())
+                        eddyStoneMap[earSide]?.setEddystoneProperties(it, address, hearingAidMap[earSide]?.name ?: "",requireContext())
                 }
             }
         }
     }
-
     private fun handleNotSupportedHearingAid()
     {
         with(binding) {
@@ -377,7 +376,6 @@ class BeaconFragment : Fragment(), IEventListener {
             linearLayoutMain.visibility = View.INVISIBLE
         }
     }
-
     private fun handleEddystoneTLM()
     {
         configuration.eddyStoneMap.forEach { (earSide, eddystoneHearingAid) ->
@@ -415,12 +413,12 @@ class BeaconFragment : Fragment(), IEventListener {
         {
             mWeakReference.get()?.binding?.let {
                 if (earSide == EarSide.Left) {
-                    //it.textViewLeftDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString().substring(0, hearingAid.temperature.toString().length - 2))
-                    //it.textViewLeftDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.appCompatTextViewTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString().substring(0, hearingAid.temperature.toString().length - 2))
+                    it.appCompatTextViewStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
                 }
                 else {
-                    //it.textViewRightDeviceTLMTemperature.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
-                    //it.textViewRightDeviceTLMStepCount.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
+                    it.appCompatTextViewTemperatureRight.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.temperature.toString())
+                    it.appCompatTextViewStepCountRight.startTextAlphaAnimation(mWeakReference.get()?.requireContext()!!, hearingAid.stepCount.toString())
                 }
 
                 if (hearingAid.isFallen || hearingAid.isFallenSecond) {
@@ -430,10 +428,31 @@ class BeaconFragment : Fragment(), IEventListener {
                 }
 
                 if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature > 38)
-                    showHighTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
+                {
+                    if (earSide == EarSide.Left)
+                        it.appCompatTextViewTemperatureWarnLeft.visibility = View.VISIBLE
+                    else
+                        it.appCompatTextViewTemperatureWarnRight.visibility = View.VISIBLE
 
-                else if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature <= 34)
+                    showHighTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
+                }
+
+                else if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature <= 35)
+                {
+                    if (earSide == EarSide.Left)
+                        it.appCompatTextViewTemperatureWarnLeft.visibility = View.VISIBLE
+                    else
+                        it.appCompatTextViewTemperatureWarnRight.visibility = View.VISIBLE
+
                     showLowTemperatureWarningDialog(mWeakReference.get()?.requireActivity()!! as Activity)
+                }
+                else
+                {
+                    if (earSide == EarSide.Left)
+                        it.appCompatTextViewTemperatureWarnLeft.visibility = View.INVISIBLE
+                    else
+                        it.appCompatTextViewTemperatureWarnRight.visibility = View.INVISIBLE
+                }
             }
         }
 
@@ -459,15 +478,8 @@ class BeaconFragment : Fragment(), IEventListener {
             }
         }
     }
-
     fun onEddystoneTrackingButtonClicked(earSide: EarSide)
     {
-        if (!(requireActivity() as MainContainerActivity).mSendSmsPermission) {
-            (requireActivity() as MainContainerActivity).requestSmsPermission(earSide,
-                if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)
-            return
-        }
-
         if (getEmergencyNumber(requireContext()).isBlank())
             (requireActivity() as MainContainerActivity).showSMSInformationDialog(earSide,
                 if (earSide == EarSide.Left) binding.buttonTrackLeftDevice else binding.buttonTrackRightDevice)

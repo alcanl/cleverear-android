@@ -23,18 +23,13 @@ import com.alcanl.cleverear.entity.HearingAid
 import com.alcanl.cleverear.util.mapper.ConfigurationMapper
 import com.google.gson.Gson
 import androidx.core.content.edit
-
+import java.time.LocalDate
 
 private fun getPrivatePrefs(context: Context) = context.getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE)
-
 fun getLeftHearingAidAddress(context: Context) = getPrivatePrefs(context).getString(HA_LEFT_ADDRESS, "")!!
-
 fun getRightHearingAidAddress(context: Context) = getPrivatePrefs(context).getString(HA_RIGHT_ADDRESS, "")!!
-
 fun getLeftHearingAidModelNumber(context: Context) = getPrivatePrefs(context).getString(HA_LEFT_NAME, "")!!
-
 fun getRightHearingAidModelNumber(context: Context) = getPrivatePrefs(context).getString(HA_RIGHT_NAME, "")!!
-
 fun saveHearingAidInfoToPrefs(context: Context, hearingAid: HearingAid)
 {
     getPrivatePrefs(context).edit {
@@ -59,7 +54,6 @@ fun saveHearingAidInfoToPrefs(context: Context, hearingAid: HearingAid)
 
     }
 }
-
 fun getLeftSideHearingAid(context: Context) : HearingAid
 {
     val prefs = getPrivatePrefs(context)
@@ -72,7 +66,6 @@ fun getLeftSideHearingAid(context: Context) : HearingAid
 
     return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Left, isEddystoneTLM = isEddystone)
 }
-
 fun getRightSideHearingAid(context: Context) : HearingAid
 {
     val prefs = getPrivatePrefs(context)
@@ -86,23 +79,18 @@ fun getRightSideHearingAid(context: Context) : HearingAid
     return HearingAid(deviceAddress!!, deviceName!!, deviceRSSI, deviceManu!!, EarSide.Right, isEddystoneTLM =  isEddystone)
 
 }
-
 fun saveEmergencyNumberToPrefs(context: Context, phoneNumber: String)
 {
     getPrivatePrefs(context).edit {
         putString(EMERGENCY_NUMBER, phoneNumber)
     }
 }
-
 fun getEmergencyNumber(context: Context) : String = getPrivatePrefs(context).getString(EMERGENCY_NUMBER, "")!!
-
 fun getHearingAidSerialNumber(context: Context, configuration: ConfigurationModule, fittingConfig: FittingConfigurationModule) : String
 {
     return getPrivatePrefs(context).getString(String.format(PREF_DEVICE_SERIAL, configuration.hearingAidMap[fittingConfig.selectedEarSide]?.toString()), "")!!
 }
-
-fun saveHearingAidDTOPref(context: Context, configuration : ConfigurationModule,
-                                  fittingConfig: FittingConfigurationModule, hearingAidDTO: HearingAidDTO?)
+fun saveHearingAidDTOPref(context: Context, configuration : ConfigurationModule, fittingConfig: FittingConfigurationModule, hearingAidDTO: HearingAidDTO?)
 {
     if (hearingAidDTO == null)
         return
@@ -295,8 +283,8 @@ fun determineHearingAidObjects(configuration: ConfigurationModule, context: Cont
 fun saveStepCount(stepCount: Long, context: Context, deviceMac: String)
 {
     getPrivatePrefs(context).edit {
-        putLong(STEP_COUNT + deviceMac, stepCount)
+        putLong(STEP_COUNT + deviceMac + LocalDate.now(), stepCount)
     }
 }
 
-fun readStepCount(context: Context, deviceMac: String) = getPrivatePrefs(context).getLong(STEP_COUNT + deviceMac, 0)
+fun readStepCount(context: Context, deviceMac: String) = getPrivatePrefs(context).getLong(STEP_COUNT + deviceMac + LocalDate.now(), 0)
