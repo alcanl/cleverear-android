@@ -52,8 +52,11 @@ import com.ark.EventHandler
 import com.ark.ProductManager
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import com.twilio.Twilio
-import com.twilio.type.PhoneNumber
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.Credentials
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -215,7 +218,7 @@ class AutoConnectService : Service()
 
                     if (hearingAid.isFallen) {
                         mFallenDeviceNotification = handleDeviceFellNotification(intent, this@AutoConnectService)
-                        sendDeviceFellSMS(hearingAid.deviceName)
+                        threadPool.execute { sendDeviceFellSMS(hearingAid.deviceName) }
                         mHandler.sendEmptyMessage(WHAT_BACKGROUND_DEVICE_FALL)
                         stopScanFlag = true
                     }
@@ -250,9 +253,29 @@ class AutoConnectService : Service()
         try {
             val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
             val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
-            com.twilio.rest.api.v2010.account.Message
-                              .creator(PhoneNumber(phoneNumber), PhoneNumber(PHONE_NUMBER), smsText)
-                              .create()
+
+            val client = OkHttpClient()
+            val credential = Credentials.basic(ACCOUNT_SID, AUTH_TOKEN)
+
+            val formBody = FormBody.Builder()
+                .add("To", phoneNumber!!)
+                .add("From", PHONE_NUMBER)
+                .add("Body", smsText)
+                .build()
+
+            val request = Request.Builder()
+                .url("https://api.twilio.com/2010-04-01/Accounts/$ACCOUNT_SID/Messages.json")
+                .header("Authorization", credential)
+                .post(formBody)
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful)
+                Log.d("Twilio", "SMS sent")
+            else {
+                Log.e("Twilio", "Error: ${response.code()}")
+                Log.e("Twilio", "Error: ${response.body()}")
+            }
 
         } catch (ex: Throwable) {
             Log.e(AutoConnectService::class.simpleName, ex.message!!)

@@ -29,7 +29,7 @@
     <string name="dialog_save_contact_number_textview_text" translatable="true">İşitme cihazı ile ilgili acil durumlarda SMS ile bilgilendirilecek kişinin telefon numarasını kaydederek\n CleverEar İşitme Cihazı Akıllı Takibini\n aktifleştirebilirsiniz.</string>
     <string name="button_cancel_text" translatable="true">İptal</string>
     <string name="button_save_contact_number_text" translatable="true">Numarayı Kaydet</string>
-    <string name="fallen_device_sms_body" translatable="true">CleverEar uygulaması bir yakınınız tarafından kullanılmakta olan %s seri numaralı işitme cihazının yüksekten düşmesine ait bir durum algıladı.\nBu mesaj bilgilendirme amacıyla sistem CleverEar tarafından otomatik olarak gönderilmiştir. Eğer yanlış bir bilgilendirme olduğunu düşünüyorsanız lütfen dikkate almayın.</string>
+    <string name="fallen_device_sms_body" translatable="true">CleverEar bir yakınınız tarafından kullanılmakta olan %s seri numaralı işitme cihazının düşmesine ait bir durum algıladı.</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">Bağlantı Yok</string>
     <string name="textview_eddystone_not_supporting_text" translatable="true">Desteklenmeyen Cihaz</string>
     <string name="toast_update_need_text" translatable="true">Uygulamanın yeni bir versiyonu yayında, devam etmek için lütfen güncelleme yapınız.</string>

@@ -36,7 +36,7 @@
     <string name="dialog_save_contact_number_textview_text" translatable="true">You can activate\nCleverEar Hearing Aid Smart Tracking System\n by saving the phone number of the person who will be informed via SMS in case of emergencies related to the hearing aid.</string>
     <string name="button_cancel_text" translatable="true">Cancel</string>
     <string name="button_save_contact_number_text" translatable="true">Save Contact</string>
-    <string name="fallen_device_sms_body" translatable="true">The CleverEar application has detected a situation involving the fall of a hearing aid with serial number %s, being used by one of your close contacts.
+    <string name="fallen_device_sms_body" translatable="true">The CleverEar application has detected a situation involving the fall of a hearing aid with serial number %s.
 This message has been automatically sent by the CleverEar system for informational purposes. If you believe this is incorrect information, please disregard this message.</string>
     <string name="textview_remote_conf_ha" translatable="true">Remote Fitting</string>
     <string name="textview_eddystone_not_connected_device_text" translatable="true">No Connection</string>
