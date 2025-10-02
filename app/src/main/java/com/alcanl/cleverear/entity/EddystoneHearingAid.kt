@@ -15,8 +15,11 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, @
         false, 0L, false, false, "", "")
     private fun setStepCount(stepCountFirstData: String, stepCountSecondData: String, context: Context)
     {
-        stepCount = readStepCount(context, macAddress) + (stepCountFirstData + stepCountSecondData).toLong(16)
-        saveStepCount(stepCount, context, macAddress)
+        if (readStepCount(context, macAddress) != (stepCountFirstData + stepCountSecondData).toLong(16))
+        {
+            stepCount =  readStepCount(context, macAddress) + (stepCountFirstData + stepCountSecondData).toLong(16)
+            saveStepCount(stepCount, context, macAddress)
+        }
     }
     private fun setTemperatureData(tempFirstData: String, tempSecondData: String)
     {
@@ -41,5 +44,6 @@ data class EddystoneHearingAid(var tlmVersion : Int, var batteryVoltage : Int, @
         isFallenSecond = eddystoneTLM.data[11].toUInt() == 1u
         setStepCount(eddystoneTLM.data[8].toHexString(), eddystoneTLM.data[9].toHexString(), context)
         setTemperatureData(eddystoneTLM.data[6].toHexString(), eddystoneTLM.data[7].toHexString())
+
     }
 }

@@ -76,11 +76,8 @@ class BeaconFragment : Fragment(), IEventListener {
     lateinit var listener : BeaconFragmentEventListener
 
     lateinit var binding: FragmentBeaconBinding
-
     private lateinit var mHandler: BeaconHandler
-
     private var mJob: Job? = null
-
     private val mBluetoothLeScanner by lazy {
         requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
@@ -110,7 +107,6 @@ class BeaconFragment : Fragment(), IEventListener {
                 is ConnectionEvent -> onConnectionEventReceived(event)
             }
     }
-
     private fun onVolumeEventReceived(event: VolumeEvent)
     {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -133,7 +129,6 @@ class BeaconFragment : Fragment(), IEventListener {
             }
         }
     }
-
     private fun onBatteryEventReceived(event: BatteryEvent)
     {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -149,7 +144,6 @@ class BeaconFragment : Fragment(), IEventListener {
             }
         }
     }
-
     private fun onMemoryEventReceived(event: MemoryEvent)
     {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -311,16 +305,22 @@ class BeaconFragment : Fragment(), IEventListener {
     private fun initializeTrackingButtons()
     {
         configuration.apply {
-            if (getEmergencyNumber(requireContext()).isNotBlank() && getLeftHearingAidModelNumber(requireContext()).isNotBlank())
-            {
+            if (getEmergencyNumber(requireContext()).isNotBlank() && getLeftHearingAidModelNumber(requireContext()).isNotBlank()) {
                 eddyStoneMap[EarSide.Left]?.isTrackingActive = true
                 binding.buttonTrackLeftDevice.text = getString(R.string.button_disable_tracking_text)
             }
+            else{
+                eddyStoneMap[EarSide.Left]?.isTrackingActive = false
+                binding.buttonTrackLeftDevice.text = getString(R.string.button_enable_tracking_text)
+            }
 
-            if (getEmergencyNumber(requireContext()).isNotBlank() && getRightHearingAidModelNumber(requireContext()).isNotBlank())
-            {
+            if (getEmergencyNumber(requireContext()).isNotBlank() && getRightHearingAidModelNumber(requireContext()).isNotBlank()) {
                 eddyStoneMap[EarSide.Right]?.isTrackingActive = true
                 binding.buttonTrackRightDevice.text = getString(R.string.button_disable_tracking_text)
+            }
+            else {
+                eddyStoneMap[EarSide.Right]?.isTrackingActive = false
+                binding.buttonTrackRightDevice.text = getString(R.string.button_enable_tracking_text)
             }
         }
     }
@@ -338,6 +338,7 @@ class BeaconFragment : Fragment(), IEventListener {
         configuration.isEddyStoneScanInProgress = true
     }
 
+    @Synchronized
     private fun determineEddystoneBeacons(scanRecord: ByteArray, address: String)
     {
         ADPayloadParser.getInstance().parse(scanRecord).forEach {
@@ -348,18 +349,16 @@ class BeaconFragment : Fragment(), IEventListener {
                     if (isDoubleDeviceConnection)
                         when (address) {
                             hearingAidMap[EarSide.Left]?.address -> eddyStoneMap[EarSide.Left]?.setEddystoneProperties(
-                                it,
-                                address,
-                                hearingAidMap[EarSide.Left]?.name ?: "",
-                                requireContext()
-                            )
+                                    it,
+                                    address,
+                                    hearingAidMap[EarSide.Left]?.name ?: "",
+                                    requireContext())
 
                             hearingAidMap[EarSide.Right]?.address -> eddyStoneMap[EarSide.Right]?.setEddystoneProperties(
                                 it,
                                 address,
                                 hearingAidMap[EarSide.Right]?.name ?: "",
-                                requireContext()
-                            )
+                                requireContext())
 
                             else -> {}
                         }
