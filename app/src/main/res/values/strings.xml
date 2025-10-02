@@ -6,7 +6,7 @@
     <string name="button_single_device_connection_text" translatable="true">Connect For Single Device</string>
     <string name="button_double_device_connection_text" translatable="true">Connect For Double Device</string>
     <string name="dialog_low_temp_text" translatable="true">Lower then 35 degree temperature detected!!</string>
-    <string name="dialog_high_temp_text" translatable="true">Higher then 38 degree temperature detected!</string>
+    <string name="dialog_high_temp_text" translatable="true">Higher then 39 degree temperature detected!</string>
     <string name="dialog_device_fall_text" translatable="true">High fall detected!</string>
     <string name="toast_unknown_problem_text" translatable="true">Some Unknown Problems Occurred. Please Try To Reconnect With The Device.</string>
     <string name="dialog_unpaired_device_text" translatable="true">Device Must Be Paired With Mobile Phone For Configuration</string>

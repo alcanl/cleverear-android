@@ -39,8 +39,8 @@ class CustomDialogSmsInformation (activity: MainContainerActivity) : Dialog(acti
                 with (mWeakReference.get()!!) {
                     val code = this.getString(R.string.edittext_contact_number_national_code_hint)
                     code.substring(1, code.length)
-                } + binding.editTextContactNumber.text?.toString() })
+                }} + binding.editTextContactNumber.text?.toString())
 
-        saveEmergencyNumberToPrefs(mWeakReference.get()!!, phoneNumber!!)
+        saveEmergencyNumberToPrefs(mWeakReference.get()!!, phoneNumber)
     }
 }

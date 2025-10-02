@@ -81,7 +81,6 @@ class BeaconFragment : Fragment(), IEventListener {
     private val mBluetoothLeScanner by lazy {
         requireContext().getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
     }
-
     private val mScanCallback: ScanCallback by lazy {
         object : ScanCallback() {
 
@@ -389,6 +388,7 @@ class BeaconFragment : Fragment(), IEventListener {
         discoverEddyStoneBeacons()
 
         mJob = lifecycleScope.launch(Dispatchers.IO) {
+
             while (isActive) {
                 try {
                     mHandler.apply {
@@ -426,7 +426,7 @@ class BeaconFragment : Fragment(), IEventListener {
                     hearingAid.isFallenSecond = false
                 }
 
-                if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature > 38)
+                if (hearingAid.temperature.toInt() != 0 && hearingAid.temperature > 39)
                 {
                     if (earSide == EarSide.Left)
                         it.appCompatTextViewTemperatureWarnLeft.visibility = View.VISIBLE

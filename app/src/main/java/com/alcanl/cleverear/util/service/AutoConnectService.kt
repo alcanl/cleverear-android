@@ -27,13 +27,12 @@ import com.alcanl.cleverear.R
 import com.alcanl.cleverear.di.module.ConfigurationModule
 import com.alcanl.cleverear.entity.EddystoneHearingAid
 import com.alcanl.cleverear.entity.HearingAid
-import com.alcanl.cleverear.util.EMERGENCY_NUMBER
 import com.alcanl.cleverear.util.EarSide
-import com.alcanl.cleverear.util.SHARED_PREF_DEVICE
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_CONNECTED
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_DEVICE_FALL
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_HIGH_TEMPERATURE
 import com.alcanl.cleverear.util.WHAT_BACKGROUND_LOW_TEMPERATURE
+import com.alcanl.cleverear.util.getEmergencyNumber
 import com.alcanl.cleverear.util.getLeftSideHearingAid
 import com.alcanl.cleverear.util.getRightSideHearingAid
 import com.alcanl.cleverear.util.isConnected
@@ -50,6 +49,7 @@ import com.alcanl.cleverear.util.service.broadcast.DeviceDisconnectBroadcastRece
 import com.alcanl.cleverear.util.service.broadcast.DeviceFoundBroadcastReceiver
 import com.ark.EventHandler
 import com.ark.ProductManager
+import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.EddystoneTLM
 import com.twilio.Twilio
 import dagger.hilt.android.AndroidEntryPoint
@@ -197,7 +197,7 @@ class AutoConnectService : Service()
                 .filter { it.value.isEddystoneTLM }
                 .map { configuration.eddyStoneMap[it.key]!! }
                 .forEach { eddystoneHearingAid -> scheduledExecutor.scheduleWithFixedDelay({ scheduledEddystoneThreadCallback(eddystoneHearingAid, intent!!) },
-                    0, 30, TimeUnit.SECONDS) }
+                    0, 10, TimeUnit.SECONDS) }
     }
 
     @SuppressLint("MissingPermission")
@@ -209,36 +209,36 @@ class AutoConnectService : Service()
         val bleScanner = getSystemService(BluetoothManager::class.java).adapter.bluetoothLeScanner
         val scanCallback = object : ScanCallback() {
 
-            override fun onScanResult(callbackType: Int, result: ScanResult?)
-            {
-                if (result?.device?.address == hearingAid.macAddress)
-                {
-                    hearingAid.reSetEddyStoneProperties(EddystoneTLM(17, 0x16, result.scanRecord?.bytes), this@AutoConnectService)
-                    var stopScanFlag = false
+            override fun onScanResult(callbackType: Int, result: ScanResult?) {
+                ADPayloadParser.getInstance().parse(result?.scanRecord!!.bytes).forEach {
 
-                    if (hearingAid.isFallen) {
-                        mFallenDeviceNotification = handleDeviceFellNotification(intent, this@AutoConnectService)
-                        threadPool.execute { sendDeviceFellSMS(hearingAid.deviceName) }
-                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_DEVICE_FALL)
-                        stopScanFlag = true
-                    }
+                    if (it is EddystoneTLM) {
 
-                    else if (hearingAid.isLowTemperature()) {
-                        mLowTemperatureNotification = handleLowTemperatureNotification(intent, this@AutoConnectService)
-                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_LOW_TEMPERATURE)
-                        stopScanFlag = true
-                    }
+                        hearingAid.reSetEddyStoneProperties(it, this@AutoConnectService)
+                        var stopScanFlag = false
 
-                    else if (hearingAid.isHighTemperature()) {
-                        mHighTemperatureNotification = handleHighTemperatureNotification(intent, this@AutoConnectService)
-                        mHandler.sendEmptyMessage(WHAT_BACKGROUND_HIGH_TEMPERATURE)
-                        stopScanFlag = true
-                    }
+                        if (hearingAid.isFallen) {
+                            mFallenDeviceNotification =
+                                handleDeviceFellNotification(intent, this@AutoConnectService)
+                            threadPool.execute { sendDeviceFellSMS(hearingAid.deviceName) }
+                            mHandler.sendEmptyMessage(WHAT_BACKGROUND_DEVICE_FALL)
+                            stopScanFlag = true
+                        } else if (hearingAid.isLowTemperature()) {
+                            mLowTemperatureNotification =
+                                handleLowTemperatureNotification(intent, this@AutoConnectService)
+                            mHandler.sendEmptyMessage(WHAT_BACKGROUND_LOW_TEMPERATURE)
+                            stopScanFlag = true
+                        } else if (hearingAid.isHighTemperature()) {
+                            mHighTemperatureNotification =
+                                handleHighTemperatureNotification(intent, this@AutoConnectService)
+                            mHandler.sendEmptyMessage(WHAT_BACKGROUND_HIGH_TEMPERATURE)
+                            stopScanFlag = true
+                        }
 
-                    if (stopScanFlag)
-                    {
-                        isScanInProgress = false
-                        bleScanner.stopScan(this)
+                        if (stopScanFlag) {
+                            isScanInProgress = false
+                            bleScanner.stopScan(this)
+                        }
                     }
                 }
             }
@@ -247,18 +247,19 @@ class AutoConnectService : Service()
         bleScanner.startScan(scanCallback)
         isScanInProgress = true
         mHandler.postDelayed({ if (isScanInProgress) bleScanner.stopScan(scanCallback) }, 10000)
+
     }
     private fun sendDeviceFellSMS(serialNumber: String)
     {
         try {
             val smsText = getString(R.string.fallen_device_sms_body).format(serialNumber)
-            val phoneNumber = getSharedPreferences(SHARED_PREF_DEVICE, MODE_PRIVATE).getString(EMERGENCY_NUMBER, "")
+            val phoneNumber = "+" + getEmergencyNumber(this)
 
             val client = OkHttpClient()
             val credential = Credentials.basic(ACCOUNT_SID, AUTH_TOKEN)
 
             val formBody = FormBody.Builder()
-                .add("To", phoneNumber!!)
+                .add("To", phoneNumber)
                 .add("From", PHONE_NUMBER)
                 .add("Body", smsText)
                 .build()

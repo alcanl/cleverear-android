@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CleverEar</string>
-    <string name="dialog_high_temp_text" translatable="true">38 dereceden yüksek seviye sıcaklık tespit edildi!</string>
+    <string name="dialog_high_temp_text" translatable="true">39 dereceden yüksek seviye sıcaklık tespit edildi!</string>
     <string name="dialog_low_temp_text" translatable="true">35 dereceden düşük seviye sıcaklık tespit edildi!</string>
     <string name="button_single_device_connection_text">Tek Cihaz İle Bağlantı</string>
     <string name="button_double_device_connection_text">Çift Cihaz İle Bağlantı</string>
